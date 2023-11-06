@@ -1,0 +1,437 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "ArcanePunk Win64 Debug Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Debug",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Debug Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Debug",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunk Win64 Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Debug Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Debug",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 DebugGame Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"DebugGame",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"DebugGame",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunk Win64 DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 DebugGame Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"DebugGame",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Development Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Development",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Development Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Development",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunk Win64 Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Development Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Development",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Test Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Test",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Test Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Test",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunk Win64 Test Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Test Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Test",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Shipping Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Shipping",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Shipping Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Shipping",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunk Win64 Shipping Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunk Win64 Shipping Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunk",
+				"Win64",
+				"Shipping",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 Debug Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"Debug",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 Debug Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"Debug",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunkEditor Win64 Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 Debug Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"Debug",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 DebugGame Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"DebugGame",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"DebugGame",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunkEditor Win64 DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 DebugGame Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"DebugGame",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 Development Build",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"Development",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 Development Rebuild",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"Development",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ArcanePunkEditor Win64 Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		},
+		{
+			"label": "ArcanePunkEditor Win64 Development Clean",
+			"group": "build",
+			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"args": [
+				"ArcanePunkEditor",
+				"Win64",
+				"Development",
+				"C:\\ArcanePunk\\ArcanePunk.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "C:\\Program Files\\Epic Games\\UE_5.2"
+			}
+		}
+	]
+}
