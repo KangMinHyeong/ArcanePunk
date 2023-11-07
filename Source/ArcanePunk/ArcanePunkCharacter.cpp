@@ -12,17 +12,33 @@ AArcanePunkCharacter::AArcanePunkCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 
-	SpringArm->SetupAttachment(GetRootComponent());
-	Camera->SetupAttachment(SpringArm);
+	MySpringArm->SetupAttachment(GetRootComponent());
+	MyCamera->SetupAttachment(MySpringArm);
+
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	
 }
 
 // Called when the game starts or when spawned
 void AArcanePunkCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if(!MySpringArm) return;
+	MaximumSpringArmLength = MySpringArm->TargetArmLength;
+	CurrentArmLength = MaximumSpringArmLength;
+
 	
 }
 
@@ -40,16 +56,36 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
 }
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
 {
-	AddMovementInput(GetActorForwardVector()*AxisValue);
+	PlayerVec.X = AxisValue;
+	if(PlayerVec.SizeSquared() != 0)
+	{
+		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
+		AddMovementInput(PlayerVec);
+	}	
 	
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
 {
-	AddMovementInput(GetActorRightVector()*AxisValue);
+	PlayerVec.Y = AxisValue;
+	if(PlayerVec.SizeSquared() != 0)
+	{
+		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
+		AddMovementInput(PlayerVec);
+	}
 }
 
+void AArcanePunkCharacter::ZoomInOut(float AxisValue)
+{
+	CurrentArmLength += AxisValue * ZoomCoefficient;
+	if(CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
+	else if(CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
+
+	MySpringArm->TargetArmLength = CurrentArmLength;
+	
+}
