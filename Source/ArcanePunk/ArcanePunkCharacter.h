@@ -29,12 +29,25 @@ public:
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
+	void ZoomInOut(float AxisValue);
 	
 private:
 	UPROPERTY(EditAnywhere)
-	class USpringArmComponent* SpringArm;
+	class USpringArmComponent* MySpringArm;
 
 	UPROPERTY(EditAnywhere)
-	class UCameraComponent* Camera;
+	class UCameraComponent* MyCamera;
+
+	float MaximumSpringArmLength = 0.0f;
+
+	float CurrentArmLength = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float MinimumSpringArmLength = 150.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ZoomCoefficient = 20.0f;
+
+	FVector PlayerVec = FVector::ZeroVector;
 
 };
