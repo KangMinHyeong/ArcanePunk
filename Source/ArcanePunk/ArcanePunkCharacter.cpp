@@ -2,6 +2,9 @@
 
 
 #include "ArcanePunkCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -30,5 +33,18 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
+}
+
+void AArcanePunkCharacter::MoveForward(float AxisValue)
+{
+	AddMovementInput(GetActorForwardVector()*AxisValue);
+	
+}
+
+void AArcanePunkCharacter::MoveRight(float AxisValue)
+{
+	AddMovementInput(GetActorRightVector()*AxisValue);
 }
 
