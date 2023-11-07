@@ -11,7 +11,12 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 
+	SpringArm->SetupAttachment(GetRootComponent());
+	Camera->SetupAttachment(SpringArm);
 }
 
 // Called when the game starts or when spawned
