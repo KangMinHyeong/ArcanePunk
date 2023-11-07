@@ -1,5 +1,5 @@
 /FI "C:\Program Files\Epic Games\UE_5.2\Engine\Intermediate\Build\Win64\x64\UnrealEditor\Development\MeshUtilitiesCommon\Definitions.MeshUtilitiesCommon.h" 
-/FI "C:\ArcanePunk\Intermediate\Build\Win64\x64\ArcanePunkEditor\Development\Core\SharedPCH.Core.ShadowErrors.h" 
+/FI "C:\ArcanePunk\ArcanePunk\Intermediate\Build\Win64\x64\ArcanePunkEditor\Development\Core\SharedPCH.Core.ShadowErrors.h" 
 /I "C:\Program Files\Epic Games\UE_5.2\Engine\Source" 
 /I "C:\Program Files\Epic Games\UE_5.2\Engine\Source\Runtime\MeshUtilitiesCommon\Private" 
 /I "C:\Program Files\Epic Games\UE_5.2\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\Core\UHT" 

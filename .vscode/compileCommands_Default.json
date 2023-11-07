@@ -1,41 +1,41 @@
 [
 	{
-		"file": "C:\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.Build.cs",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.Build.cs",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
+			"@C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.cpp",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
+			"@C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.h",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
+			"@C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunkGameModeBase.cpp",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunkGameModeBase.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
+			"@C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunkGameModeBase.h",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunkGameModeBase.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
+			"@C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default\\ArcanePunk.261.rsp"
 		],
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Source"
 	}
