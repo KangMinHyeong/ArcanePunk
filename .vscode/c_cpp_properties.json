@@ -7,7 +7,7 @@
 			"cppStandard": "c++17",
 			"intelliSenseMode": "msvc-x64",
 			"configurationProvider": "epic.ue",
-			"compileCommands": "C:\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk.json"
+			"compileCommands": "C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk.json"
 		},
 		{
 			"name": "Win32",
@@ -16,7 +16,7 @@
 			"cppStandard": "c++17",
 			"intelliSenseMode": "msvc-x64",
 			"configurationProvider": "epic.ue",
-			"compileCommands": "C:\\ArcanePunk\\.vscode\\compileCommands_Default.json"
+			"compileCommands": "C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default.json"
 		}
 	]
 }
