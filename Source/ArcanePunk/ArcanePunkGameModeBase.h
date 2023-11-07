@@ -13,6 +13,5 @@ UCLASS()
 class ARCANEPUNK_API AArcanePunkGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-
 	
 };
