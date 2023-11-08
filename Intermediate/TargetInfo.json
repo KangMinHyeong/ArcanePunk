@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "ArcanePunk",
+			"Path": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "ArcanePunkEditor",
+			"Path": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunkEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
