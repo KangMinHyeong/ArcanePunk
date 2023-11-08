@@ -1,5 +1,5 @@
 /FI "C:\Program Files\Epic Games\UE_5.2\Engine\Plugins\Developer\RiderSourceCodeAccess\Intermediate\Build\Win64\x64\UnrealEditor\Development\RiderSCA\Definitions.RiderSourceCodeAccess.h" 
-/FI "C:\ArcanePunk\Intermediate\Build\Win64\x64\ArcanePunkEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h" 
+/FI "C:\ArcanePunk\ArcanePunk\Intermediate\Build\Win64\x64\ArcanePunkEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h" 
 /I "C:\Program Files\Epic Games\UE_5.2\Engine\Source" 
 /I "C:\Program Files\Epic Games\UE_5.2\Engine\Plugins\Developer\RiderSourceCodeAccess\Source\RiderSourceCodeAccess\Private" 
 /I "C:\Program Files\Epic Games\UE_5.2\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\Core\UHT" 
