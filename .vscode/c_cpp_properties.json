@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "configurations": [
         {
             "name": "ArcanePunkEditor Editor Win64 Development (ArcanePunk)",
@@ -21,3 +22,26 @@
     ],
     "version": 4
 }
+=======
+	"configurations": [
+		{
+			"name": "ArcanePunkEditor Editor Win64 Development (ArcanePunk)",
+			"compilerPath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"cStandard": "c17",
+			"cppStandard": "c++17",
+			"intelliSenseMode": "msvc-x64",
+			"configurationProvider": "epic.ue",
+			"compileCommands": "C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk.json"
+		},
+		{
+			"name": "Win32",
+			"compilerPath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"cStandard": "c17",
+			"cppStandard": "c++17",
+			"intelliSenseMode": "msvc-x64",
+			"configurationProvider": "epic.ue",
+			"compileCommands": "C:\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_Default.json"
+		}
+	]
+}
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861

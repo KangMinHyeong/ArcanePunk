@@ -45,7 +45,10 @@ void AArcanePunkCharacter::BeginPlay()
 	CurrentArmLength = MaximumSpringArmLength;
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
+<<<<<<< HEAD
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 // Called every frame
@@ -53,7 +56,12 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+<<<<<<< HEAD
 	if(PlayerVec.SizeSquared() > 0)
+=======
+<<<<<<< HEAD
+	if(PlayerVec.SizeSquared() > 0 && bCanMove)
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 	{
 		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		AddMovementInput(PlayerVec);
@@ -62,6 +70,11 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 	{
 		SetActorRotation(GetController()->GetControlRotation());
 	}
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> parent of cd34300 (test)
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 // Called to bind functionality to input
@@ -78,6 +91,7 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
@@ -89,6 +103,8 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Test_KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Test_Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 bool AArcanePunkCharacter::IsAttack_A()
@@ -109,11 +125,14 @@ bool AArcanePunkCharacter::IsSkill_Q()
 bool AArcanePunkCharacter::IsSkill_E()
 {
     return bSkill_E;
+<<<<<<< HEAD
 }
 
 uint8 AArcanePunkCharacter::returnState()
 {
     return CurrentState;
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
@@ -155,14 +174,20 @@ void AArcanePunkCharacter::Attack_typeA()
 	{
 		bAttack_A = true;
 		bCanMove = false;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Attack_ATimerHandle, this, &AArcanePunkCharacter::Attack_typeA, Attack_CastingTime, false);
 	}
 	else
 	{
 		bAttack_A = false;
 		bCanMove = true;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Attack_ATimerHandle);
 	}
 }
@@ -173,14 +198,20 @@ void AArcanePunkCharacter::Attack_typeB()
 	{
 		bAttack_B = true;
 		bCanMove = false;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Attack_BTimerHandle, this, &AArcanePunkCharacter::Attack_typeB, Attack_CastingTime, false);
 	}
 	else
 	{
 		bAttack_B = false;
 		bCanMove = true;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Attack_BTimerHandle);
 	}
 }
@@ -192,14 +223,20 @@ void AArcanePunkCharacter::Skill_typeQ()
 		bSkill_Q = true;
 		bCanMove = false;
 		// Skill_Q_Effect->Activate(true);
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Skill_QTimerHandle, this, &AArcanePunkCharacter::Skill_typeQ, Skill_CastingTime, false);
 	}
 	else
 	{
 		bSkill_Q = false;
 		bCanMove = true;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Skill_QTimerHandle);
 	}
 }
@@ -210,14 +247,20 @@ void AArcanePunkCharacter::Skill_typeE()
 	{
 		bSkill_E = true;
 		bCanMove = false;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Skill_ETimerHandle, this, &AArcanePunkCharacter::Skill_typeE, Skill_CastingTime, false);
 	}
 	else
 	{
 		bSkill_E = false;
 		bCanMove = true;
+<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Skill_ETimerHandle);
 	}
 }
@@ -231,6 +274,7 @@ void AArcanePunkCharacter::EndJog()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 }
+<<<<<<< HEAD
 
 <<<<<<< Updated upstream
 void AArcanePunkCharacter::NormalState()
@@ -322,3 +366,5 @@ uint8 AArcanePunkCharacter::returnCharacterState()
     return CurrentCharacterState;
 }
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861

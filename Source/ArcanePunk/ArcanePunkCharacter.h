@@ -59,6 +59,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSkill_E();
 
+<<<<<<< HEAD
 	UFUNCTION(BlueprintPure)
 <<<<<<< Updated upstream
 	uint8 returnState();
@@ -66,6 +67,8 @@ public:
 	uint8 returnCharacterState();
 >>>>>>> Stashed changes
 
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -76,6 +79,7 @@ private:
 	void Skill_typeE();
 	void StartJog();
 	void EndJog();
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	void NormalState();
 	void StunState();//후에 인자 추가 (상태시간)
@@ -89,6 +93,8 @@ private:
 	void KnockBackState(); //나중에 float 인자 추가
 	void SleepState(); //나중에 float 인자 추가
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -120,11 +126,14 @@ private:
 	FTimerHandle Attack_BTimerHandle;
 	FTimerHandle Skill_QTimerHandle;
 	FTimerHandle Skill_ETimerHandle;
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	FTimerHandle State_ETimerHandle;
 =======
 	FTimerHandle State_TimerHandle;
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 
 	UPROPERTY(EditAnywhere)
 	float Attack_CastingTime = 0.5f;
@@ -133,9 +142,12 @@ private:
 	float Skill_CastingTime = 1.0f;
 
 	UPROPERTY(EditAnywhere)
+<<<<<<< HEAD
 	float State_Time = 3.0f;
 
 	UPROPERTY(EditAnywhere)
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 	float JoggingSpeed = 700.0f;
 
 	float DefaultSpeed = 400.0f;
@@ -143,6 +155,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UParticleSystemComponent* Skill_Q_Effect;
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 	uint8 CurrentState = 0;
 
@@ -153,4 +166,6 @@ private:
 
 	float StateTime = 3.0f;
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 };
