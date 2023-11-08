@@ -45,10 +45,7 @@ void AArcanePunkCharacter::BeginPlay()
 	CurrentArmLength = MaximumSpringArmLength;
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
-<<<<<<< HEAD
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 // Called every frame
@@ -56,12 +53,7 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-<<<<<<< HEAD
 	if(PlayerVec.SizeSquared() > 0)
-=======
-<<<<<<< HEAD
-	if(PlayerVec.SizeSquared() > 0 && bCanMove)
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 	{
 		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		AddMovementInput(PlayerVec);
@@ -70,11 +62,7 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 	{
 		SetActorRotation(GetController()->GetControlRotation());
 	}
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of cd34300 (test)
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
+
 }
 
 // Called to bind functionality to input
@@ -91,20 +79,10 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
-=======
-	PlayerInputComponent->BindAction(TEXT("Test_Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
-	PlayerInputComponent->BindAction(TEXT("Test_Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
-	PlayerInputComponent->BindAction(TEXT("Test_KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
-	PlayerInputComponent->BindAction(TEXT("Test_Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
->>>>>>> Stashed changes
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 bool AArcanePunkCharacter::IsAttack_A()
@@ -125,14 +103,11 @@ bool AArcanePunkCharacter::IsSkill_Q()
 bool AArcanePunkCharacter::IsSkill_E()
 {
     return bSkill_E;
-<<<<<<< HEAD
 }
 
 uint8 AArcanePunkCharacter::returnState()
 {
     return CurrentState;
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 }
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
@@ -174,20 +149,14 @@ void AArcanePunkCharacter::Attack_typeA()
 	{
 		bAttack_A = true;
 		bCanMove = false;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Attack_ATimerHandle, this, &AArcanePunkCharacter::Attack_typeA, Attack_CastingTime, false);
 	}
 	else
 	{
 		bAttack_A = false;
 		bCanMove = true;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Attack_ATimerHandle);
 	}
 }
@@ -198,20 +167,14 @@ void AArcanePunkCharacter::Attack_typeB()
 	{
 		bAttack_B = true;
 		bCanMove = false;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Attack_BTimerHandle, this, &AArcanePunkCharacter::Attack_typeB, Attack_CastingTime, false);
 	}
 	else
 	{
 		bAttack_B = false;
 		bCanMove = true;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Attack_BTimerHandle);
 	}
 }
@@ -223,20 +186,14 @@ void AArcanePunkCharacter::Skill_typeQ()
 		bSkill_Q = true;
 		bCanMove = false;
 		// Skill_Q_Effect->Activate(true);
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Skill_QTimerHandle, this, &AArcanePunkCharacter::Skill_typeQ, Skill_CastingTime, false);
 	}
 	else
 	{
 		bSkill_Q = false;
 		bCanMove = true;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Skill_QTimerHandle);
 	}
 }
@@ -247,20 +204,14 @@ void AArcanePunkCharacter::Skill_typeE()
 	{
 		bSkill_E = true;
 		bCanMove = false;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().SetTimer(Skill_ETimerHandle, this, &AArcanePunkCharacter::Skill_typeE, Skill_CastingTime, false);
 	}
 	else
 	{
 		bSkill_E = false;
 		bCanMove = true;
-<<<<<<< HEAD
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 		GetWorldTimerManager().ClearTimer(Skill_ETimerHandle);
 	}
 }
@@ -274,9 +225,7 @@ void AArcanePunkCharacter::EndJog()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 }
-<<<<<<< HEAD
 
-<<<<<<< Updated upstream
 void AArcanePunkCharacter::NormalState()
 {
 	CurrentState = 0;
@@ -310,9 +259,7 @@ void AArcanePunkCharacter::SleepState()
 }
 
 //피격 판정 생성시 이용 예정
-=======
 //나중에 쓸 함수(피격 시 발동되게)
->>>>>>> Stashed changes
 void AArcanePunkCharacter::SwitchState(uint8 Current)
 {
 	switch(Current)
@@ -334,37 +281,3 @@ void AArcanePunkCharacter::SwitchState(uint8 Current)
 		break;
 	}
 }
-<<<<<<< Updated upstream
-=======
-
-void AArcanePunkCharacter::NormalState()
-{
-	CurrentCharacterState = 0;
-	GetWorldTimerManager().ClearTimer(State_TimerHandle);
-}
-
-void AArcanePunkCharacter::StunState()
-{
-	CurrentCharacterState = 1;
-	GetWorldTimerManager().SetTimer(State_TimerHandle, this, &AArcanePunkCharacter::NormalState, StateTime, false);
-}
-
-void AArcanePunkCharacter::KnockBackState()
-{
-	CurrentCharacterState = 2;
-	GetWorldTimerManager().SetTimer(State_TimerHandle, this, &AArcanePunkCharacter::NormalState, StateTime, false);
-}
-
-void AArcanePunkCharacter::SleepState()
-{
-	CurrentCharacterState = 3;
-	GetWorldTimerManager().SetTimer(State_TimerHandle, this, &AArcanePunkCharacter::NormalState, StateTime, false);
-}
-
-uint8 AArcanePunkCharacter::returnCharacterState()
-{
-    return CurrentCharacterState;
-}
->>>>>>> Stashed changes
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
