@@ -1,8 +1,8 @@
 {
 	"SourceFiles": [
-		"C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.Build.cs",
-		"C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk.Target.cs",
-		"C:\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunkEditor.Target.cs"
+		"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\ArcanePunk.Build.cs",
+		"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk.Target.cs",
+		"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunkEditor.Target.cs"
 	],
 	"EngineVersion": "5.2.0"
 }
