@@ -78,10 +78,17 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
+<<<<<<< Updated upstream
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
+=======
+	PlayerInputComponent->BindAction(TEXT("Test_Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
+	PlayerInputComponent->BindAction(TEXT("Test_Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
+	PlayerInputComponent->BindAction(TEXT("Test_KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
+	PlayerInputComponent->BindAction(TEXT("Test_Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
+>>>>>>> Stashed changes
 }
 
 bool AArcanePunkCharacter::IsAttack_A()
@@ -225,6 +232,7 @@ void AArcanePunkCharacter::EndJog()
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 }
 
+<<<<<<< Updated upstream
 void AArcanePunkCharacter::NormalState()
 {
 	CurrentState = 0;
@@ -258,6 +266,9 @@ void AArcanePunkCharacter::SleepState()
 }
 
 //피격 판정 생성시 이용 예정
+=======
+//나중에 쓸 함수(피격 시 발동되게)
+>>>>>>> Stashed changes
 void AArcanePunkCharacter::SwitchState(uint8 Current)
 {
 	switch(Current)
@@ -279,3 +290,35 @@ void AArcanePunkCharacter::SwitchState(uint8 Current)
 		break;
 	}
 }
+<<<<<<< Updated upstream
+=======
+
+void AArcanePunkCharacter::NormalState()
+{
+	CurrentCharacterState = 0;
+	GetWorldTimerManager().ClearTimer(State_TimerHandle);
+}
+
+void AArcanePunkCharacter::StunState()
+{
+	CurrentCharacterState = 1;
+	GetWorldTimerManager().SetTimer(State_TimerHandle, this, &AArcanePunkCharacter::NormalState, StateTime, false);
+}
+
+void AArcanePunkCharacter::KnockBackState()
+{
+	CurrentCharacterState = 2;
+	GetWorldTimerManager().SetTimer(State_TimerHandle, this, &AArcanePunkCharacter::NormalState, StateTime, false);
+}
+
+void AArcanePunkCharacter::SleepState()
+{
+	CurrentCharacterState = 3;
+	GetWorldTimerManager().SetTimer(State_TimerHandle, this, &AArcanePunkCharacter::NormalState, StateTime, false);
+}
+
+uint8 AArcanePunkCharacter::returnCharacterState()
+{
+    return CurrentCharacterState;
+}
+>>>>>>> Stashed changes

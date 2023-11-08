@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ArcanePunkCharacter.generated.h"
 
+<<<<<<< Updated upstream
 enum class ECharacterState : uint8
 {
     None        = 0,
@@ -14,6 +15,17 @@ enum class ECharacterState : uint8
     Sleep       = 3,
 };
 //나중에 스킬도 uint8 또는 16으로 만들기
+=======
+UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{	
+	None = 0,
+	Stun = 1,
+	KnockBack = 2,
+	Sleep = 3,
+};
+
+>>>>>>> Stashed changes
 
 UCLASS()
 class ARCANEPUNK_API AArcanePunkCharacter : public ACharacter
@@ -48,7 +60,11 @@ public:
 	bool IsSkill_E();
 
 	UFUNCTION(BlueprintPure)
+<<<<<<< Updated upstream
 	uint8 returnState();
+=======
+	uint8 returnCharacterState();
+>>>>>>> Stashed changes
 
 private:
 	void MoveForward(float AxisValue);
@@ -60,11 +76,19 @@ private:
 	void Skill_typeE();
 	void StartJog();
 	void EndJog();
+<<<<<<< Updated upstream
 	void NormalState();
 	void StunState();//후에 인자 추가 (상태시간)
 	void KnockBackState();//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
+=======
+	void SwitchState(uint8 Current);
+	void NormalState();
+	void StunState(); //나중에 float 인자 추가
+	void KnockBackState(); //나중에 float 인자 추가
+	void SleepState(); //나중에 float 인자 추가
+>>>>>>> Stashed changes
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -96,7 +120,11 @@ private:
 	FTimerHandle Attack_BTimerHandle;
 	FTimerHandle Skill_QTimerHandle;
 	FTimerHandle Skill_ETimerHandle;
+<<<<<<< Updated upstream
 	FTimerHandle State_ETimerHandle;
+=======
+	FTimerHandle State_TimerHandle;
+>>>>>>> Stashed changes
 
 	UPROPERTY(EditAnywhere)
 	float Attack_CastingTime = 0.5f;
@@ -115,8 +143,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UParticleSystemComponent* Skill_Q_Effect;
 
+<<<<<<< Updated upstream
 	uint8 CurrentState = 0;
 
 	float DefaultSlip = 0.0f;
 
+=======
+	uint8 CurrentCharacterState = 0;
+
+	float StateTime = 3.0f;
+>>>>>>> Stashed changes
 };
