@@ -6,7 +6,6 @@
 #include "GameFramework/Character.h"
 #include "ArcanePunkCharacter.generated.h"
 
-<<<<<<< Updated upstream
 enum class ECharacterState : uint8
 {
     None        = 0,
@@ -15,17 +14,6 @@ enum class ECharacterState : uint8
     Sleep       = 3,
 };
 //나중에 스킬도 uint8 또는 16으로 만들기
-=======
-UENUM(BlueprintType)
-enum class ECharacterState : uint8
-{	
-	None = 0,
-	Stun = 1,
-	KnockBack = 2,
-	Sleep = 3,
-};
-
->>>>>>> Stashed changes
 
 UCLASS()
 class ARCANEPUNK_API AArcanePunkCharacter : public ACharacter
@@ -59,16 +47,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSkill_E();
 
-<<<<<<< HEAD
 	UFUNCTION(BlueprintPure)
-<<<<<<< Updated upstream
 	uint8 returnState();
-=======
-	uint8 returnCharacterState();
->>>>>>> Stashed changes
 
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
+	uint8 returnCharacterState();
+
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -79,22 +62,11 @@ private:
 	void Skill_typeE();
 	void StartJog();
 	void EndJog();
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 	void NormalState();
 	void StunState();//후에 인자 추가 (상태시간)
 	void KnockBackState();//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
-=======
-	void SwitchState(uint8 Current);
-	void NormalState();
-	void StunState(); //나중에 float 인자 추가
-	void KnockBackState(); //나중에 float 인자 추가
-	void SleepState(); //나중에 float 인자 추가
->>>>>>> Stashed changes
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -126,14 +98,8 @@ private:
 	FTimerHandle Attack_BTimerHandle;
 	FTimerHandle Skill_QTimerHandle;
 	FTimerHandle Skill_ETimerHandle;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 	FTimerHandle State_ETimerHandle;
-=======
 	FTimerHandle State_TimerHandle;
->>>>>>> Stashed changes
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 
 	UPROPERTY(EditAnywhere)
 	float Attack_CastingTime = 0.5f;
@@ -142,12 +108,10 @@ private:
 	float Skill_CastingTime = 1.0f;
 
 	UPROPERTY(EditAnywhere)
-<<<<<<< HEAD
 	float State_Time = 3.0f;
 
 	UPROPERTY(EditAnywhere)
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
+
 	float JoggingSpeed = 700.0f;
 
 	float DefaultSpeed = 400.0f;
@@ -155,17 +119,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UParticleSystemComponent* Skill_Q_Effect;
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 	uint8 CurrentState = 0;
 
 	float DefaultSlip = 0.0f;
 
-=======
 	uint8 CurrentCharacterState = 0;
 
 	float StateTime = 3.0f;
->>>>>>> Stashed changes
-=======
->>>>>>> 1380e2be853f23020963dd1c53d81d4c5396b861
 };
