@@ -50,7 +50,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	uint8 returnState();
 
-	uint8 returnCharacterState();
+	UFUNCTION()
+	void LookCharacter();
+
 
 private:
 	void MoveForward(float AxisValue);
@@ -67,7 +69,10 @@ private:
 	void KnockBackState();//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
-	
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
+	void NormalAttack(float ATK);
+	bool VisionTrace(FHitResult &HitResult);
+
 private:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* MySpringArm;
@@ -126,4 +131,16 @@ private:
 	uint8 CurrentCharacterState = 0;
 
 	float StateTime = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	float MaxDistance = 200.0f;
+
+	UPROPERTY(EditAnywhere)
+	float AttackRadius = 40.0f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AArcanePunkPlayerState> PlayerStateClass;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class AArcanePunkPlayerState* MyPlayerState;
 };
