@@ -8,6 +8,10 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "GameFramework/Controller.h"
+#include "Engine/DamageEvents.h"
+#include "DrawDebugHelpers.h"
+#include "ArcanePunkPlayerState.h"
 
 // Sets default values
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -46,6 +50,12 @@ void AArcanePunkCharacter::BeginPlay()
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
+
+	MyPlayerState = GetWorld()->SpawnActor<AArcanePunkPlayerState>(PlayerStateClass);
+
+	if(MyPlayerState == nullptr) UE_LOG(LogTemp, Display, TEXT("Your message"));
+
+	MyPlayerState->MoveSpeed = DefaultSpeed;
 }
 
 // Called every frame
@@ -53,15 +63,7 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(PlayerVec.SizeSquared() > 0)
-	{
-		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-		AddMovementInput(PlayerVec);
-	}
-	else
-	{
-		SetActorRotation(GetController()->GetControlRotation());
-	}
+	LookCharacter();
 
 }
 
@@ -120,6 +122,15 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 		AddMovementInput(PlayerVec);
 	}	
 	
+	// if(PlayerVec.SizeSquared() > 0)
+	// {
+	// 	GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
+	// 	AddMovementInput(PlayerVec);
+	// }
+	// else
+	// {
+	// 	SetActorRotation(GetController()->GetControlRotation());
+	// }
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
@@ -150,6 +161,7 @@ void AArcanePunkCharacter::Attack_typeA()
 		bAttack_A = true;
 		bCanMove = false;
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		NormalAttack(MyPlayerState->ATK);
 		GetWorldTimerManager().SetTimer(Attack_ATimerHandle, this, &AArcanePunkCharacter::Attack_typeA, Attack_CastingTime, false);
 	}
 	else
@@ -168,6 +180,7 @@ void AArcanePunkCharacter::Attack_typeB()
 		bAttack_B = true;
 		bCanMove = false;
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		NormalAttack(MyPlayerState->ATK);
 		GetWorldTimerManager().SetTimer(Attack_BTimerHandle, this, &AArcanePunkCharacter::Attack_typeB, Attack_CastingTime, false);
 	}
 	else
@@ -279,5 +292,85 @@ void AArcanePunkCharacter::SwitchState(uint8 Current)
 		case 3:
 		SleepState();
 		break;
+	}
+}
+
+bool AArcanePunkCharacter::AttackTrace(FHitResult &HitResult, FVector &HitVector)
+{
+	// FVector Location;
+	FRotator Rotation = GetActorRotation();
+	// AController* MyController = Cast<AController>(GetController());
+	// if(MyController == nullptr)
+	// {
+	// 	return false;
+	// }
+	// MyController->GetPlayerViewPoint(Location, Rotation);
+	FVector End = GetActorLocation() + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+
+	// 아군은 타격 판정이 안되게 하는 코드
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
+	for (AActor* Actor : Actors)
+    {
+		Params.AddIgnoredActor(Actor);
+    }    
+	
+	HitVector = -Rotation.Vector();
+
+	//DrawDebugSphere(GetWorld(), End, AttackRadius, 10, FColor::Green, false, 5);
+
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(AttackRadius);
+
+	return GetWorld()->SweepSingleByChannel(HitResult, GetActorLocation(), End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+}
+
+void AArcanePunkCharacter::NormalAttack(float ATK)
+{
+	if(CurrentCharacterState != 0) return;
+	float Damage = ATK;
+	FHitResult HitResult;
+	FVector HitVector;
+	bool Line = AttackTrace(HitResult, HitVector);
+	if(Line)
+	{
+		if(AActor* Actor = HitResult.GetActor())
+		{
+			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
+			AController* MyController = Cast<AController>(GetController());
+			if(MyController == nullptr) return;
+			UE_LOG(LogTemp, Display, TEXT("youy"));
+			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
+		}
+	}
+}
+
+bool AArcanePunkCharacter::VisionTrace(FHitResult &HitResult)
+{
+	FVector Location;
+	FRotator Rotation;
+	AController* MyController = Cast<AController>(GetController());
+	if(MyController == nullptr)
+	{
+		return false;
+	}
+	MyController->GetPlayerViewPoint(Location, Rotation);
+	FVector Start = Location;
+	FVector End = GetActorLocation();
+
+	return GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel3);
+}
+
+void AArcanePunkCharacter::LookCharacter()
+{
+	FHitResult HitResult;
+	bool Line = VisionTrace(HitResult);
+	if(Line)
+	{
+		if(AActor* Actor = HitResult.GetActor())
+		{
+			Actor->SetActorHiddenInGame(true);
+		}
 	}
 }
