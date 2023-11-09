@@ -52,7 +52,7 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-<<<<<<< HEAD
+
 	if(PlayerVec.SizeSquared() > 0 && bCanMove)
 	{
 		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
@@ -62,8 +62,7 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 	{
 		SetActorRotation(GetController()->GetControlRotation());
 	}
-=======
->>>>>>> parent of cd34300 (test)
+
 }
 
 // Called to bind functionality to input
