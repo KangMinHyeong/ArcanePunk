@@ -9,6 +9,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
+// prodo
+#include "DrawDebugHelpers.h"
+#include "Items/APItemBase.h"
+#include "UserInterface/APHUD.h"
+#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "Test/Pickup.h"
+
 // Sets default values
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
@@ -33,6 +40,16 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	// prodo
+
+	InteractionCheckFrequency = 0.1f;
+	InteractionCheckDistance = 225.0f;
+
+	PlayerInventory = CreateDefaultSubobject<UAPInventoryComponent>(TEXT("PlayerInventory"));
+	// set capacity of inventory
+	PlayerInventory->SetSlotsCapacity(20);
+	PlayerInventory->SetWeightCapacity(50.0f);
 	
 }
 
@@ -45,6 +62,9 @@ void AArcanePunkCharacter::BeginPlay()
 	CurrentArmLength = MaximumSpringArmLength;
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	// prodo
+	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
 // Called every frame
@@ -63,6 +83,13 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 		SetActorRotation(GetController()->GetControlRotation());
 	}
 
+	// prodo
+	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
+	{
+		PerformInteractionCheck();
+	}
+
+
 }
 
 // Called to bind functionality to input
@@ -79,6 +106,12 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
+
+
+	// prodo
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AArcanePunkCharacter::EndInteract);
+	PlayerInputComponent->BindAction("ToggleMenu", IE_Pressed, this, &AArcanePunkCharacter::ToggleMenu);
 }
 
 bool AArcanePunkCharacter::IsAttack_A()
@@ -205,4 +238,175 @@ void AArcanePunkCharacter::StartJog()
 void AArcanePunkCharacter::EndJog()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+}
+
+
+// prodo
+
+void AArcanePunkCharacter::PerformInteractionCheck()
+{
+	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
+
+	FVector TraceStart{ GetPawnViewLocation() };
+	FVector TraceEnd{ TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance) };
+
+	float LookDirection = FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector());
+
+
+	if (LookDirection > 0)
+	{
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
+
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+		FHitResult TraceHit;
+
+		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+		{
+			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
+			{
+				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
+				{
+					FoundInteractable(TraceHit.GetActor());
+					return;
+				}
+
+				if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
+				{
+					return;
+				}
+
+			}
+		}
+	}
+
+	NoInteractableFound();
+}
+
+void AArcanePunkCharacter::FoundInteractable(AActor* NewInteractable)
+{
+	if (IsInteracting())
+	{
+		EndInteract();
+	}
+
+	if (InteractionData.CurrentInteractable)
+	{
+		TargetInteractable = InteractionData.CurrentInteractable;
+		TargetInteractable->EndFocus();
+	}
+
+	InteractionData.CurrentInteractable = NewInteractable;
+	TargetInteractable = NewInteractable;
+
+	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+
+	TargetInteractable->BeginFocus();
+}
+
+void AArcanePunkCharacter::NoInteractableFound()
+{
+	if (IsInteracting())
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+	}
+
+	if (InteractionData.CurrentInteractable)
+	{
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->EndFocus();
+		}
+
+		HUD->HideInteractionWidget();
+
+		// when display UI whole monitor, then cant use interact
+		InteractionData.CurrentInteractable = nullptr;
+		TargetInteractable = nullptr;
+	}
+}
+
+void AArcanePunkCharacter::BeginInteract()
+{
+	PerformInteractionCheck();
+
+	if (InteractionData.CurrentInteractable)
+	{
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->BeginInteract();
+
+			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
+			{
+				Interact();
+			}
+			else
+			{
+				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
+					this,
+					&AArcanePunkCharacter::Interact,
+					TargetInteractable->InteractableData.InteractionDuration,
+					false);
+			}
+		}
+	}
+}
+
+void AArcanePunkCharacter::EndInteract()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->EndInteract();
+	}
+
+}
+
+void AArcanePunkCharacter::Interact()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->Interact(this);
+	}
+
+}
+
+void AArcanePunkCharacter::UpdateInteractionWidget() const
+{
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	}
+}
+
+void AArcanePunkCharacter::DropItem(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)
+{
+	if (PlayerInventory->FindMatchingItem(ItemToDrop))
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * 50.0f) };
+		const FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
+
+		const int32 RemovedQuantity = PlayerInventory->RemoveAmountOfItem(ItemToDrop, QuantityToDrop);
+
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(APickup::StaticClass(), SpawnTransform, SpawnParams);
+
+		Pickup->InitializeDrop(ItemToDrop, RemovedQuantity);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("drop item is null"));
+	}
+}
+
+void AArcanePunkCharacter::ToggleMenu()
+{
+	HUD->ToggleMenu();
 }

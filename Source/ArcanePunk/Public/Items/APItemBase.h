@@ -7,9 +7,9 @@
 #include "UObject/NoExportTypes.h"
 #include "APItemBase.generated.h"
 
-/**
- * 
- */
+class AAranePunkCharacter;
+class UAPInventoryComponent;
+
 UCLASS()
 class ARCANEPUNK_API UAPItemBase : public UObject
 {
@@ -17,36 +17,41 @@ class ARCANEPUNK_API UAPItemBase : public UObject
 
 public:
 	// valuables
-	// 인벤토리에 쌓이는 양 ( 있을수도있고 없을수도 .. ? )
-	UPROPERTY(VisibleAnywhere, Category = "Item Data", meta = (UIMin=1, UIMax=100))
+	// 인벤토리에 쌓이는 양 ( 있을수도있고 없을수도 )
+	UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 Quantity;
 
-	//UPROPERTY()
-		//UInventoryComponent* OwningInventory;
+	UPROPERTY()
+	UAPInventoryComponent* OwningInventory;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	FName ID;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	EItemQuality ItemQuality;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	EItemType ItemType;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	FItemNumericData ItemNumericData;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	FItemAssetData ItemAssetData;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	FItemStatistics ItemStatistics;
 
-	UPROPERTY(EditAnywhere, Category = "Item Data")
+	UPROPERTY(EditAnywhere, Category = "Item")
 	FItemTextData ItemTextData;
+
+	bool bIsCopy;
+	bool bIsPickup;
 
 	// functions
 	UAPItemBase();
+
+	void ResetItemFlags();
 
 	UFUNCTION(Category = "Item")
 	UAPItemBase* CreateItemCopy() const;
@@ -71,6 +76,6 @@ protected:
 	// tarray find
 	bool operator==(const FName& OtherID) const
 	{
-		return ID == OtherID;
+		return this->ID == OtherID;
 	}
 };

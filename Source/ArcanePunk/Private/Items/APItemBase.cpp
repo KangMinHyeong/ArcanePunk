@@ -2,10 +2,18 @@
 
 
 #include "Items/APItemBase.h"
+#include "ArcanePunk/ArcanePunkCharacter.h"
+#include "ArcanePunk/Public/Components/APInventoryComponent.h"
 
-UAPItemBase::UAPItemBase()
+UAPItemBase::UAPItemBase() : bIsCopy(false), bIsPickup(false)
 {
-	
+
+}
+
+void UAPItemBase::ResetItemFlags()
+{
+	bIsCopy = false;
+	bIsPickup = false;
 }
 
 UAPItemBase* UAPItemBase::CreateItemCopy() const
@@ -20,6 +28,7 @@ UAPItemBase* UAPItemBase::CreateItemCopy() const
 	ItemCopy->ItemNumericData = this->ItemNumericData;
 	ItemCopy->ItemStatistics = this->ItemStatistics;
 	ItemCopy->ItemAssetData = this->ItemAssetData;
+	ItemCopy->bIsCopy = true;
 
 	return ItemCopy;
 }
@@ -30,13 +39,13 @@ void UAPItemBase::SetQuantity(const int32 NewQuantity)
 	{
 		Quantity = FMath::Clamp(NewQuantity, 0, ItemNumericData.bIsStackable ? ItemNumericData.MaxStackSize : 1);
 
-		// if (OwningInventory)
-		// {
-		//	if (Quantity <= 0)
-		//	{
-		//		owningInventory->RemoveItem(this);		
-		//	}
-		// }
+		if (this->OwningInventory)
+		{
+			if (this->Quantity <= 0)
+			{
+				this->OwningInventory->RemoveSingleInstaceOfItem(this);		
+			}
+		}
 	}
 }
 
