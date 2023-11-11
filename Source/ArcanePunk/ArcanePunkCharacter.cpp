@@ -370,7 +370,8 @@ void AArcanePunkCharacter::LookCharacter()
 	{
 		if(AActor* Actor = HitResult.GetActor())
 		{
-			Actor->SetActorHiddenInGame(true);
+			// Actor->MaterialParameters
+			// GetMaterial
 		}
 	}
 }
