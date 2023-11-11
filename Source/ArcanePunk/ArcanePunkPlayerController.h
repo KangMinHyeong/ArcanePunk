@@ -20,6 +20,7 @@ public:
 
 private:
 	void LookStatus();
+	void FreeCameraMode();
 
 private:
 	bool bLookStatus = false;
@@ -33,5 +34,13 @@ private:
 	FInputModeGameOnly GameInputMode;
 
 	FInputModeGameAndUI UIInputMode;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class APawn> FreeCameraClass;
+
+	bool bFreeCameraMode = false;
+
+	APawn* FreeCamera;
+	class AArcanePunkCharacter* MyCharacter;
 
 };

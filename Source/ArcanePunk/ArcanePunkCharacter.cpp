@@ -17,7 +17,7 @@
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -372,6 +372,12 @@ void AArcanePunkCharacter::LookCharacter()
 		{
 			// Actor->MaterialParameters
 			// GetMaterial
+			
 		}
 	}
+}
+
+FTransform AArcanePunkCharacter::ReturnCameraTransform()
+{
+    return MyCamera->GetComponentTransform();
 }

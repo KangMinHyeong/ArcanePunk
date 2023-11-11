@@ -53,6 +53,7 @@ public:
 	UFUNCTION()
 	void LookCharacter();
 
+	FTransform ReturnCameraTransform();
 
 private:
 	void MoveForward(float AxisValue);
@@ -143,4 +144,5 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class AArcanePunkPlayerState* MyPlayerState;
+
 };
