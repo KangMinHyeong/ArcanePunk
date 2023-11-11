@@ -4,7 +4,7 @@
 		{
 			"name": "Launch ArcanePunk (Debug)",
 			"request": "launch",
-			"program": "C:\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-Debug.exe",
+			"program": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-Debug.exe",
 			"preLaunchTask": "ArcanePunk Win64 Debug Build",
 			"args": [
 			],
@@ -20,7 +20,7 @@
 		{
 			"name": "Launch ArcanePunk (DebugGame)",
 			"request": "launch",
-			"program": "C:\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-DebugGame.exe",
+			"program": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-DebugGame.exe",
 			"preLaunchTask": "ArcanePunk Win64 DebugGame Build",
 			"args": [
 			],
@@ -36,7 +36,7 @@
 		{
 			"name": "Launch ArcanePunk (Development)",
 			"request": "launch",
-			"program": "C:\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame.exe",
+			"program": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame.exe",
 			"preLaunchTask": "ArcanePunk Win64 Development Build",
 			"args": [
 			],
@@ -52,7 +52,7 @@
 		{
 			"name": "Launch ArcanePunk (Test)",
 			"request": "launch",
-			"program": "C:\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-Test.exe",
+			"program": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-Test.exe",
 			"preLaunchTask": "ArcanePunk Win64 Test Build",
 			"args": [
 			],
@@ -68,7 +68,7 @@
 		{
 			"name": "Launch ArcanePunk (Shipping)",
 			"request": "launch",
-			"program": "C:\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-Shipping.exe",
+			"program": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Binaries\\Win64\\UnrealGame-Win64-Shipping.exe",
 			"preLaunchTask": "ArcanePunk Win64 Shipping Build",
 			"args": [
 			],
@@ -87,7 +87,7 @@
 			"program": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Binaries\\Win64\\UnrealEditor-Win64-Debug.exe",
 			"preLaunchTask": "ArcanePunkEditor Win64 Debug Build",
 			"args": [
-				"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject"
+				"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject"
 			],
 			"cwd": "C:\\Program Files\\Epic Games\\UE_5.2",
 			"stopAtEntry": false,
@@ -104,7 +104,7 @@
 			"program": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Binaries\\Win64\\UnrealEditor-Win64-DebugGame.exe",
 			"preLaunchTask": "ArcanePunkEditor Win64 DebugGame Build",
 			"args": [
-				"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject"
+				"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject"
 			],
 			"cwd": "C:\\Program Files\\Epic Games\\UE_5.2",
 			"stopAtEntry": false,
@@ -121,7 +121,7 @@
 			"program": "C:\\Program Files\\Epic Games\\UE_5.2\\Engine\\Binaries\\Win64\\UnrealEditor.exe",
 			"preLaunchTask": "ArcanePunkEditor Win64 Development Build",
 			"args": [
-				"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject"
+				"C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject"
 			],
 			"cwd": "C:\\Program Files\\Epic Games\\UE_5.2",
 			"stopAtEntry": false,
@@ -140,7 +140,7 @@
 			"args": [
 				"-projectfiles",
 				"-vscode",
-				"-project=C:\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject",
+				"-project=C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\ArcanePunk.uproject",
 				"-game",
 				"-engine"
 			],

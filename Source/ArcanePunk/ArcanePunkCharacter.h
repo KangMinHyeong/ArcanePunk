@@ -27,6 +27,16 @@ struct FInteractionData
 	float LastInteractionCheckTime;
 };
 
+enum class ECharacterState : uint8
+{
+    None        = 0,
+    Stun        = 1,
+    KnockBack 	= 2,
+    Sleep       = 3,
+};
+//나중에 스킬도 uint8 또는 16으로 만들기
+
+
 UCLASS()
 class ARCANEPUNK_API AArcanePunkCharacter : public ACharacter
 {
@@ -59,6 +69,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSkill_E();
 
+	UFUNCTION(BlueprintPure)
+	uint8 returnState();
+
+	UFUNCTION()
+	void LookCharacter();
+
+	FTransform ReturnCameraTransform();
+
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -69,7 +87,15 @@ private:
 	void Skill_typeE();
 	void StartJog();
 	void EndJog();
-	
+	void NormalState();
+	void StunState();//후에 인자 추가 (상태시간)
+	void KnockBackState();//후에 인자 추가 (상태시간)
+	void SleepState();//후에 인자 추가 (상태시간)
+	void SwitchState(uint8 Current);
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
+	void NormalAttack(float ATK);
+	bool VisionTrace(FHitResult &HitResult);
+
 private:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* MySpringArm;
@@ -100,6 +126,8 @@ private:
 	FTimerHandle Attack_BTimerHandle;
 	FTimerHandle Skill_QTimerHandle;
 	FTimerHandle Skill_ETimerHandle;
+	FTimerHandle State_ETimerHandle;
+	FTimerHandle State_TimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float Attack_CastingTime = 0.5f;
@@ -108,6 +136,10 @@ private:
 	float Skill_CastingTime = 1.0f;
 
 	UPROPERTY(EditAnywhere)
+	float State_Time = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+
 	float JoggingSpeed = 700.0f;
 
 	float DefaultSpeed = 400.0f;
@@ -115,7 +147,27 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UParticleSystemComponent* Skill_Q_Effect;
 
-	// prodo
+	uint8 CurrentState = 0;
+
+	float DefaultSlip = 0.0f;
+
+	uint8 CurrentCharacterState = 0;
+
+	float StateTime = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	float MaxDistance = 200.0f;
+
+	UPROPERTY(EditAnywhere)
+	float AttackRadius = 40.0f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AArcanePunkPlayerState> PlayerStateClass;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class AArcanePunkPlayerState* MyPlayerState;
+
+// prodo
 
 protected:
 
