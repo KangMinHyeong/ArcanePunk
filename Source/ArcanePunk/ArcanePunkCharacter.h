@@ -4,7 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
+
+// prodo
+
+class UAPItemBase;
+class UAPInventoryComponent;
+class AAPHUD;
+
+USTRUCT()
+struct FInteractionData
+{
+	GENERATED_USTRUCT_BODY()
+
+	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f) {};
+
+	UPROPERTY()
+	AActor* CurrentInteractable;
+
+	UPROPERTY()
+	float LastInteractionCheckTime;
+};
 
 enum class ECharacterState : uint8
 {
@@ -14,6 +35,7 @@ enum class ECharacterState : uint8
     Sleep       = 3,
 };
 //나중에 스킬도 uint8 또는 16으로 만들기
+
 
 UCLASS()
 class ARCANEPUNK_API AArcanePunkCharacter : public ACharacter
@@ -145,4 +167,43 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class AArcanePunkPlayerState* MyPlayerState;
 
+// prodo
+
+protected:
+
+	UPROPERTY()
+	AAPHUD* HUD;
+
+	UPROPERTY(VisibleAnywhere, Category = "Character | Interaction")
+	TScriptInterface<IInteractionInterface> TargetInteractable;
+
+	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
+	UAPInventoryComponent* PlayerInventory;
+
+	float InteractionCheckFrequency;
+
+	float InteractionCheckDistance;
+
+	FTimerHandle TimerHandle_Interaction;
+
+	FInteractionData InteractionData;
+
+	void ToggleMenu();
+
+	void PerformInteractionCheck();
+	void FoundInteractable(AActor* NewInteractable);
+	void NoInteractableFound();
+	void BeginInteract();
+	void EndInteract();
+	void Interact();
+
+public :
+
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); };
+
+	FORCEINLINE UAPInventoryComponent* GetInventory() const { return PlayerInventory; };
+
+	void UpdateInteractionWidget() const;
+
+	void DropItem(UAPItemBase* ItemToDrop, const int32 QuantityToDrop);
 };
