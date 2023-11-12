@@ -2,7 +2,7 @@
 
 
 #include "Items/APItemBase.h"
-#include "ArcanePunk/ArcanePunkCharacter.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
 
 UAPItemBase::UAPItemBase() : bIsCopy(false), bIsPickup(false)

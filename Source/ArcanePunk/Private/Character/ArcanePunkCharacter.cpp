@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ArcanePunkCharacter.h"
+#include "Character/ArcanePunkCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -11,7 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "Engine/DamageEvents.h"
 #include "DrawDebugHelpers.h"
-#include "ArcanePunkPlayerState.h"
+#include "PlayerState/ArcanePunkPlayerState.h"
 
 // prodo
 #include "DrawDebugHelpers.h"

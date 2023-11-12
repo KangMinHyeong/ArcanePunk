@@ -3,7 +3,7 @@
 
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Inventory/ItemDragDropOperation.h"
-#include "ArcanePunk/ArcanePunkCharacter.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "Items/APItemBase.h"
 
 void UMainMenu::NativeOnInitialized()

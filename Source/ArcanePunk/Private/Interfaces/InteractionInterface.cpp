@@ -2,7 +2,7 @@
 
 
 #include "Interfaces/InteractionInterface.h"
-#include "ArcanePunk/ArcanePunkCharacter.h"
+#include "Character/ArcanePunkCharacter.h"
 
 // Add default functionality here for any IInteractionInterface functions that are not pure virtual.
 void IInteractionInterface::BeginFocus()
