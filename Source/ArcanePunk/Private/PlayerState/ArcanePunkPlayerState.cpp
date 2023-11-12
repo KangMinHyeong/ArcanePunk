@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ArcanePunkPlayerState.h"
+#include "PlayerState/ArcanePunkPlayerState.h"
 
 AArcanePunkPlayerState::AArcanePunkPlayerState()
 {

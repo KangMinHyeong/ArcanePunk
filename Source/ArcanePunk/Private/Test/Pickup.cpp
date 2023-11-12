@@ -2,7 +2,7 @@
 
 
 #include "Test/Pickup.h"
-#include "ArcanePunk/ArcanePunkCharacter.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
 #include "Items/APItemBase.h"
 
