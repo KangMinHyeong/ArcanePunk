@@ -1,0 +1,75 @@
+#include "CMinimapActor.h"
+#include "Blueprint/UserWidget.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
+#include "ArcanePunkCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetTree.h"
+
+ACMinimapActor::ACMinimapActor()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ACMinimapActor::BeginPlay()
+{
+    Super::BeginPlay();
+
+    FString WidgetBlueprintPath = "/Game/Minimap/WB_Minimap.WB_Minimap_C";
+
+    UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(GetWorld(), LoadClass<UUserWidget>(nullptr, *WidgetBlueprintPath));
+    if (WidgetInstance)
+    {
+
+        // 뷰포트에 추가
+        WidgetInstance->AddToViewport();
+    }
+	
+}
+
+void ACMinimapActor::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    UMaterialParameterCollection* ParameterCollection = LoadObject<UMaterialParameterCollection>(nullptr, TEXT("/Game/Minimap/MP_Minimap.MP_Minimap"));
+
+    if (ParameterCollection)
+    {
+        AArcanePunkCharacter* Player = nullptr;
+
+        TArray<AActor*> FoundActors;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArcanePunkCharacter::StaticClass(), FoundActors);
+        if (FoundActors.Num() > 0)
+        {
+            Player = Cast<AArcanePunkCharacter>(FoundActors[0]);
+        }
+        else
+        {
+            Player = GetWorld()->SpawnActor<AArcanePunkCharacter>(AArcanePunkCharacter::StaticClass(), FVector(100.0f, 0.0f, 100.0f), FRotator::ZeroRotator);
+        }
+
+        if (Player)
+        {
+            UMaterialParameterCollectionInstance* ParameterCollectionInstance = GetWorld()->GetParameterCollectionInstance(ParameterCollection);
+
+            if (ParameterCollectionInstance)
+            {
+                FName VectorParameterName = FName("Player Location");
+
+                // 여기서 GetActorRotation 대신 Character의 함수 사용
+                FName ScalarParameterName = FName("Player Yaw");
+                FVector VectorParameterValue = Player->GetActorLocation();
+                float ScalarParameterValue = Player->GetControlRotation().Yaw;
+                float ScalarParameterZeroValue = Player->GetControlRotation().Yaw + 360;
+                float Alpha = (ScalarParameterValue < 0.0f) ? 0.0f : 1.0f;
+                float SelectedValue = FMath::Lerp(ScalarParameterZeroValue, ScalarParameterValue, Alpha);
+
+                SelectedValue /= 360;
+
+                ParameterCollectionInstance->SetVectorParameterValue(VectorParameterName, VectorParameterValue);
+                ParameterCollectionInstance->SetScalarParameterValue(ScalarParameterName, SelectedValue);
+            }
+        }
+    }
+}
+
