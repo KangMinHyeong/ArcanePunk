@@ -78,7 +78,6 @@ void AAPHUD::ShowInteractionWidget() const
 void AAPHUD::HideInteractionWidget() const
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("HIDE@!!!!!!!"));
 	if (InteractionWidget)
 	{
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
@@ -87,7 +86,6 @@ void AAPHUD::HideInteractionWidget() const
 
 void AAPHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("UPDATE@!!!!!!!"));
 	if (InteractionWidget)
 	{
 		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)

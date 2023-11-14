@@ -18,13 +18,14 @@
 #include "Items/APItemBase.h"
 #include "UserInterface/APHUD.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
 
 // Sets default values
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -51,10 +52,10 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	InteractionCheckDistance = 225.0f;
 
 	PlayerInventory = CreateDefaultSubobject<UAPInventoryComponent>(TEXT("PlayerInventory"));
+
 	// set capacity of inventory
 	PlayerInventory->SetSlotsCapacity(20);
 	PlayerInventory->SetWeightCapacity(50.0f);
-	
 }
 
 // Called when the game starts or when spawned
@@ -84,13 +85,13 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	LookCharacter();
-
 	// prodo
 	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 	{
 		PerformInteractionCheck();
 	}
+
+	LookCharacter();
 }
 
 // Called to bind functionality to input
@@ -424,9 +425,30 @@ void AArcanePunkCharacter::PerformInteractionCheck()
 
 	float LookDirection = FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector());
 
+	if (!TextRenderActor)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		const FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);// { GetActorLocation() + (GetActorForwardVector() * 50.0f) };
+		const FTransform SpawnTransform = FTransform(FRotator(0.0f, 0.0f, 0.0f), SpawnLocation);// (GetActorRotation(), SpawnLocation);
+
+		TextRenderActor = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), SpawnTransform, SpawnParams);
+		FRotator Rotator = TextRenderActor->GetActorRotation();
+		TextRenderActor->SetActorRotation(FRotator(Rotator.Pitch, Rotator.Yaw + 180.0f, Rotator.Roll));
+		TextRenderActor->SetActorScale3D(FVector3d(5.0f, 5.0f, 5.0f));
+		TextRenderActor->SetActorHiddenInGame(true);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("아이템 감지중 ...  %f"), LookDirection);
+
+	// add circle collision to player
+	// if anyone detect in collision then, the first detected enroll interactable
 
 	if (LookDirection > 0)
 	{
+
 		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
 
 		FCollisionQueryParams QueryParams;
@@ -435,16 +457,20 @@ void AArcanePunkCharacter::PerformInteractionCheck()
 
 		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("감지 ?"));
 			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("히트 ?"));
 				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
 				{
 					FoundInteractable(TraceHit.GetActor());
+					UE_LOG(LogTemp, Warning, TEXT("아이템 감지"));
 					return;
 				}
 
 				if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
 				{
+					UE_LOG(LogTemp, Warning, TEXT("아이템 감지 X"));
 					return;
 				}
 
@@ -471,6 +497,28 @@ void AArcanePunkCharacter::FoundInteractable(AActor* NewInteractable)
 	InteractionData.CurrentInteractable = NewInteractable;
 	TargetInteractable = NewInteractable;
 
+	// hud 위치 설정 viewport 상에서 이루어져야함
+	//FVector Position = NewInteractable->GetActorLocation();
+	//UE_LOG(LogTemp, Warning, TEXT("%f %f"), Position.X, Position.Y);
+	//FVector WPosition = HUD->GetActorLocation();
+	//UE_LOG(LogTemp, Warning, TEXT("%f %f"), WPosition.X, WPosition.Y);
+	//HUD->SetInteractableText(FText::FromString("IS IT WORK?"));
+	//HUD->SetInteractableTextPosition(Position);
+	//HUD->SetActorLocation(Position);
+	//WPosition = HUD->GetActorLocation();
+	//UE_LOG(LogTemp, Warning, TEXT("%f %f"), WPosition.X, WPosition.Y);
+
+	if (TextRenderActor)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("실행중"));
+		TextRenderActor->SetActorHiddenInGame(false);
+		FVector Position = NewInteractable->GetActorLocation();
+		TextRenderActor->SetActorLocation(FVector(Position.X, Position.Y - 250.0f , Position.Z + 250.0f));
+		TextRenderActor->GetTextRender()->SetText(FText::FromString("Press K"));
+		//TextRenderActor->GetTextRender()->SetText(FText::FromString(("{0} {1} To Press K.", TargetInteractable->InteractableData.Action, TargetInteractable->InteractableData.Name);  //TargetInteractable->InteractableData.Action + TargetInteractable->InteractableData.Name); // + FText::FromString("To Press K"));
+	}
+
+	
 	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 
 	TargetInteractable->BeginFocus();
@@ -488,6 +536,11 @@ void AArcanePunkCharacter::NoInteractableFound()
 		if (IsValid(TargetInteractable.GetObject()))
 		{
 			TargetInteractable->EndFocus();
+		}
+
+		if (TextRenderActor)
+		{
+			TextRenderActor->SetActorHiddenInGame(true);
 		}
 
 		HUD->HideInteractionWidget();

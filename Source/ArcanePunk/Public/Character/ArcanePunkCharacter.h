@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/TextRenderActor.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
@@ -173,6 +174,9 @@ protected:
 
 	UPROPERTY()
 	AAPHUD* HUD;
+
+	UPROPERTY()
+	ATextRenderActor* TextRenderActor;
 
 	UPROPERTY(VisibleAnywhere, Category = "Character | Interaction")
 	TScriptInterface<IInteractionInterface> TargetInteractable;

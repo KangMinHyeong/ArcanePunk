@@ -44,6 +44,7 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
 
 	ActionText->SetText(InteractableData->Action);
 	NameText->SetText(InteractableData->Name);
+
 }
 
 float UInteractionWidget::UpdateInteractionProgress()
