@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ArcanePunk/ArcanePunkCharacter.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "UserInterface/Inventory/InventoryPanel.h"
 #include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Components/APInventoryComponent.h"

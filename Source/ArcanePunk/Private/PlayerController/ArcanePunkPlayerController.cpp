@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ArcanePunkPlayerController.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
-#include "ArcanePunkCharacter.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
