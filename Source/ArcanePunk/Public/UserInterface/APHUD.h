@@ -23,6 +23,7 @@ public:
 	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
 
 
+
 	bool bIsMenuVisible;
 
 	AAPHUD();
@@ -36,6 +37,7 @@ public:
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
 
 
+
 protected:
 
 	// 실제 사용될 위젯들
@@ -45,6 +47,7 @@ protected:
 
 	UPROPERTY()
 	UInteractionWidget* InteractionWidget;
+
 
 	virtual void BeginPlay() override;
 };
