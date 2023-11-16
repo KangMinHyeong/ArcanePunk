@@ -14,6 +14,8 @@ class UAPItemBase;
 class UAPInventoryComponent;
 class AAPHUD;
 
+#define Defense_constant 1000
+
 USTRUCT()
 struct FInteractionData
 {
@@ -44,18 +46,14 @@ class ARCANEPUNK_API AArcanePunkCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AArcanePunkCharacter();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintPure)
@@ -73,12 +71,20 @@ public:
 	UFUNCTION(BlueprintPure)
 	uint8 returnState();
 
-	UFUNCTION()
-	void LookCharacter();
-
 	FTransform ReturnCameraTransform();
 
 	void SetCanMove(bool NewValue);
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+
+	UFUNCTION(BlueprintPure)
+	bool IsDead();
+
+	UFUNCTION(BlueprintPure)
+	bool IsHitting();
+
+private:
+	float DamageMath(float Damage);
 
 private:
 	void MoveForward(float AxisValue);
@@ -97,7 +103,7 @@ private:
 	void SwitchState(uint8 Current);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
 	void NormalAttack(float ATK);
-	bool VisionTrace(FHitResult &HitResult);
+	void OnHitting();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -131,12 +137,16 @@ private:
 	FTimerHandle Skill_ETimerHandle;
 	FTimerHandle State_ETimerHandle;
 	FTimerHandle State_TimerHandle;
+	FTimerHandle HitTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float Attack_CastingTime = 0.5f;
 
 	UPROPERTY(EditAnywhere)
 	float Skill_CastingTime = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	float HitMotionTime = 1.0f;
 
 	UPROPERTY(EditAnywhere)
 	float State_Time = 3.0f;
@@ -164,14 +174,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AttackRadius = 40.0f;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AArcanePunkPlayerState> PlayerStateClass;
-
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY()
 	class AArcanePunkPlayerState* MyPlayerState;
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Weapon;
+
+	bool bHitting = false;
+	bool bBegin = false;
 
 // prodo
 

@@ -12,6 +12,7 @@
 #include "Engine/DamageEvents.h"
 #include "DrawDebugHelpers.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
+#include "Components/CapsuleComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -21,7 +22,7 @@
 #include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
 
-// Sets default values
+// Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -68,11 +69,13 @@ void AArcanePunkCharacter::BeginPlay()
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
 
+	bBegin = true;
+
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 
-	MyPlayerState = GetWorld()->SpawnActor<AArcanePunkPlayerState>(PlayerStateClass);
+	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 
 	if(MyPlayerState == nullptr) UE_LOG(LogTemp, Display, TEXT("Your message"));
 
@@ -381,36 +384,43 @@ void AArcanePunkCharacter::NormalAttack(float ATK)
 	}
 }
 
-bool AArcanePunkCharacter::VisionTrace(FHitResult &HitResult)
+void AArcanePunkCharacter::OnHitting()
 {
-	FVector Location;
-	FRotator Rotation;
-	AController* MyController = Cast<AController>(GetController());
-	if(MyController == nullptr)
-	{
-		return false;
-	}
-	MyController->GetPlayerViewPoint(Location, Rotation);
-	FVector Start = Location;
-	FVector End = GetActorLocation();
-
-	return GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel3);
+	bHitting = false;
+	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
-void AArcanePunkCharacter::LookCharacter()
-{
-	FHitResult HitResult;
-	bool Line = VisionTrace(HitResult);
-	if(Line)
-	{
-		if(AActor* Actor = HitResult.GetActor())
-		{
-			// Actor->MaterialParameters
-			// GetMaterial
+// 나중에 벽 투명화로 쓸 C++ 코드 (함수 헤더 지움)
+// bool AArcanePunkCharacter::VisionTrace(FHitResult &HitResult)
+// {
+// 	FVector Location;
+// 	FRotator Rotation;
+// 	AController* MyController = Cast<AController>(GetController());
+// 	if(MyController == nullptr)
+// 	{
+// 		return false;
+// 	}
+// 	MyController->GetPlayerViewPoint(Location, Rotation);
+// 	FVector Start = Location;
+// 	FVector End = GetActorLocation();
+
+// 	return GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel3);
+// }
+
+// void AArcanePunkCharacter::LookCharacter()
+// {
+// 	FHitResult HitResult;
+// 	bool Line = VisionTrace(HitResult);
+// 	if(Line)
+// 	{
+// 		if(AActor* Actor = HitResult.GetActor())
+// 		{
+// 			// Actor->MaterialParameters
+// 			// GetMaterial
 			
-		}
-	}
-}
+// 		}
+// 	}
+// }
 
 FTransform AArcanePunkCharacter::ReturnCameraTransform()
 {
@@ -421,7 +431,56 @@ void AArcanePunkCharacter::SetCanMove(bool NewValue)
 {
 	bCanMove = NewValue;
 }
+
+float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
+{
+	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	DamageApplied = FMath::Min(MyPlayerState->HP, DamageApplied);
+
+	MyPlayerState->HP = MyPlayerState->HP - DamageMath(DamageApplied);
+	
+	if(IsDead())
+	{
+	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
+	// 	bDead = true;
+		
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		//DetachFromControllerPendingDestroy();
+	// 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABossMonster_Stage1::Destoryed, DeathLoadingTime, false);
+
+	}
+	else
+	{
+		bHitting = true;
+	
+		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), MyPlayerState->HP);
+		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AArcanePunkCharacter::OnHitting, HitMotionTime, false);
+	}
+
+    return DamageApplied;
+}
+
+bool AArcanePunkCharacter::IsDead()
+{
+	if(!bBegin) return false;
+	
+    return MyPlayerState->HP<=0;
+}
+
+bool AArcanePunkCharacter::IsHitting()
+{
+    return bHitting;
+}
+
+float AArcanePunkCharacter::DamageMath(float Damage)
+{
+    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerState->DEF));
+}
+
 // prodo
+
 void AArcanePunkCharacter::PerformInteractionCheck()
 {
 	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
