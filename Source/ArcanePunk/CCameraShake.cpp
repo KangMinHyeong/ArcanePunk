@@ -30,7 +30,7 @@ void ACCameraShake::OnBoxComponentHit(UPrimitiveComponent* OverlappedComponent, 
         APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
         if (PlayerController)
         {
-            PlayerController->ClientPlayCameraShake(CameraShakeClass, 1.0f);
+            PlayerController->ClientStartCameraShake(CameraShakeClass, 1.0f);
         }
     }
 }
