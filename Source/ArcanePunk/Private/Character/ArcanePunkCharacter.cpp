@@ -30,10 +30,12 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Skill_Q_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Q_Effect"));
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
 	Skill_Q_Effect->SetupAttachment(GetMesh());
+	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
@@ -86,12 +88,12 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// prodo
-	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
-	{
-		PerformInteractionCheck();
-	}
+	// if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
+	// {
+	// 	PerformInteractionCheck();
+	// }
 
-	LookCharacter();
+	// LookCharacter();
 }
 
 // Called to bind functionality to input
@@ -415,6 +417,10 @@ FTransform AArcanePunkCharacter::ReturnCameraTransform()
     return MyCamera->GetComponentTransform();
 }
 
+void AArcanePunkCharacter::SetCanMove(bool NewValue)
+{
+	bCanMove = NewValue;
+}
 // prodo
 void AArcanePunkCharacter::PerformInteractionCheck()
 {

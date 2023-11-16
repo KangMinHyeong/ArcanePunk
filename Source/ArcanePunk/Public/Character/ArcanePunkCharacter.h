@@ -78,6 +78,8 @@ public:
 
 	FTransform ReturnCameraTransform();
 
+	void SetCanMove(bool NewValue);
+
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -168,10 +170,12 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class AArcanePunkPlayerState* MyPlayerState;
 
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* Weapon;
+
 // prodo
 
 protected:
-
 	UPROPERTY()
 	AAPHUD* HUD;
 
