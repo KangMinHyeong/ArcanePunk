@@ -2,7 +2,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
-#include "ArcanePunkCharacter.h"
+#include "Public/Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetTree.h"
 
@@ -21,7 +21,7 @@ void ACMinimapActor::BeginPlay()
     if (WidgetInstance)
     {
 
-        // ºäÆ÷Æ®¿¡ Ãß°¡
+        // ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ß°ï¿½
         WidgetInstance->AddToViewport();
     }
 	
@@ -56,7 +56,7 @@ void ACMinimapActor::Tick(float DeltaTime)
             {
                 FName VectorParameterName = FName("Player Location");
 
-                // ¿©±â¼­ GetActorRotation ´ë½Å CharacterÀÇ ÇÔ¼ö »ç¿ë
+                // ï¿½ï¿½ï¿½â¼­ GetActorRotation ï¿½ï¿½ï¿½ Characterï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½
                 FName ScalarParameterName = FName("Player Yaw");
                 FVector VectorParameterValue = Player->GetActorLocation();
                 float ScalarParameterValue = Player->GetControlRotation().Yaw;
