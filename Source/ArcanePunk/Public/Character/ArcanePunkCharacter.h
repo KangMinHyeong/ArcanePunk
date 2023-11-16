@@ -176,7 +176,6 @@ private:
 // prodo
 
 protected:
-
 	UPROPERTY()
 	AAPHUD* HUD;
 
