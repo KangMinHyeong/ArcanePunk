@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "ArcanePunk",
+			"Path": "C:\\Users\\User\\Documents\\GitHub\\ArcanePunk\\Source\\ArcanePunk.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "ArcanePunkEditor",
+			"Path": "C:\\Users\\User\\Documents\\GitHub\\ArcanePunk\\Source\\ArcanePunkEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
