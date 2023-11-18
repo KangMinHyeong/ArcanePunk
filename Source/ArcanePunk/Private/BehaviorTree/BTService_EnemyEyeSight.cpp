@@ -3,9 +3,11 @@
 
 #include "BehaviorTree/BTService_EnemyEyeSight.h"
 
-#include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "AIController.h"
+#include "Enemy/EnemyBaseAIController.h"
+#include "Enemy/Enemy_CharacterBase.h"
+#include "Character/ArcanePunkCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 UBTService_EnemyEyeSight::UBTService_EnemyEyeSight()
 {
@@ -18,16 +20,23 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
     APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-    if(PlayerPawn == nullptr) return;
     if(OwnerComp.GetAIOwner() == nullptr) return;
 
-    AAIController* AIController = Cast<AAIController>(OwnerComp.GetAIOwner());
+    AEnemyBaseAIController* AIController = Cast<AEnemyBaseAIController>(OwnerComp.GetAIOwner());
+    if(!AIController) return;
 
-    if(AIController == nullptr) return;
+    AEnemy_CharacterBase* Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
+    if(!Monster) return;
 
-    if (AIController->LineOfSightTo(PlayerPawn))
+    AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+    if(!TargetPlayer) return;
+
+    FVector TargetLocation = TargetPlayer->GetActorLocation();
+    float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
+
+    if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetPlayer) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
     {
-        OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), PlayerPawn);
+        OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetPlayer);
     }
     else
     {
