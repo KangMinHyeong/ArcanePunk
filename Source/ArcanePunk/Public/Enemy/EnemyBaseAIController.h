@@ -18,8 +18,16 @@ protected:
 
 public:
 	virtual void OnPossess(APawn* InPawn) override;
+	bool GetEyeSightTrace();
+	bool GetDistanceTrace();
 
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
+
+	UPROPERTY(EditAnywhere)
+	bool EyeSightTrace = true;
+
+	UPROPERTY(EditAnywhere)
+	bool DistanceTrace = true;
 };

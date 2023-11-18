@@ -56,17 +56,7 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintPure)
-	bool IsAttack_A();
-
-	UFUNCTION(BlueprintPure)
-	bool IsAttack_B();
-
-	UFUNCTION(BlueprintPure)
-	bool IsSkill_Q();
-
-	UFUNCTION(BlueprintPure)
-	bool IsSkill_E();
+	virtual void PostInitializeComponents() override;
 
 	UFUNCTION(BlueprintPure)
 	uint8 returnState();
@@ -83,10 +73,22 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsHitting();
 
+	UFUNCTION()
+	void OnAttack_A_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void OnAttack_B_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void OnSkill_Q_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void OnSkill_E_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	void NormalAttack(float Multiple = 1.0f);
+	void Activate_Q();
+	void Activate_E();
+
 private:
 	float DamageMath(float Damage);
 
-private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 	void ZoomInOut(float AxisValue);
@@ -102,8 +104,9 @@ private:
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
-	void NormalAttack(float ATK);
 	void OnHitting();
+	void BindAttackCheck();
+	void DeActivate_Q();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -131,19 +134,10 @@ private:
 	bool bSkill_Q = false;
 	bool bSkill_E = false;
 
-	FTimerHandle Attack_ATimerHandle;
-	FTimerHandle Attack_BTimerHandle;
-	FTimerHandle Skill_QTimerHandle;
-	FTimerHandle Skill_ETimerHandle;
 	FTimerHandle State_ETimerHandle;
 	FTimerHandle State_TimerHandle;
 	FTimerHandle HitTimerHandle;
-
-	UPROPERTY(EditAnywhere)
-	float Attack_CastingTime = 0.5f;
-
-	UPROPERTY(EditAnywhere)
-	float Skill_CastingTime = 1.0f;
+	FTimerHandle DeActivate_Q_TimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float HitMotionTime = 1.0f;
@@ -152,13 +146,13 @@ private:
 	float State_Time = 3.0f;
 
 	UPROPERTY(EditAnywhere)
+	float Q_ActiveTime = 7.0f;
+
+	UPROPERTY(EditAnywhere)
 
 	float JoggingSpeed = 700.0f;
 
 	float DefaultSpeed = 400.0f;
-
-	UPROPERTY(EditAnywhere)
-	class UParticleSystemComponent* Skill_Q_Effect;
 
 	uint8 CurrentState = 0;
 
@@ -174,15 +168,43 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AttackRadius = 40.0f;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class AArcanePunkPlayerState* MyPlayerState;
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Weapon;
 
 	bool bHitting = false;
-	bool bBegin = false;
 
+	UPROPERTY()
+	class UArcanePunkCharacterAnimInstance* Anim;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystemComponent* Q_Effect;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* E_Effect;
+
+	UPROPERTY(EditAnywhere)
+	FVector E_Size = FVector(1,1,1);
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* E_Sound_first;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* E_Sound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* Q_Sound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* Attack_Sound;
+
+	UPROPERTY(EditAnywhere)
+	float E_SoundScale = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Q_SoundScale = 1.0f;
 // prodo
 
 protected:
