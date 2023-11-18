@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Enemy_CharacterBase.generated.h"
 
+#define Defense_constant 1000
+
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
 {
@@ -31,16 +33,42 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsDead();
 
-private:
-	float DamageMath(float Damage);
+	UFUNCTION(BlueprintPure)
+	bool IsNormalAttack();
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	void NormalAttack();
 
 private:
+	float DamageMath(float Damage);
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
+	void ResetNormalAttack();
+
+private:
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* Weapon;
+
 	UPROPERTY(EditAnywhere)
 	float HP = 100.0f;
 
-	float Defense_constant = 1000.0f;
-
 	UPROPERTY(EditAnywhere)
 	float Character_Defense = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Monster_AttackRange = 250.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Monster_AttackRadius = 80.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Monster_ATK = 25.0f;
+
+	bool bNormalAttack = false;
+
+	FTimerHandle NormalAttackTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float NormalAttack_CastingTime = 1.2f;
 
 };

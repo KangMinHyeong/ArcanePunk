@@ -7,7 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "APItemBase.generated.h"
 
-class AAranePunkCharacter;
+class AArcanePunkCharacter;
 class UAPInventoryComponent;
 
 UCLASS()
@@ -17,7 +17,7 @@ class ARCANEPUNK_API UAPItemBase : public UObject
 
 public:
 	// valuables
-	// ÀÎº¥Åä¸®¿¡ ½×ÀÌ´Â ¾ç ( ÀÖÀ»¼öµµÀÖ°í ¾øÀ»¼öµµ )
+	// ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ ( ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ )
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 Quantity;
 
