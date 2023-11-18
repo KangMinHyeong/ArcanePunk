@@ -15,6 +15,7 @@
 
 // prodo
 #include "DrawDebugHelpers.h"
+#include "kismet/KismetSystemLibrary.h"
 #include "Items/APItemBase.h"
 #include "UserInterface/APHUD.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
@@ -420,11 +421,6 @@ void AArcanePunkCharacter::PerformInteractionCheck()
 {
 	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
 
-	FVector TraceStart{ GetPawnViewLocation() };
-	FVector TraceEnd{ TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance) };
-
-	float LookDirection = FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector());
-
 	if (!TextRenderActor)
 	{
 		FActorSpawnParameters SpawnParams;
@@ -441,10 +437,46 @@ void AArcanePunkCharacter::PerformInteractionCheck()
 		TextRenderActor->SetActorScale3D(FVector3d(5.0f, 5.0f, 5.0f));
 		TextRenderActor->SetActorHiddenInGame(true);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("아이템 감지중 ...  %f"), LookDirection);
 
 	// add circle collision to player
 	// if anyone detect in collision then, the first detected enroll interactable
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> types;
+	types.Reserve(1);
+	types.Emplace(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Visibility));
+
+	TArray<AActor*> Ignores;
+	TEnumAsByte<EDrawDebugTrace::Type> DrawDebug;
+	FHitResult HitResult;
+	float DrawTime = 5.0f;
+
+	bool b = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), GetActorLocation(), GetActorLocation(), 500, types, false, Ignores, DrawDebug, HitResult, true, FLinearColor::Red, FLinearColor::Green, DrawTime);
+
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), 500, 26, FColor::Red, false, 0.2f, 0, 2.0f);
+
+	if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
+	{
+		if (HitResult.GetActor() != InteractionData.CurrentInteractable)
+		{
+			FoundInteractable(HitResult.GetActor());
+			return;
+		}
+
+		if (HitResult.GetActor() == InteractionData.CurrentInteractable)
+		{
+			return;
+		}
+
+	}
+
+	// linetrace
+	/* 
+	FVector TraceStart{ GetPawnViewLocation() };
+	FVector TraceEnd{ TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance) };
+
+	float LookDirection = FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector());
+
+	LookDirection = -1;
 
 	if (LookDirection > 0)
 	{
@@ -457,27 +489,23 @@ void AArcanePunkCharacter::PerformInteractionCheck()
 
 		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("감지 ?"));
 			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("히트 ?"));
 				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
 				{
 					FoundInteractable(TraceHit.GetActor());
-					UE_LOG(LogTemp, Warning, TEXT("아이템 감지"));
 					return;
 				}
 
 				if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("아이템 감지 X"));
 					return;
 				}
 
 			}
 		}
 	}
-
+	*/
 	NoInteractableFound();
 }
 
