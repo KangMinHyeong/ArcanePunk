@@ -1,4 +1,4 @@
-#include "CCameraShake.h"
+#include "ArcanePunk/Public/ProductionSystem/CCameraShake.h"
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Kismet/GameplayStatics.h"

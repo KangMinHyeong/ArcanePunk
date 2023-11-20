@@ -1,4 +1,4 @@
-#include "Chromatic.h"
+#include "ArcanePunk/Public/ProductionSystem/Chromatic.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
 #include "Components/BoxComponent.h"
