@@ -2,11 +2,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
-<<<<<<< Updated upstream:Source/ArcanePunk/CMinimapActor.cpp
-#include "ArcanePunkCharacter.h"
-=======
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
->>>>>>> Stashed changes:Source/ArcanePunk/Private/Minimap/CMinimapActor.cpp
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetTree.h"
 
@@ -24,11 +20,6 @@ void ACMinimapActor::BeginPlay()
     UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(GetWorld(), LoadClass<UUserWidget>(nullptr, *WidgetBlueprintPath));
     if (WidgetInstance)
     {
-
-<<<<<<< Updated upstream:Source/ArcanePunk/CMinimapActor.cpp
-        // 뷰포트에 추가
-=======
->>>>>>> Stashed changes:Source/ArcanePunk/Private/Minimap/CMinimapActor.cpp
         WidgetInstance->AddToViewport();
     }
 	
@@ -62,11 +53,6 @@ void ACMinimapActor::Tick(float DeltaTime)
             if (ParameterCollectionInstance)
             {
                 FName VectorParameterName = FName("Player Location");
-
-<<<<<<< Updated upstream:Source/ArcanePunk/CMinimapActor.cpp
-                // 여기서 GetActorRotation 대신 Character의 함수 사용
-=======
->>>>>>> Stashed changes:Source/ArcanePunk/Private/Minimap/CMinimapActor.cpp
                 FName ScalarParameterName = FName("Player Yaw");
                 FVector VectorParameterValue = Player->GetActorLocation();
                 float ScalarParameterValue = Player->GetControlRotation().Yaw;
