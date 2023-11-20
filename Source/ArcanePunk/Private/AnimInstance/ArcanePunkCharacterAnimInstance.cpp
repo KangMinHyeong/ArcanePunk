@@ -52,6 +52,12 @@ void UArcanePunkCharacterAnimInstance::PlaySkill_E_Montage()
     Montage_Play(Skill_E_Montage);
 }
 
+void UArcanePunkCharacterAnimInstance::PlaySkill_R_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_R_Montage);
+}
+
 void UArcanePunkCharacterAnimInstance::AnimNotify_AttackTrigger()
 {
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());

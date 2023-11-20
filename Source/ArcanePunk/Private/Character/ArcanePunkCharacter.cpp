@@ -16,6 +16,8 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundBase.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -110,16 +112,16 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
 	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
-	PlayerInputComponent->BindAction(TEXT("Attack_B"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
+	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeQ);
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
+	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeR);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
-
 
 	// prodo
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
@@ -192,13 +194,23 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 
 void AArcanePunkCharacter::Attack_typeB()
 {
-	if(bAttack_B) return;
-	bAttack_B = true;
-	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-	if(!Anim) return;
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
-	Anim->PlayAttack_B_Montage();
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	if(bSkill_R)
+	{
+		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
+		if(!MyController) return;
+		MyController->Casting();
+		return;
+	}
+	else
+	{
+		if(bAttack_B) return;
+		bAttack_B = true;
+		Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+		if(!Anim) return;
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
+		Anim->PlayAttack_B_Montage();
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	}
 }
 
 void AArcanePunkCharacter::Skill_typeQ()
@@ -219,6 +231,36 @@ void AArcanePunkCharacter::Skill_typeE()
 	if(!Anim) return;
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), E_Sound_first, GetActorLocation(), E_SoundScale);
 	Anim->PlaySkill_E_Montage();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+}
+
+void AArcanePunkCharacter::Skill_typeR()
+{
+	AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
+	if(!MyController) return;
+
+	if(!bSkill_R)
+	{
+		bSkill_R = true;
+		//UGameplayStatics::SpawnDecalAtLocation(GetWorld(), R_Range_Decal, FVector(R_LimitDist, R_LimitDist, 1), GetActorLocation(), FRotator(-90, 0, 0), 10.0f);
+		// UGameplayStatics::SpawnDecalAttached(R_Range_Decal, FVector(R_LimitDist, R_LimitDist, 10), RangeComp);
+		// UMaterialInstance
+		MyController->SetActivate_R(bSkill_R);
+	}
+	else
+	{
+		bSkill_R = false;
+		MyController->SetActivate_R(bSkill_R);
+	}
+}
+
+void AArcanePunkCharacter::Cast_R()
+{
+	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	if(!Anim) return;
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), R_Effect, R_Location, FRotator::ZeroRotator, R_Size);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), R_Sound_Cast, R_Location, E_SoundScale);
+	Anim->PlaySkill_R_Montage();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
@@ -354,6 +396,21 @@ void AArcanePunkCharacter::Activate_E()
 	NormalAttack(4.0f);
 }
 
+void AArcanePunkCharacter::SetSkill_R(bool bValue)
+{
+	bSkill_R = bValue;
+}
+
+float AArcanePunkCharacter::GetR_LimitDist()
+{
+	return R_LimitDist;
+}
+
+void AArcanePunkCharacter::SetR_Location(FVector Vector)
+{
+	R_Location = Vector;
+}
+
 void AArcanePunkCharacter::OnHitting()
 {
 	bHitting = false;
@@ -369,6 +426,7 @@ void AArcanePunkCharacter::BindAttackCheck()
 	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnAttack_B_MontageEnded);
 	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnSkill_Q_MontageEnded);
 	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnSkill_E_MontageEnded);
+	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnSkill_R_MontageEnded);
 }
 
 void AArcanePunkCharacter::DeActivate_Q()
@@ -481,6 +539,12 @@ void AArcanePunkCharacter::OnSkill_Q_MontageEnded(UAnimMontage *Montage, bool bI
 void AArcanePunkCharacter::OnSkill_E_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
 {
 	bSkill_E = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AArcanePunkCharacter::OnSkill_R_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
+{
+	bSkill_R = false;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
