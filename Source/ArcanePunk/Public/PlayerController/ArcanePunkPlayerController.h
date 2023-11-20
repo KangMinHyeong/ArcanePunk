@@ -15,12 +15,19 @@ class ARCANEPUNK_API AArcanePunkPlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	AArcanePunkPlayerController();
+	void SetActivate_R(bool bValue);
+	void Casting();
 
+protected:
 	virtual void SetupInputComponent() override;
+	virtual void PlayerTick(float DeltaTime) override;
+	void MouseSkillEvent();
 
 private:
 	void LookStatus();
 	void FreeCameraMode();
+	void IsCasting(class AArcanePunkCharacter* APCharacter, FVector HitPoint);
+	bool ViewInteraction(class AArcanePunkCharacter* APCharacter, float Distance, FVector HitPoint);
 
 private:
 	bool bLookStatus = false;
@@ -42,5 +49,9 @@ private:
 
 	APawn* FreeCamera;
 	class AArcanePunkCharacter* MyCharacter;
+
+	bool bCast = false;
+	bool bActivate_R = false;
+	bool bCanSkill_R = false;
 
 };

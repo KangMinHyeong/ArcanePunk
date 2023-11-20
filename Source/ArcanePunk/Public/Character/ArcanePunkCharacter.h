@@ -81,10 +81,18 @@ public:
 	void OnSkill_Q_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
 	UFUNCTION()
 	void OnSkill_E_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void OnSkill_R_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	void NormalAttack(float Multiple = 1.0f);
 	void Activate_Q();
 	void Activate_E();
+	void Cast_R();
+
+	void SetSkill_R(bool bValue);
+	float GetR_LimitDist();
+
+	void SetR_Location(FVector Vector);
 
 private:
 	float DamageMath(float Damage);
@@ -96,6 +104,7 @@ private:
 	void Attack_typeB();
 	void Skill_typeQ();
 	void Skill_typeE();
+	void Skill_typeR();
 	void StartJog();
 	void EndJog();
 	void NormalState();
@@ -133,6 +142,7 @@ private:
 	bool bAttack_B = false;
 	bool bSkill_Q = false;
 	bool bSkill_E = false;
+	bool bSkill_R = false;
 
 	FTimerHandle State_ETimerHandle;
 	FTimerHandle State_TimerHandle;
@@ -186,8 +196,17 @@ private:
 	class UParticleSystem* E_Effect;
 
 	UPROPERTY(EditAnywhere)
+	class UParticleSystem* R_Effect;
+
+	UPROPERTY(EditAnywhere)
 	FVector E_Size = FVector(1,1,1);
 
+	UPROPERTY(EditAnywhere)
+	FVector R_Location;
+
+	UPROPERTY(EditAnywhere)
+	FVector R_Size = FVector(1,1,1);
+	
 	UPROPERTY(EditAnywhere)
 	class USoundBase* E_Sound_first;
 
@@ -201,10 +220,20 @@ private:
 	class USoundBase* Attack_Sound;
 
 	UPROPERTY(EditAnywhere)
+	class USoundBase* R_Sound_Cast;
+
+	UPROPERTY(EditAnywhere)
 	float E_SoundScale = 1.0f;
 
 	UPROPERTY(EditAnywhere)
 	float Q_SoundScale = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	float R_LimitDist = 1500.0f;
+
+	UPROPERTY(EditAnywhere)
+	class UMaterialInterface* R_Range_Decal;
+
 // prodo
 
 protected:

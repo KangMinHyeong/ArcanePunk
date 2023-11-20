@@ -23,6 +23,7 @@ public:
 	void PlayAttack_B_Montage();
 	void PlaySkill_Q_Montage();
 	void PlaySkill_E_Montage();
+	void PlaySkill_R_Montage();
 
 	UFUNCTION()
 	void AnimNotify_AttackTrigger();
@@ -49,5 +50,8 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_E_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_R_Montage;
 
 };
