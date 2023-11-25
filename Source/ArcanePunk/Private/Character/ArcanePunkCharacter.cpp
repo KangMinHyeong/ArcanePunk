@@ -32,7 +32,7 @@
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -41,7 +41,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
-	Q_Effect->SetupAttachment(GetMesh(),FName("HandWeapon"));
+	Q_Effect->SetupAttachment(GetMesh(),FName("SwordEffect"));
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;

@@ -64,8 +64,8 @@ protected:
 	void TakePickup(const AArcanePunkCharacter* PlayerCharacter);
 
 	// change property event where the UE5 Editor
-#if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+// #if WITH_EDITOR
+// 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+// #endif
 
 };

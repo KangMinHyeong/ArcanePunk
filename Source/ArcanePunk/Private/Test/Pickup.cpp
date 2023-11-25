@@ -141,26 +141,26 @@ void APickup::TakePickup(const AArcanePunkCharacter* PlayerCharacter)
 	}
 }
 
-void APickup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+// void APickup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	const FName ChangePropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+// 	const FName ChangePropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
 
-	// isvalid
-	if (ChangePropertyName == GET_MEMBER_NAME_CHECKED(APickup, DesiredItemID))
-	{
-		if (ItemDataTable)
-		{
-			const FString ContextString{ DesiredItemID.ToString() };
+// 	// isvalid
+// 	if (ChangePropertyName == GET_MEMBER_NAME_CHECKED(APickup, DesiredItemID))
+// 	{
+// 		if (ItemDataTable)
+// 		{
+// 			const FString ContextString{ DesiredItemID.ToString() };
 
-			if (const FItemData* ItemData = ItemDataTable->FindRow<FItemData>(DesiredItemID, DesiredItemID.ToString()))
-			{
-				PickupMesh->SetStaticMesh(ItemData->ItemAssetData.Mesh);
-			}
-		}
-	}
-}
+// 			if (const FItemData* ItemData = ItemDataTable->FindRow<FItemData>(DesiredItemID, DesiredItemID.ToString()))
+// 			{
+// 				PickupMesh->SetStaticMesh(ItemData->ItemAssetData.Mesh);
+// 			}
+// 		}
+// 	}
+// }
 
 
 
