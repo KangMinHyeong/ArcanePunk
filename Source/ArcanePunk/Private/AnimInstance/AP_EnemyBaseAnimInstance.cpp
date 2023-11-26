@@ -38,3 +38,15 @@ void UAP_EnemyBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		
 	}
 }
+bool UAP_EnemyBaseAnimInstance::IsRun()
+{
+	if(CurrentPawnSpeed >= 1.0f)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+    return false;
+}

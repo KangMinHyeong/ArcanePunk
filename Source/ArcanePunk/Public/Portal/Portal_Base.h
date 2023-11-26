@@ -17,30 +17,17 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
 	UFUNCTION()
-	void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	UFUNCTION()
-	void OnTeleport_B(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	void StartTeleport();
+	virtual void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-private:
+	virtual void StartTeleport();
+
+protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PortalMesh;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* Destination;
-
-	UPROPERTY(EditAnywhere)
 	class UBoxComponent* PortalTrigger;
-
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* DestinationTrigger;
-
-	UPROPERTY(EditAnywhere)
-	FName PlayerTag;
 
 	FTimerHandle Delay_TimerHandle;
 
@@ -49,8 +36,4 @@ private:
 
 	class AArcanePunkCharacter* OverlapCharacter;
 
-	bool Start = true;
-
-	UPROPERTY(EditAnywhere)
-	bool BothSides = true;
 };
