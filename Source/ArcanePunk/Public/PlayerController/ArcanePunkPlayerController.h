@@ -17,8 +17,12 @@ public:
 	AArcanePunkPlayerController();
 	void SetActivate_R(bool bValue);
 	void Casting();
+	void StartFadeIn();
+	void StartFadeOut();
+	void StartLoading();
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void PlayerTick(float DeltaTime) override;
 	void MouseSkillEvent();
@@ -30,10 +34,20 @@ private:
 	bool ViewInteraction(class AArcanePunkCharacter* APCharacter, float Distance, FVector HitPoint);
 
 private:
+	FTimerHandle LoadTimerHandle;
+
 	bool bLookStatus = false;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> StatusWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> FadeLoadingWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> LoadingWidgetClass;
+
+	UUserWidget* LoadingWidget;
 
 	UPROPERTY(EditAnywhere)
 	UUserWidget* StatusWidget;
@@ -53,5 +67,8 @@ private:
 	bool bCast = false;
 	bool bActivate_R = false;
 	bool bCanSkill_R = false;
+
+	UPROPERTY(EditAnywhere)
+	float LoadingTime = 2.0f;
 
 };

@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "UserInterface/LoadingFade.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -16,6 +17,13 @@ void AArcanePunkPlayerController::SetActivate_R(bool bValue)
     bActivate_R = bValue;
     if(bActivate_R) bShowMouseCursor = true;
     else bShowMouseCursor = false;
+}
+
+ void AArcanePunkPlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+
+    StartLoading();
 }
 
 void AArcanePunkPlayerController::SetupInputComponent()
@@ -143,4 +151,34 @@ bool AArcanePunkPlayerController::ViewInteraction(AArcanePunkCharacter *APCharac
         return false;
     }
     
+}
+
+void AArcanePunkPlayerController::StartFadeIn()
+{
+    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass));
+    if(!FadeLoadingWidget) return;
+
+    FadeLoadingWidget->AddToViewport();
+    FadeLoadingWidget->FadeIn();
+
+    if(!LoadingWidget) return;
+    LoadingWidget->RemoveFromParent();
+}
+
+void AArcanePunkPlayerController::StartFadeOut()
+{
+    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass));
+    if(!FadeLoadingWidget) return;
+
+    FadeLoadingWidget->AddToViewport();
+    FadeLoadingWidget->FadeOut();
+}
+
+void AArcanePunkPlayerController::StartLoading()
+{
+    LoadingWidget = CreateWidget(this, LoadingWidgetClass);
+    if(!LoadingWidget) return;
+    LoadingWidget->AddToViewport();
+
+    GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &AArcanePunkPlayerController::StartFadeIn, LoadingTime, false);
 }
