@@ -17,6 +17,9 @@ public:
 	UAP_EnemyBaseAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintPure)
+	bool IsRun();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
