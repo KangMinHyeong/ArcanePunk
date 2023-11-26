@@ -131,7 +131,6 @@ void AEnemy_CharacterBase::NormalAttack()
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(GetController());
 			if(MyController == nullptr) return;
-			UE_LOG(LogTemp, Display, TEXT("youy"));
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
 		}
 	}
