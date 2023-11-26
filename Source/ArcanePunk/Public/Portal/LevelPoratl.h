@@ -22,6 +22,16 @@ protected:
 	virtual void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
 private:
+	void Loading();
+
+private:
 	UPROPERTY(EditAnywhere)
 	FName NextLevel;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> FadeLoadingWidgetClass;
+
+	FTimerHandle LoadTimerHandle;
+	
+	class AArcanePunkPlayerController* CharacterPC;
 };
