@@ -218,7 +218,7 @@ FItemAddResult UAPInventoryComponent::HandleAddItem(UAPItemBase* InputItem)
 	{
 		const int32 InitialRequestedAddAmount = InputItem->Quantity;
 
-		if (!InputItem->ItemNumericData.bIsStackable)
+		if (!InputItem->ItemNumericData.IsStackable)
 		{
 			return HandleNonStackableItems(InputItem);
 		}
