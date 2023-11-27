@@ -12,17 +12,22 @@ enum class EItemQuality : uint8
 {
 	Common		UMETA(DisplayName = "Common"),
 	Rare		UMETA(DisplayName = "Rare"),
-	Unique		UMETA(DisplayName = "Unique")
+	Unique		UMETA(DisplayName = "Unique"),
+	Epic		UMETA(DisplayName = "Epic"),
+	Legendary	UMETA(DispalyName = "Legendary"),
+	Master		UMETA(DisplayName = "Master")
 };
 
 UENUM()
 enum class EItemType : uint8
 {
-	None		UMETA(DisplayName = "None"),
+	Goods		UMETA(DisplayName = "Goods"),
 	Equipment	UMETA(DisplayName = "Equipment"),
-	Material	UMETA(DisplayName = "Material"),
 	Consumption	UMETA(DisplayName = "Consumption"),
-	Goods		UMETA(DisplayName = "Goods")
+	RandomBox	UMETA(DisplayName = "RandomBox"),
+	Material	UMETA(DisplayName = "Material"),
+	Quest		UMETA(DisplayName = "Quest"),
+	Etc			UMETA(DisplayName = "Etc")
 };
 
 USTRUCT()
@@ -40,7 +45,28 @@ struct FItemStatistics
 	float RestoreAmount;
 
 	UPROPERTY(EditAnywhere)
-	float SellValue;
+	bool IsBound;
+
+	UPROPERTY(EditAnywhere)
+	bool IsStotrage;
+
+	UPROPERTY(EditAnywhere)
+	bool IsCraft;
+
+	UPROPERTY(EditAnywhere)
+	bool IsDisassemble;
+
+	UPROPERTY(EditAnywhere)
+	bool IsQuickSlot;
+
+	UPROPERTY(EditAnywhere)
+	int32 ItemEfficacy;
+
+	UPROPERTY(EditAnywhere)
+	FString RecipeItem;
+
+	UPROPERTY(EditAnywhere)
+	FString DisassembleResult;
 };
 
 USTRUCT()
@@ -59,6 +85,9 @@ struct FItemTextData
 
 	UPROPERTY(EditAnywhere)
 	FText UsageText;
+
+	UPROPERTY(EditAnywhere)
+	FText ConditionText;
 };
 
 USTRUCT()
@@ -70,10 +99,19 @@ struct FItemNumericData
 	float Weight;
 
 	UPROPERTY(EditAnywhere)
+	bool IsStackable;
+
+	UPROPERTY(EditAnywhere)
 	int32 MaxStackSize;
 
 	UPROPERTY(EditAnywhere)
-	bool bIsStackable;
+	int32 Cost;
+
+	UPROPERTY(EditAnywhere)
+	int32 Price;
+
+	UPROPERTY(EditAnywhere)
+	int32 RepairCost;
 };
 
 USTRUCT()
