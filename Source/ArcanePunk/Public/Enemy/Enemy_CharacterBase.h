@@ -28,6 +28,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void PostInitializeComponents() override;
+
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintPure)
@@ -39,6 +41,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	void NormalAttack();
+
+	float GetDistanceLimit();
 
 private:
 	float DamageMath(float Damage);
@@ -63,6 +67,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float Monster_ATK = 25.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Distance_Limit = 800.0f;
 
 	bool bNormalAttack = false;
 

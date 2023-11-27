@@ -21,11 +21,7 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	AEnemyBaseAIController* MonsterAIController = Cast<AEnemyBaseAIController>(GetController());
-	if(!MonsterAIController) return;
 
-	PossessedBy(MonsterAIController);
 }
 
 // Called every frame
@@ -40,6 +36,16 @@ void AEnemy_CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AEnemy_CharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AEnemyBaseAIController* MonsterAIController = Cast<AEnemyBaseAIController>(GetController());
+	if(!MonsterAIController) return;
+
+	PossessedBy(MonsterAIController);
 }
 
 float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
@@ -125,10 +131,14 @@ void AEnemy_CharacterBase::NormalAttack()
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(GetController());
 			if(MyController == nullptr) return;
-			UE_LOG(LogTemp, Display, TEXT("youy"));
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
 		}
 	}
+}
+
+float AEnemy_CharacterBase::GetDistanceLimit()
+{
+    return Distance_Limit;
 }
 
 void AEnemy_CharacterBase::PossessedBy(AController *NewController)

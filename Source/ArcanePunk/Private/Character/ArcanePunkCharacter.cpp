@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+// Minhyeong
 #include "Character/ArcanePunkCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -13,6 +13,11 @@
 #include "DrawDebugHelpers.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "Components/CapsuleComponent.h"
+#include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundBase.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -27,16 +32,16 @@
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Skill_Q_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Q_Effect"));
+	Q_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Q_Effect"));
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
-	Skill_Q_Effect->SetupAttachment(GetMesh());
+	Q_Effect->SetupAttachment(GetMesh(),FName("SwordEffect"));
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -69,8 +74,6 @@ void AArcanePunkCharacter::BeginPlay()
 	if(!MySpringArm) return;
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
-
-	bBegin = true;
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
@@ -108,10 +111,11 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
-	if(!bAttack_A && !bAttack_B)PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
-	if(!bAttack_B && !bAttack_A)PlayerInputComponent->BindAction(TEXT("Attack_B"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
+	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
+	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeQ);
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
+	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeR);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
@@ -119,31 +123,16 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
 
-
 	// prodo
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
 	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AArcanePunkCharacter::EndInteract);
 	PlayerInputComponent->BindAction("ToggleMenu", IE_Pressed, this, &AArcanePunkCharacter::ToggleMenu);
 }
 
-bool AArcanePunkCharacter::IsAttack_A()
+void AArcanePunkCharacter::PostInitializeComponents()
 {
-    return bAttack_A;
-}
-
-bool AArcanePunkCharacter::IsAttack_B()
-{
-    return bAttack_B;
-}
-
-bool AArcanePunkCharacter::IsSkill_Q()
-{
-    return bSkill_Q;
-}
-
-bool AArcanePunkCharacter::IsSkill_E()
-{
-    return bSkill_E;
+	Super::PostInitializeComponents();
+	BindAttackCheck();
 }
 
 uint8 AArcanePunkCharacter::returnState()
@@ -190,82 +179,89 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 	else if(CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
 
 	MySpringArm->TargetArmLength = CurrentArmLength;
-	
 }
 
-void AArcanePunkCharacter::Attack_typeA()
+void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
-	if(!bAttack_A)
-	{
-		bAttack_A = true;
-		bCanMove = false;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		NormalAttack(MyPlayerState->ATK);
-		GetWorldTimerManager().SetTimer(Attack_ATimerHandle, this, &AArcanePunkCharacter::Attack_typeA, Attack_CastingTime, false);
-	}
-	else
-	{
-		bAttack_A = false;
-		bCanMove = true;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		GetWorldTimerManager().ClearTimer(Attack_ATimerHandle);
-	}
+	if(bAttack_A) return;
+	bAttack_A = true;
+	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	if(!Anim) return;
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
+	Anim->PlayAttack_A_Montage();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
 void AArcanePunkCharacter::Attack_typeB()
 {
-	if(!bAttack_B)
+	if(bSkill_R)
 	{
-		bAttack_B = true;
-		bCanMove = false;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		NormalAttack(MyPlayerState->ATK);
-		GetWorldTimerManager().SetTimer(Attack_BTimerHandle, this, &AArcanePunkCharacter::Attack_typeB, Attack_CastingTime, false);
+		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
+		if(!MyController) return;
+		MyController->Casting();
+		return;
 	}
 	else
 	{
-		bAttack_B = false;
-		bCanMove = true;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		GetWorldTimerManager().ClearTimer(Attack_BTimerHandle);
+		if(bAttack_B) return;
+		bAttack_B = true;
+		Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+		if(!Anim) return;
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
+		Anim->PlayAttack_B_Montage();
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
 }
 
 void AArcanePunkCharacter::Skill_typeQ()
 {
-	if(!bSkill_Q)
-	{
-		bSkill_Q = true;
-		bCanMove = false;
-		// Skill_Q_Effect->Activate(true);
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		GetWorldTimerManager().SetTimer(Skill_QTimerHandle, this, &AArcanePunkCharacter::Skill_typeQ, Skill_CastingTime, false);
-	}
-	else
-	{
-		bSkill_Q = false;
-		bCanMove = true;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		GetWorldTimerManager().ClearTimer(Skill_QTimerHandle);
-	}
+	if(bSkill_Q) return;
+	bSkill_Q = true;
+	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	if(!Anim) return;
+	Anim->PlaySkill_Q_Montage();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
 void AArcanePunkCharacter::Skill_typeE()
 {
-	if(!bSkill_E)
+	if(bSkill_E) return;
+	bSkill_E = true;
+	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	if(!Anim) return;
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), E_Sound_first, GetActorLocation(), E_SoundScale);
+	Anim->PlaySkill_E_Montage();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+}
+
+void AArcanePunkCharacter::Skill_typeR()
+{
+	AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
+	if(!MyController) return;
+
+	if(!bSkill_R)
 	{
-		bSkill_E = true;
-		bCanMove = false;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		GetWorldTimerManager().SetTimer(Skill_ETimerHandle, this, &AArcanePunkCharacter::Skill_typeE, Skill_CastingTime, false);
+		bSkill_R = true;
+		//UGameplayStatics::SpawnDecalAtLocation(GetWorld(), R_Range_Decal, FVector(R_LimitDist, R_LimitDist, 1), GetActorLocation(), FRotator(-90, 0, 0), 10.0f);
+		// UGameplayStatics::SpawnDecalAttached(R_Range_Decal, FVector(R_LimitDist, R_LimitDist, 10), RangeComp);
+		// UMaterialInstance
+		MyController->SetActivate_R(bSkill_R);
 	}
 	else
 	{
-		bSkill_E = false;
-		bCanMove = true;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		GetWorldTimerManager().ClearTimer(Skill_ETimerHandle);
+		bSkill_R = false;
+		MyController->SetActivate_R(bSkill_R);
 	}
+}
+
+void AArcanePunkCharacter::Cast_R()
+{
+	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	if(!Anim) return;
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), R_Effect, R_Location, FRotator::ZeroRotator, R_Size);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), R_Sound_Cast, R_Location, E_SoundScale);
+	Anim->PlaySkill_R_Montage();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
 void AArcanePunkCharacter::StartJog()
@@ -358,17 +354,17 @@ bool AArcanePunkCharacter::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	
 	HitVector = -Rotation.Vector();
 
-	//DrawDebugSphere(GetWorld(), End, AttackRadius, 10, FColor::Green, false, 5);
+	DrawDebugSphere(GetWorld(), End, AttackRadius, 10, FColor::Green, false, 5);
 
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(AttackRadius);
 
 	return GetWorld()->SweepSingleByChannel(HitResult, GetActorLocation(), End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
 }
 
-void AArcanePunkCharacter::NormalAttack(float ATK)
+void AArcanePunkCharacter::NormalAttack(float Multiple)
 {
 	if(CurrentCharacterState != 0) return;
-	float Damage = ATK;
+	float Damage = MyPlayerState->ATK * Multiple;
 	FHitResult HitResult;
 	FVector HitVector;
 	bool Line = AttackTrace(HitResult, HitVector);
@@ -385,12 +381,59 @@ void AArcanePunkCharacter::NormalAttack(float ATK)
 	}
 }
 
+void AArcanePunkCharacter::Activate_Q()
+{
+	Q_Effect->Activate(true);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Q_Sound, GetActorLocation(), Q_SoundScale);
+	GetWorldTimerManager().SetTimer(DeActivate_Q_TimerHandle, this, &AArcanePunkCharacter::DeActivate_Q, Q_ActiveTime, false);
+}
+
+void AArcanePunkCharacter::Activate_E()
+{
+	FVector E_Location = GetActorLocation() + GetActorRotation().Vector() * MaxDistance + FVector::UpVector* 25.0f;
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), E_Effect, E_Location, FRotator::ZeroRotator, E_Size);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), E_Sound, E_Location, E_SoundScale);
+	NormalAttack(4.0f);
+}
+
+void AArcanePunkCharacter::SetSkill_R(bool bValue)
+{
+	bSkill_R = bValue;
+}
+
+float AArcanePunkCharacter::GetR_LimitDist()
+{
+	return R_LimitDist;
+}
+
+void AArcanePunkCharacter::SetR_Location(FVector Vector)
+{
+	R_Location = Vector;
+}
+
 void AArcanePunkCharacter::OnHitting()
 {
 	bHitting = false;
 	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
+void AArcanePunkCharacter::BindAttackCheck()
+{
+	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	if(!Anim) return;
+
+	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnAttack_A_MontageEnded);
+	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnAttack_B_MontageEnded);
+	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnSkill_Q_MontageEnded);
+	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnSkill_E_MontageEnded);
+	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::OnSkill_R_MontageEnded);
+}
+
+void AArcanePunkCharacter::DeActivate_Q()
+{
+	Q_Effect->Deactivate();
+	GetWorldTimerManager().ClearTimer(DeActivate_Q_TimerHandle);
+}
 // 나중에 벽 투명화로 쓸 C++ 코드 (함수 헤더 지움)
 // bool AArcanePunkCharacter::VisionTrace(FHitResult &HitResult)
 // {
@@ -465,7 +508,7 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 
 bool AArcanePunkCharacter::IsDead()
 {
-	if(!bBegin) return false;
+	if(!MyPlayerState) return false;
 	
     return MyPlayerState->HP<=0;
 }
@@ -473,6 +516,36 @@ bool AArcanePunkCharacter::IsDead()
 bool AArcanePunkCharacter::IsHitting()
 {
     return bHitting;
+}
+
+void AArcanePunkCharacter::OnAttack_A_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
+{
+	bAttack_A = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AArcanePunkCharacter::OnAttack_B_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
+{
+	bAttack_B = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AArcanePunkCharacter::OnSkill_Q_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
+{
+	bSkill_Q = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AArcanePunkCharacter::OnSkill_E_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
+{
+	bSkill_E = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AArcanePunkCharacter::OnSkill_R_MontageEnded(UAnimMontage *Montage, bool bInterrupted)
+{
+	bSkill_R = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 float AArcanePunkCharacter::DamageMath(float Damage)

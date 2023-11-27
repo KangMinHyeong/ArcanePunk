@@ -21,3 +21,12 @@ void AEnemyBaseAIController::OnPossess(APawn *InPawn)
         GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), GetPawn()->GetActorLocation());
     }
 }
+bool AEnemyBaseAIController::GetEyeSightTrace()
+{
+    return EyeSightTrace;
+}
+
+bool AEnemyBaseAIController::GetDistanceTrace()
+{
+    return DistanceTrace;
+}
