@@ -13,8 +13,6 @@ void UInventoryTooltip::NativeConstruct()
 
 	switch(ItemBeingHovered->ItemType)
 	{
-	case EItemType::None:
-		break;
 	case EItemType::Equipment:
 		ItemType->SetText(FText::FromString("Equipment"));
 		DamageValue->SetVisibility(ESlateVisibility::Collapsed);
@@ -50,7 +48,7 @@ void UInventoryTooltip::NativeConstruct()
 
 	StackWeight->SetText(FText::FromString(WeightInfo));
 
-	if (ItemBeingHovered->ItemNumericData.bIsStackable)
+	if (ItemBeingHovered->ItemNumericData.IsStackable)
 	{
 		const FString StackInfo = { "Max stack size : " + FString::FromInt(ItemBeingHovered->ItemNumericData.MaxStackSize) };
 

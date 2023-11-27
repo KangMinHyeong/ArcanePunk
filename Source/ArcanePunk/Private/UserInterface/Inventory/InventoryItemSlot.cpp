@@ -42,7 +42,7 @@ void UInventoryItemSlot::NativeConstruct()
 
 		ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 
-		if (ItemReference->ItemNumericData.bIsStackable)
+		if (ItemReference->ItemNumericData.IsStackable)
 		{
 			ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
 		}
@@ -88,7 +88,7 @@ void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const
 		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
 
-		ItemReference->ItemNumericData.bIsStackable ? DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity)) : DragVisual->ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
+		ItemReference->ItemNumericData.IsStackable ? DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity)) : DragVisual->ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
 
 		UItemDragDropOperation* DragItemOperation = NewObject<UItemDragDropOperation>();
 		DragItemOperation->SourceItem = ItemReference;
