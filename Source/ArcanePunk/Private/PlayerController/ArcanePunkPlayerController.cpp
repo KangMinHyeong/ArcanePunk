@@ -23,6 +23,9 @@ void AArcanePunkPlayerController::SetActivate_R(bool bValue)
 {
     Super::BeginPlay();
 
+    SetInputMode(GameInputMode);
+    bShowMouseCursor = false;
+
     StartLoading();
 }
 
@@ -163,6 +166,7 @@ void AArcanePunkPlayerController::StartFadeIn()
 
     if(!LoadingWidget) return;
     LoadingWidget->RemoveFromParent();
+    GetWorldTimerManager().ClearTimer(LoadTimerHandle);
 }
 
 void AArcanePunkPlayerController::StartFadeOut()
@@ -181,4 +185,19 @@ void AArcanePunkPlayerController::StartLoading()
     LoadingWidget->AddToViewport();
 
     GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &AArcanePunkPlayerController::StartFadeIn, LoadingTime, false);
+}
+
+void AArcanePunkPlayerController::StartSaveUI()
+{
+    SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass));
+    if(!SaveUI) return;
+
+    SaveUI->AddToViewport();
+
+    GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AArcanePunkPlayerController::EndSaveUI, LoadingTime, false);
+}
+
+void AArcanePunkPlayerController::EndSaveUI()
+{
+    SaveUI->RemoveFromParent();
 }

@@ -11,13 +11,13 @@
 #include "GameFramework/Controller.h"
 #include "Engine/DamageEvents.h"
 #include "DrawDebugHelpers.h"
-#include "PlayerState/ArcanePunkPlayerState.h"
 #include "Components/CapsuleComponent.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundBase.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Save/APSaveGame.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -82,9 +82,10 @@ void AArcanePunkCharacter::BeginPlay()
 
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 
-	if(MyPlayerState == nullptr) UE_LOG(LogTemp, Display, TEXT("Your message"));
+	if(!MyPlayerState) UE_LOG(LogTemp, Display, TEXT("Your message"));
+	InitPlayerStatus();
 
-	MyPlayerState->MoveSpeed = DefaultSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MyPlayerStatus.MoveSpeed;
 
 	// prodo
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -123,6 +124,7 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
+	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
 
 	// prodo
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
@@ -365,7 +367,7 @@ bool AArcanePunkCharacter::AttackTrace(FHitResult &HitResult, FVector &HitVector
 void AArcanePunkCharacter::NormalAttack(float Multiple)
 {
 	if(CurrentCharacterState != 0) return;
-	float Damage = MyPlayerState->ATK * Multiple;
+	float Damage = MyPlayerStatus.ATK * Multiple;
 	FHitResult HitResult;
 	FVector HitVector;
 	bool Line = AttackTrace(HitResult, HitVector);
@@ -435,7 +437,33 @@ void AArcanePunkCharacter::DeActivate_Q()
 	Q_Effect->Deactivate();
 	GetWorldTimerManager().ClearTimer(DeActivate_Q_TimerHandle);
 }
+
+void AArcanePunkCharacter::SaveStatus()
+{	
+	MyPlayerStatus.MoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	MyPlayerStatus.PlayerLocation = GetActorLocation();
+	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
+	
+	MyPlayerState->UpdatePlayerData(MyPlayerStatus);
+
+	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
+	MyGameState->UpdateGameData(MyGameStatus);
+
+	AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
+	if(!MyController) return;
+	
+	MyController->StartSaveUI();
+}
+
+void AArcanePunkCharacter::CurrentPlayerLocation()
+{
+	if(MyPlayerStatus.SaveOperation)
+	{
+		SetActorLocation(MyPlayerStatus.PlayerLocation);
+	}
+}
 // 나중에 벽 투명화로 쓸 C++ 코드 (함수 헤더 지움)
+
 // bool AArcanePunkCharacter::VisionTrace(FHitResult &HitResult)
 // {
 // 	FVector Location;
@@ -481,9 +509,9 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
-	DamageApplied = FMath::Min(MyPlayerState->HP, DamageApplied);
+	DamageApplied = FMath::Min(MyPlayerStatus.HP, DamageApplied);
 
-	MyPlayerState->HP = MyPlayerState->HP - DamageMath(DamageApplied);
+	MyPlayerStatus.HP = MyPlayerStatus.HP - DamageMath(DamageApplied);
 	
 	if(IsDead())
 	{
@@ -500,7 +528,7 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 	{
 		bHitting = true;
 	
-		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), MyPlayerState->HP);
+		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), MyPlayerStatus.HP);
 		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AArcanePunkCharacter::OnHitting, HitMotionTime, false);
 	}
 
@@ -511,7 +539,7 @@ bool AArcanePunkCharacter::IsDead()
 {
 	if(!MyPlayerState) return false;
 	
-    return MyPlayerState->HP<=0;
+    return MyPlayerStatus.HP<=0;
 }
 
 bool AArcanePunkCharacter::IsHitting()
@@ -551,9 +579,28 @@ void AArcanePunkCharacter::OnSkill_R_MontageEnded(UAnimMontage *Montage, bool bI
 
 float AArcanePunkCharacter::DamageMath(float Damage)
 {
-    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerState->DEF));
+    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerStatus.DEF));
 }
 
+void AArcanePunkCharacter::InitPlayerStatus()
+{
+	if(!MyPlayerState) return;
+
+	MyPlayerStatus.SaveOperation = MyPlayerState->PlayerStatus.SaveOperation;
+	MyPlayerStatus.MyCharacterIndex = MyPlayerState->PlayerStatus.MyCharacterIndex;
+	MyPlayerStatus.CharacterName = MyPlayerState->PlayerStatus.CharacterName;
+	MyPlayerStatus.CharacterGroup = MyPlayerState->PlayerStatus.CharacterGroup;
+	MyPlayerStatus.Gender = MyPlayerState->PlayerStatus.Gender;
+	MyPlayerStatus.HP = MyPlayerState->PlayerStatus.HP;
+	MyPlayerStatus.MP = MyPlayerState->PlayerStatus.MP;
+	MyPlayerStatus.ATK = MyPlayerState->PlayerStatus.ATK;
+	MyPlayerStatus.ATKSpeed = MyPlayerState->PlayerStatus.ATKSpeed;
+	MyPlayerStatus.DEF = MyPlayerState->PlayerStatus.DEF;
+	MyPlayerStatus.MoveSpeed = MyPlayerState->PlayerStatus.MoveSpeed;
+	MyPlayerStatus.SP = MyPlayerState->PlayerStatus.SP;
+	MyPlayerStatus.PlayerLocation = MyPlayerState->PlayerStatus.PlayerLocation;
+	CurrentPlayerLocation();
+}
 // prodo
 
 void AArcanePunkCharacter::PerformInteractionCheck()

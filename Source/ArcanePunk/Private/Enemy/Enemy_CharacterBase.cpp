@@ -9,6 +9,7 @@
 #include "TimerManager.h"
 #include "Engine/TextRenderActor.h"
 #include "Components/TextRenderComponent.h"
+#include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 
 // Sets default values
 AEnemy_CharacterBase::AEnemy_CharacterBase()
@@ -17,6 +18,7 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
+
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +26,7 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Anim = Cast<UAP_EnemyBaseAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 // Called every frame
@@ -123,6 +126,20 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 
     return DamageApplied;
 }
+
+// void AEnemy_CharacterBase::Idle()
+// {
+// 	if(!Anim) return;
+// 	if(bIdle) return;
+// 	Anim->PlayIdle();
+// 	bIdle = true;
+// }
+
+// void AEnemy_CharacterBase::Run()
+// {
+// 	if(!Anim) return;
+// 	Anim->PlayRun();
+// }
 
 bool AEnemy_CharacterBase::IsDead()
 {

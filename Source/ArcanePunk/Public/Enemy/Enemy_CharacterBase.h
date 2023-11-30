@@ -37,6 +37,9 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
+	void Idle();
+	// void Run();
+
 	UFUNCTION(BlueprintPure)
 	bool IsDead();
 
@@ -57,9 +60,6 @@ private:
 	void ResetNormalAttack();
 
 private:
-	UPROPERTY(EditAnywhere)
-	USkeletalMeshComponent* Weapon;
-
 	UPROPERTY(EditAnywhere)
 	float HP = 100.0f;
 
@@ -86,5 +86,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float NormalAttack_CastingTime = 1.2f;
+
+	UPROPERTY()
+	class UAP_EnemyBaseAnimInstance* Anim;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* Weapon;
 
 };
