@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/TextRenderActor.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
@@ -13,6 +12,7 @@
 class UAPItemBase;
 class UAPInventoryComponent;
 class AAPHUD;
+class ATextRenderActor;
 
 #define Defense_constant 1000
 
