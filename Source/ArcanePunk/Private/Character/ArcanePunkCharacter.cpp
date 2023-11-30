@@ -25,6 +25,7 @@
 #include "Items/APItemBase.h"
 #include "UserInterface/APHUD.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "Engine/TextRenderActor.h"
 #include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
 
