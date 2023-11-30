@@ -20,6 +20,8 @@ public:
 	void StartFadeIn();
 	void StartFadeOut();
 	void StartLoading();
+	void StartSaveUI();
+	void EndSaveUI();
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,6 +37,7 @@ private:
 
 private:
 	FTimerHandle LoadTimerHandle;
+	FTimerHandle SaveTimerHandle;
 
 	bool bLookStatus = false;
 
@@ -47,10 +50,15 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> LoadingWidgetClass;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> SaveCompleteClass;
+
 	UUserWidget* LoadingWidget;
 
 	UPROPERTY(EditAnywhere)
 	UUserWidget* StatusWidget;
+	
+	UUserWidget* SaveUI;
 
 	FInputModeGameOnly GameInputMode;
 

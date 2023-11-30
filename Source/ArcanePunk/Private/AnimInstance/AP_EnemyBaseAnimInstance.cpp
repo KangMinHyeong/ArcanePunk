@@ -19,17 +19,6 @@ void UAP_EnemyBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		CurrentPawnSpeed = Character->GetVelocity().Size();
 
-		// if(CurrentPawnSpeed < 1.0f)
-		// {
-		// 	UE_LOG(LogTemp, Display, TEXT("Your a"));
-		// 	Character->GetMesh()->PlayAnimation(IdlePose, false);
-		// }
-		// else
-		// {
-		// 	UE_LOG(LogTemp, Display, TEXT("Your b"));
-		// 	Character->GetMesh()->PlayAnimation(RunPose, false);
-		// }
-
 		// auto Character = Cast<ACharacter>(Pawn);
 		// if (Character)
 		// {
@@ -50,3 +39,15 @@ bool UAP_EnemyBaseAnimInstance::IsRun()
 	}
     return false;
 }
+
+// void UAP_EnemyBaseAnimInstance::PlayIdle()
+// {
+// 	auto Character = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
+// 	Character->GetMesh()->PlayAnimation(IdlePose, true);
+// }
+
+// void UAP_EnemyBaseAnimInstance::PlayRun()
+// {
+// 	auto Character = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
+// 	Character->GetMesh()->PlayAnimation(RunPose, true);
+// }

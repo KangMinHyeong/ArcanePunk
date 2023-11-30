@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/TextRenderActor.h"
 #include "GameFramework/Character.h"
+#include "PlayerState/ArcanePunkPlayerState.h"
+#include "GameState/APGameState.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
 
@@ -96,7 +98,7 @@ public:
 
 private:
 	float DamageMath(float Damage);
-
+	void InitPlayerStatus();
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 	void ZoomInOut(float AxisValue);
@@ -116,6 +118,8 @@ private:
 	void OnHitting();
 	void BindAttackCheck();
 	void DeActivate_Q();
+	void SaveStatus();
+	void CurrentPlayerLocation();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -233,6 +237,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	class UMaterialInterface* R_Range_Decal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	struct FPlayerData MyPlayerStatus;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	struct FGameData MyGameStatus;
 
 // prodo
 
