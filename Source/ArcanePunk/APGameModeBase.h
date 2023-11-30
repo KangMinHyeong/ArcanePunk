@@ -11,6 +11,7 @@ class ARCANEPUNK_API AAPGameModeBase : public AGameModeBase
 
 public:
 	AAPGameModeBase();
+	virtual void PostLogin(APlayerController* NewPlayer) override;	
 
 protected:
 	void SpawnMonster();

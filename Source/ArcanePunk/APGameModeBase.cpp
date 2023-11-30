@@ -4,8 +4,26 @@
 #include "APGameModeBase.h"
 #include "ArcanePunk/Public/Enemy/Enemy_CharacterBase.h"
 
+#include "PlayerState/ArcanePunkPlayerState.h"
+#include "GameState/APGameState.h"
+#include "Kismet/GameplayStatics.h"
+
 AAPGameModeBase::AAPGameModeBase()
 {
+}
+
+void AAPGameModeBase::PostLogin(APlayerController *NewPlayer)
+{
+    Super::PostLogin(NewPlayer);
+
+    AArcanePunkPlayerState* MyPlayerState = Cast<AArcanePunkPlayerState>(NewPlayer->PlayerState);
+	if(!MyPlayerState) return;
+
+    AAPGameState* MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(this));
+	if(!MyGameState) return;
+    
+	MyPlayerState->InitPlayerData();
+    MyGameState->InitGameData();
 }
 
 void AAPGameModeBase::SpawnMonster()

@@ -9,15 +9,16 @@
 /**
  * 
  */
-UCLASS()
-class ARCANEPUNK_API AArcanePunkPlayerState : public APlayerState
+USTRUCT(BlueprintType)
+struct FPlayerData
 {
 	GENERATED_BODY()
-public:
-	AArcanePunkPlayerState();
-	
 
-public:
+	FPlayerData() {}
+
+	UPROPERTY(Transient, BlueprintReadWrite)
+	bool SaveOperation = false;
+
 	UPROPERTY(Transient, BlueprintReadWrite)
 	int32 MyCharacterIndex = 0;
 
@@ -56,4 +57,25 @@ public:
 
 	UPROPERTY(Transient, BlueprintReadWrite)
 	int32 SP = 500.0f;
+
+	UPROPERTY(Transient, BlueprintReadWrite)
+	FVector PlayerLocation = FVector(0,0,0);
+		
+};
+
+UCLASS()
+class ARCANEPUNK_API AArcanePunkPlayerState : public APlayerState
+{
+	GENERATED_BODY()
+public:
+	AArcanePunkPlayerState();
+	void SavePlayerData();
+	void InitPlayerData();
+	void UpdatePlayerData(FPlayerData& PS);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FPlayerData PlayerStatus;
+
+	FString SaveSlotName = TEXT("Player1");
 };
