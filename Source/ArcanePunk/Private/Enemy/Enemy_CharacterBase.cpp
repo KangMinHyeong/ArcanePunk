@@ -8,6 +8,7 @@
 #include "Engine/DamageEvents.h"
 #include "TimerManager.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
+#include "DamageText/DamageText.h"
 
 // Sets default values
 AEnemy_CharacterBase::AEnemy_CharacterBase()
@@ -61,6 +62,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	HP = HP - DamageMath(DamageApplied);
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
+	SpawnDamageText();
 
 	if(IsDead())
 	{
@@ -167,4 +169,12 @@ void AEnemy_CharacterBase::ResetNormalAttack()
 {
 	bNormalAttack = false;
 	GetWorldTimerManager().ClearTimer(NormalAttackTimerHandle);
+}
+
+void AEnemy_CharacterBase::SpawnDamageText()
+{
+	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	if(!DamageText) return;
+
+	DamageText->SetOwner(this);
 }
