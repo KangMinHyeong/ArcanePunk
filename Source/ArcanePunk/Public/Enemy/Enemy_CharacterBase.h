@@ -8,6 +8,8 @@
 
 #define Defense_constant 1000
 
+class ATextRenderActor;
+
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
 {
@@ -20,6 +22,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	TArray<ATextRenderActor*> PresentDamages;
+
 
 public:	
 	// Called every frame
@@ -46,6 +51,8 @@ public:
 	void NormalAttack();
 
 	float GetDistanceLimit();
+
+	void RemovePresentDamage();
 
 private:
 	float DamageMath(float Damage);
@@ -74,6 +81,8 @@ private:
 	bool bNormalAttack = false;
 
 	FTimerHandle NormalAttackTimerHandle;
+
+	FTimerHandle PresentDamageTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float NormalAttack_CastingTime = 1.2f;
