@@ -58,6 +58,7 @@ private:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
 	void ResetNormalAttack();
+	void SpawnDamageText();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -93,5 +94,7 @@ private:
 protected:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Weapon;
-
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> DamageTextClass;
 };
