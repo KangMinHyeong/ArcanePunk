@@ -52,7 +52,7 @@ void UAPTitleUI::NewGame()
 		return;
 	}
 
-    UGameplayStatics::OpenLevel(GetWorld(), TEXT("Test1"));
+    UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap1"));
 }
 
 void UAPTitleUI::Continue()

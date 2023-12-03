@@ -133,7 +133,7 @@ void AArcanePunkPlayerController::IsCasting(AArcanePunkCharacter* APCharacter, F
         bActivate_R = false;
         bShowMouseCursor = false;
         APCharacter->SetR_Location(HitPoint);
-        APCharacter->Cast_R();
+        APCharacter->Cast_R(HitPoint);
         APCharacter->SetSkill_R(bActivate_R);
         bCast = false;
     }

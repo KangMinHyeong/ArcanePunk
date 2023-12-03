@@ -25,9 +25,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void SetDamageText(float Damage);
+
 private:
 	UFUNCTION()
 	void TimeLineUpdateFunc(float Output);
+	UFUNCTION()
+	void TimeLineUpdateFunc2(FVector Output);
+	UFUNCTION()
+	void TimeLineUpdateFunc3(FLinearColor Output);
  
 	UFUNCTION()
 	void TimeLineFinishFunc();
@@ -37,11 +43,30 @@ private:
 private:
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* TimelineCurve;
+	UPROPERTY(EditAnywhere)
+	UCurveVector* TimelineCurve2;
+	UPROPERTY(EditAnywhere)
+	UCurveLinearColor* TimelineCurve3;
 
 	FTimeline TimeLine;
  
 	FOnTimelineFloat TimeLineUpdateDelegate;
+	FOnTimelineVector TimeLineUpdateDelegate2;
+	FOnTimelineLinearColor TimeLineUpdateDelegate3;
  
 	FOnTimelineEvent TimeLineFinishDelegate;
+
+	UPROPERTY(EditAnywhere)
+	class USceneComponent* Root;
+
+	UPROPERTY(EditAnywhere)
+	class UTextRenderComponent* MyTextRender;
+
+	UPROPERTY(EditAnywhere)
+	float MaxLength = 2.0f;
+
+	FVector InitLocation;
+
+	FColor InitColor;
 
 };

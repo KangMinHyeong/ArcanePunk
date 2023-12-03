@@ -6,9 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "ArcanePunkCharacterAnimInstance.generated.h"
 
-/**
- * 
- */
+DECLARE_MULTICAST_DELEGATE(FOnComboCheckDelegate);
+
 UCLASS()
 class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
 {
@@ -31,6 +30,12 @@ public:
 	void AnimNotify_Active_Q();
 	UFUNCTION()
 	void AnimNotify_Skill_E_Trigger();
+	UFUNCTION()
+	void AnimNotify_NextCombo();
+
+	void JumpToComboSection(int32 NewSection);
+
+	FName GetAttackMontageSectionName(int32 Section);
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
@@ -38,6 +43,13 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	bool IsDead;
+
+	FVector Before = FVector(0,0,0);
+    FVector NowLocation = FVector(0,0,0);
+
+public:
+	FOnComboCheckDelegate OnComboCheck;
+	FOnMontageEnded OnAttack_A_Montage_End;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Attack_A_Montage;
@@ -53,5 +65,4 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_R_Montage;
-
 };

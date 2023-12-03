@@ -14,12 +14,19 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-	auto Character = TryGetPawnOwner();
+	auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
 	if (!Character) return;
 
 	if (!IsDead)
 	{
 		CurrentPawnSpeed = Character->GetVelocity().Size();
+
+        if (Montage_IsPlaying(Attack_A_Montage))
+        {
+            Character->SetActorRotation(Character->BeforeRotation);
+            
+        }
+        
 		// auto Character = Cast<ACharacter>(Pawn);
 		// if (Character)
 		// {
@@ -31,7 +38,7 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Attack_A_Montage);
+    Montage_Play(Attack_A_Montage, 1.0f);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
@@ -62,8 +69,8 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_AttackTrigger()
 {
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
-
-    Character->NormalAttack();
+    
+    Character->NormalAttack(Character->GetActorLocation(), true);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Active_Q()
@@ -80,4 +87,30 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_E_Trigger()
     if(!Character) return;
 
     Character->Activate_E();
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
+{
+    OnComboCheck.Broadcast();
+}
+
+void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
+{
+    if(IsDead) return;
+	if(!Montage_IsPlaying(Attack_A_Montage)) return;
+	Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
+}
+
+FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Section)
+{
+    if(Section >= 1 && Section <= 4)
+    {
+        UE_LOG(LogTemp, Display, TEXT("Your a"));
+        return FName(*FString::Printf(TEXT("Attack%d"), Section));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Display, TEXT("Your b"));
+    }
+	return FName(TEXT(""));
 }
