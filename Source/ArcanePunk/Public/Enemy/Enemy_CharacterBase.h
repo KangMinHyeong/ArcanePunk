@@ -37,9 +37,6 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
-	void Idle();
-	// void Run();
-
 	UFUNCTION(BlueprintPure)
 	bool IsDead();
 
@@ -47,18 +44,20 @@ public:
 	bool IsNormalAttack();
 
 	virtual void PossessedBy(AController* NewController) override;
-
 	void NormalAttack();
 
 	float GetDistanceLimit();
 
 	void RemovePresentDamage();
 
+	void TeleportMarkActivate(float Time);
+	void TeleportMarkDeactivate();
+
 private:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
 	void ResetNormalAttack();
-	void SpawnDamageText();
+	void SpawnDamageText(float Damage);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -85,11 +84,16 @@ private:
 
 	FTimerHandle PresentDamageTimerHandle;
 
+	FTimerHandle TeleportTimerHandle;
+
 	UPROPERTY(EditAnywhere)
 	float NormalAttack_CastingTime = 1.2f;
 
 	UPROPERTY()
 	class UAP_EnemyBaseAnimInstance* Anim;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* TeleportMark;
 
 protected:
 	UPROPERTY(EditAnywhere)

@@ -76,25 +76,20 @@ public:
 	bool IsHitting();
 
 	UFUNCTION()
-	void OnAttack_A_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	UFUNCTION()
-	void OnAttack_B_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	UFUNCTION()
-	void OnSkill_Q_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	UFUNCTION()
-	void OnSkill_E_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	UFUNCTION()
-	void OnSkill_R_MontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	void PlayerMontageEnded(UAnimMontage *Montage, bool bInterrupted);
 
-	void NormalAttack(float Multiple = 1.0f);
+	void NormalAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f);
 	void Activate_Q();
 	void Activate_E();
-	void Cast_R();
+	void Cast_R(FVector HitLocation);
 
 	void SetSkill_R(bool bValue);
 	float GetR_LimitDist();
 
 	void SetR_Location(FVector Vector);
+	FPlayerData GetPlayerStatus();
+
+	void MarkingOn(FVector Location, AActor* OtherActor);
 
 private:
 	float DamageMath(float Damage);
@@ -114,13 +109,23 @@ private:
 	void KnockBackState();//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
-	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack);
 	void OnHitting();
 	void BindAttackCheck();
+	void BindComboCheck();
 	void DeActivate_Q();
 	void SaveStatus();
 	void CurrentPlayerLocation();
+	void ComboAttackStart();
+	void ComboAttackEnd();
 
+	void OnAttack_A_MontageEnded();
+	void OnAttack_B_MontageEnded();
+	void OnSkill_Q_MontageEnded();
+	void OnSkill_E_MontageEnded();
+	void OnSkill_R_MontageEnded();
+
+	void MarkErase();
 private:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* MySpringArm;
@@ -152,6 +157,7 @@ private:
 	FTimerHandle State_TimerHandle;
 	FTimerHandle HitTimerHandle;
 	FTimerHandle DeActivate_Q_TimerHandle;
+	FTimerHandle MarkTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float HitMotionTime = 1.0f;
@@ -243,6 +249,30 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	struct FGameData MyGameStatus;
+
+	bool CanCombo = true;
+	bool IsComboInputOn = false;
+
+	int32 CurrentCombo = 0;
+	int32 MaxCombo = 3;
+
+	UPROPERTY(EditAnyWhere)
+	TSubclassOf<class ASwordImpact> SwordImpactClass;
+
+	UPROPERTY(EditAnyWhere)
+	TSubclassOf<class ASwordThrowBase> SwordThrowClass;
+
+	bool bMarking = false;
+
+	FVector MarkingLocation;
+
+	AActor* MarkingActor;
+
+public:
+	FRotator BeforeRotation;
+
+	UPROPERTY(EditAnyWhere)
+	float SwordTeleportTime = 5.0f;
 
 // prodo
 
