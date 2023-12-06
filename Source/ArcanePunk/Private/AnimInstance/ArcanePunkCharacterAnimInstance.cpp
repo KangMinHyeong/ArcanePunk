@@ -2,7 +2,9 @@
 
 
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
+
 #include "Character/ArcanePunkCharacter.h"
+#include "Components/Character/APAttackComponent.h"
 
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
 {
@@ -21,12 +23,6 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		CurrentPawnSpeed = Character->GetVelocity().Size();
 
-        if (Montage_IsPlaying(Attack_A_Montage))
-        {
-            Character->SetActorRotation(Character->BeforeRotation);
-            
-        }
-        
 		// auto Character = Cast<ACharacter>(Pawn);
 		// if (Character)
 		// {
@@ -70,7 +66,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_AttackTrigger()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
     
-    Character->NormalAttack(Character->GetActorLocation(), true);
+    Character->GetAttackComponent()->NormalAttack(Character->GetActorLocation(), true);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Active_Q()

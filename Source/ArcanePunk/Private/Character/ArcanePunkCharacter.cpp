@@ -2,6 +2,7 @@
 
 // Minhyeong
 #include "Character/ArcanePunkCharacter.h"
+
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -20,6 +21,7 @@
 #include "Skill/SwordImpact.h"
 #include "Skill/SwordThrowBase.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "Components/Character/APAttackComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -43,6 +45,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
+	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
@@ -163,16 +166,6 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		AddMovementInput(PlayerVec);
 	}	
-	
-	// if(PlayerVec.SizeSquared() > 0)
-	// {
-	// 	GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-	// 	AddMovementInput(PlayerVec);
-	// }
-	// else
-	// {
-	// 	SetActorRotation(GetController()->GetControlRotation());
-	// }
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
@@ -197,26 +190,8 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 
 void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
-	if(bAttack_A)
-	{
-		if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo)) return;
-		if (CanCombo)
-		{
-			IsComboInputOn = true;
-		}
-	}
-	else
-	{
-		if(!Anim) return;
-		ComboAttackStart();
-		BeforeRotation = GetController()->GetControlRotation();
-		Anim->PlayAttack_A_Montage();
-		Anim->JumpToComboSection(CurrentCombo);
-		bAttack_A = true;
-		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		bCanMove = false;
-	}
-	
+	if(!AttackComp) return;
+	AttackComp->StartAttack_A(bCanMove);
 }
 
 void AArcanePunkCharacter::Attack_typeB()
@@ -230,12 +205,8 @@ void AArcanePunkCharacter::Attack_typeB()
 	}
 	else
 	{
-		if(bAttack_B) return;
-		bAttack_B = true;
-		if(!Anim) return;
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
-		Anim->PlayAttack_B_Montage();
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		if(!AttackComp) return;
+		AttackComp->StartAttack_B(bCanMove);
 	}
 }
 
@@ -280,9 +251,7 @@ void AArcanePunkCharacter::Skill_typeR()
 	if(!bSkill_R)
 	{
 		bSkill_R = true;
-		//UGameplayStatics::SpawnDecalAtLocation(GetWorld(), R_Range_Decal, FVector(R_LimitDist, R_LimitDist, 1), GetActorLocation(), FRotator(-90, 0, 0), 10.0f);
-		// UGameplayStatics::SpawnDecalAttached(R_Range_Decal, FVector(R_LimitDist, R_LimitDist, 10), RangeComp);
-		// UMaterialInstance
+		
 		MyController->SetActivate_R(bSkill_R);
 	}
 	else
@@ -297,7 +266,7 @@ void AArcanePunkCharacter::Cast_R(FVector HitLocation)
 	if(!Anim) return;
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), R_Effect, R_Location, FRotator::ZeroRotator, R_Size);
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), R_Sound_Cast, R_Location, E_SoundScale);
-	NormalAttack(HitLocation, false, 0.4);
+	if(AttackComp) AttackComp->NormalAttack(HitLocation, false, 0.4);
 	Anim->PlaySkill_R_Montage();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
@@ -368,66 +337,8 @@ void AArcanePunkCharacter::SwitchState(uint8 Current)
 	}
 }
 
-bool AArcanePunkCharacter::AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack)
-{
-	// FVector Location;
-	FRotator Rotation = GetActorRotation();
-	// AController* MyController = Cast<AController>(GetController());
-	// if(MyController == nullptr)
-	// {
-	// 	return false;
-	// }
-	// MyController->GetPlayerViewPoint(Location, Rotation);
-	FVector End = Start;
-	if(CloseAttack) End = End + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
-	else End = End + FVector::UpVector* 100.0f;
-
-	// 아군은 타격 판정이 안되게 하는 코드
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
-	for (AActor* Actor : Actors)
-    {
-		Params.AddIgnoredActor(Actor);
-    }    
-	
-	HitVector = -Rotation.Vector();
-
-	//DrawDebugSphere(GetWorld(), End, AttackRadius, 10, FColor::Green, false, 5);
-
-	FCollisionShape Sphere;
-	if(CloseAttack) Sphere = FCollisionShape::MakeSphere(AttackRadius);
-	else Sphere = FCollisionShape::MakeSphere(AttackRadius*1.25);
-
-	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
-}
-
-void AArcanePunkCharacter::NormalAttack(FVector Start, bool CloseAttack, float Multiple)
-{
-	if(CurrentCharacterState != 0) return;
-	float Damage = MyPlayerStatus.ATK * Multiple;
-	FHitResult HitResult;
-	FVector HitVector;
-	bool Line = AttackTrace(HitResult, HitVector, Start, CloseAttack);
-	if(Line)
-	{
-		if(AActor* Actor = HitResult.GetActor())
-		{
-			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
-			AController* MyController = Cast<AController>(GetController());
-			if(!MyController) return;
-			UE_LOG(LogTemp, Display, TEXT("youy"));
-			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
-		}
-	}
-}
-
 void AArcanePunkCharacter::Activate_Q()
 {
-	//Q_Effect->Activate(true);
-	//GetWorldTimerManager().SetTimer(DeActivate_Q_TimerHandle, this, &AArcanePunkCharacter::DeActivate_Q, Q_ActiveTime, false);
-
 	auto SwordSkill = GetWorld()->SpawnActor<ASwordImpact>(SwordImpactClass, GetActorLocation()+GetActorForwardVector()*150.0f, GetActorRotation());
 	if(!SwordSkill) return;
 	SwordSkill->SetOwner(this);
@@ -470,13 +381,11 @@ void AArcanePunkCharacter::MarkingOn(FVector Location, AActor* OtherActor)
 
 void AArcanePunkCharacter::AnimMovement()
 {
-	GetCharacterMovement()->BrakingFrictionFactor = Fric;
 	AttackMove = true;
 }
 
 void AArcanePunkCharacter::AnimMoveStop()
 {
-	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
 	AttackMove = false;
 }
 
@@ -505,6 +414,26 @@ void AArcanePunkCharacter::SpawnFootPrint(bool LeftFoot)
 	}
 }
 
+UAPAttackComponent *AArcanePunkCharacter::GetAttackComponent()
+{
+    return AttackComp;
+}
+
+FPlayerData AArcanePunkCharacter::GetMyPlayerStatus()
+{
+    return MyPlayerStatus;
+}
+
+uint8 AArcanePunkCharacter::GetCurrentCharacterState()
+{
+    return CurrentCharacterState;
+}
+
+UArcanePunkCharacterAnimInstance *AArcanePunkCharacter::GetAnim()
+{
+    return Anim;
+}
+
 void AArcanePunkCharacter::OnHitting()
 {
 	bHitting = false;
@@ -522,16 +451,11 @@ void AArcanePunkCharacter::BindAttackCheck()
 
 void AArcanePunkCharacter::BindComboCheck()
 {
-	if(!Anim) return;
+	if(!Anim || !AttackComp) return;
 	//ComboAttack
 	Anim->OnComboCheck.AddLambda([this]()->void {
 
-		CanCombo = false;
-		if (IsComboInputOn)
-		{
-			ComboAttackStart();
-			Anim->JumpToComboSection(CurrentCombo);
-		}
+		AttackComp->ComboCheck();
 	});
 }
 
@@ -565,53 +489,6 @@ void AArcanePunkCharacter::CurrentPlayerLocation()
 		SetActorLocation(MyPlayerStatus.PlayerLocation);
 	}
 }
-void AArcanePunkCharacter::ComboAttackStart()
-{
-	CanCombo = true;
-	IsComboInputOn = false;
-	if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 0, MaxCombo - 1)) return;
-	CurrentCombo = FMath::Clamp<int32>(CurrentCombo + 1, 1, MaxCombo);
-}
-
-void AArcanePunkCharacter::ComboAttackEnd()
-{
-	CanCombo = false;
-	IsComboInputOn = false;
-	CurrentCombo = 0;
-}
-
-// 나중에 벽 투명화로 쓸 C++ 코드 (함수 헤더 지움)
-
-// bool AArcanePunkCharacter::VisionTrace(FHitResult &HitResult)
-// {
-// 	FVector Location;
-// 	FRotator Rotation;
-// 	AController* MyController = Cast<AController>(GetController());
-// 	if(MyController == nullptr)
-// 	{
-// 		return false;
-// 	}
-// 	MyController->GetPlayerViewPoint(Location, Rotation);
-// 	FVector Start = Location;
-// 	FVector End = GetActorLocation();
-
-// 	return GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_GameTraceChannel3);
-// }
-
-// void AArcanePunkCharacter::LookCharacter()
-// {
-// 	FHitResult HitResult;
-// 	bool Line = VisionTrace(HitResult);
-// 	if(Line)
-// 	{
-// 		if(AActor* Actor = HitResult.GetActor())
-// 		{
-// 			// Actor->MaterialParameters
-// 			// GetMaterial
-			
-// 		}
-// 	}
-// }
 
 FTransform AArcanePunkCharacter::ReturnCameraTransform()
 {
@@ -679,15 +556,16 @@ void AArcanePunkCharacter::PlayerMontageEnded(UAnimMontage *Montage, bool bInter
 
 void AArcanePunkCharacter::OnAttack_A_MontageEnded()
 {
-	bAttack_A = false;
-	ComboAttackEnd();
-	SetActorRotation(BeforeRotation);
+	if(!AttackComp) return;
+	AttackComp->SetAttack_A(false);
+	AttackComp->ComboAttackEnd();
 	bCanMove = true;
 }
 
 void AArcanePunkCharacter::OnAttack_B_MontageEnded()
 {
-	bAttack_B = false;
+	if(!AttackComp) return;
+	AttackComp->SetAttack_B(false);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -738,14 +616,9 @@ void AArcanePunkCharacter::AttackMoving(float DeltaTime)
 
 	if(!PMCheck(HitResult, OverlapStart, OverlapEnd))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Your a"));
 		FVector DashVector = GetActorLocation() + GetActorForwardVector()*Speed * DeltaTime;
 		SetActorLocation(DashVector);
 	} 
-	else
-	{
-		UE_LOG(LogTemp, Display, TEXT("Your b"));
-	}
 }
 
 float AArcanePunkCharacter::DamageMath(float Damage)
@@ -756,7 +629,6 @@ float AArcanePunkCharacter::DamageMath(float Damage)
 void AArcanePunkCharacter::InitPlayerStatus()
 {
 	if(!MyPlayerState) return;
-
 	MyPlayerStatus = MyPlayerState->PlayerStatus;
 
 	CurrentPlayerLocation();
