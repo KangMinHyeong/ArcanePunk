@@ -91,6 +91,11 @@ public:
 
 	void MarkingOn(FVector Location, AActor* OtherActor);
 
+	void AnimMovement();
+	void AnimMoveStop();
+
+	void SpawnFootPrint(bool LeftFoot);
+
 private:
 	float DamageMath(float Damage);
 	void InitPlayerStatus();
@@ -126,12 +131,22 @@ private:
 	void OnSkill_R_MontageEnded();
 
 	void MarkErase();
+
+	bool PMCheck(FHitResult& HitResult, FVector OverlapStart, FVector OverlapEnd);
+
+	void AttackMoving(float DeltaTime);
 private:
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* MySpringArm;
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* MyCamera;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* FootPrint_L;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* FootPrint_R;
 
 	float MaximumSpringArmLength = 0.0f;
 
@@ -262,11 +277,34 @@ private:
 	UPROPERTY(EditAnyWhere)
 	TSubclassOf<class ASwordThrowBase> SwordThrowClass;
 
+	UPROPERTY(EditAnyWhere)
+	TSubclassOf<AActor> LeftFootClass;
+
+	UPROPERTY(EditAnyWhere)
+	TSubclassOf<AActor> RightFootClass;
+
 	bool bMarking = false;
 
 	FVector MarkingLocation;
 
 	AActor* MarkingActor;
+
+	UPROPERTY(EditAnyWhere)
+	float Attack1_MoveSpeed = 500.0f;
+
+	UPROPERTY(EditAnyWhere)
+	float Attack2_MoveSpeed = 500.0f;
+
+	UPROPERTY(EditAnyWhere)
+	float Attack3_MoveSpeed = 500.0f;
+
+	UPROPERTY(EditAnyWhere)
+	float Fric = 0.75f;
+
+	bool AttackMove = false;
+
+	UPROPERTY(EditAnyWhere)
+	float Customfloat = 75.0f;
 
 public:
 	FRotator BeforeRotation;
