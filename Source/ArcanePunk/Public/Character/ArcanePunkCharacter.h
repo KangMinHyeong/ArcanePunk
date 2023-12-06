@@ -78,7 +78,6 @@ public:
 	UFUNCTION()
 	void PlayerMontageEnded(UAnimMontage *Montage, bool bInterrupted);
 
-	void NormalAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f);
 	void Activate_Q();
 	void Activate_E();
 	void Cast_R(FVector HitLocation);
@@ -96,6 +95,13 @@ public:
 
 	void SpawnFootPrint(bool LeftFoot);
 
+	class UAPAttackComponent* GetAttackComponent(); // AttackComp 반환
+
+	struct FPlayerData GetMyPlayerStatus(); // PlayerStatus 반환
+
+	uint8 GetCurrentCharacterState(); // CurrentCharacterState 반환
+
+	class UArcanePunkCharacterAnimInstance* GetAnim(); // AnimInstance 반환
 private:
 	float DamageMath(float Damage);
 	void InitPlayerStatus();
@@ -114,15 +120,13 @@ private:
 	void KnockBackState();//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
-	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack);
+	
 	void OnHitting();
 	void BindAttackCheck();
 	void BindComboCheck();
 	void DeActivate_Q();
 	void SaveStatus();
 	void CurrentPlayerLocation();
-	void ComboAttackStart();
-	void ComboAttackEnd();
 
 	void OnAttack_A_MontageEnded();
 	void OnAttack_B_MontageEnded();
@@ -141,6 +145,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* MyCamera;
+
+	UPROPERTY(EditAnywhere)
+	class UAPAttackComponent* AttackComp;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* FootPrint_L;
@@ -162,8 +169,6 @@ private:
 
 	bool bCanMove = true;
 
-	bool bAttack_A = false;
-	bool bAttack_B = false;
 	bool bSkill_Q = false;
 	bool bSkill_E = false;
 	bool bSkill_R = false;
@@ -196,12 +201,6 @@ private:
 	uint8 CurrentCharacterState = 0;
 
 	float StateTime = 3.0f;
-
-	UPROPERTY(EditAnywhere)
-	float MaxDistance = 200.0f;
-
-	UPROPERTY(EditAnywhere)
-	float AttackRadius = 40.0f;
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class AArcanePunkPlayerState* MyPlayerState;
@@ -265,12 +264,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	struct FGameData MyGameStatus;
 
-	bool CanCombo = true;
-	bool IsComboInputOn = false;
-
-	int32 CurrentCombo = 0;
-	int32 MaxCombo = 3;
-
 	UPROPERTY(EditAnyWhere)
 	TSubclassOf<class ASwordImpact> SwordImpactClass;
 
@@ -298,17 +291,12 @@ private:
 	UPROPERTY(EditAnyWhere)
 	float Attack3_MoveSpeed = 500.0f;
 
-	UPROPERTY(EditAnyWhere)
-	float Fric = 0.75f;
-
 	bool AttackMove = false;
 
 	UPROPERTY(EditAnyWhere)
 	float Customfloat = 75.0f;
 
 public:
-	FRotator BeforeRotation;
-
 	UPROPERTY(EditAnyWhere)
 	float SwordTeleportTime = 5.0f;
 
