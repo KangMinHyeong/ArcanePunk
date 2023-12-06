@@ -32,6 +32,14 @@ public:
 	void AnimNotify_Skill_E_Trigger();
 	UFUNCTION()
 	void AnimNotify_NextCombo();
+	UFUNCTION()
+	void AnimNotify_AnimMove();
+	UFUNCTION()
+	void AnimNotify_AnimStop();
+	UFUNCTION()
+	void AnimNotify_FootRight();
+	UFUNCTION()
+	void AnimNotify_FootLeft();
 
 	void JumpToComboSection(int32 NewSection);
 
@@ -65,4 +73,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_R_Montage;
+
+	int32 AttackSection = 0;;
 };

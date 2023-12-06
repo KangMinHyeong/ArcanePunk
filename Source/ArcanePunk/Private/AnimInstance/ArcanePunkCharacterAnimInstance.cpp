@@ -94,23 +94,51 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
     OnComboCheck.Broadcast();
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_AnimMove()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character) return;
+
+    Character->AnimMovement();
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_AnimStop()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character) return;
+
+    Character->AnimMoveStop();
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character) return;
+    
+    Character->SpawnFootPrint(true);
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character) return;
+    
+    Character->SpawnFootPrint(false);
+}
+
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
 {
     if(IsDead) return;
+    AttackSection = NewSection;
 	if(!Montage_IsPlaying(Attack_A_Montage)) return;
 	Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
 }
 
 FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Section)
 {
-    if(Section >= 1 && Section <= 4)
+    if(Section >= 1 && Section <= 3)
     {
-        UE_LOG(LogTemp, Display, TEXT("Your a"));
         return FName(*FString::Printf(TEXT("Attack%d"), Section));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Display, TEXT("Your b"));
     }
 	return FName(TEXT(""));
 }

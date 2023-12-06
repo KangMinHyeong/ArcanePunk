@@ -35,17 +35,21 @@
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Q_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Q_Effect"));
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
+	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
 	Q_Effect->SetupAttachment(GetMesh(),FName("SwordEffect"));
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
+	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
+	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
@@ -84,7 +88,7 @@ void AArcanePunkCharacter::BeginPlay()
 
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 
-	if(!MyPlayerState) UE_LOG(LogTemp, Display, TEXT("Your message"));
+	if(!MyPlayerState) return;
 	InitPlayerStatus();
 
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerStatus.MoveSpeed;
@@ -98,6 +102,10 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(AttackMove)
+	{
+		AttackMoving(DeltaTime);
+	}
 	// prodo
 	// if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 	// {
@@ -206,6 +214,7 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 		Anim->JumpToComboSection(CurrentCombo);
 		bAttack_A = true;
 		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		bCanMove = false;
 	}
 	
 }
@@ -459,6 +468,43 @@ void AArcanePunkCharacter::MarkingOn(FVector Location, AActor* OtherActor)
 	GetWorldTimerManager().SetTimer(MarkTimerHandle, this, &AArcanePunkCharacter::MarkErase, SwordTeleportTime, false);
 }
 
+void AArcanePunkCharacter::AnimMovement()
+{
+	GetCharacterMovement()->BrakingFrictionFactor = Fric;
+	AttackMove = true;
+}
+
+void AArcanePunkCharacter::AnimMoveStop()
+{
+	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
+	AttackMove = false;
+}
+
+void AArcanePunkCharacter::SpawnFootPrint(bool LeftFoot)
+{
+	FHitResult HitResult;
+	if(LeftFoot)
+	{
+		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*Customfloat))
+		{
+			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
+			{
+				auto FootPrint = GetWorld()->SpawnActor<AActor>(LeftFootClass, FootPrint_L->GetComponentTransform());
+			}	
+		}
+	}
+	else
+	{
+		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*Customfloat))
+		{
+			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
+			{
+				auto FootPrint = GetWorld()->SpawnActor<AActor>(RightFootClass, FootPrint_R->GetComponentTransform());
+			}
+		}
+	}
+}
+
 void AArcanePunkCharacter::OnHitting()
 {
 	bHitting = false;
@@ -636,7 +682,7 @@ void AArcanePunkCharacter::OnAttack_A_MontageEnded()
 	bAttack_A = false;
 	ComboAttackEnd();
 	SetActorRotation(BeforeRotation);
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	bCanMove = true;
 }
 
 void AArcanePunkCharacter::OnAttack_B_MontageEnded()
@@ -669,6 +715,39 @@ void AArcanePunkCharacter::MarkErase()
 	GetWorldTimerManager().ClearTimer(MarkTimerHandle);
 }
 
+bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, FVector OverlapEnd)
+{
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.bReturnPhysicalMaterial = true;
+	 
+    return GetWorld()->LineTraceSingleByChannel(HitResult, OverlapStart, OverlapEnd, ECC_Visibility, Params);
+}
+
+void AArcanePunkCharacter::AttackMoving(float DeltaTime)
+{
+	float Speed = 0.0f;
+	int32 Section = Anim->AttackSection;
+	if (Section == 1) Speed = Attack1_MoveSpeed;
+	else if(Section == 2) Speed = Attack2_MoveSpeed;
+	else if(Section == 3) Speed = Attack3_MoveSpeed;
+
+	FHitResult HitResult;
+	FVector OverlapStart = GetActorLocation() + GetActorForwardVector() * 34.0f;
+	FVector OverlapEnd = OverlapStart + GetActorForwardVector()*Speed * DeltaTime;
+
+	if(!PMCheck(HitResult, OverlapStart, OverlapEnd))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Your a"));
+		FVector DashVector = GetActorLocation() + GetActorForwardVector()*Speed * DeltaTime;
+		SetActorLocation(DashVector);
+	} 
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("Your b"));
+	}
+}
+
 float AArcanePunkCharacter::DamageMath(float Damage)
 {
     return Damage * Defense_constant * (1/(Defense_constant + MyPlayerStatus.DEF));
@@ -678,21 +757,11 @@ void AArcanePunkCharacter::InitPlayerStatus()
 {
 	if(!MyPlayerState) return;
 
-	MyPlayerStatus.SaveOperation = MyPlayerState->PlayerStatus.SaveOperation;
-	MyPlayerStatus.MyCharacterIndex = MyPlayerState->PlayerStatus.MyCharacterIndex;
-	MyPlayerStatus.CharacterName = MyPlayerState->PlayerStatus.CharacterName;
-	MyPlayerStatus.CharacterGroup = MyPlayerState->PlayerStatus.CharacterGroup;
-	MyPlayerStatus.Gender = MyPlayerState->PlayerStatus.Gender;
-	MyPlayerStatus.HP = MyPlayerState->PlayerStatus.HP;
-	MyPlayerStatus.MP = MyPlayerState->PlayerStatus.MP;
-	MyPlayerStatus.ATK = MyPlayerState->PlayerStatus.ATK;
-	MyPlayerStatus.ATKSpeed = MyPlayerState->PlayerStatus.ATKSpeed;
-	MyPlayerStatus.DEF = MyPlayerState->PlayerStatus.DEF;
-	MyPlayerStatus.MoveSpeed = MyPlayerState->PlayerStatus.MoveSpeed;
-	MyPlayerStatus.SP = MyPlayerState->PlayerStatus.SP;
-	MyPlayerStatus.PlayerLocation = MyPlayerState->PlayerStatus.PlayerLocation;
+	MyPlayerStatus = MyPlayerState->PlayerStatus;
+
 	CurrentPlayerLocation();
 }
+
 // prodo
 
 void AArcanePunkCharacter::PerformInteractionCheck()
