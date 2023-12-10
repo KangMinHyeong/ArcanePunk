@@ -5,6 +5,7 @@
 
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APAttackComponent.h"
+#include "Components/Character/APMovementComponent.h"
 
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
 {
@@ -95,7 +96,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_AnimMove()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
 
-    Character->AnimMovement();
+    Character->GetAPMoveComponent()->AnimMovement();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AnimStop()
@@ -103,7 +104,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_AnimStop()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
 
-    Character->AnimMoveStop();
+    Character->GetAPMoveComponent()->AnimMoveStop();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
@@ -137,4 +138,9 @@ FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Sectio
         return FName(*FString::Printf(TEXT("Attack%d"), Section));
     }
 	return FName(TEXT(""));
+}
+
+int32 UArcanePunkCharacterAnimInstance::GetAttackSection()
+{
+    return AttackSection;
 }

@@ -40,14 +40,3 @@ bool UAP_EnemyBaseAnimInstance::IsRun()
     return false;
 }
 
-// void UAP_EnemyBaseAnimInstance::PlayIdle()
-// {
-// 	auto Character = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
-// 	Character->GetMesh()->PlayAnimation(IdlePose, true);
-// }
-
-// void UAP_EnemyBaseAnimInstance::PlayRun()
-// {
-// 	auto Character = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
-// 	Character->GetMesh()->PlayAnimation(RunPose, true);
-// }

@@ -22,6 +22,7 @@
 #include "Skill/SwordThrowBase.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Components/Character/APAttackComponent.h"
+#include "Components/Character/APMovementComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -36,8 +37,7 @@
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -46,6 +46,8 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
+	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
+	HitMaterial = CreateDefaultSubobject<UMaterialInterface>(TEXT("HitMaterial"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
@@ -77,7 +79,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	PlayerInventory->SetWeightCapacity(50.0f);
 }
 
-// Called when the game starts or when spawned
 void AArcanePunkCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -86,7 +87,7 @@ void AArcanePunkCharacter::BeginPlay()
 	CurrentArmLength = MaximumSpringArmLength;
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
-
+	DefaultMaterial = GetMesh()->GetMaterial(0);
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
@@ -100,15 +101,10 @@ void AArcanePunkCharacter::BeginPlay()
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
-// Called every frame
 void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(AttackMove)
-	{
-		AttackMoving(DeltaTime);
-	}
 	// prodo
 	// if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 	// {
@@ -159,24 +155,12 @@ uint8 AArcanePunkCharacter::returnState()
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
 {
-	if(!bCanMove) return;
-	PlayerVec.X = AxisValue;
-	if(PlayerVec.SizeSquared() != 0)
-	{
-		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-		AddMovementInput(PlayerVec);
-	}	
+	MoveComp->PlayerMoveForward(AxisValue);
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
 {
-	if(!bCanMove) return;
-	PlayerVec.Y = AxisValue;
-	if(PlayerVec.SizeSquared() != 0)
-	{
-		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-		AddMovementInput(PlayerVec);
-	}
+	MoveComp->PlayerMoveRight(AxisValue);
 }
 
 void AArcanePunkCharacter::ZoomInOut(float AxisValue)
@@ -265,7 +249,6 @@ void AArcanePunkCharacter::Cast_R(FVector HitLocation)
 {
 	if(!Anim) return;
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), R_Effect, R_Location, FRotator::ZeroRotator, R_Size);
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), R_Sound_Cast, R_Location, E_SoundScale);
 	if(AttackComp) AttackComp->NormalAttack(HitLocation, false, 0.4);
 	Anim->PlaySkill_R_Montage();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -371,6 +354,11 @@ FPlayerData AArcanePunkCharacter::GetPlayerStatus()
     return MyPlayerStatus;
 }
 
+void AArcanePunkCharacter::SetPlayerStatus(FPlayerData NewPlayerData)
+{
+	MyPlayerStatus = NewPlayerData;
+}
+
 void AArcanePunkCharacter::MarkingOn(FVector Location, AActor* OtherActor)
 {
 	bMarking = true;
@@ -379,14 +367,24 @@ void AArcanePunkCharacter::MarkingOn(FVector Location, AActor* OtherActor)
 	GetWorldTimerManager().SetTimer(MarkTimerHandle, this, &AArcanePunkCharacter::MarkErase, SwordTeleportTime, false);
 }
 
-void AArcanePunkCharacter::AnimMovement()
+float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
 {
-	AttackMove = true;
+	float Speed = 0.0f;
+	if (Section == 1) Speed = Attack1_MoveSpeed;
+	else if(Section == 2) Speed = Attack2_MoveSpeed;
+	else if(Section == 3) Speed = Attack3_MoveSpeed;
+
+    return Speed;
 }
 
-void AArcanePunkCharacter::AnimMoveStop()
+float AArcanePunkCharacter::GetPushCoefficient()
 {
-	AttackMove = false;
+    return AttackPushCoefficient;
+}
+
+UAPMovementComponent *AArcanePunkCharacter::GetAPMoveComponent()
+{
+    return MoveComp;
 }
 
 void AArcanePunkCharacter::SpawnFootPrint(bool LeftFoot)
@@ -394,7 +392,7 @@ void AArcanePunkCharacter::SpawnFootPrint(bool LeftFoot)
 	FHitResult HitResult;
 	if(LeftFoot)
 	{
-		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*Customfloat))
+		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*100.0f))
 		{
 			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
 			{
@@ -404,7 +402,7 @@ void AArcanePunkCharacter::SpawnFootPrint(bool LeftFoot)
 	}
 	else
 	{
-		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*Customfloat))
+		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*100.0f))
 		{
 			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
 			{
@@ -419,24 +417,40 @@ UAPAttackComponent *AArcanePunkCharacter::GetAttackComponent()
     return AttackComp;
 }
 
-FPlayerData AArcanePunkCharacter::GetMyPlayerStatus()
-{
-    return MyPlayerStatus;
-}
-
-uint8 AArcanePunkCharacter::GetCurrentCharacterState()
-{
-    return CurrentCharacterState;
-}
-
 UArcanePunkCharacterAnimInstance *AArcanePunkCharacter::GetAnim()
 {
     return Anim;
 }
 
+float AArcanePunkCharacter::GetMaxDistance()
+{
+    return MaxDistance;
+}
+
+float AArcanePunkCharacter::GetAttackRadius()
+{
+    return AttackRadius;
+}
+
+UParticleSystem *AArcanePunkCharacter::GetComboHitEffect()
+{
+    return ComboHitEffect;
+}
+
+FVector AArcanePunkCharacter::GetComboHitEffectScale()
+{
+    return HitEffectScale;
+}
+
+bool AArcanePunkCharacter::GetCanMove()
+{
+    return bCanMove;
+}
+
 void AArcanePunkCharacter::OnHitting()
 {
 	bHitting = false;
+	GetMesh()->SetMaterial(0,DefaultMaterial);
 	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
@@ -520,9 +534,11 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 
 	}
 	else
-	{
+	{ 
 		bHitting = true;
-	
+		if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
+		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
+		if(MyController) MyController->HitUI();
 		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), MyPlayerStatus.HP);
 		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AArcanePunkCharacter::OnHitting, HitMotionTime, false);
 	}
@@ -598,27 +614,10 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.bReturnPhysicalMaterial = true;
-	 
-    return GetWorld()->LineTraceSingleByChannel(HitResult, OverlapStart, OverlapEnd, ECC_Visibility, Params);
-}
+	
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(AttackRadius * 0.75f);
 
-void AArcanePunkCharacter::AttackMoving(float DeltaTime)
-{
-	float Speed = 0.0f;
-	int32 Section = Anim->AttackSection;
-	if (Section == 1) Speed = Attack1_MoveSpeed;
-	else if(Section == 2) Speed = Attack2_MoveSpeed;
-	else if(Section == 3) Speed = Attack3_MoveSpeed;
-
-	FHitResult HitResult;
-	FVector OverlapStart = GetActorLocation() + GetActorForwardVector() * 34.0f;
-	FVector OverlapEnd = OverlapStart + GetActorForwardVector()*Speed * DeltaTime;
-
-	if(!PMCheck(HitResult, OverlapStart, OverlapEnd))
-	{
-		FVector DashVector = GetActorLocation() + GetActorForwardVector()*Speed * DeltaTime;
-		SetActorLocation(DashVector);
-	} 
+	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Visibility, Sphere, Params);
 }
 
 float AArcanePunkCharacter::DamageMath(float Damage)

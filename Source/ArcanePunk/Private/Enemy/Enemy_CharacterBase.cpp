@@ -10,8 +10,10 @@
 #include "Engine/TextRenderActor.h"
 #include "Components/TextRenderComponent.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "DamageText/DamageText.h"
 #include "NiagaraComponent.h"
+#include "Enemy/Drop/Enemy_DropBase.h"
 
 // Sets default values
 AEnemy_CharacterBase::AEnemy_CharacterBase()
@@ -31,6 +33,9 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OnDrop = true;
+	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
+	DefaultMaterial = GetMesh()->GetMaterial(0);
 	Anim = Cast<UAP_EnemyBaseAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
@@ -60,15 +65,6 @@ void AEnemy_CharacterBase::PostInitializeComponents()
 
 }
 
-void AEnemy_CharacterBase::RemovePresentDamage()
-{
-	//PresentDamages.RemoveAt(0);
-	PresentDamages[0]->Destroy();
-	PresentDamages.RemoveAt(0);
-
-	//if (PresentDamages[0] == nullptr) GetWorldTimerManager().ClearTimer(PresentDamageTimerHandle);
-}
-
 void AEnemy_CharacterBase::TeleportMarkActivate(float Time)
 {
 	TeleportMark->Activate();
@@ -81,47 +77,27 @@ void AEnemy_CharacterBase::TeleportMarkDeactivate()
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
 }
 
+bool AEnemy_CharacterBase::IsHitting()
+{
+    return bHitting;
+}
+
+bool AEnemy_CharacterBase::AttackPushBack(FVector NewLocation)
+{
+	if(!IsAttackPush) return false;
+	else
+	{
+		GetCharacterMovement()->BrakingFrictionFactor = 0;
+		SetActorLocation(GetActorLocation() + NewLocation);
+	}
+	return true;
+}
+
 float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	DamageApplied = FMath::Min(HP, DamageApplied);
-
-
-	// if (true)//(!TextRenderActor)
-	// {
-	// 	// 공격 마다 대미지가 표기 되어야하므로 그때그때 생성해서 사용
-
-	// 	ATextRenderActor* TextRenderActor;
-
-	// 	FActorSpawnParameters SpawnParams;
-	// 	SpawnParams.Owner = this;
-	// 	SpawnParams.bNoFail = true;
-	// 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	// 	const FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
-	// 	const FTransform SpawnTransform = FTransform(FRotator(0.0f, 0.0f, 0.0f), SpawnLocation);
-
-	// 	TextRenderActor = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), SpawnTransform, SpawnParams);
-	// 	FRotator Rotator = TextRenderActor->GetActorRotation();
-	// 	TextRenderActor->SetActorRotation(FRotator(Rotator.Pitch, Rotator.Yaw + 180.0f, Rotator.Roll));
-	// 	TextRenderActor->SetActorScale3D(FVector3d(5.0f, 5.0f, 5.0f));
-
-	// 	FVector Position = this->GetActorLocation();
-
-
-	// 	// 대미지 표기
-	// 	TextRenderActor->SetActorLocation(FVector(Position.X + 10.0f, Position.Y - 50.0f, Position.Z + 50.0f));
-	// 	TextRenderActor->GetTextRender()->SetText(FText::FromString(FString::FromInt((int)DamageApplied)));
-	// 	TextRenderActor->GetTextRender()->SetTextRenderColor(FColor::Red);
-
-	// 	// 표기된 대미지 배열 저장
-	// 	PresentDamages.Emplace(TextRenderActor);
-
-	// 	// 타이머
-	// 	GetWorldTimerManager().SetTimer(PresentDamageTimerHandle, this, &AEnemy_CharacterBase::RemovePresentDamage, 1.0f, false);
-
-	// }
 	
 	HP = HP - DamageMath(DamageApplied);
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
@@ -132,13 +108,17 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	{
 	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
 	// 	bDead = true;
-
-		
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABossMonster_Stage1::Destoryed, DeathLoadingTime, false);
+	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
 
+	}
+	else
+	{
+		bHitting = true;
+		if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
+		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AEnemy_CharacterBase::ResetHitStiffness, HitStiffnessTime, false);
 	}
 
     return DamageApplied;
@@ -146,7 +126,9 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 
 bool AEnemy_CharacterBase::IsDead()
 {
-    return HP<=0;
+	if(HP <= 0) bIsDead = true;
+	else bIsDead = false;
+    return bIsDead;
 }
 
 bool AEnemy_CharacterBase::IsNormalAttack()
@@ -221,6 +203,14 @@ void AEnemy_CharacterBase::ResetNormalAttack()
 	GetWorldTimerManager().ClearTimer(NormalAttackTimerHandle);
 }
 
+void AEnemy_CharacterBase::ResetHitStiffness()
+{
+	bHitting = false;
+	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
+	GetMesh()->SetMaterial(0,DefaultMaterial);
+	GetWorldTimerManager().ClearTimer(HitTimerHandle);
+}
+
 void AEnemy_CharacterBase::SpawnDamageText(float Damage)
 {
 	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation(), FRotator(0.0f, 180.0f, 0.0f));
@@ -228,4 +218,24 @@ void AEnemy_CharacterBase::SpawnDamageText(float Damage)
 
 	DamageText->SetOwner(this);
 	DamageText->SetDamageText(Damage);
+}
+
+void AEnemy_CharacterBase::DropItemActor() 
+{
+	UE_LOG(LogTemp, Display, TEXT("Your ass"));
+	float IsSpawn = FMath::RandRange(0.0f, 100.0f);
+	float RandAngle = FMath::RandRange(-DropAngleMax,DropAngleMax);
+	if(IsSpawn <= DropPercent)
+	{
+		FRotator DropAngle = DropRot + FRotator(RandAngle, 0, RandAngle);
+		auto DropItems = GetWorld()->SpawnActor<AEnemy_DropBase>(DropActorClass, GetActorLocation() + GetActorUpVector()*100.0f, DropAngle);
+	}
+}
+
+void AEnemy_CharacterBase::EnemyDestroyed()
+{
+	UE_LOG(LogTemp, Display, TEXT("Your ss"));
+	if(OnDrop) DropItemActor();
+	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
+	Destroy();
 }

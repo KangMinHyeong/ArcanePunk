@@ -20,9 +20,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsRun();
 
-	// void PlayIdle();
-	// void PlayRun();
-
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
