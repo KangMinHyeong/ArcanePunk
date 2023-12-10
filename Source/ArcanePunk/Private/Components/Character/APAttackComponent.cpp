@@ -117,9 +117,12 @@ void UAPAttackComponent::ComboCheck()
 //AttackTrace 코드 시작
 bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack)
 {
+	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!Character) return false;
+
 	FRotator Rotation = GetOwner()->GetActorRotation();
 	FVector End = Start;
-	if(CloseAttack) End = End + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+	if(CloseAttack) End = End + Rotation.Vector() * Character->GetMaxDistance() + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
 	else End = End + FVector::UpVector* 100.0f;
 
 	// 아군은 타격 판정이 안되게 하는 코드
@@ -134,11 +137,9 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 	
 	HitVector = -Rotation.Vector();
 
-	//DrawDebugSphere(GetWorld(), End, AttackRadius, 10, FColor::Green, false, 5);
-
 	FCollisionShape Sphere;
-	if(CloseAttack) Sphere = FCollisionShape::MakeSphere(AttackRadius);
-	else Sphere = FCollisionShape::MakeSphere(AttackRadius*1.25);
+	if(CloseAttack) Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius());
+	else Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius()*1.25);
 
 	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
 }
@@ -147,9 +148,9 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 {
 	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!Character) return;
-	if(Character->GetCurrentCharacterState() != 0) return;
+	if(Character->returnState() != 0) return;
 
-	float Damage = Character->GetMyPlayerStatus().ATK * Multiple;
+	float Damage = Character->GetPlayerStatus().ATK * Multiple;
 	FHitResult HitResult;
 	FVector HitVector;
 	bool Line = AttackTrace(HitResult, HitVector, Start, CloseAttack);
@@ -161,6 +162,7 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 			AController* MyController = Cast<AController>(Character->GetController());
 			if(!MyController) return;
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
+			if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 		}
 	}
 }

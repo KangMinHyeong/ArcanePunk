@@ -52,11 +52,4 @@ private:
 	int32 CurrentCombo = 0;
 	int32 MaxCombo = 3;
 
-	//Attack Variable
-	UPROPERTY(EditAnywhere)
-	float MaxDistance = 200.0f;
-
-	UPROPERTY(EditAnywhere)
-	float AttackRadius = 40.0f;
-
 };

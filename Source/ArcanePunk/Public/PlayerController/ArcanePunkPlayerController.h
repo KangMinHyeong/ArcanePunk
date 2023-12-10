@@ -23,6 +23,8 @@ public:
 	void StartSaveUI();
 	void EndSaveUI();
 
+	void HitUI();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -52,6 +54,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> SaveCompleteClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> HitWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Shake")
+	TSubclassOf<UCameraShakeBase> HitCS;
 
 	UUserWidget* LoadingWidget;
 

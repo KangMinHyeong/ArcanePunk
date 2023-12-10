@@ -45,6 +45,8 @@ public:
 
 	FName GetAttackMontageSectionName(int32 Section);
 
+	int32 GetAttackSection();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
@@ -54,6 +56,8 @@ private:
 
 	FVector Before = FVector(0,0,0);
     FVector NowLocation = FVector(0,0,0);
+
+	int32 AttackSection = 0;
 
 public:
 	FOnComboCheckDelegate OnComboCheck;
@@ -73,6 +77,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_R_Montage;
-
-	int32 AttackSection = 0;;
 };

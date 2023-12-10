@@ -7,6 +7,7 @@
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "UserInterface/LoadingFade.h"
+#include "UserInterface/Fade/HitFade.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -200,4 +201,15 @@ void AArcanePunkPlayerController::StartSaveUI()
 void AArcanePunkPlayerController::EndSaveUI()
 {
     SaveUI->RemoveFromParent();
+}
+
+void AArcanePunkPlayerController::HitUI()
+{
+    auto HitWidget = Cast<UHitFade>(CreateWidget(this, HitWidgetClass));
+    if(!HitWidget) return;
+
+    HitWidget->AddToViewport();
+    HitWidget->FadeOut();
+
+    if(HitCS) ClientStartCameraShake(HitCS, 1.0f);
 }
