@@ -20,7 +20,6 @@ public:
 
 	void Activate_Skill2();
 	
-private:
 	void MarkErase();
 
 private:

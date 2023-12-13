@@ -61,7 +61,7 @@ void UAPTakeDamageComponent::OnHitting()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->SetHitting(true);
+	OwnerCharacter->SetHitting(false);
 	OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetDefaultMaterial());
 	GetWorld()->GetTimerManager().ClearTimer(HitTimerHandle);
 }

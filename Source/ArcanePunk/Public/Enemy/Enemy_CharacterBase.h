@@ -49,7 +49,7 @@ public:
 
 	float GetDistanceLimit();
 
-	void TeleportMarkActivate(float Time);
+	void TeleportMarkActivate(float Time, AActor * MarkOwner);
 	void TeleportMarkDeactivate();
 
 	bool IsHitting();
@@ -142,6 +142,8 @@ private:
 	float DeathLoadingTime = 3.0f;
 
 	bool bIsDead = false;
+
+	AActor* MarkActor;
 
 protected:
 	UPROPERTY(EditAnywhere)
