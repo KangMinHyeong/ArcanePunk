@@ -11,11 +11,8 @@
 UAPMovementComponent::UAPMovementComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
 }
 
-
-// Called when the game starts
 void UAPMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();

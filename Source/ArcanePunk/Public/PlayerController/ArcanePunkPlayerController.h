@@ -15,7 +15,7 @@ class ARCANEPUNK_API AArcanePunkPlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	AArcanePunkPlayerController();
-	void SetActivate_R(bool bValue);
+	void SetActivate_Skill3(bool bValue);
 	void Casting();
 	void StartFadeIn();
 	void StartFadeOut();

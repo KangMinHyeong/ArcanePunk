@@ -8,12 +8,14 @@
 #include "DrawDebugHelpers.h"
 #include "UserInterface/LoadingFade.h"
 #include "UserInterface/Fade/HitFade.h"
+#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/SkillNumber/SkillNumber3.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
 }
 
-void AArcanePunkPlayerController::SetActivate_R(bool bValue)
+void AArcanePunkPlayerController::SetActivate_Skill3(bool bValue)
 {
     bActivate_R = bValue;
     if(bActivate_R) bShowMouseCursor = true;
@@ -52,7 +54,7 @@ void AArcanePunkPlayerController::MouseSkillEvent()
 {
     AArcanePunkCharacter* APCharacter = Cast<AArcanePunkCharacter>(GetPawn());
     if(!APCharacter) return;
-    UKismetSystemLibrary::DrawDebugCircle(GetWorld(), APCharacter->GetMesh()->GetComponentLocation(), APCharacter->GetR_LimitDist()-50.0f, 200, FColor::Green, 0, 15, FVector(1.f,0.f,0.f), FVector(0.f,1.f,0.f), false);
+    UKismetSystemLibrary::DrawDebugCircle(GetWorld(), APCharacter->GetMesh()->GetComponentLocation(), APCharacter->GetSkill3_LimitDist()-50.0f, 200, FColor::Green, 0, 15, FVector(1.f,0.f,0.f), FVector(0.f,1.f,0.f), false);
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
     if(HitResult.bBlockingHit)
@@ -127,22 +129,21 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
 
 void AArcanePunkPlayerController::IsCasting(AArcanePunkCharacter* APCharacter, FVector HitPoint)
 {
-    APCharacter->SetSkill_R(true);
+    APCharacter->GetAPSkillNumberComponent()->GetSkillNumber3()->SetSkill3(true);
     if(bCast)
     {
-        UE_LOG(LogTemp, Display, TEXT("Your message"));
         bActivate_R = false;
         bShowMouseCursor = false;
-        APCharacter->SetR_Location(HitPoint);
-        APCharacter->Cast_R(HitPoint);
-        APCharacter->SetSkill_R(bActivate_R);
+        APCharacter->SetSkill3_Location(HitPoint);
+        APCharacter->GetAPSkillNumberComponent()->GetSkillNumber3()->Cast_Skill3(HitPoint);
+        APCharacter->GetAPSkillNumberComponent()->GetSkillNumber3()->SetSkill3(bActivate_R);
         bCast = false;
     }
 }
 
 bool AArcanePunkPlayerController::ViewInteraction(AArcanePunkCharacter *APCharacter, float Distance, FVector HitPoint)
 {
-    float LimitDist = APCharacter->GetR_LimitDist();
+    float LimitDist = APCharacter->GetSkill3_LimitDist();
 
     if(Distance <= LimitDist)
     {

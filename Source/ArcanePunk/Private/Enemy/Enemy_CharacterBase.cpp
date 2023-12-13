@@ -222,7 +222,6 @@ void AEnemy_CharacterBase::SpawnDamageText(float Damage)
 
 void AEnemy_CharacterBase::DropItemActor() 
 {
-	UE_LOG(LogTemp, Display, TEXT("Your ass"));
 	float IsSpawn = FMath::RandRange(0.0f, 100.0f);
 	float RandAngle = FMath::RandRange(-DropAngleMax,DropAngleMax);
 	if(IsSpawn <= DropPercent)
@@ -234,7 +233,6 @@ void AEnemy_CharacterBase::DropItemActor()
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
-	UE_LOG(LogTemp, Display, TEXT("Your ss"));
 	if(OnDrop) DropItemActor();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();

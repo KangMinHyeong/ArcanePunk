@@ -20,9 +20,9 @@ public:
 
 	void PlayAttack_A_Montage();
 	void PlayAttack_B_Montage();
-	void PlaySkill_Q_Montage();
-	void PlaySkill_E_Montage();
-	void PlaySkill_R_Montage();
+	void PlaySkill_1_Montage();
+	void PlaySkill_2_Montage();
+	void PlaySkill_3_Montage();
 
 	UFUNCTION()
 	void AnimNotify_AttackTrigger();
@@ -70,11 +70,11 @@ public:
 	UAnimMontage* Attack_B_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Skill_Q_Montage;
+	UAnimMontage* Skill_1_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Skill_E_Montage;
+	UAnimMontage* Skill_2_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Skill_R_Montage;
+	UAnimMontage* Skill_3_Montage;
 };

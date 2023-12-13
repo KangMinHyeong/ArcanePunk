@@ -27,6 +27,11 @@ void AAPHUD::BeginPlay()
 		InteractionWidget->AddToViewport(-1);
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
+
+	//Minhyeong
+	if(!SkillPressClass) return;
+	SkillPressWidget = CreateWidget<UUserWidget>(GetWorld(), SkillPressClass);
+	SkillPressWidget->AddToViewport(-1);
 }
 
 void AAPHUD::DisplayMenu()
