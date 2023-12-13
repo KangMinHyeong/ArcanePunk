@@ -6,6 +6,10 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APAttackComponent.h"
 #include "Components/Character/APMovementComponent.h"
+#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/SkillNumber/SkillNumber1.h"
+#include "Components/Character/SkillNumber/SkillNumber2.h"
+#include "Components/Character/APSpawnFootPrintComponent.h"
 
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
 {
@@ -44,22 +48,22 @@ void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
     Montage_Play(Attack_B_Montage);
 }
 
-void UArcanePunkCharacterAnimInstance::PlaySkill_Q_Montage()
+void UArcanePunkCharacterAnimInstance::PlaySkill_1_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Skill_Q_Montage);
+    Montage_Play(Skill_1_Montage);
 }
 
-void UArcanePunkCharacterAnimInstance::PlaySkill_E_Montage()
+void UArcanePunkCharacterAnimInstance::PlaySkill_2_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Skill_E_Montage);
+    Montage_Play(Skill_2_Montage);
 }
 
-void UArcanePunkCharacterAnimInstance::PlaySkill_R_Montage()
+void UArcanePunkCharacterAnimInstance::PlaySkill_3_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Skill_R_Montage);
+    Montage_Play(Skill_3_Montage);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AttackTrigger()
@@ -75,7 +79,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Active_Q()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
 
-    Character->Activate_Q();
+    Character->GetAPSkillNumberComponent()->GetSkillNumber1()->Activate_Skill1();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_E_Trigger()
@@ -83,7 +87,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_E_Trigger()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
 
-    Character->Activate_E();
+    Character->GetAPSkillNumberComponent()->GetSkillNumber2()->Activate_Skill2();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
@@ -112,7 +116,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
     
-    Character->SpawnFootPrint(true);
+    Character->GetSpawnFootPrintComponent()->SpawnFootPrint(true);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
@@ -120,7 +124,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!Character) return;
     
-    Character->SpawnFootPrint(false);
+    Character->GetSpawnFootPrintComponent()->SpawnFootPrint(false);
 }
 
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)

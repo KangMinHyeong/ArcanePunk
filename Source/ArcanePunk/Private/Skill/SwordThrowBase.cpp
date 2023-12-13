@@ -52,7 +52,6 @@ void ASwordThrowBase::Tick(float DeltaTime)
 
 void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
-	UE_LOG(LogTemp, Display, TEXT("Your message"));
 	auto MyOwner = GetOwner();
 	if(MyOwner == nullptr)
 	{
@@ -66,7 +65,7 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
 	{
 		UGameplayStatics::ApplyDamage(OtherActor, Character->GetPlayerStatus().ATK * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-		if(HitEffect)
+		if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
 		}

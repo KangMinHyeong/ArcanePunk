@@ -10,19 +10,18 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/Controller.h"
-#include "Engine/DamageEvents.h"
-#include "Components/CapsuleComponent.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "Sound/SoundBase.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Save/APSaveGame.h"
-#include "Skill/SwordImpact.h"
-#include "Skill/SwordThrowBase.h"
-#include "Enemy/Enemy_CharacterBase.h"
 #include "Components/Character/APAttackComponent.h"
 #include "Components/Character/APMovementComponent.h"
+#include "Components/Character/APSkillHubComponent.h"
+#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/APAnimHubComponent.h"
+#include "Components/Character/APTakeDamageComponent.h"
+#include "Components/Character/APSpawnFootPrintComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -41,17 +40,20 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Q_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Q_Effect"));
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
+	HitMaterial = CreateDefaultSubobject<UMaterialInterface>(TEXT("HitMaterial"));
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
-	HitMaterial = CreateDefaultSubobject<UMaterialInterface>(TEXT("HitMaterial"));
+	SkillComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillComp"));
+	SkillNumberComp = CreateDefaultSubobject<UAPSkillNumber>(TEXT("SkillNumberComp"));
+	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
+	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
+	SpawnFootPrintComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnFootPrintComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
-	Q_Effect->SetupAttachment(GetMesh(),FName("SwordEffect"));
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
@@ -62,7 +64,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	
-
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
@@ -71,7 +72,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 
 	InteractionCheckFrequency = 0.1f;
 	InteractionCheckDistance = 225.0f;
-
 	PlayerInventory = CreateDefaultSubobject<UAPInventoryComponent>(TEXT("PlayerInventory"));
 
 	// set capacity of inventory
@@ -82,20 +82,15 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 void AArcanePunkCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if(!MySpringArm) return;
+
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
 
 	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	DefaultMaterial = GetMesh()->GetMaterial(0);
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
-
-	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
-
-	if(!MyPlayerState) return;
-	InitPlayerStatus();
-
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerStatus.MoveSpeed;
+	InitPlayerStatus();
 
 	// prodo
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -104,17 +99,8 @@ void AArcanePunkCharacter::BeginPlay()
 void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// prodo
-	// if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
-	// {
-	// 	PerformInteractionCheck();
-	// }
-
-	// LookCharacter();
 }
 
-// Called to bind functionality to input
 void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -126,8 +112,8 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeQ);
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
-	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeR);
-	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
+	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeSpace);
+	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeShift);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
@@ -144,8 +130,8 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 void AArcanePunkCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	BindAttackCheck();
-	BindComboCheck();
+	AnimHubComp->BindAttackCheck();
+	AnimHubComp->BindComboCheck();
 }
 
 uint8 AArcanePunkCharacter::returnState()
@@ -174,89 +160,48 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 
 void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
-	if(!AttackComp) return;
+	if(bDoing) return;
 	AttackComp->StartAttack_A(bCanMove);
 }
 
 void AArcanePunkCharacter::Attack_typeB()
 {
-	if(bSkill_R)
+	if(bMouseAttack)
+	{
+		if(bDoing) return;
+		bDoing = true;
+		AttackComp->StartAttack_B(bCanMove);
+	} 
+	else
 	{
 		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
 		if(!MyController) return;
 		MyController->Casting();
+		bMouseAttack = true;
 		return;
-	}
-	else
-	{
-		if(!AttackComp) return;
-		AttackComp->StartAttack_B(bCanMove);
 	}
 }
 
 void AArcanePunkCharacter::Skill_typeQ()
 {
-	if(bSkill_Q) return;
-	bSkill_Q = true;
-	if(!Anim) return;
-	Anim->PlaySkill_Q_Montage();
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	SkillComp->PressQ();	
 }
 
 void AArcanePunkCharacter::Skill_typeE()
 {
-	if(bMarking)
-	{
-		auto Enemy = Cast<AEnemy_CharacterBase>(MarkingActor);
-		if(!Enemy) return;
-		SetActorLocation(MarkingLocation);
-		Enemy->TeleportMarkDeactivate();
-		bMarking = false;
-	}
-	else
-	{
-		if(bSkill_E) return;
-		else
-		{
-			bSkill_E = true;
-			if(!Anim) return;
-			Anim->PlaySkill_E_Montage();
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		}	
-	}
-	
+	SkillComp->PressE();
 }
 
-void AArcanePunkCharacter::Skill_typeR()
+void AArcanePunkCharacter::Skill_typeSpace()
 {
-	AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
-	if(!MyController) return;
-
-	if(!bSkill_R)
-	{
-		bSkill_R = true;
-		
-		MyController->SetActivate_R(bSkill_R);
-	}
-	else
-	{
-		bSkill_R = false;
-		MyController->SetActivate_R(bSkill_R);
-	}
+	SkillComp->PressSpace();
 }
 
-void AArcanePunkCharacter::Cast_R(FVector HitLocation)
-{
-	if(!Anim) return;
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), R_Effect, R_Location, FRotator::ZeroRotator, R_Size);
-	if(AttackComp) AttackComp->NormalAttack(HitLocation, false, 0.4);
-	Anim->PlaySkill_R_Montage();
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-}
-
-void AArcanePunkCharacter::StartJog()
+void AArcanePunkCharacter::Skill_typeShift()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
+	bMouseAttack = false;
+	SkillComp->PressShift();
 }
 
 void AArcanePunkCharacter::EndJog()
@@ -296,8 +241,7 @@ void AArcanePunkCharacter::SleepState()
 	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, State_Time, false);
 }
 
-//피격 판정 생성시 이용 예정
-//나중에 쓸 함수(피격 시 발동되게)
+//나중에 쓸 함수(피격 시 발동되게) //피격 판정 생성시 이용 예정
 void AArcanePunkCharacter::SwitchState(uint8 Current)
 {
 	switch(Current)
@@ -320,33 +264,14 @@ void AArcanePunkCharacter::SwitchState(uint8 Current)
 	}
 }
 
-void AArcanePunkCharacter::Activate_Q()
+float AArcanePunkCharacter::GetSkill3_LimitDist()
 {
-	auto SwordSkill = GetWorld()->SpawnActor<ASwordImpact>(SwordImpactClass, GetActorLocation()+GetActorForwardVector()*150.0f, GetActorRotation());
-	if(!SwordSkill) return;
-	SwordSkill->SetOwner(this);
+	return Skill3_LimitDist;
 }
 
-void AArcanePunkCharacter::Activate_E()
+void AArcanePunkCharacter::SetSkill3_Location(FVector Vector)
 {
-	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(SwordThrowClass, GetActorLocation()+GetActorForwardVector()*150.0f, GetActorRotation() + FRotator(0,90.0f,0));
-	if(!SwordThrow) return;
-	SwordThrow->SetOwner(this);
-}
-
-void AArcanePunkCharacter::SetSkill_R(bool bValue)
-{
-	bSkill_R = bValue;
-}
-
-float AArcanePunkCharacter::GetR_LimitDist()
-{
-	return R_LimitDist;
-}
-
-void AArcanePunkCharacter::SetR_Location(FVector Vector)
-{
-	R_Location = Vector;
+	Skill3_Location = Vector;
 }
 
 FPlayerData AArcanePunkCharacter::GetPlayerStatus()
@@ -359,21 +284,12 @@ void AArcanePunkCharacter::SetPlayerStatus(FPlayerData NewPlayerData)
 	MyPlayerStatus = NewPlayerData;
 }
 
-void AArcanePunkCharacter::MarkingOn(FVector Location, AActor* OtherActor)
-{
-	bMarking = true;
-	MarkingLocation = Location;
-	MarkingActor = OtherActor;
-	GetWorldTimerManager().SetTimer(MarkTimerHandle, this, &AArcanePunkCharacter::MarkErase, SwordTeleportTime, false);
-}
-
 float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
 {
 	float Speed = 0.0f;
 	if (Section == 1) Speed = Attack1_MoveSpeed;
 	else if(Section == 2) Speed = Attack2_MoveSpeed;
 	else if(Section == 3) Speed = Attack3_MoveSpeed;
-
     return Speed;
 }
 
@@ -387,39 +303,19 @@ UAPMovementComponent *AArcanePunkCharacter::GetAPMoveComponent()
     return MoveComp;
 }
 
-void AArcanePunkCharacter::SpawnFootPrint(bool LeftFoot)
+UMaterialInterface *AArcanePunkCharacter::GetHitMaterial()
 {
-	FHitResult HitResult;
-	if(LeftFoot)
-	{
-		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*100.0f))
-		{
-			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
-			{
-				auto FootPrint = GetWorld()->SpawnActor<AActor>(LeftFootClass, FootPrint_L->GetComponentTransform());
-			}	
-		}
-	}
-	else
-	{
-		if(PMCheck(HitResult, GetActorLocation(), GetActorLocation() - GetActorUpVector()*100.0f))
-		{
-			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
-			{
-				auto FootPrint = GetWorld()->SpawnActor<AActor>(RightFootClass, FootPrint_R->GetComponentTransform());
-			}
-		}
-	}
+    return HitMaterial;
+}
+
+UMaterialInterface *AArcanePunkCharacter::GetDefaultMaterial()
+{
+    return DefaultMaterial;
 }
 
 UAPAttackComponent *AArcanePunkCharacter::GetAttackComponent()
 {
     return AttackComp;
-}
-
-UArcanePunkCharacterAnimInstance *AArcanePunkCharacter::GetAnim()
-{
-    return Anim;
 }
 
 float AArcanePunkCharacter::GetMaxDistance()
@@ -442,41 +338,14 @@ FVector AArcanePunkCharacter::GetComboHitEffectScale()
     return HitEffectScale;
 }
 
+void AArcanePunkCharacter::SetbMouseAttack(bool NewValue)
+{
+	bMouseAttack = NewValue;
+}
+
 bool AArcanePunkCharacter::GetCanMove()
 {
     return bCanMove;
-}
-
-void AArcanePunkCharacter::OnHitting()
-{
-	bHitting = false;
-	GetMesh()->SetMaterial(0,DefaultMaterial);
-	GetWorldTimerManager().ClearTimer(HitTimerHandle);
-}
-
-void AArcanePunkCharacter::BindAttackCheck()
-{
-	Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-	if(!Anim) return;
-	// MontageEnd
-	Anim->OnMontageEnded.AddDynamic(this, &AArcanePunkCharacter::PlayerMontageEnded);
-
-}
-
-void AArcanePunkCharacter::BindComboCheck()
-{
-	if(!Anim || !AttackComp) return;
-	//ComboAttack
-	Anim->OnComboCheck.AddLambda([this]()->void {
-
-		AttackComp->ComboCheck();
-	});
-}
-
-void AArcanePunkCharacter::DeActivate_Q()
-{
-	// Q_Effect->Deactivate();
-	// GetWorldTimerManager().ClearTimer(DeActivate_Q_TimerHandle);
 }
 
 void AArcanePunkCharacter::SaveStatus()
@@ -518,31 +387,7 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
-	DamageApplied = FMath::Min(MyPlayerStatus.HP, DamageApplied);
-
-	MyPlayerStatus.HP = MyPlayerStatus.HP - DamageMath(DamageApplied);
-	
-	if(IsDead())
-	{
-	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
-	// 	bDead = true;
-		
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//DetachFromControllerPendingDestroy();
-	// 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABossMonster_Stage1::Destoryed, DeathLoadingTime, false);
-
-	}
-	else
-	{ 
-		bHitting = true;
-		if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
-		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
-		if(MyController) MyController->HitUI();
-		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), MyPlayerStatus.HP);
-		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AArcanePunkCharacter::OnHitting, HitMotionTime, false);
-	}
-
+	TakeDamageComp->DamageCalculation(DamageApplied);
     return DamageApplied;
 }
 
@@ -558,55 +403,31 @@ bool AArcanePunkCharacter::IsHitting()
     return bHitting;
 }
 
-void AArcanePunkCharacter::PlayerMontageEnded(UAnimMontage *Montage, bool bInterrupted)
+void AArcanePunkCharacter::SetHitting(bool NewBool)
 {
-	if(!Anim) return;
-	
-	if(Montage == Anim->Attack_A_Montage) OnAttack_A_MontageEnded();
-	else if(Montage == Anim->Attack_B_Montage) OnAttack_B_MontageEnded();
-	else if(Montage == Anim->Skill_Q_Montage) OnSkill_Q_MontageEnded();
-	else if(Montage == Anim->Skill_E_Montage) OnSkill_E_MontageEnded();
-	else if(Montage == Anim->Skill_R_Montage) OnSkill_R_MontageEnded();
-	
+	bHitting = NewBool;
 }
 
-void AArcanePunkCharacter::OnAttack_A_MontageEnded()
+float AArcanePunkCharacter::GetHitMotionTime()
 {
-	if(!AttackComp) return;
-	AttackComp->SetAttack_A(false);
-	AttackComp->ComboAttackEnd();
-	bCanMove = true;
+    return HitMotionTime;
 }
 
-void AArcanePunkCharacter::OnAttack_B_MontageEnded()
+UAPSpawnFootPrintComponent *AArcanePunkCharacter::GetSpawnFootPrintComponent()
 {
-	if(!AttackComp) return;
-	AttackComp->SetAttack_B(false);
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+    return SpawnFootPrintComp;
 }
 
-void AArcanePunkCharacter::OnSkill_Q_MontageEnded()
-{
-	bSkill_Q = false;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+TSubclassOf<AActor> AArcanePunkCharacter::GetFootClass(bool Left)
+{	
+	if(Left) return LeftFootClass;
+    return RightFootClass;
 }
 
-void AArcanePunkCharacter::OnSkill_E_MontageEnded()
+FTransform AArcanePunkCharacter::GetFootTransform(bool Left)
 {
-	bSkill_E = false;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-}
-
-void AArcanePunkCharacter::OnSkill_R_MontageEnded()
-{
-	bSkill_R = false;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-}
-
-void AArcanePunkCharacter::MarkErase()
-{
-	bMarking = false;
-	GetWorldTimerManager().ClearTimer(MarkTimerHandle);
+	if(Left) return FootPrint_L->GetComponentTransform();
+    return FootPrint_R->GetComponentTransform();
 }
 
 bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, FVector OverlapEnd)
@@ -620,13 +441,39 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Visibility, Sphere, Params);
 }
 
-float AArcanePunkCharacter::DamageMath(float Damage)
+void AArcanePunkCharacter::SetDoing(bool NewBool)
 {
-    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerStatus.DEF));
+	bDoing = NewBool;
+}
+
+bool AArcanePunkCharacter::GetDoing()
+{
+    return bDoing;
+}
+
+UAPSkillHubComponent *AArcanePunkCharacter::GetAPSkillHubComponent()
+{
+    return SkillComp;
+}
+
+UAPSkillNumber *AArcanePunkCharacter::GetAPSkillNumberComponent()
+{
+    return SkillNumberComp;
+}
+
+TSubclassOf<class ASwordImpact> AArcanePunkCharacter::GetSwordImpactClass()
+{
+    return SwordImpactClass;
+}
+
+TSubclassOf<class ASwordThrowBase> AArcanePunkCharacter::GetSwordThrowClass()
+{
+    return SwordThrowClass;
 }
 
 void AArcanePunkCharacter::InitPlayerStatus()
 {
+	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
 	MyPlayerStatus = MyPlayerState->PlayerStatus;
 

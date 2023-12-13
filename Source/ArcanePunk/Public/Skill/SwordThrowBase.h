@@ -26,8 +26,8 @@ public:
 	UFUNCTION()
 	virtual void OnHitting(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-private:
-	void DestroySword();
+protected:
+	virtual void DestroySword();
 
 protected:
 	UPROPERTY(EditAnywhere)

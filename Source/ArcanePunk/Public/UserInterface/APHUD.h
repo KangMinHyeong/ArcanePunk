@@ -40,7 +40,7 @@ public:
 
 protected:
 
-	// ╫га╕ ╩Г©К╣и ю╖а╛╣И
+	// О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫
 
 	UPROPERTY()
 	UMainMenu* MainMenuWidget;
@@ -50,4 +50,12 @@ protected:
 
 
 	virtual void BeginPlay() override;
+
+//Minhyeong
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> SkillPressClass;
+
+	UPROPERTY()
+	UUserWidget* SkillPressWidget;
 };

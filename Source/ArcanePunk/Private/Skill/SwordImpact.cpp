@@ -80,7 +80,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor)
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
 	{
 		UGameplayStatics::ApplyDamage(OtherActor, Character->GetPlayerStatus().ATK * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-		if(HitEffect)
+		if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
 		}
