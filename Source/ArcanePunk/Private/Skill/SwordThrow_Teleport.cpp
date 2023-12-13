@@ -25,7 +25,7 @@ void ASwordThrow_Teleport::ActiveMark(AActor *OtherActor)
 
     FVector EnemyLocation = Enemy->GetActorLocation() + Enemy->GetActorForwardVector() * MarkDistance;
 
-    Enemy->TeleportMarkActivate(DestroyTime);
+    Enemy->TeleportMarkActivate(DestroyTime, GetOwner());
     Character->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkingOn(EnemyLocation, OtherActor, DestroyTime);
 }
 

@@ -14,6 +14,9 @@
 #include "DamageText/DamageText.h"
 #include "NiagaraComponent.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
+#include "Components/Character/SkillNumber/SkillNumber2.h"
+#include "Components/Character/APSkillNumber.h"
+#include "Character/ArcanePunkCharacter.h"
 
 // Sets default values
 AEnemy_CharacterBase::AEnemy_CharacterBase()
@@ -65,8 +68,9 @@ void AEnemy_CharacterBase::PostInitializeComponents()
 
 }
 
-void AEnemy_CharacterBase::TeleportMarkActivate(float Time)
+void AEnemy_CharacterBase::TeleportMarkActivate(float Time, AActor* MarkOwner)
 {
+	MarkActor = MarkOwner;
 	TeleportMark->Activate();
 	GetWorldTimerManager().SetTimer(TeleportTimerHandle, this, &AEnemy_CharacterBase::TeleportMarkDeactivate, Time, false);
 }
@@ -74,6 +78,10 @@ void AEnemy_CharacterBase::TeleportMarkActivate(float Time)
 void AEnemy_CharacterBase::TeleportMarkDeactivate()
 {
 	TeleportMark->DeactivateImmediate();
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(MarkActor);
+	if(!OwnerCharacter) return;
+	UE_LOG(LogTemp, Display, TEXT("Your message"));
+	OwnerCharacter->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkErase();
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
 }
 
@@ -104,6 +112,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
 	SpawnDamageText(DamageAmount);
 
+	if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
+
 	if(IsDead())
 	{
 	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
@@ -112,12 +122,10 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
-
 	}
 	else
 	{
 		bHitting = true;
-		if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
 		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AEnemy_CharacterBase::ResetHitStiffness, HitStiffnessTime, false);
 	}
 
@@ -234,6 +242,7 @@ void AEnemy_CharacterBase::DropItemActor()
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
 	if(OnDrop) DropItemActor();
+	TeleportMarkDeactivate();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();
 }
