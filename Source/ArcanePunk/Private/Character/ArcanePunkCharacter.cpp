@@ -28,6 +28,7 @@
 #include "Engine/TextRenderActor.h"
 #include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
+#include "UserInterface/APTuTorialUserWidget.h"
 
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -89,6 +90,7 @@ void AArcanePunkCharacter::BeginPlay()
 
 	// prodo
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	HUD->UpdateTutorialWidget("NONE");
 }
 
 // Called every frame
@@ -112,18 +114,24 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
+
 	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
+
 	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
 	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
+
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeQ);
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
 	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeR);
+
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
+
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
+
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
 
 	// prodo
@@ -151,17 +159,13 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 	{
 		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		AddMovementInput(PlayerVec);
-	}	
-	
-	// if(PlayerVec.SizeSquared() > 0)
-	// {
-	// 	GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-	// 	AddMovementInput(PlayerVec);
-	// }
-	// else
-	// {
-	// 	SetActorRotation(GetController()->GetControlRotation());
-	// }
+
+		if (!HUD->TutorialDone)
+		{
+			if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
+			else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
+		}
+	}
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
@@ -172,14 +176,28 @@ void AArcanePunkCharacter::MoveRight(float AxisValue)
 	{
 		GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		AddMovementInput(PlayerVec);
+
+		if (!HUD->TutorialDone)
+		{
+			if (PlayerVec.Y > 0) HUD->UpdateTutorialWidget("PressRight");
+			else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
+		}
 	}
 }
 
 void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 {
+
+	if (!HUD->TutorialDone)
+	{
+		if (AxisValue < 0) HUD->UpdateTutorialWidget("WheelUp");
+		else if (AxisValue > 0) HUD->UpdateTutorialWidget("WheelDown");
+	}
+
 	CurrentArmLength += AxisValue * ZoomCoefficient;
-	if(CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
-	else if(CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
+	if (CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
+	else if (CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
+	
 
 	MySpringArm->TargetArmLength = CurrentArmLength;
 }
@@ -193,6 +211,8 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
 	Anim->PlayAttack_A_Montage();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
 }
 
 void AArcanePunkCharacter::Attack_typeB()
@@ -214,6 +234,8 @@ void AArcanePunkCharacter::Attack_typeB()
 		Anim->PlayAttack_B_Montage();
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
 }
 
 void AArcanePunkCharacter::Skill_typeQ()
@@ -224,6 +246,8 @@ void AArcanePunkCharacter::Skill_typeQ()
 	if(!Anim) return;
 	Anim->PlaySkill_Q_Montage();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
 }
 
 void AArcanePunkCharacter::Skill_typeE()
@@ -235,6 +259,8 @@ void AArcanePunkCharacter::Skill_typeE()
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), E_Sound_first, GetActorLocation(), E_SoundScale);
 	Anim->PlaySkill_E_Montage();
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
 }
 
 void AArcanePunkCharacter::Skill_typeR()
@@ -255,6 +281,8 @@ void AArcanePunkCharacter::Skill_typeR()
 		bSkill_R = false;
 		MyController->SetActivate_R(bSkill_R);
 	}
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
 }
 
 void AArcanePunkCharacter::Cast_R()
@@ -270,6 +298,8 @@ void AArcanePunkCharacter::Cast_R()
 void AArcanePunkCharacter::StartJog()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
 }
 
 void AArcanePunkCharacter::EndJog()
@@ -439,7 +469,13 @@ void AArcanePunkCharacter::DeActivate_Q()
 }
 
 void AArcanePunkCharacter::SaveStatus()
-{	
+{
+	if (!HUD->TutorialDone) {
+		HUD->UpdateTutorialWidget("PressCtrl + 9");
+		return;
+	}
+
+	
 	MyPlayerStatus.MoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	MyPlayerStatus.PlayerLocation = GetActorLocation();
 	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
@@ -453,6 +489,7 @@ void AArcanePunkCharacter::SaveStatus()
 	if(!MyController) return;
 	
 	MyController->StartSaveUI();
+	
 }
 
 void AArcanePunkCharacter::CurrentPlayerLocation()
@@ -767,6 +804,11 @@ void AArcanePunkCharacter::NoInteractableFound()
 
 void AArcanePunkCharacter::BeginInteract()
 {
+	if (!HUD->TutorialDone) {
+		HUD->UpdateTutorialWidget("PressF");
+		return;
+	}
+
 	PerformInteractionCheck();
 
 	if (InteractionData.CurrentInteractable)
@@ -847,5 +889,7 @@ void AArcanePunkCharacter::DropItem(UAPItemBase* ItemToDrop, const int32 Quantit
 
 void AArcanePunkCharacter::ToggleMenu()
 {
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressTab");
+
 	HUD->ToggleMenu();
 }

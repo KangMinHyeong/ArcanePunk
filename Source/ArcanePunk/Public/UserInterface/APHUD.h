@@ -9,6 +9,7 @@
 struct FInteractableData;
 class UInteractionWidget;
 class UMainMenu;
+class UAPTuTorialUserWidget;
 
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
@@ -22,7 +23,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UAPTuTorialUserWidget> TutorialWidgetClass;
 
+	bool TutorialDone;
 
 	bool bIsMenuVisible;
 
@@ -36,6 +40,9 @@ public:
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
 
+	void UpdateTutorialWidget(const FString PressedKey);
+	void HideTutorialWidget() const;
+
 
 
 protected:
@@ -47,6 +54,9 @@ protected:
 
 	UPROPERTY()
 	UInteractionWidget* InteractionWidget;
+
+	UPROPERTY()
+	UAPTuTorialUserWidget* TutorialWidget;
 
 
 	virtual void BeginPlay() override;
