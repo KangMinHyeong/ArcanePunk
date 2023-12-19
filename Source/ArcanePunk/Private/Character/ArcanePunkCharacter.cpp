@@ -32,6 +32,7 @@
 #include "Engine/TextRenderActor.h"
 #include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
+#include "UserInterface/APTuTorialUserWidget.h"
 
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -94,6 +95,7 @@ void AArcanePunkCharacter::BeginPlay()
 
 	// prodo
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	HUD->UpdateTutorialWidget("NONE");
 }
 
 void AArcanePunkCharacter::Tick(float DeltaTime)
@@ -107,18 +109,25 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
+
 	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
+
 	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
 	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
+
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeQ);
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
+
 	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeSpace);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeShift);
+
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
+
 	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
 	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
 	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
+
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
 
 	// prodo
@@ -141,19 +150,41 @@ uint8 AArcanePunkCharacter::returnState()
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
 {
+	PlayerVec.X = AxisValue;
+	if (!HUD->TutorialDone)
+	{
+		if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
+		else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
+	}
+
 	MoveComp->PlayerMoveForward(AxisValue);
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
 {
+	PlayerVec.Y = AxisValue;
+	if (!HUD->TutorialDone)
+	{
+		if (PlayerVec.Y > 0) HUD->UpdateTutorialWidget("PressRight");
+		else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
+	}
+
 	MoveComp->PlayerMoveRight(AxisValue);
 }
 
 void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 {
+
+	if (!HUD->TutorialDone)
+	{
+		if (AxisValue < 0) HUD->UpdateTutorialWidget("WheelUp");
+		else if (AxisValue > 0) HUD->UpdateTutorialWidget("WheelDown");
+	}
+
 	CurrentArmLength += AxisValue * ZoomCoefficient;
-	if(CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
-	else if(CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
+	if (CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
+	else if (CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
+	
 
 	MySpringArm->TargetArmLength = CurrentArmLength;
 }
@@ -161,6 +192,7 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
 	if(bDoing) return;
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
 	AttackComp->StartAttack_A(bCanMove);
 }
 
@@ -180,20 +212,24 @@ void AArcanePunkCharacter::Attack_typeB()
 		bMouseAttack = true;
 		return;
 	}
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
 }
 
 void AArcanePunkCharacter::Skill_typeQ()
 {
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
 	SkillComp->PressQ();	
 }
 
 void AArcanePunkCharacter::Skill_typeE()
 {
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
 	SkillComp->PressE();
 }
 
 void AArcanePunkCharacter::Skill_typeSpace()
 {
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
 	SkillComp->PressSpace();
 }
 
@@ -201,6 +237,7 @@ void AArcanePunkCharacter::Skill_typeShift()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
 	bMouseAttack = false;
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
 	SkillComp->PressShift();
 }
 
@@ -349,7 +386,13 @@ bool AArcanePunkCharacter::GetCanMove()
 }
 
 void AArcanePunkCharacter::SaveStatus()
-{	
+{
+	if (!HUD->TutorialDone) {
+		HUD->UpdateTutorialWidget("PressCtrl + 9");
+		return;
+	}
+
+	
 	MyPlayerStatus.MoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	MyPlayerStatus.PlayerLocation = GetActorLocation();
 	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
@@ -363,6 +406,7 @@ void AArcanePunkCharacter::SaveStatus()
 	if(!MyController) return;
 	
 	MyController->StartSaveUI();
+	
 }
 
 void AArcanePunkCharacter::CurrentPlayerLocation()
@@ -646,6 +690,11 @@ void AArcanePunkCharacter::NoInteractableFound()
 
 void AArcanePunkCharacter::BeginInteract()
 {
+	if (!HUD->TutorialDone) {
+		HUD->UpdateTutorialWidget("PressF");
+		return;
+	}
+
 	PerformInteractionCheck();
 
 	if (InteractionData.CurrentInteractable)
@@ -726,5 +775,7 @@ void AArcanePunkCharacter::DropItem(UAPItemBase* ItemToDrop, const int32 Quantit
 
 void AArcanePunkCharacter::ToggleMenu()
 {
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressTab");
+
 	HUD->ToggleMenu();
 }

@@ -4,6 +4,7 @@
 #include "UserInterface/APHUD.h"
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
+#include "UserInterface/APTuTorialUserWidget.h"
 
 AAPHUD::AAPHUD()
 {
@@ -28,10 +29,20 @@ void AAPHUD::BeginPlay()
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
+	if (TutorialWidgetClass)
+	{
+		TutorialWidget = CreateWidget<UAPTuTorialUserWidget>(GetWorld(), TutorialWidgetClass);
+		TutorialWidget->AddToViewport(-2);
+		TutorialWidget->SetVisibility(ESlateVisibility::Visible);
+
+		TutorialDone = false;
+	}
+
 	//Minhyeong
 	if(!SkillPressClass) return;
 	SkillPressWidget = CreateWidget<UUserWidget>(GetWorld(), SkillPressClass);
 	SkillPressWidget->AddToViewport(-1);
+
 }
 
 void AAPHUD::DisplayMenu()
@@ -101,3 +112,28 @@ void AAPHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) 
 		InteractionWidget->UpdateWidget(InteractableData);
 	}
 }
+
+void AAPHUD::UpdateTutorialWidget(const FString PressedKey)
+{
+	if (TutorialWidget)
+	{
+		if (TutorialWidget->GetVisibility() == ESlateVisibility::Collapsed)
+		{
+			TutorialWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+
+		TutorialDone = TutorialWidget->UpdateWidget(PressedKey);
+
+		if (TutorialDone) HideTutorialWidget();
+	}
+}
+
+void AAPHUD::HideTutorialWidget() const
+{
+	if (TutorialWidget)
+	{
+		TutorialWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+
