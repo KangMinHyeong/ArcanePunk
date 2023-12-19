@@ -37,6 +37,12 @@ void AAPHUD::BeginPlay()
 
 		TutorialDone = false;
 	}
+
+	//Minhyeong
+	if(!SkillPressClass) return;
+	SkillPressWidget = CreateWidget<UUserWidget>(GetWorld(), SkillPressClass);
+	SkillPressWidget->AddToViewport(-1);
+
 }
 
 void AAPHUD::DisplayMenu()

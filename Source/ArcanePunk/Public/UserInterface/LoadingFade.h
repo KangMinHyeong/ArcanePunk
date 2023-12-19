@@ -22,6 +22,6 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float FadeTime = 2.5f;
+	float FadeTime = 2.0f;
 	
 };

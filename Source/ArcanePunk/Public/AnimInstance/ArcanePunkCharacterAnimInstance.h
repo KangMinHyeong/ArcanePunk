@@ -6,9 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "ArcanePunkCharacterAnimInstance.generated.h"
 
-/**
- * 
- */
+DECLARE_MULTICAST_DELEGATE(FOnComboCheckDelegate);
+
 UCLASS()
 class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
 {
@@ -21,9 +20,9 @@ public:
 
 	void PlayAttack_A_Montage();
 	void PlayAttack_B_Montage();
-	void PlaySkill_Q_Montage();
-	void PlaySkill_E_Montage();
-	void PlaySkill_R_Montage();
+	void PlaySkill_1_Montage();
+	void PlaySkill_2_Montage();
+	void PlaySkill_3_Montage();
 
 	UFUNCTION()
 	void AnimNotify_AttackTrigger();
@@ -31,6 +30,22 @@ public:
 	void AnimNotify_Active_Q();
 	UFUNCTION()
 	void AnimNotify_Skill_E_Trigger();
+	UFUNCTION()
+	void AnimNotify_NextCombo();
+	UFUNCTION()
+	void AnimNotify_AnimMove();
+	UFUNCTION()
+	void AnimNotify_AnimStop();
+	UFUNCTION()
+	void AnimNotify_FootRight();
+	UFUNCTION()
+	void AnimNotify_FootLeft();
+
+	void JumpToComboSection(int32 NewSection);
+
+	FName GetAttackMontageSectionName(int32 Section);
+
+	int32 GetAttackSection();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
@@ -39,6 +54,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	bool IsDead;
 
+	FVector Before = FVector(0,0,0);
+    FVector NowLocation = FVector(0,0,0);
+
+	int32 AttackSection = 0;
+
+public:
+	FOnComboCheckDelegate OnComboCheck;
+	FOnMontageEnded OnAttack_A_Montage_End;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Attack_A_Montage;
 
@@ -46,12 +70,11 @@ private:
 	UAnimMontage* Attack_B_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Skill_Q_Montage;
+	UAnimMontage* Skill_1_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Skill_E_Montage;
+	UAnimMontage* Skill_2_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Skill_R_Montage;
-
+	UAnimMontage* Skill_3_Montage;
 };

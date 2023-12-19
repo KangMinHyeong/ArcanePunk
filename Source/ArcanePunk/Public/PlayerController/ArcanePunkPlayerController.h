@@ -15,13 +15,15 @@ class ARCANEPUNK_API AArcanePunkPlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	AArcanePunkPlayerController();
-	void SetActivate_R(bool bValue);
+	void SetActivate_Skill3(bool bValue);
 	void Casting();
 	void StartFadeIn();
 	void StartFadeOut();
 	void StartLoading();
 	void StartSaveUI();
 	void EndSaveUI();
+
+	void HitUI();
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,6 +54,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> SaveCompleteClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> HitWidgetClass;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Shake")
+	TSubclassOf<UCameraShakeBase> HitCS;
 
 	UUserWidget* LoadingWidget;
 

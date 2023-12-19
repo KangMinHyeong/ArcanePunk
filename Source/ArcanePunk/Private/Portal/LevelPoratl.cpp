@@ -36,10 +36,10 @@ void ALevelPoratl::OnTeleport_A(UPrimitiveComponent *OverlappedComp, AActor *Oth
 
 void ALevelPoratl::Loading()
 {
-    UGameplayStatics::OpenLevel(CharacterPC, NextLevel);
-
     if(!CharacterPC) return;
     CharacterPC->StartLoading();
+
+    UGameplayStatics::OpenLevel(CharacterPC, NextLevel);
 
     GetWorldTimerManager().ClearTimer(LoadTimerHandle);
 }
