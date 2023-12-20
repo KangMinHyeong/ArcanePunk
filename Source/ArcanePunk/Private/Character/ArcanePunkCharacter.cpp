@@ -749,7 +749,7 @@ void AArcanePunkCharacter::UpdateInteractionWidget() const
 	}
 }
 
-void AArcanePunkCharacter::DropItem(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)
+void AArcanePunkCharacter::DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)
 {
 	if (PlayerInventory->FindMatchingItem(ItemToDrop))
 	{

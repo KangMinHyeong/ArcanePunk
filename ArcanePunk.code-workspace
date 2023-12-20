@@ -10,12 +10,7 @@
 		}
 	],
 	"settings": {
-		"typescript.tsc.autoDetect": "off",
-		"files.associations": {
-			"__config": "cpp",
-			"*.rh": "cpp",
-			"alignedvector3": "cpp"
-		}
+		"typescript.tsc.autoDetect": "off"
 	},
 	"extensions": {
 		"recommendations": [
