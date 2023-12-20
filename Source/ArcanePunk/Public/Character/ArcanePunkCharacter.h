@@ -343,5 +343,5 @@ public :
 
 	void UpdateInteractionWidget() const;
 
-	void DropItem(UAPItemBase* ItemToDrop, const int32 QuantityToDrop);
+	void DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop);
 };

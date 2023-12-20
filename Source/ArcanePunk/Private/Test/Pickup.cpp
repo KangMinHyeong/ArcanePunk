@@ -36,7 +36,6 @@ void APickup::InitializePickup(const TSubclassOf<UAPItemBase> BaseClass, const i
 
 		// Itema Data Register
 
-
 		ItemReference->ID = ItemData->ID;
 		ItemReference->ItemType = ItemData->ItemType;
 		ItemReference->ItemQuality = ItemData->ItemQuality;

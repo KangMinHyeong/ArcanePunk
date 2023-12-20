@@ -101,6 +101,7 @@ void AArcanePunkCharacter::BeginPlay()
 void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -150,24 +151,24 @@ uint8 AArcanePunkCharacter::returnState()
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
 {
-	PlayerVec.X = AxisValue;
-	if (!HUD->TutorialDone)
-	{
-		if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
-		else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
-	}
+	// PlayerVec.X = AxisValue;
+	// if (!HUD->TutorialDone)
+	// {
+	// 	if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
+	// 	else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
+	// }
 
 	MoveComp->PlayerMoveForward(AxisValue);
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
 {
-	PlayerVec.Y = AxisValue;
-	if (!HUD->TutorialDone)
-	{
-		if (PlayerVec.Y > 0) HUD->UpdateTutorialWidget("PressRight");
-		else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
-	}
+	// PlayerVec.Y = AxisValue;
+	// if (!HUD->TutorialDone)
+	// {
+	// 	if (PlayerVec.Y > 0) HUD->UpdateTutorialWidget("PressRight");
+	// 	else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
+	// }
 
 	MoveComp->PlayerMoveRight(AxisValue);
 }
@@ -749,7 +750,7 @@ void AArcanePunkCharacter::UpdateInteractionWidget() const
 	}
 }
 
-void AArcanePunkCharacter::DropItem(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)
+void AArcanePunkCharacter::DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)
 {
 	if (PlayerInventory->FindMatchingItem(ItemToDrop))
 	{
