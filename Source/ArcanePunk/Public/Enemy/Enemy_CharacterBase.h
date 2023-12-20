@@ -64,7 +64,7 @@ private:
 	void SpawnDamageText(float Damage);
 
 	//드롭 관련 함수
-	void DropItemActor();
+	void DropItemActor(TSubclassOf<class AEnemy_DropBase> DropClass, float DropItemPercent);
 
 	// 몬스터 Dead 관련 함수
 	void EnemyDestroyed();
@@ -124,10 +124,16 @@ private:
 
 	// 드롭 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<class AEnemy_DropBase> DropActorClass;
+	TSubclassOf<class AEnemy_DropBase> DropEnergyClass;
 
 	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropPercent = 100.0f;
+	TSubclassOf<class AEnemy_DropBase> DropEquipClass;
+
+	UPROPERTY(EditAnywhere, Category = "Drop")
+	float DropEnergyPercent = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Drop")
+	float DropEquipPercent = 100.0f;
 
 	bool OnDrop = false;
 

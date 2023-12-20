@@ -228,20 +228,27 @@ void AEnemy_CharacterBase::SpawnDamageText(float Damage)
 	DamageText->SetDamageText(Damage);
 }
 
-void AEnemy_CharacterBase::DropItemActor() 
+void AEnemy_CharacterBase::DropItemActor(TSubclassOf<AEnemy_DropBase> DropClass, float DropItemPercent) 
 {
+	if(!DropClass) return;
+
 	float IsSpawn = FMath::RandRange(0.0f, 100.0f);
 	float RandAngle = FMath::RandRange(-DropAngleMax,DropAngleMax);
-	if(IsSpawn <= DropPercent)
+	if(IsSpawn <= DropItemPercent)
 	{
 		FRotator DropAngle = DropRot + FRotator(RandAngle, 0, RandAngle);
-		auto DropItems = GetWorld()->SpawnActor<AEnemy_DropBase>(DropActorClass, GetActorLocation() + GetActorUpVector()*100.0f, DropAngle);
+		auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass, GetActorLocation() + GetActorUpVector()*100.0f, DropAngle);
 	}
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
-	if(OnDrop) DropItemActor();
+	if(OnDrop)
+	{
+		DropItemActor(DropEnergyClass, DropEnergyPercent);
+		DropItemActor(DropEquipClass, DropEquipPercent);
+	} 
+
 	TeleportMarkDeactivate();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();

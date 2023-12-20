@@ -244,7 +244,8 @@ FItemAddResult UAPInventoryComponent::HandleAddItem(UAPItemBase* InputItem)
 		}
 
 	}
-	check(false);
+	
+	(false);
 	return FItemAddResult::AddedNone(FText::Format(FText::FromString("TryAddItem {0} error. GetWoner() check somehow fail."), InputItem->ItemTextData.Name));
 }
 
