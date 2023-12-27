@@ -6,9 +6,13 @@
 #include "GameFramework/PlayerController.h"
 #include "ArcanePunkPlayerController.generated.h"
 
-/**
- * 
- */
+class UUserWidget;
+class UAPStatusUI;
+class APawn;
+class AArcanePunkCharacter;
+
+DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
+
 UCLASS()
 class ARCANEPUNK_API AArcanePunkPlayerController : public APlayerController
 {
@@ -25,6 +29,8 @@ public:
 
 	void HitUI();
 
+	FORCEINLINE UAPStatusUI* GetStatusUI() { return StatusWidget; };
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -34,8 +40,8 @@ protected:
 private:
 	void LookStatus();
 	void FreeCameraMode();
-	void IsCasting(class AArcanePunkCharacter* APCharacter, FVector HitPoint);
-	bool ViewInteraction(class AArcanePunkCharacter* APCharacter, float Distance, FVector HitPoint);
+	void IsCasting(AArcanePunkCharacter* APCharacter, FVector HitPoint);
+	bool ViewInteraction(AArcanePunkCharacter* APCharacter, float Distance, FVector HitPoint);
 
 private:
 	FTimerHandle LoadTimerHandle;
@@ -44,27 +50,27 @@ private:
 	bool bLookStatus = false;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> StatusWidgetClass;
+	TSubclassOf<UAPStatusUI> StatusWidgetClass;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> FadeLoadingWidgetClass;
+	TSubclassOf<UUserWidget> FadeLoadingWidgetClass;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> LoadingWidgetClass;
+	TSubclassOf<UUserWidget> LoadingWidgetClass;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> SaveCompleteClass;
+	TSubclassOf<UUserWidget> SaveCompleteClass;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> HitWidgetClass;
+	TSubclassOf<UUserWidget> HitWidgetClass;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Shake")
 	TSubclassOf<UCameraShakeBase> HitCS;
 
 	UUserWidget* LoadingWidget;
 
-	UPROPERTY(EditAnywhere)
-	UUserWidget* StatusWidget;
+	UPROPERTY()
+	UAPStatusUI* StatusWidget;
 	
 	UUserWidget* SaveUI;
 
@@ -73,12 +79,12 @@ private:
 	FInputModeGameAndUI UIInputMode;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class APawn> FreeCameraClass;
+	TSubclassOf<APawn> FreeCameraClass;
 
 	bool bFreeCameraMode = false;
 
 	APawn* FreeCamera;
-	class AArcanePunkCharacter* MyCharacter;
+	AArcanePunkCharacter* MyCharacter;
 
 	bool bCast = false;
 	bool bActivate_R = false;
@@ -87,4 +93,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float LoadingTime = 2.0f;
 
+public:
+	FOnUpdateStatusText OnUpdateStatusText;
 };

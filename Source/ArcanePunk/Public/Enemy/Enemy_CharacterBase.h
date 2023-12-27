@@ -37,10 +37,22 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
-	// 몬스터 Dead 관련 함수
+	// 몬스터 Dead , Hit 관련 함수
 	UFUNCTION(BlueprintPure)
 	bool IsDead();
 
+	UFUNCTION(BlueprintPure)
+	bool IsHitting();
+
+	UFUNCTION(BlueprintPure)
+	float GetForward();
+
+	UFUNCTION(BlueprintPure)
+	float GetRight();
+
+	void SetHitPoint(float Forward, float Right);
+
+	// 몬스터 Attack 관련 함수
 	UFUNCTION(BlueprintPure)
 	bool IsNormalAttack();
 
@@ -51,8 +63,6 @@ public:
 
 	void TeleportMarkActivate(float Time, AActor * MarkOwner);
 	void TeleportMarkDeactivate();
-
-	bool IsHitting();
 
 	bool AttackPushBack(FVector NewLocation);
 
@@ -68,6 +78,10 @@ private:
 
 	// 몬스터 Dead 관련 함수
 	void EnemyDestroyed();
+
+	// HitPoint 관련 함수
+	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
+	void TestHit();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -105,20 +119,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* TeleportMark;
 
-	UPROPERTY()
-	bool bHitting = false;
-
-	UPROPERTY(EditAnywhere)
-	float HitStiffnessTime = 0.75f;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	bool IsAttackPush = true;
-
 	// 머터리얼
 	UMaterialInterface* DefaultMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "Skin")
 	UMaterialInterface* HitMaterial; // 피격 점멸 머터리얼
+
+	UPROPERTY(EditAnywhere, Category = "Skin")
+	UMaterialInterface* HitMaterial_Test1; // 피격 점멸 머터리얼
+
+	UPROPERTY(EditAnywhere, Category = "Skin")
+	UMaterialInterface* HitMaterial_Test2; // 피격 점멸 머터리얼
 
 	float DefaultSlip;
 
@@ -150,6 +161,19 @@ private:
 	bool bIsDead = false;
 
 	AActor* MarkActor;
+
+	// 몬스터 Hit 관련 변수
+	UPROPERTY()
+	bool bHitting = false;
+
+	UPROPERTY(EditAnywhere)
+	float HitStiffnessTime = 0.75f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	bool IsAttackPush = true;
+
+	float MonsterIsForward = 0.0f;
+	float MonsterIsRight = 0.0f;
 
 protected:
 	UPROPERTY(EditAnywhere)

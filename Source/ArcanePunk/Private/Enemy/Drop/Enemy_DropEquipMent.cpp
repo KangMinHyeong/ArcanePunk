@@ -38,6 +38,9 @@ void AEnemy_DropEquipMent::InitializePickup(const TSubclassOf<UAPItemBase> BaseC
 		ItemReference->ItemNumericData = ItemData->ItemNumericData;
 		ItemReference->ItemTextData = ItemData->ItemTextData;
 		ItemReference->ItemAssetData = ItemData->ItemAssetData;
+		ItemReference->ItemStatistics = ItemData->ItemStatistics;
+
+		DropMesh->SetStaticMesh(ItemData->ItemAssetData.Mesh);
 
 		Quantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(Quantity);
 	}
@@ -46,7 +49,7 @@ void AEnemy_DropEquipMent::InitializePickup(const TSubclassOf<UAPItemBase> BaseC
 void AEnemy_DropEquipMent::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
     auto Character = Cast<AArcanePunkCharacter>(OtherActor);
-    if(!Character && IsPendingKillPending() && !ItemReference) return;
+    if(!Character || IsPendingKillPending() || !ItemReference) return;
 
     if (UAPInventoryComponent* PlayerInventory = Character->GetInventory())
 	{

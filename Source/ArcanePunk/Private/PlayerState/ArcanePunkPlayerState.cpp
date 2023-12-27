@@ -15,7 +15,9 @@ void AArcanePunkPlayerState::SavePlayerData()
     
     SaveGameData->bSave = PlayerStatus.SaveOperation;
     SaveGameData->SaveHP = PlayerStatus.HP;
+    SaveGameData->SaveMaxHP = PlayerStatus.MaxHP;
 	SaveGameData->SaveMP = PlayerStatus.MP;
+    SaveGameData->SaveMaxMP = PlayerStatus.MaxMP;
 	SaveGameData->SaveATK = PlayerStatus.ATK;
 	SaveGameData->SaveATKSpeed = PlayerStatus.ATKSpeed;
     SaveGameData->SaveDEF = PlayerStatus.DEF;
@@ -39,7 +41,9 @@ void AArcanePunkPlayerState::InitPlayerData()
 
     PlayerStatus.SaveOperation = SaveGameData->bSave;
     PlayerStatus.HP = SaveGameData->SaveHP;
+    PlayerStatus.MaxHP = SaveGameData->SaveMaxHP;
 	PlayerStatus.MP = SaveGameData->SaveMP;
+    PlayerStatus.MaxMP = SaveGameData->SaveMaxMP;
 	PlayerStatus.ATK = SaveGameData->SaveATK;
 	PlayerStatus.ATKSpeed = SaveGameData->SaveATKSpeed;
     PlayerStatus.DEF = SaveGameData->SaveDEF;
@@ -52,7 +56,9 @@ void AArcanePunkPlayerState::UpdatePlayerData(FPlayerData &PS)
 {
     PlayerStatus.SaveOperation = true;
     PlayerStatus.HP = PS.HP;
+    PlayerStatus.MaxHP = PS.MaxHP;
     PlayerStatus.MP = PS.MP;
+    PlayerStatus.MaxMP = PS.MaxMP;
     PlayerStatus.ATK = PS.ATK;
     PlayerStatus.ATKSpeed = PS.ATKSpeed;
     PlayerStatus.DEF = PS.DEF;

@@ -28,7 +28,8 @@ public:
 
 protected:
 	virtual void DestroySword();
-
+	void ScaleSet();
+	
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Sword;
@@ -43,9 +44,13 @@ protected:
 	class UNiagaraSystem* HitEffect;
 
 	FTimerHandle DestroyTimerHandle;
+	FTimerHandle ScaleTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ScaleTime = 0.001f;
 
 	UPROPERTY(EditAnywhere)
 	float DamageCoefficient = 1.0f;
@@ -55,4 +60,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	class UProjectileMovementComponent* SwordMovementComponent;
+
+	UPROPERTY()
+	class UAPHitPointComponent* HitPointComp;
 };

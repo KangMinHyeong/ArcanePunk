@@ -25,7 +25,13 @@ public:
 	float SaveHP = 100.0f;
 
 	UPROPERTY()
+	float SaveMaxHP = 100.0f;
+
+	UPROPERTY()
 	int32 SaveMP = 100;
+
+	UPROPERTY()
+	int32 SaveMaxMP = 100;
 
 	UPROPERTY()
 	float SaveATK = 25.0f;

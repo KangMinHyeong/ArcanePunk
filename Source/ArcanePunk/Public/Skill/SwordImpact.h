@@ -33,8 +33,9 @@ public:
 private:
 	void BintHit();
 	void DestroyImpact();
-	void DamageAction(AActor* OtherActor);
-
+	void DamageAction(AActor *OtherActor, const FHitResult &HitResult);
+	void ScaleSet();
+	
 private:
 	UPROPERTY(EditAnywhere)
 	bool IsPenetrate = false;
@@ -49,6 +50,7 @@ private:
 	class UNiagaraSystem* HitEffect;
 
 	FTimerHandle DestroyTimerHandle;
+	FTimerHandle ScaleTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 5.0f;
@@ -57,9 +59,14 @@ private:
 	float DamageCoefficient = 1.0f;
 
 	UPROPERTY(EditAnywhere)
+	float ScaleTime = 0.01f;
+
+	UPROPERTY(EditAnywhere)
 	float ImpactSpeed = 1500.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	class UProjectileMovementComponent* ImpactMovementComponent;
 	
+	UPROPERTY()
+	class UAPHitPointComponent* HitPointComp;
 };

@@ -10,7 +10,7 @@ void UInventoryTooltip::NativeConstruct()
 	Super::NativeConstruct();
 
 	UAPItemBase* ItemBeingHovered = InventorySlotBeingHovered->GetItemReference();
-
+	if(!ItemBeingHovered) return;
 	switch(ItemBeingHovered->ItemType)
 	{
 	case EItemType::Equipment:

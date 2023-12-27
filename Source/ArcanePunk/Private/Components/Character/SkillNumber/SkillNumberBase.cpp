@@ -2,7 +2,7 @@
 
 USkillNumberBase::USkillNumberBase()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void USkillNumberBase::BeginPlay()

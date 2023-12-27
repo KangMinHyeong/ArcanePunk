@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PlayerController/ArcanePunkPlayerController.h"
+
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
@@ -10,6 +8,7 @@
 #include "UserInterface/Fade/HitFade.h"
 #include "Components/Character/APSkillNumber.h"
 #include "Components/Character/SkillNumber/SkillNumber3.h"
+#include "UserInterface/Status/APStatusUI.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -30,6 +29,8 @@ void AArcanePunkPlayerController::SetActivate_Skill3(bool bValue)
     bShowMouseCursor = false;
 
     StartLoading();
+    LookStatus(); LookStatus(); // 오류 때문에 삽입
+    
 }
 
 void AArcanePunkPlayerController::SetupInputComponent()
@@ -76,11 +77,15 @@ void AArcanePunkPlayerController::Casting()
 
 void AArcanePunkPlayerController::LookStatus()
 {
+    auto APCharacter = Cast<AArcanePunkCharacter>(GetPawn());
+    if(!APCharacter) return;
+
     if(bFreeCameraMode) return;
 	if(!bLookStatus)
 	{
         bLookStatus = true;
-		StatusWidget = CreateWidget(this, StatusWidgetClass);
+        APCharacter->MouseArr.Add(0);
+		StatusWidget = Cast<UAPStatusUI>(CreateWidget(this, StatusWidgetClass));
         if(StatusWidget != nullptr)
         {
             StatusWidget->AddToViewport();
@@ -93,6 +98,8 @@ void AArcanePunkPlayerController::LookStatus()
 	{
         bLookStatus = false;
         StatusWidget->RemoveFromParent();
+        APCharacter->MouseArr.Pop();
+        if(!APCharacter->MouseArr.IsEmpty()) return;
         SetInputMode(GameInputMode);
         bShowMouseCursor = false;
 	}
@@ -108,7 +115,6 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
         if(!FreeCamera) return;
         Possess(FreeCamera);
         bFreeCameraMode = true;
-        UE_LOG(LogTemp, Display, TEXT("Your c"));
     }
     else
     {
