@@ -2,6 +2,7 @@
 
 
 #include "Enemy/Enemy_CharacterBase.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBaseAIController.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,6 +18,7 @@
 #include "Components/Character/SkillNumber/SkillNumber2.h"
 #include "Components/Character/APSkillNumber.h"
 #include "Character/ArcanePunkCharacter.h"
+#include "Components/Character/APTakeDamageComponent.h"
 
 // Sets default values
 AEnemy_CharacterBase::AEnemy_CharacterBase()
@@ -90,6 +92,16 @@ bool AEnemy_CharacterBase::IsHitting()
     return bHitting;
 }
 
+float AEnemy_CharacterBase::GetForward()
+{
+    return MonsterIsForward;
+}
+
+float AEnemy_CharacterBase::GetRight()
+{
+    return MonsterIsRight;
+}
+
 bool AEnemy_CharacterBase::AttackPushBack(FVector NewLocation)
 {
 	if(!IsAttackPush) return false;
@@ -112,8 +124,6 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
 	SpawnDamageText(DamageAmount);
 
-	if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
-
 	if(IsDead())
 	{
 	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
@@ -126,6 +136,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	else
 	{
 		bHitting = true;
+		TestHit();
 		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AEnemy_CharacterBase::ResetHitStiffness, HitStiffnessTime, false);
 	}
 
@@ -190,6 +201,7 @@ void AEnemy_CharacterBase::NormalAttack()
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(GetController());
 			if(MyController == nullptr) return;
+			DistinctHitPoint(HitResult.Location, Actor);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
 		}
 	}
@@ -252,4 +264,42 @@ void AEnemy_CharacterBase::EnemyDestroyed()
 	TeleportMarkDeactivate();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();
+}
+
+void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActor)
+{
+	FVector HitPoint = ImpactPoint - HitActor->GetActorLocation();
+	FVector HitActorForwardVec = HitActor->GetActorForwardVector(); 
+	FVector HitActorRightVec = HitActor->GetActorRightVector(); 
+
+	float Forward = (HitActorForwardVec.X * HitPoint.X) + (HitActorForwardVec.Y * HitPoint.Y); // 앞 뒤 Hit 판별
+	float Right = (HitActorRightVec.X * HitPoint.X) + (HitActorRightVec.Y * HitPoint.Y); // 좌 우 Hit 판별
+
+	auto Character = Cast<AArcanePunkCharacter>(HitActor);
+	if(Character) Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right);
+}
+
+void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
+{
+	MonsterIsForward = Forward;
+	MonsterIsRight = Right;
+}
+
+void AEnemy_CharacterBase::TestHit()
+{
+	if(MonsterIsForward > 0)
+	{
+		if(MonsterIsRight > 0)
+		{
+			if(HitMaterial_Test1) GetMesh()->SetMaterial(0, HitMaterial_Test1); 
+		}
+		else
+		{
+			if(HitMaterial_Test2) GetMesh()->SetMaterial(0, HitMaterial_Test2); 
+		}
+	}
+	else
+	{
+		if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
+	}
 }

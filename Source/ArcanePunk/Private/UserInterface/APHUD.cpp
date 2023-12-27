@@ -5,6 +5,7 @@
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/APTuTorialUserWidget.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 
 AAPHUD::AAPHUD()
 {
@@ -65,10 +66,14 @@ void AAPHUD::HideMenu()
 
 void AAPHUD::ToggleMenu()
 {
+	auto Character = Cast<AArcanePunkCharacter>(GetOwningPawn());
+	if(!Character) return;
+
 	if (bIsMenuVisible)
 	{
 		HideMenu();
-
+		Character->MouseArr.Pop();
+		if(!Character->MouseArr.IsEmpty()) return;
 		const FInputModeGameOnly InputMode;
 		GetOwningPlayerController()->SetInputMode(InputMode);
 		GetOwningPlayerController()->SetShowMouseCursor(false);
@@ -76,7 +81,7 @@ void AAPHUD::ToggleMenu()
 	else
 	{
 		DisplayMenu();
-
+		Character->MouseArr.Add(0);
 		const FInputModeGameAndUI InputMode;
 		GetOwningPlayerController()->SetInputMode(InputMode);
 		GetOwningPlayerController()->SetShowMouseCursor(true);

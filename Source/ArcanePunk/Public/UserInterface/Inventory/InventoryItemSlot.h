@@ -53,4 +53,14 @@ protected:
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
+	//Minhyeong
+	void SetEquipment();
+	void ChangeEquip(uint8 NewValue);
+	void UpdateEquipInventory(UAPItemBase* NewData);
+
+	UPROPERTY()
+	bool InInventory = true;
+
+public:
+	FORCEINLINE void SetInInventory(bool NewBool) { InInventory = NewBool; };
 };

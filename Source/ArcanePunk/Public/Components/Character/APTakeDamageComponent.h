@@ -22,11 +22,23 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void DamageCalculation(float & DamageApplied);
+	void DamageCalculation(float &DamageApplied);
+
+	void SetHitPoint(float Forward, float Right);
+
+	UFUNCTION(BlueprintPure)
+	float GetForward();
+
+	UFUNCTION(BlueprintPure)
+	float GetRight();
 
 private:
 	void OnHitting();
+	void TestHit(); // 맞는 방향 확인용 후에 삭제
 
 private:
-	FTimerHandle HitTimerHandle;
+	FTimerHandle HittingTimerHandle;
+
+	float PlayerIsForward = 0.0f;
+	float PlayerIsRight = 0.0f;
 };

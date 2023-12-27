@@ -50,7 +50,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	SkillComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillComp"));
 	SkillNumberComp = CreateDefaultSubobject<UAPSkillNumber>(TEXT("SkillNumberComp"));
 	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
-	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
+	TakeDMComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDMComp"));
 	SpawnFootPrintComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnFootPrintComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
@@ -84,6 +84,8 @@ void AArcanePunkCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PC = Cast<AArcanePunkPlayerController>(GetController());
+
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
 
@@ -91,7 +93,10 @@ void AArcanePunkCharacter::BeginPlay()
 	DefaultMaterial = GetMesh()->GetMaterial(0);
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerStatus.MoveSpeed;
+
+	UpdateStatus();
 	InitPlayerStatus();
+	InitEquipData(WeaponReference, DesiredWeaponID);
 
 	// prodo
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -101,7 +106,6 @@ void AArcanePunkCharacter::BeginPlay()
 void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -144,11 +148,6 @@ void AArcanePunkCharacter::PostInitializeComponents()
 	AnimHubComp->BindComboCheck();
 }
 
-uint8 AArcanePunkCharacter::returnState()
-{
-    return CurrentState;
-}
-
 void AArcanePunkCharacter::MoveForward(float AxisValue)
 {
 	// PlayerVec.X = AxisValue;
@@ -185,7 +184,6 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 	CurrentArmLength += AxisValue * ZoomCoefficient;
 	if (CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
 	else if (CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
-	
 
 	MySpringArm->TargetArmLength = CurrentArmLength;
 }
@@ -207,13 +205,54 @@ void AArcanePunkCharacter::Attack_typeB()
 	} 
 	else
 	{
-		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
-		if(!MyController) return;
-		MyController->Casting();
+		if(!PC) return;
+		PC->Casting();
 		bMouseAttack = true;
 		return;
 	}
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
+}
+
+void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
+{
+	//후에 세이브 데이터 생기면 로직 추가해야할 듯
+	if(EquipArr.IsEmpty())
+	{
+		if (EquipDataTable && !EquipID.IsNone())
+		{
+			const FItemData* ItemData = EquipDataTable->FindRow<FItemData>(EquipID, EquipID.ToString());
+
+			auto ItemReference = NewObject<UAPItemBase>(this, UAPItemBase::StaticClass());
+
+			ItemReference->ID = ItemData->ID;
+			ItemReference->ItemType = ItemData->ItemType;
+			ItemReference->ItemQuality = ItemData->ItemQuality;
+			ItemReference->ItemNumericData = ItemData->ItemNumericData;
+			ItemReference->ItemTextData = ItemData->ItemTextData;
+			ItemReference->ItemAssetData = ItemData->ItemAssetData;
+			ItemReference->ItemStatistics = ItemData->ItemStatistics;
+
+			EquipArr.Add(ItemReference);
+		}
+	}
+	
+}
+
+void AArcanePunkCharacter::ChangeEquipData(TArray<UAPItemBase *> & EquipArr, UAPItemBase *NewData)
+{
+	// 현재는 테스트용 나중에 강화 등 캐릭터 스테이터스에 변화를 고려하여 수정
+	if(EquipArr.IsEmpty())
+	{
+		if(NewData) EquipArr.Add(NewData);
+	}
+	else
+	{
+		EquipArr.Empty();
+		if(NewData) EquipArr.Add(NewData);;
+	}
+	
+	UpdateStatus();
+	if(PC) PC->OnUpdateStatusText.Broadcast();
 }
 
 void AArcanePunkCharacter::Skill_typeQ()
@@ -302,26 +341,6 @@ void AArcanePunkCharacter::SwitchState(uint8 Current)
 	}
 }
 
-float AArcanePunkCharacter::GetSkill3_LimitDist()
-{
-	return Skill3_LimitDist;
-}
-
-void AArcanePunkCharacter::SetSkill3_Location(FVector Vector)
-{
-	Skill3_Location = Vector;
-}
-
-FPlayerData AArcanePunkCharacter::GetPlayerStatus()
-{
-    return MyPlayerStatus;
-}
-
-void AArcanePunkCharacter::SetPlayerStatus(FPlayerData NewPlayerData)
-{
-	MyPlayerStatus = NewPlayerData;
-}
-
 float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
 {
 	float Speed = 0.0f;
@@ -331,70 +350,13 @@ float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
     return Speed;
 }
 
-float AArcanePunkCharacter::GetPushCoefficient()
-{
-    return AttackPushCoefficient;
-}
-
-UAPMovementComponent *AArcanePunkCharacter::GetAPMoveComponent()
-{
-    return MoveComp;
-}
-
-UMaterialInterface *AArcanePunkCharacter::GetHitMaterial()
-{
-    return HitMaterial;
-}
-
-UMaterialInterface *AArcanePunkCharacter::GetDefaultMaterial()
-{
-    return DefaultMaterial;
-}
-
-UAPAttackComponent *AArcanePunkCharacter::GetAttackComponent()
-{
-    return AttackComp;
-}
-
-float AArcanePunkCharacter::GetMaxDistance()
-{
-    return MaxDistance;
-}
-
-float AArcanePunkCharacter::GetAttackRadius()
-{
-    return AttackRadius;
-}
-
-UParticleSystem *AArcanePunkCharacter::GetComboHitEffect()
-{
-    return ComboHitEffect;
-}
-
-FVector AArcanePunkCharacter::GetComboHitEffectScale()
-{
-    return HitEffectScale;
-}
-
-void AArcanePunkCharacter::SetbMouseAttack(bool NewValue)
-{
-	bMouseAttack = NewValue;
-}
-
-bool AArcanePunkCharacter::GetCanMove()
-{
-    return bCanMove;
-}
-
 void AArcanePunkCharacter::SaveStatus()
 {
-	if (!HUD->TutorialDone) {
-		HUD->UpdateTutorialWidget("PressCtrl + 9");
-		return;
-	}
+	// if (!HUD->TutorialDone) {
+	// 	HUD->UpdateTutorialWidget("PressCtrl + 9");
+	// 	return;
+	// }
 
-	
-	MyPlayerStatus.MoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	MyPlayerStatus.PlayerLocation = GetActorLocation();
 	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
 	
@@ -403,10 +365,8 @@ void AArcanePunkCharacter::SaveStatus()
 	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	MyGameState->UpdateGameData(MyGameStatus);
 
-	AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(GetController());
-	if(!MyController) return;
-	
-	MyController->StartSaveUI();
+	if(!PC) return;
+	PC->StartSaveUI();
 	
 }
 
@@ -423,16 +383,12 @@ FTransform AArcanePunkCharacter::ReturnCameraTransform()
     return MyCamera->GetComponentTransform();
 }
 
-void AArcanePunkCharacter::SetCanMove(bool NewValue)
-{
-	bCanMove = NewValue;
-}
-
 float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
-	TakeDamageComp->DamageCalculation(DamageApplied);
+
+	TakeDMComp->DamageCalculation(DamageApplied);
+	if(PC) PC->OnUpdateStatusText.Broadcast();
     return DamageApplied;
 }
 
@@ -441,26 +397,6 @@ bool AArcanePunkCharacter::IsDead()
 	if(!MyPlayerState) return false;
 	
     return MyPlayerStatus.HP<=0;
-}
-
-bool AArcanePunkCharacter::IsHitting()
-{
-    return bHitting;
-}
-
-void AArcanePunkCharacter::SetHitting(bool NewBool)
-{
-	bHitting = NewBool;
-}
-
-float AArcanePunkCharacter::GetHitMotionTime()
-{
-    return HitMotionTime;
-}
-
-UAPSpawnFootPrintComponent *AArcanePunkCharacter::GetSpawnFootPrintComponent()
-{
-    return SpawnFootPrintComp;
 }
 
 TSubclassOf<AActor> AArcanePunkCharacter::GetFootClass(bool Left)
@@ -475,6 +411,38 @@ FTransform AArcanePunkCharacter::GetFootTransform(bool Left)
     return FootPrint_R->GetComponentTransform();
 }
 
+USkeletalMeshComponent *AArcanePunkCharacter::GetPlayerEquipment(uint8 NewValue)
+{
+	switch(NewValue)
+	{
+		case 1:
+		return Weapon;
+		break;
+	}
+    return nullptr;
+}
+
+UAPItemBase *AArcanePunkCharacter::GetEquipData(uint8 NewValue)
+{
+	switch(NewValue)
+	{
+		case 1:
+		return (WeaponReference.IsEmpty() ? nullptr : WeaponReference.Top());
+		break;
+	}
+    return nullptr;
+}
+
+void AArcanePunkCharacter::SetEquipData(uint8 NewValue, UAPItemBase *NewData)
+{
+	switch(NewValue)
+	{
+		case 1:
+		ChangeEquipData(WeaponReference, NewData);
+		break;
+	}
+}
+
 bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, FVector OverlapEnd)
 {
 	FCollisionQueryParams Params;
@@ -486,34 +454,10 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Visibility, Sphere, Params);
 }
 
-void AArcanePunkCharacter::SetDoing(bool NewBool)
+void AArcanePunkCharacter::UpdateStatus()
 {
-	bDoing = NewBool;
-}
-
-bool AArcanePunkCharacter::GetDoing()
-{
-    return bDoing;
-}
-
-UAPSkillHubComponent *AArcanePunkCharacter::GetAPSkillHubComponent()
-{
-    return SkillComp;
-}
-
-UAPSkillNumber *AArcanePunkCharacter::GetAPSkillNumberComponent()
-{
-    return SkillNumberComp;
-}
-
-TSubclassOf<class ASwordImpact> AArcanePunkCharacter::GetSwordImpactClass()
-{
-    return SwordImpactClass;
-}
-
-TSubclassOf<class ASwordThrowBase> AArcanePunkCharacter::GetSwordThrowClass()
-{
-    return SwordThrowClass;
+	WeaponReference.IsEmpty() ? FinalATK = MyPlayerStatus.ATK : FinalATK = MyPlayerStatus.ATK + WeaponReference.Top()->ItemStatistics.DamageValue;
+	 
 }
 
 void AArcanePunkCharacter::InitPlayerStatus()
@@ -759,12 +703,10 @@ void AArcanePunkCharacter::DropItems(UAPItemBase* ItemToDrop, const int32 Quanti
 		SpawnParams.bNoFail = true;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * 50.0f) };
-		const FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
-
+		const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * 50.0f) + GetActorUpVector() * 150.0f };
 		const int32 RemovedQuantity = PlayerInventory->RemoveAmountOfItem(ItemToDrop, QuantityToDrop);
 
-		APickup* Pickup = GetWorld()->SpawnActor<APickup>(APickup::StaticClass(), SpawnTransform, SpawnParams);
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(DropClass, SpawnLocation, GetActorRotation(), SpawnParams);
 
 		Pickup->InitializeDrop(ItemToDrop, RemovedQuantity);
 	}

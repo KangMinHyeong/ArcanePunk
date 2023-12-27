@@ -7,11 +7,12 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/Character/APHitPointComponent.h"
 
 UAPAttackComponent::UAPAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
+	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 }
 
 void UAPAttackComponent::BeginPlay()
@@ -150,7 +151,7 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 	if(!Character) return;
 	if(Character->returnState() != 0) return;
 
-	float Damage = Character->GetPlayerStatus().ATK * Multiple;
+	float Damage = Character->GetFinalATK() * Multiple;
 	FHitResult HitResult;
 	FVector HitVector;
 	bool Line = AttackTrace(HitResult, HitVector, Start, CloseAttack);
@@ -161,9 +162,11 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(Character->GetController());
 			if(!MyController) return;
+			HitPointComp->DistinctHitPoint(HitResult.Location, Actor);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
 			if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 		}
 	}
 }
+
 //AttackTrace 코드 끝

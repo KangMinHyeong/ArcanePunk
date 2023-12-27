@@ -9,6 +9,24 @@
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
 
+//Minhyeong
+class UDataTable;
+class UAPAttackComponent;
+class UParticleSystem;
+class UAPMovementComponent;
+class UAPSkillHubComponent;
+class UAPSkillNumber;
+class ASwordImpact;
+class ASwordThrowBase;
+class UAPTakeDamageComponent;
+class UAPSpawnFootPrintComponent;
+class UAPAnimHubComponent;
+class APickup;
+class UArcanePunkCharacterAnimInstance;
+class USpringArmComponent;
+class UCameraComponent;
+class AArcanePunkPlayerController;
+
 // prodo
 
 class UAPItemBase;
@@ -70,63 +88,74 @@ public:
 
 	FTransform ReturnCameraTransform();
 
-	UMaterialInterface* GetHitMaterial(); // HitMaterial 반환
-	UMaterialInterface* GetDefaultMaterial(); // DefaultMaterial 반환
+	FORCEINLINE UMaterialInterface* GetHitMaterial() const {return HitMaterial;}; // HitMaterial 반환
+	FORCEINLINE UMaterialInterface* GetDefaultMaterial() const {return DefaultMaterial;}; // DefaultMaterial 반환
 
 	bool PMCheck(FHitResult& HitResult, FVector OverlapStart, FVector OverlapEnd); // 발 밑 메쉬의 피지컬 머터리얼 체크 // 그외에 캐릭터 근처 히트 체크
 	
-	void SetDoing(bool NewBool); // bDoing 설정
-	bool GetDoing(); // bDoing 반환
+	FORCEINLINE void SetDoing(bool NewBool) {bDoing = NewBool;}; // bDoing 설정
+	FORCEINLINE bool GetDoing() const {return bDoing;}; // bDoing 반환
 
 	//플레이어 스테이터스 관련 함수
-	FPlayerData GetPlayerStatus(); // PlayerStatus 반환
-	void SetPlayerStatus(FPlayerData NewPlayerData);
+	FORCEINLINE FPlayerData GetPlayerStatus() const {return MyPlayerStatus;}; // PlayerStatus 반환
+	FORCEINLINE void SetPlayerStatus(FPlayerData NewPlayerData) {MyPlayerStatus = NewPlayerData;}; // PlayerStatus 설정 
 
 	UFUNCTION(BlueprintPure)
-	uint8 returnState(); // CurrentCharacterState 반환
+	FORCEINLINE uint8 returnState() const {return CurrentState;}; // CurrentCharacterState 반환
+
+	void UpdateStatus();
+
+	FORCEINLINE float GetFinalATK() const {return FinalATK;}; // FinalATK 반환
 
 	// Attack 관련 함수
-	class UAPAttackComponent* GetAttackComponent(); // AttackComp 반환
-	float GetMaxDistance(); // 공격 사거리 반환
-	float GetAttackRadius(); // 공격 반경 반환
-	class UParticleSystem* GetComboHitEffect(); // 콤보어택 히트 파티클 반환;
-	FVector GetComboHitEffectScale(); // 콤보어택 히트 스케일 반환;
-	void SetbMouseAttack(bool NewValue); // bMouseAttack 설정 
+	FORCEINLINE UAPAttackComponent* GetAttackComponent() const {return AttackComp;};  // AttackComp 반환
+	FORCEINLINE float GetMaxDistance() const {return MaxDistance;}; // 공격 사거리 반환
+	FORCEINLINE float GetAttackRadius() const {return AttackRadius;}; // 공격 반경 반환
+	FORCEINLINE UParticleSystem* GetComboHitEffect() const {return ComboHitEffect;}; // 콤보어택 히트 파티클 반환;
+	FORCEINLINE FVector GetComboHitEffectScale() const {return HitEffectScale;}; // 콤보어택 히트 스케일 반환;
+	FORCEINLINE void SetbMouseAttack(bool NewValue) {bMouseAttack = NewValue;}; // bMouseAttack 설정 
 
 	// Move 관련 함수
-	class UAPMovementComponent* GetAPMoveComponent(); // MoveComp 반환
-	bool GetCanMove(); // bCanMove 반환;
-	void SetCanMove(bool NewValue); // bCanMove 설정;
-	float GetAttackMoveSpeed(int32 Section); // 콤보 어택 Section Speed 반환
-	float GetPushCoefficient(); // 콤보 어택 시 Enemy Push 계수 반환
+	FORCEINLINE UAPMovementComponent* GetAPMoveComponent() const {return MoveComp;}; // MoveComp 반환
+	FORCEINLINE bool GetCanMove() const {return bCanMove;}; // bCanMove 반환;
+	FORCEINLINE void SetCanMove(bool NewValue) {bCanMove = NewValue;}; // bCanMove 설정;
+	float GetAttackMoveSpeed(int32 Section);// 콤보 어택 Section Speed 반환
+	FORCEINLINE float GetPushCoefficient() const {return AttackPushCoefficient;}; // 콤보 어택 시 Enemy Push 계수 반환
 	
 	// Skill 관련 함수
 	UFUNCTION(BlueprintPure)
-	class UAPSkillHubComponent* GetAPSkillHubComponent(); // SkillComp 반환
-	
-	class UAPSkillNumber* GetAPSkillNumberComponent(); // SkillNumberComp 반환
-	TSubclassOf<class ASwordImpact> GetSwordImpactClass(); //SwordImpactClass 반환
-	TSubclassOf<class ASwordThrowBase> GetSwordThrowClass(); // SwordThrowClass 반환
+	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return SkillComp;}; // SkillComp 반환
+	FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumberComp;}; // SkillNumberComp 반환
+	FORCEINLINE TSubclassOf<ASwordImpact> GetSwordImpactClass() const {return SwordImpactClass;}; //SwordImpactClass 반환
+	FORCEINLINE TSubclassOf<ASwordThrowBase> GetSwordThrowClass() const {return SwordThrowClass;}; // SwordThrowClass 반환
 
-	float GetSkill3_LimitDist(); // Skill3_LimitDist 반환
-	void SetSkill3_Location(FVector Vector); // Skill3 위치 설정
+	FORCEINLINE float GetSkill3_LimitDist() const {return Skill3_LimitDist;}; // Skill3_LimitDist 반환
+	FORCEINLINE void SetSkill3_Location(FVector Vector) {Skill3_Location = Vector;};// Skill3 위치 설정
 
 	// Hit, Dead 관련 함수
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintPure)
+	FORCEINLINE UAPTakeDamageComponent* GetTakeDamageComponent() const {return TakeDMComp;}; // DamageComp 반환
+
+	UFUNCTION(BlueprintPure)
 	bool IsDead(); // HP가 0이하인지 반환
 
 	UFUNCTION(BlueprintPure)
-	bool IsHitting(); // bHitting 반환
-	void SetHitting(bool NewBool); // bHitting 설정
-	float GetHitMotionTime(); // HitMotionTime 반환
+	FORCEINLINE bool IsHitting() const {return bHitting;};  // bHitting 반환
+	FORCEINLINE void SetHitting(bool NewBool) {bHitting = NewBool;}; // bHitting 설정
+	FORCEINLINE float GetHitMotionTime() const {return HitMotionTime;}; // HitMotionTime 반환
 
 	//FootPrint 관련 함수
-	class UAPSpawnFootPrintComponent* GetSpawnFootPrintComponent();
+	FORCEINLINE UAPSpawnFootPrintComponent* GetSpawnFootPrintComponent() const {return SpawnFootPrintComp;}; // HitMotionTime 반환
 
 	TSubclassOf<AActor> GetFootClass(bool Left);
 	FTransform GetFootTransform(bool Left);
+
+	// 장비 관련 함수
+	USkeletalMeshComponent* GetPlayerEquipment(uint8 NewValue);
+	UAPItemBase* GetEquipData(uint8 NewValue);
+	void SetEquipData(uint8 NewValue, UAPItemBase* NewData);
 
 private:
 	void InitPlayerStatus();
@@ -156,38 +185,55 @@ private:
 	void Attack_typeA(); // 마우스 오른쪽 공격
 	void Attack_typeB(); // 마우스 왼쪽 공격
 
+	//캐릭터장비 데이터 초기화
+	void InitEquipData(TArray<UAPItemBase*> & EquipArr, FName EquipID);
+	void ChangeEquipData(TArray<UAPItemBase*> & EquipArr, UAPItemBase* NewData);
+
 private:
 	// 부착 컴포넌트
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPAttackComponent* AttackComp;
+	UAPAttackComponent* AttackComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPMovementComponent* MoveComp;
+	UAPMovementComponent* MoveComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPSkillHubComponent* SkillComp;
+	UAPSkillHubComponent* SkillComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPSkillNumber* SkillNumberComp;
+	UAPSkillNumber* SkillNumberComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPAnimHubComponent* AnimHubComp;
+	UAPAnimHubComponent* AnimHubComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPTakeDamageComponent* TakeDamageComp;
+	UAPTakeDamageComponent* TakeDMComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	class UAPSpawnFootPrintComponent* SpawnFootPrintComp;
+	UAPSpawnFootPrintComponent* SpawnFootPrintComp;
+
+	//PlayerController 변수
+	AArcanePunkPlayerController* PC;
 	
-	UPROPERTY(EditAnywhere, Category = "Component")
+	// 장비, 무기 변수
+	UPROPERTY(EditAnywhere, Category = "Equipment")
 	USkeletalMeshComponent* Weapon;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	UDataTable* EquipDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment") // 1개만 채우기
+	TArray<UAPItemBase*> WeaponReference;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment")
+	FName DesiredWeaponID;
 
 	// 카메라, 스프링암 변수
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	class USpringArmComponent* MySpringArm;
+	USpringArmComponent* MySpringArm;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	class UCameraComponent* MyCamera;
+	UCameraComponent* MyCamera;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float MinimumSpringArmLength = 150.0f;
@@ -228,27 +274,30 @@ private:
 	bool bDoing = false; // 공격 , 스킬 사용중인지 체크하는 변수 / true면 다른 행동 제약 
 
 	UPROPERTY()
-	class UArcanePunkCharacterAnimInstance* Anim;
+	UArcanePunkCharacterAnimInstance* Anim;
 
 	// State 관련 변수
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class AArcanePunkPlayerState* MyPlayerState;
+	AArcanePunkPlayerState* MyPlayerState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	struct FPlayerData MyPlayerStatus;
+	FPlayerData MyPlayerStatus;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	struct FGameData MyGameStatus;
+	FGameData MyGameStatus;
+
+	UPROPERTY()
+	float FinalATK = 0.0f;
 
 	// 스킬 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	float Skill3_LimitDist = 1500.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	TSubclassOf<class ASwordImpact> SwordImpactClass;
+	TSubclassOf<ASwordImpact> SwordImpactClass;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	TSubclassOf<class ASwordThrowBase> SwordThrowClass;
+	TSubclassOf<ASwordThrowBase> SwordThrowClass;
 
 	// Foot Print 변수
 	UPROPERTY(EditAnywhere, Category = "Foot Print")
@@ -274,7 +323,7 @@ private:
 	float Attack3_MoveSpeed = 500.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	class UParticleSystem* ComboHitEffect;
+	UParticleSystem* ComboHitEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float MaxDistance = 200.0f;
@@ -293,9 +342,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Skin")
 	UMaterialInterface* HitMaterial;
 
+	// 드랍
+	UPROPERTY(EditAnywhere, Category = "Drop")
+	TSubclassOf<APickup> DropClass;
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	class UParticleSystem* Skill3_Effect;
+	UParticleSystem* Skill3_Effect;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	FVector Skill3_Location;
@@ -303,6 +356,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	FVector Skill3_Size = FVector(1,1,1);
 
+	UPROPERTY(EditAnywhere, Category = "Skin")
+	UMaterialInterface* HitMaterial_Test1; // Test용 후에 삭제
+
+	UPROPERTY(EditAnywhere, Category = "Skin")
+	UMaterialInterface* HitMaterial_Test2; // Test용 후에 삭제
+
+	UPROPERTY()
+	TArray<uint8> MouseArr;
 // prodo
 
 protected:

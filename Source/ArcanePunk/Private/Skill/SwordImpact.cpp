@@ -11,6 +11,7 @@
 #include "TimerManager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/Character/APHitPointComponent.h"
 
 // Sets default values
 ASwordImpact::ASwordImpact()
@@ -19,6 +20,7 @@ ASwordImpact::ASwordImpact()
 	PrimaryActorTick.bCanEverTick = false;
 	ImpactComp = CreateDefaultSubobject<UBoxComponent>(TEXT("ImpactComp"));
 	BaseEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseEffect"));
+	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 
 	SetRootComponent(ImpactComp);
 	BaseEffect->SetupAttachment(ImpactComp);
@@ -32,6 +34,7 @@ ASwordImpact::ASwordImpact()
 void ASwordImpact::BeginPlay()
 {
 	Super::BeginPlay();
+	GetWorldTimerManager().SetTimer(ScaleTimerHandle, this, &ASwordImpact::ScaleSet, ScaleTime, false);
 	BintHit();
 }
 
@@ -65,7 +68,7 @@ void ASwordImpact::DestroyImpact()
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
-void ASwordImpact::DamageAction(AActor *OtherActor)
+void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 {
 	auto MyOwner = GetOwner();
 	if(MyOwner == nullptr)
@@ -79,7 +82,8 @@ void ASwordImpact::DamageAction(AActor *OtherActor)
 	
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, Character->GetPlayerStatus().ATK * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
+		UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 		if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
@@ -89,13 +93,19 @@ void ASwordImpact::DamageAction(AActor *OtherActor)
 
 }
 
+void ASwordImpact::ScaleSet()
+{
+	SetActorScale3D(FVector(1.0f, 1.0f, 1.0f));
+	GetWorldTimerManager().ClearTimer(ScaleTimerHandle);
+}
+
 void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
-	DamageAction(OtherActor);
+	DamageAction(OtherActor, Hit);
 	Destroy();
 }
 
 void ASwordImpact::OnPenetrating(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	DamageAction(OtherActor);
+	DamageAction(OtherActor, SweepResult);
 }

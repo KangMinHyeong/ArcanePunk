@@ -41,7 +41,13 @@ struct FPlayerData
 	float HP = 100.0f;
 
 	UPROPERTY(Transient, BlueprintReadWrite)
+	float MaxHP = 100.0f;
+
+	UPROPERTY(Transient, BlueprintReadWrite)
 	int32 MP = 100;
+
+	UPROPERTY(Transient, BlueprintReadWrite)
+	int32 MaxMP = 100;
 
 	UPROPERTY(Transient, BlueprintReadWrite)
 	float ATK = 25.0f;

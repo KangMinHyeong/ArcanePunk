@@ -52,4 +52,6 @@ private:
 	int32 CurrentCombo = 0;
 	int32 MaxCombo = 3;
 
+	UPROPERTY()
+	class UAPHitPointComponent* HitPointComp;
 };

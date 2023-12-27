@@ -30,6 +30,14 @@ enum class EItemType : uint8
 	Etc			UMETA(DisplayName = "Etc")
 };
 
+//Minhyeong
+UENUM()
+enum class EEquipType : uint8
+{
+	No_Equip	UMETA(DisplayName = "No_Equip"),
+	Weapon		UMETA(DisplayName = "Weapon")
+};
+
 USTRUCT()
 struct FItemStatistics
 {
@@ -67,6 +75,10 @@ struct FItemStatistics
 
 	UPROPERTY(EditAnywhere)
 	FString DisassembleResult;
+
+	// Minhyeong
+	UPROPERTY(EditAnywhere)
+	EEquipType EquipType;
 };
 
 USTRUCT()
@@ -124,6 +136,9 @@ struct FItemAssetData
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* SkelMesh;
 };
 
 USTRUCT()
