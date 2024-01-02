@@ -34,6 +34,8 @@
 #include "Test/Pickup.h"
 #include "UserInterface/APTuTorialUserWidget.h"
 
+#include "../APGameModeBase.h"
+
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
@@ -101,7 +103,6 @@ void AArcanePunkCharacter::BeginPlay()
 void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
