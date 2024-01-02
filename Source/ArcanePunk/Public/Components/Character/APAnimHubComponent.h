@@ -39,4 +39,5 @@ private:
 	void OnSkill_1_MontageEnded();
 	void OnSkill_2_MontageEnded();
 	void OnSkill_3_MontageEnded();
+
 };

@@ -16,7 +16,7 @@ class ARCANEPUNK_API USkillNumber2 : public USkillNumberBase
 public:
 	virtual void PlaySkill() override;
 
-	void MarkingOn(FVector Location, AActor* OtherActor, float Time);
+	void MarkingOn(AActor* OtherActor, float Time);
 
 	void Activate_Skill2();
 	

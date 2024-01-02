@@ -12,6 +12,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APHitPointComponent.h"
+#include "Enemy/Enemy_CharacterBase.h"
 
 // Sets default values
 ASwordImpact::ASwordImpact()
@@ -34,7 +35,6 @@ ASwordImpact::ASwordImpact()
 void ASwordImpact::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(ScaleTimerHandle, this, &ASwordImpact::ScaleSet, ScaleTime, false);
 	BintHit();
 }
 
@@ -78,25 +78,40 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 	} 
 	auto MyOwnerInstigator = MyOwner->GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
-	auto Character = Cast<AArcanePunkCharacter>(MyOwner);
-	
-	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
+	if(IsPlayerSkill)
 	{
-		HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-		if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
+		auto Character = Cast<AArcanePunkCharacter>(MyOwner);
+		if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
 		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
+			HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
+			UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+			if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
+			}
 		}
-
+	}
+	else
+	{
+		auto Enemy = Cast<AEnemy_CharacterBase>(MyOwner);
+		if (OtherActor && OtherActor != this && OtherActor != MyOwner && Enemy)
+		{
+			if(HitEffect && OtherActor->ActorHasTag(TEXT("Player")))
+			{
+				Enemy->DistinctHitPoint(HitResult.Location, OtherActor);
+				UGameplayStatics::ApplyDamage(OtherActor, Enemy->GetMonsterATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
+				SlowPlayer(OtherActor);
+			}
+		}
 	}
 
 }
 
-void ASwordImpact::ScaleSet()
+void ASwordImpact::SlowPlayer(AActor *OtherActor)
 {
-	SetActorScale3D(FVector(1.0f, 1.0f, 1.0f));
-	GetWorldTimerManager().ClearTimer(ScaleTimerHandle);
+	auto Character = Cast<AArcanePunkCharacter>(OtherActor);
+	if(Character) Character->SlowState(SlowCoefficient, SlowTime);
 }
 
 void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)

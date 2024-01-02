@@ -9,7 +9,6 @@
 
 AAPHUD::AAPHUD()
 {
-
 }
 
 void AAPHUD::BeginPlay()
@@ -141,4 +140,9 @@ void AAPHUD::HideTutorialWidget() const
 	}
 }
 
-
+void AAPHUD::SetBossHPUI()
+{
+	if(!BossHPUIClass) return;
+	BossHPWidget = CreateWidget<UUserWidget>(GetWorld(), BossHPUIClass);
+	BossHPWidget->AddToViewport(-1);
+}

@@ -12,12 +12,13 @@ void UAP_EnemyBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-	auto Character = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
-	if (!Character) return;
+	Enemy = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
+	if (!Enemy) return;
 
+	IsDead = Enemy->IsDead();
 	if (!IsDead)
 	{
-		CurrentPawnSpeed = Character->GetVelocity().Size();
+		CurrentPawnSpeed = Enemy->GetVelocity().Size();
 
 		// auto Character = Cast<ACharacter>(Pawn);
 		// if (Character)
@@ -27,9 +28,12 @@ void UAP_EnemyBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		
 	}
 }
+
 bool UAP_EnemyBaseAnimInstance::IsRun()
 {
-	if(CurrentPawnSpeed >= 1.0f)
+	if(IsDead) return false;
+	
+	if(CurrentPawnSpeed >= 0.1f)
 	{
 		return true;
 	}
@@ -40,3 +44,13 @@ bool UAP_EnemyBaseAnimInstance::IsRun()
     return false;
 }
 
+void UAP_EnemyBaseAnimInstance::PlayNormalAttack_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(NormalAttack_Montage);
+}
+
+void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()
+{
+	if(Enemy) Enemy->NormalAttack();
+}

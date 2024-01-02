@@ -9,6 +9,7 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Skill/SwordThrowBase.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "Components/CapsuleComponent.h"
 
 void USkillNumber2::PlaySkill()
 {
@@ -19,7 +20,7 @@ void USkillNumber2::PlaySkill()
 	{
 		auto Enemy = Cast<AEnemy_CharacterBase>(MarkedActor);
 		if(!Enemy) return;
-		OwnerCharacter->SetActorLocation(MarkingLocation);
+		OwnerCharacter->SetActorLocation(Enemy->GetActorLocation() - Enemy->GetActorForwardVector() * Enemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 1.5f);
 		OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 		Enemy->TeleportMarkDeactivate();
 		MarkErase();
@@ -35,10 +36,9 @@ void USkillNumber2::PlaySkill()
 	}
 }
 
-void USkillNumber2::MarkingOn(FVector Location, AActor* OtherActor, float Time)
+void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
 {
 	bMark = true;
-	MarkingLocation = Location;
 	MarkedActor = OtherActor;
 	GetWorld()->GetTimerManager().SetTimer(MarkTimerHandle, this, &USkillNumber2::MarkErase, Time, false);
 }
