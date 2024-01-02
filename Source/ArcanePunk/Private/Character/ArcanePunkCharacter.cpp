@@ -22,6 +22,7 @@
 #include "Components/Character/APAnimHubComponent.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
+#include "NiagaraComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -45,6 +46,8 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
 	HitMaterial = CreateDefaultSubobject<UMaterialInterface>(TEXT("HitMaterial"));
+	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
+
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
 	SkillComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillComp"));
@@ -58,6 +61,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
+	StunEffect->SetupAttachment(GetMesh(), FName("HeadMark"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
@@ -128,9 +132,6 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
 
-	PlayerInputComponent->BindAction(TEXT("Normal"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::NormalState);
-	PlayerInputComponent->BindAction(TEXT("Stun"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StunState);
-	PlayerInputComponent->BindAction(TEXT("KnockBack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::KnockBackState);
 	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
 
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
@@ -275,7 +276,7 @@ void AArcanePunkCharacter::Skill_typeSpace()
 
 void AArcanePunkCharacter::Skill_typeShift()
 {
-	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
+	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
 	bMouseAttack = false;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
 	SkillComp->PressShift();
@@ -283,32 +284,37 @@ void AArcanePunkCharacter::Skill_typeShift()
 
 void AArcanePunkCharacter::EndJog()
 {
-	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 }
 
-void AArcanePunkCharacter::NormalState()
+void AArcanePunkCharacter::NormalState() // 후에 벡터로 관리
 {
+	StunEffect->DeactivateImmediate();
 	CurrentState = 0;
 	bCanMove = true;
+	bCanJog = true;
 	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
+	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 	GetWorldTimerManager().ClearTimer(State_ETimerHandle);
 }
 
-void AArcanePunkCharacter::StunState()
+void AArcanePunkCharacter::StunState(float StunTime)
 {
+	StunEffect->Activate();
 	CurrentState = 1;
 	bCanMove = false;
-	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, State_Time, false);
+	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, StunTime, false);
 }
 
-void AArcanePunkCharacter::KnockBackState()
+void AArcanePunkCharacter::KnockBackState(FVector KnockBackPoint, float KnockBackTime)
 {
 	CurrentState = 2;
 	bCanMove = false;
-	FVector KnockBackVec = -GetActorForwardVector() * 1500.0f;
+	FVector KnockBackVec = (KnockBackPoint - GetActorLocation()) * FVector(1.0f, 1.0f, 0.0f);
+	KnockBackVec = -( KnockBackVec / KnockBackVec.Size());
 	GetCharacterMovement()->BrakingFrictionFactor = 0.0f;
-	LaunchCharacter(KnockBackVec, true, true);
-	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, State_Time/3, false);
+	LaunchCharacter(KnockBackVec * 1500.0f, true, true);
+	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, KnockBackTime, false);
 }
 
 void AArcanePunkCharacter::SleepState()
@@ -318,27 +324,34 @@ void AArcanePunkCharacter::SleepState()
 	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, State_Time, false);
 }
 
+void AArcanePunkCharacter::SlowState(float SlowCoefficient, float SlowTime)
+{
+	CurrentState = 4;
+	bCanJog = false;
+	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * SlowCoefficient;
+	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, SlowTime, false);
+}
 //나중에 쓸 함수(피격 시 발동되게) //피격 판정 생성시 이용 예정
 void AArcanePunkCharacter::SwitchState(uint8 Current)
 {
-	switch(Current)
-	{
-		case 0:
-		NormalState();
-		break;
+	// switch(Current)
+	// {
+	// 	case 0:
+	// 	NormalState();
+	// 	break;
 
-		case 1:
-		StunState();
-		break;
+	// 	case 1:
+	// 	StunState();
+	// 	break;
 
-		case 2:
-		KnockBackState();
-		break;
+	// 	case 2:
+	// 	KnockBackState();
+	// 	break;
 
-		case 3:
-		SleepState();
-		break;
-	}
+	// 	case 3:
+	// 	SleepState();
+	// 	break;
+	// }
 }
 
 float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)

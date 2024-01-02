@@ -20,8 +20,4 @@ public:
 
 protected:
 	virtual void DestroySword() override;
-	
-private:
-	UPROPERTY(EditAnywhere)
-	float MarkDistance = -50.0f;
 };

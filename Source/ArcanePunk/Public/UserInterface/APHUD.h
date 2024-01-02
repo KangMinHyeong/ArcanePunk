@@ -43,7 +43,13 @@ public:
 	void UpdateTutorialWidget(const FString PressedKey);
 	void HideTutorialWidget() const;
 
+	// Minhyeong
+	UFUNCTION(BlueprintPure)
+	UUserWidget* GetBossHPUI() {return BossHPWidget;};
+	void SetBossHPUI();
 
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE UUserWidget* GetSkillPressWidget() const {return SkillPressWidget;};
 
 protected:
 
@@ -66,6 +72,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> SkillPressClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> BossHPUIClass;
+
 	UPROPERTY()
 	UUserWidget* SkillPressWidget;
+
+	UPROPERTY()
+	UUserWidget* BossHPWidget;
 };

@@ -26,6 +26,7 @@ class UArcanePunkCharacterAnimInstance;
 class USpringArmComponent;
 class UCameraComponent;
 class AArcanePunkPlayerController;
+class UNiagaraComponent;
 
 // prodo
 
@@ -56,6 +57,7 @@ enum class ECharacterState : uint8
     Stun        = 1,
     KnockBack 	= 2,
     Sleep       = 3,
+	Slow		= 4,
 };
 //나중에 스킬도 uint8 또는 16으로 만들기
 
@@ -157,6 +159,12 @@ public:
 	UAPItemBase* GetEquipData(uint8 NewValue);
 	void SetEquipData(uint8 NewValue, UAPItemBase* NewData);
 
+	// 플레이어 상태이상 함수
+	void StunState(float StunTime);//후에 인자 추가 (상태시간)
+	void KnockBackState(FVector KnockBackPoint, float KnockBackTime);//후에 인자 추가 (상태시간)
+	void SleepState();//후에 인자 추가 (상태시간)
+	void SlowState(float SlowCoefficient, float SlowTime);
+
 private:
 	void InitPlayerStatus();
 	
@@ -167,9 +175,6 @@ private:
 	void Skill_typeSpace();
 	
 	void NormalState();
-	void StunState();//후에 인자 추가 (상태시간)
-	void KnockBackState();//후에 인자 추가 (상태시간)
-	void SleepState();//후에 인자 추가 (상태시간)
 	void SwitchState(uint8 Current);
 	
 	void SaveStatus();
@@ -249,6 +254,8 @@ private:
 	bool bCanMove = true;
 
 	float DefaultSpeed = 400.0f;
+	UPROPERTY()
+	bool bCanJog = true;
 
 	UPROPERTY(EditAnywhere, Category = "Move")
 	float AttackPushCoefficient = 1.2f;
@@ -272,6 +279,9 @@ private:
 	float StateTime = 3.0f;
 
 	bool bDoing = false; // 공격 , 스킬 사용중인지 체크하는 변수 / true면 다른 행동 제약 
+
+	UPROPERTY(EditAnywhere, Category = "CC State")
+	UNiagaraComponent* StunEffect;
 
 	UPROPERTY()
 	UArcanePunkCharacterAnimInstance* Anim;

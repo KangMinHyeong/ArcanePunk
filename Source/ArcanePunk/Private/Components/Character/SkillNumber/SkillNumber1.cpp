@@ -26,10 +26,10 @@ void USkillNumber1::Activate_Skill1()
 	if(!OwnerCharacter) return;
 
 	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = OwnerCharacter;
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	auto SwordSkill = GetWorld()->SpawnActor<ASwordImpact>(OwnerCharacter->GetSwordImpactClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*35.0f, OwnerCharacter->GetActorRotation(), SpawnParams);
 	if(!SwordSkill) return;
-	SwordSkill->SetOwner(OwnerCharacter);
 }

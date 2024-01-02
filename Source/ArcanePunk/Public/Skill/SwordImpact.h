@@ -34,7 +34,7 @@ private:
 	void BintHit();
 	void DestroyImpact();
 	void DamageAction(AActor *OtherActor, const FHitResult &HitResult);
-	void ScaleSet();
+	void SlowPlayer(AActor *OtherActor);
 	
 private:
 	UPROPERTY(EditAnywhere)
@@ -50,16 +50,18 @@ private:
 	class UNiagaraSystem* HitEffect;
 
 	FTimerHandle DestroyTimerHandle;
-	FTimerHandle ScaleTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 5.0f;
 
 	UPROPERTY(EditAnywhere)
+	float SlowTime = 3.5f;
+
+	UPROPERTY(EditAnywhere)
 	float DamageCoefficient = 1.0f;
 
 	UPROPERTY(EditAnywhere)
-	float ScaleTime = 0.01f;
+	float SlowCoefficient = 0.75f;
 
 	UPROPERTY(EditAnywhere)
 	float ImpactSpeed = 1500.0f;
@@ -69,4 +71,7 @@ private:
 	
 	UPROPERTY()
 	class UAPHitPointComponent* HitPointComp;
+
+	UPROPERTY(EditAnywhere)
+	bool IsPlayerSkill = true;
 };

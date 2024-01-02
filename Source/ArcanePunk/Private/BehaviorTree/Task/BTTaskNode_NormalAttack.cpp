@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 
 UBTTaskNode_NormalAttack::UBTTaskNode_NormalAttack()
 {
@@ -15,18 +16,19 @@ EBTNodeResult::Type UBTTaskNode_NormalAttack::ExecuteTask(UBehaviorTreeComponent
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
     
-    if(OwnerComp.GetAIOwner() == nullptr)
+    if(!OwnerComp.GetAIOwner())
     {
         return EBTNodeResult::Failed;
     }
 
     AEnemy_CharacterBase* Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
-    if(Monster == nullptr)
+    if(!Monster)
     {   
         return EBTNodeResult::Failed;
     }
 
-    Monster->NormalAttack();
+    auto EnemyAnim = Cast<UAP_EnemyBaseAnimInstance>(Monster->GetMesh()->GetAnimInstance());
+	if(EnemyAnim) EnemyAnim->PlayNormalAttack_Montage();
 
     return EBTNodeResult::Succeeded;
 }
