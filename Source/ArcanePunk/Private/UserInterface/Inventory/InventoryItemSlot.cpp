@@ -1,11 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Items/APItemBase.h"
 #include "UserInterface/Inventory/DragItemVisual.h"
 #include "UserInterface/Inventory/InventoryTooltip.h"
 #include "UserInterface/Inventory/ItemDragDropOperation.h"
+
+// Minhyeong
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
+#include "Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
+#include "GameFramework/Controller.h"
+#include "UserInterface/Status/APStatusUI.h"
 
 void UInventoryItemSlot::NativeOnInitialized()
 {
@@ -67,6 +73,12 @@ FReply UInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
 	{
 		return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
 	}
+	// Minhyeong
+	else if(InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		SetEquipment();
+		return Reply.Handled();
+	}
 
 	return Reply.Unhandled();
 }
@@ -105,5 +117,64 @@ bool UInventoryItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDr
 	UDragDropOperation* InOperation)
 {
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+}
 
+//Minhyeong
+void UInventoryItemSlot::SetEquipment()
+{
+	if(ItemReference->ItemType == EItemType::Equipment)
+	{
+		switch(ItemReference->ItemStatistics.EquipType)
+		{
+			case EEquipType::No_Equip:
+			break;
+			case EEquipType::Weapon:
+			ChangeEquip(1);
+			break;
+		}
+	}
+}
+
+void UInventoryItemSlot::ChangeEquip(uint8 NewValue) // 후에 플레이어 스탯 업데이트 하기
+{
+	auto Character = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
+	if(!Character) return;
+
+	if(InInventory) // 인벤토리 장비창에서 우클릭
+	{
+		auto EquipData = Character->GetEquipData(NewValue);
+		Character->SetEquipData(NewValue, ItemReference); 
+		Character->GetPlayerEquipment(NewValue)->SetSkeletalMesh(ItemReference->ItemAssetData.SkelMesh);
+		Character->GetInventory()->RemoveAmountOfItem(ItemReference, ItemReference->Quantity);
+
+		UpdateEquipInventory(EquipData);
+	}
+	else // 스테이터스 장비창에서 우클릭
+	{
+		Character->SetEquipData(NewValue, nullptr);
+		Character->GetPlayerEquipment(NewValue)->SetSkeletalMesh(nullptr);
+		UpdateEquipInventory(ItemReference);
+	}
+	
+}
+
+void UInventoryItemSlot::UpdateEquipInventory(UAPItemBase *NewData)
+{
+	auto Character = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
+	if(!Character) return;
+
+	if(NewData)
+	{
+		ItemReference = NewData;
+		Character->GetInventory()->HandleAddItem(ItemReference);
+	}
+	// else return;
+
+	// 장비 슬롯 업데이트
+	auto PC = Cast<AArcanePunkPlayerController>(Character->GetController());
+	if(!PC) return;
+
+	PC->GetStatusUI()->InitEquipSlot();
+
+	// ItemReference를 다시 EquipData로 치환해서 Slot으로 띄우기
 }

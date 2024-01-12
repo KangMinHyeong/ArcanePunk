@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerState/APPlayerData.h"
 #include "GameFramework/SaveGame.h"
 #include "APSaveGame.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ARCANEPUNK_API UAPSaveGame : public USaveGame
 {
 	GENERATED_BODY()
 public:
+	UAPSaveGame();
+
 	void InitSaveData();
 
 public:
@@ -25,7 +25,13 @@ public:
 	float SaveHP = 100.0f;
 
 	UPROPERTY()
+	float SaveMaxHP = 100.0f;
+
+	UPROPERTY()
 	int32 SaveMP = 100;
+
+	UPROPERTY()
+	int32 SaveMaxMP = 100;
 
 	UPROPERTY()
 	float SaveATK = 25.0f;
@@ -44,6 +50,20 @@ public:
 
 	UPROPERTY()
 	FVector SavePlayerLocation = FVector(0,0,0);
+	
+	UPROPERTY()
+	bool SaveHasQSkillType = false;
+
+	UPROPERTY()
+	bool SaveHasESkillType = false;		
+
+	UPROPERTY()
+	bool SaveHasRSkillType = false;	
+
+
+	// Goods
+	UPROPERTY()
+	int32 SaveRerollDice = 0;	
 
 	// GameData
 	UPROPERTY()

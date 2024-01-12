@@ -7,11 +7,12 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/Character/APHitPointComponent.h"
 
 UAPAttackComponent::UAPAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
+	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 }
 
 void UAPAttackComponent::BeginPlay()
@@ -115,7 +116,7 @@ void UAPAttackComponent::ComboCheck()
 }
 
 //AttackTrace 코드 시작
-bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack)
+bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
 {
 	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!Character) return false;
@@ -138,22 +139,29 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 	HitVector = -Rotation.Vector();
 
 	FCollisionShape Sphere;
-	if(CloseAttack) Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius());
-	else Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius()*1.25);
+	if(Custom)
+	{
+		Sphere= FCollisionShape::MakeSphere(CustomRadius);
+	}
+	else
+	{
+		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius());}
+		else {Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius()*1.25);}
+	}
 
 	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
 }
 
-void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Multiple)
+void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Multiple, bool bStun, float StunTime, bool Custom, float CustomRadius)
 {
 	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!Character) return;
-	if(Character->returnState() != 0) return;
+	if(Character->returnState() != ECharacterState::None) return;
 
-	float Damage = Character->GetPlayerStatus().ATK * Multiple;
+	float Damage = Character->GetFinalATK() * Multiple;
 	FHitResult HitResult;
 	FVector HitVector;
-	bool Line = AttackTrace(HitResult, HitVector, Start, CloseAttack);
+	bool Line = AttackTrace(HitResult, HitVector, Start, CloseAttack, Custom, CustomRadius);
 	if(Line)
 	{
 		if(AActor* Actor = HitResult.GetActor())
@@ -161,9 +169,12 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(Character->GetController());
 			if(!MyController) return;
+			HitPointComp->DistinctHitPoint(HitResult.Location, Actor);
+			if(bStun) HitPointComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
 			if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 		}
 	}
 }
+
 //AttackTrace 코드 끝

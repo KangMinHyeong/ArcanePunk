@@ -6,7 +6,6 @@
 #include "Engine/DataTable.h"
 #include "APItemDataStruct.generated.h"
 
-
 UENUM()
 enum class EItemQuality : uint8
 {
@@ -29,6 +28,14 @@ enum class EItemType : uint8
 	RandomBox	UMETA(DisplayName = "RandomBox"),
 	Quest		UMETA(DisplayName = "Quest"),
 	Etc			UMETA(DisplayName = "Etc")
+};
+
+//Minhyeong
+UENUM()
+enum class EEquipType : uint8
+{
+	No_Equip	UMETA(DisplayName = "No_Equip"),
+	Weapon		UMETA(DisplayName = "Weapon")
 };
 
 USTRUCT()
@@ -68,6 +75,10 @@ struct FItemStatistics
 
 	UPROPERTY(EditAnywhere)
 	FString DisassembleResult;
+
+	// Minhyeong
+	UPROPERTY(EditAnywhere)
+	EEquipType EquipType;
 };
 
 USTRUCT()
@@ -125,6 +136,9 @@ struct FItemAssetData
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* SkelMesh;
 };
 
 USTRUCT()
@@ -154,9 +168,12 @@ struct FItemData : public FTableRowBase
 	FItemTextData ItemTextData;
 };
 
-class ARCANEPUNK_API APItemDataStruct
+UCLASS()
+class ARCANEPUNK_API UAPItemDataStruct : public UDataTable
 {
+	GENERATED_BODY()
+	
 public:
-	APItemDataStruct();
-	~APItemDataStruct();
+	UAPItemDataStruct();
+	~UAPItemDataStruct();
 };

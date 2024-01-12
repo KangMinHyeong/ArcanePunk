@@ -35,7 +35,7 @@ void UInventoryPanel::RefreshInventory()
 	if (InventoryReference && InventorySlotClass)
 	{
 		InventoryWrapBox->ClearChildren();
-
+		
 		//for (UAPItemBase* const& InventoryItem : InventoryReference->GetInventoryContents())
 		for(auto InventoryItem : InventoryReference->GetInventoryContents())
 		{

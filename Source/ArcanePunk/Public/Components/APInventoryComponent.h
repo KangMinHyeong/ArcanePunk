@@ -112,6 +112,9 @@ public:
 	UFUNCTION()
 	void SortingInventory();
 
+	// Minhyeong
+	UFUNCTION(Category = "Inventory")
+	UAPItemBase* FindItembyId(FName DesiredItemID) const;
 
 protected:
 	// Called when the game starts

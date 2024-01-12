@@ -4,11 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/Common/APCrowdControlComponent.h"
 #include "Enemy_CharacterBase.generated.h"
 
 #define Defense_constant 1000
 
+DECLARE_MULTICAST_DELEGATE(FOnHPChanged);
+DECLARE_MULTICAST_DELEGATE(FOnCrowdControlCheck);
+
 class ATextRenderActor;
+class UAP_EnemyBaseAnimInstance;
+class UNiagaraComponent;
+class AEnemy_DropBase;
+class UWidgetComponent;
+class AEnemyBaseAIController;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
@@ -16,34 +25,37 @@ class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AEnemy_CharacterBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	TArray<ATextRenderActor*> PresentDamages;
-
-
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void PostInitializeComponents() override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
-	// 몬스터 Dead 관련 함수
+	// 몬스터 Dead , Hit 관련 함수
 	UFUNCTION(BlueprintPure)
-	bool IsDead();
+	virtual bool IsDead();
 
 	UFUNCTION(BlueprintPure)
-	bool IsNormalAttack();
+	bool IsHitting();
 
+	UFUNCTION(BlueprintPure)
+	float GetForward();
+
+	UFUNCTION(BlueprintPure)
+	float GetRight();
+
+	void SetHitPoint(float Forward, float Right);
+
+	// 몬스터 Attack 관련 함수
 	virtual void PossessedBy(AController* NewController) override;
 	void NormalAttack();
 
@@ -52,67 +64,96 @@ public:
 	void TeleportMarkActivate(float Time, AActor * MarkOwner);
 	void TeleportMarkDeactivate();
 
-	bool IsHitting();
-
 	bool AttackPushBack(FVector NewLocation);
 
-private:
+	FORCEINLINE float GetMonsterATK() const { return Monster_ATK;}; //Monster_ATK 반환
+
+	// HitPoint 관련 함수
+	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
+
+	// 몬스터 Anim 관련 함수
+	UFUNCTION()
+	void EnemyMontageEnded(UAnimMontage *Montage, bool bInterrupted);
+
+	// 몬스터 HP 관련 함수
+	FORCEINLINE float GetMonsterMaxHP() const { return MaxHP;}; //Monster_MaxHP 반환
+	FORCEINLINE float GetMonsterHP() const { return HP;}; //Monster_HP 반환
+
+	// 몬스터 CrowdControl 관련 함수
+	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComp() const { return CrowdControlComp;};
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE ECharacterState ReturnState() const { return CurrentState;};
+	FORCEINLINE void SetState(ECharacterState UpdateState) { CurrentState = UpdateState;};
+	FORCEINLINE UNiagaraComponent* GetStunEffect() const { return StunEffect;};
+protected:
 	float DamageMath(float Damage);
-	bool AttackTrace(FHitResult &HitResult, FVector &HitVector);
-	void ResetNormalAttack();
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
 	void ResetHitStiffness();
-	void SpawnDamageText(float Damage);
+	void SpawnDamageText(float Damage, FVector AddLocation);
+
+	//HP 세팅 초기화
+	void InitHP();
 
 	//드롭 관련 함수
-	void DropItemActor(TSubclassOf<class AEnemy_DropBase> DropClass, float DropItemPercent);
+	void DropItemActor();
 
 	// 몬스터 Dead 관련 함수
-	void EnemyDestroyed();
+	virtual void EnemyDestroyed();
 
-private:
-	UPROPERTY(EditAnywhere)
+	// HitPoint 관련 함수
+	void TestHit();
+
+	// 몬스터 Anim Ended 관련 함수
+	void BindMontageEnded();
+
+	void OnNormalAttack_MontageEnded();
+
+	// 몬스터 CC기 관련 함수
+	void OnPlayerKnockBack(AActor* Actor);
+	void OnPlayerStun(AActor* Actor);
+	void CrowdControlCheck();
+
+protected:
+	//Component
+	UPROPERTY(EditAnywhere, Category = "Component")
+	UAPCrowdControlComponent* CrowdControlComp;
+
+	// 몬스터 Status 관련 변수
+	UPROPERTY(EditAnywhere, Category = "Status")
+	float MaxHP = 100.0f;
+
+	UPROPERTY()
 	float HP = 100.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Status")
+	UWidgetComponent* HealthWidgetComp;
+
+	UPROPERTY(EditAnywhere, Category = "Status")
 	float Character_Defense = 0.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRange = 250.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRadius = 80.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_ATK = 25.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Status")
 	float Distance_Limit = 800.0f;
 
-	bool bNormalAttack = false;
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* TeleportMark;
 
-	FTimerHandle NormalAttackTimerHandle;
+	UPROPERTY()
+	bool bKnockBackAttack = false;
+
+	// TimerHandle
 	FTimerHandle PresentDamageTimerHandle;
 	FTimerHandle TeleportTimerHandle;
 	FTimerHandle HitTimerHandle;
 	FTimerHandle DeathTimerHandle;
-
-	UPROPERTY(EditAnywhere)
-	float NormalAttack_CastingTime = 1.2f;
-
-	UPROPERTY()
-	class UAP_EnemyBaseAnimInstance* Anim;
-
-	UPROPERTY(EditAnywhere)
-	class UNiagaraComponent* TeleportMark;
-
-	UPROPERTY()
-	bool bHitting = false;
-
-	UPROPERTY(EditAnywhere)
-	float HitStiffnessTime = 0.75f;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	bool IsAttackPush = true;
 
 	// 머터리얼
 	UMaterialInterface* DefaultMaterial;
@@ -120,28 +161,20 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Skin")
 	UMaterialInterface* HitMaterial; // 피격 점멸 머터리얼
 
+	UPROPERTY(EditAnywhere, Category = "Skin")
+	UMaterialInterface* HitMaterial_Test1; // 피격 점멸 머터리얼
+
+	UPROPERTY(EditAnywhere, Category = "Skin")
+	UMaterialInterface* HitMaterial_Test2; // 피격 점멸 머터리얼
+
 	float DefaultSlip;
 
 	// 드롭 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<class AEnemy_DropBase> DropEnergyClass;
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<class AEnemy_DropBase> DropEquipClass;
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropEnergyPercent = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropEquipPercent = 100.0f;
+	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률
 
 	bool OnDrop = false;
 
-	UPROPERTY(EditAnywhere)
-	FRotator DropRot = FRotator(0,0,90);
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropAngleMax = 45.0f;
 
 	// 몬스터 Dead 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Dead")
@@ -151,10 +184,49 @@ private:
 
 	AActor* MarkActor;
 
-protected:
+	// 몬스터 Hit 관련 변수
+	UPROPERTY()
+	bool bHitting = false;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	float HitStiffnessTime = 0.75f;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	bool IsAttackPush = true;
+
+	float MonsterIsForward = 0.0f;
+	float MonsterIsRight = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	FVector DamageTextAddLocation = FVector(0,0,0);
+
+	// 몬스터 Anim 관련 변수
+	UPROPERTY()
+	UAP_EnemyBaseAnimInstance* EnemyAnim;
+
+	// 몬스터 CC기 관련 변수
+	UPROPERTY(EditAnywhere, Category = "CC")
+	float KnockBackTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "CC")
+	float StunTime = 1.0f;
+	
+	UPROPERTY(EditAnywhere, Category = "CC")
+	UNiagaraComponent* StunEffect;
+	
+	ECharacterState CurrentState = ECharacterState::None;
+
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Weapon;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> DamageTextClass;
+
+public:
+	FOnHPChanged OnEnemyHPChanged;
+
+	FOnCrowdControlCheck OnCrowdControlCheck;
+
+	UPROPERTY()
+	TArray<bool> StopState;
 };

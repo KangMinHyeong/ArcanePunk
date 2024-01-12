@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Components/Character/APMovementComponent.h"
 
@@ -72,7 +70,10 @@ void UAPMovementComponent::AttackMoving(float DeltaTime)
 		auto Enemy = Cast<AEnemy_CharacterBase>(HitResult.GetActor());
 		if(!Enemy) return;
 
-		if(Enemy->IsHitting()) if(Enemy->AttackPushBack(DashVector * OwnerCharacter->GetPushCoefficient())) OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + DashVector);
+		if(Enemy->IsHitting())
+		{
+			if(Enemy->AttackPushBack(DashVector * OwnerCharacter->GetPushCoefficient())) OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + DashVector);
+		} 
 		else
 		{
 			OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + DashVector);

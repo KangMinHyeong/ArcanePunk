@@ -318,4 +318,17 @@ void UAPInventoryComponent::SortingInventory()
 	OnInventoryUpdated.Broadcast();
 }
 
+// Minhyeong
+UAPItemBase * UAPInventoryComponent::FindItembyId(FName DesiredItemID) const
+{
+	if(InventoryContents.IsEmpty()) return nullptr;
 
+	for(UAPItemBase* APItemBase : InventoryContents)
+	{
+		if(APItemBase->ID == DesiredItemID)
+		{
+			return APItemBase;
+		}
+	}
+	return nullptr;
+}

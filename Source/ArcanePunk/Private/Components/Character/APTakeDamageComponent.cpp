@@ -29,31 +29,48 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 	if(!OwnerCharacter) return;
 	auto PD = OwnerCharacter->GetPlayerStatus();
 
-	DamageApplied = FMath::Min(PD.HP, DamageApplied);
+	DamageApplied = FMath::Min(PD.PlayerDynamicData.HP, DamageApplied);
 
-	PD.HP = PD.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.DEF)));
+	PD.PlayerDynamicData.HP = PD.PlayerDynamicData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.PlayerDynamicData.DEF)));
 	OwnerCharacter->SetPlayerStatus(PD);
 	
 	if(OwnerCharacter->IsDead())
 	{
 	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
 	// 	bDead = true;
-		
+		OwnerCharacter->SetCanMove(false);
 		OwnerCharacter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		OwnerCharacter->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//DetachFromControllerPendingDestroy();
+		// OwnerCharacter->DetachFromControllerPendingDestroy();
+		OwnerCharacter->DeadPenalty();
 	// 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABossMonster_Stage1::Destoryed, DeathLoadingTime, false);
 
 	}
 	else
 	{ 
+		TestHit(); // 나중에 삭제
 		OwnerCharacter->SetHitting(true);
-		if(OwnerCharacter->GetHitMaterial()) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->GetHitMaterial());
 		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
 		if(MyController) MyController->HitUI();
-		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), OwnerCharacter->GetPlayerStatus().HP);
-		GetWorld()->GetTimerManager().SetTimer(HitTimerHandle, this, &UAPTakeDamageComponent::OnHitting, OwnerCharacter->GetHitMotionTime(), false);
+		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.HP);
+		GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, OwnerCharacter->GetHitMotionTime(), false);
 	}
+}
+
+void UAPTakeDamageComponent::SetHitPoint(float Forward, float Right)
+{
+	PlayerIsForward = Forward;
+	PlayerIsRight = Right;
+}
+
+float UAPTakeDamageComponent::GetForward()
+{
+    return PlayerIsForward;
+}
+
+float UAPTakeDamageComponent::GetRight()
+{
+    return PlayerIsRight;
 }
 
 void UAPTakeDamageComponent::OnHitting()
@@ -63,5 +80,28 @@ void UAPTakeDamageComponent::OnHitting()
 
 	OwnerCharacter->SetHitting(false);
 	OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetDefaultMaterial());
-	GetWorld()->GetTimerManager().ClearTimer(HitTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(HittingTimerHandle);
 }
+
+void UAPTakeDamageComponent::TestHit()
+{
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!OwnerCharacter) return;
+
+	if(PlayerIsForward > 0)
+	{
+		if(PlayerIsRight > 0)
+		{
+			if(OwnerCharacter->HitMaterial_Test1) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->HitMaterial_Test1); 
+		}
+		else
+		{
+			if(OwnerCharacter->HitMaterial_Test2) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->HitMaterial_Test2); 
+		}
+	}
+	else
+	{
+		if(OwnerCharacter->GetHitMaterial()) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->GetHitMaterial());
+	}
+}
+

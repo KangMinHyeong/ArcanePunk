@@ -15,8 +15,6 @@ APickup::APickup()
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
 	PickupMesh->SetSimulatePhysics(true);
 	SetRootComponent(PickupMesh);
-
-
 }
 
 void APickup::BeginPlay()
@@ -42,7 +40,8 @@ void APickup::InitializePickup(const TSubclassOf<UAPItemBase> BaseClass, const i
 		ItemReference->ItemNumericData = ItemData->ItemNumericData;
 		ItemReference->ItemTextData = ItemData->ItemTextData;
 		ItemReference->ItemAssetData = ItemData->ItemAssetData;
-
+		ItemReference->ItemStatistics = ItemData->ItemStatistics;
+		
 		Quantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(Quantity);
 
 		PickupMesh->SetStaticMesh(ItemData->ItemAssetData.Mesh);

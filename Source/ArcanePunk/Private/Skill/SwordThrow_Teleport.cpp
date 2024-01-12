@@ -6,13 +6,18 @@
 #include "Components/Character/APSkillNumber.h"
 #include "Components/Character/SkillNumber/SkillNumber2.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "Components/BoxComponent.h"
 
+ASwordThrow_Teleport::ASwordThrow_Teleport()
+{
+}
 
 void ASwordThrow_Teleport::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
     Super::OnHitting(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 
     SetActorHiddenInGame(true);
+    HitTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     ActiveMark(OtherActor);
 }
 
@@ -23,10 +28,8 @@ void ASwordThrow_Teleport::ActiveMark(AActor *OtherActor)
     auto Character = Cast<AArcanePunkCharacter>(GetOwner());
     if(!Character) return;
 
-    FVector EnemyLocation = Enemy->GetActorLocation() + Enemy->GetActorForwardVector() * MarkDistance;
-
     Enemy->TeleportMarkActivate(DestroyTime, GetOwner());
-    Character->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkingOn(EnemyLocation, OtherActor, DestroyTime);
+    Character->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkingOn(OtherActor, DestroyTime);
 }
 
 void ASwordThrow_Teleport::DestroySword()
@@ -38,3 +41,4 @@ void ASwordThrow_Teleport::DestroySword()
     Destroy();
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
+

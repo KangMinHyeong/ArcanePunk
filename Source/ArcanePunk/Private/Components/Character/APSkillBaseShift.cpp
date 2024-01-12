@@ -29,11 +29,11 @@ void UAPSkillBaseShift::SkillBase_Shift(uint8 Second)
 		break;
 
 		case 3:
-		//Skill_ShiftShift();
+		//Skill_ShiftSpace();
 		break;
 
 		case 4:
-		//Skill_ShiftSpace();
+		//Skill_ShiftShift();
 		break;
 	}
 }

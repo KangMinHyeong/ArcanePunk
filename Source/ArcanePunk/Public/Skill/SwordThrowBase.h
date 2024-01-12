@@ -25,9 +25,12 @@ public:
 
 	UFUNCTION()
 	virtual void OnHitting(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
+	void SetSkillType(uint8 SkillType);
 
 protected:
 	virtual void DestroySword();
+	void ScaleSet();
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -55,4 +58,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	class UProjectileMovementComponent* SwordMovementComponent;
+
+	UPROPERTY()
+	class UAPHitPointComponent* HitPointComp;
+
+	UPROPERTY()
+	class UAPSkillType* SkillTypeComponent;
+
+	bool bStun = false;
+
+	UPROPERTY(EditAnywhere)
+	float StateTime = 3.0f;
 };

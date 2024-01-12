@@ -21,6 +21,9 @@ void UAPSkillBaseQ::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UAPSkillBaseQ::SkillBase_Q(uint8 Second)
 {
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!OwnerCharacter) return;
+
 	switch(Second)
 	{
 		case 1:
@@ -32,11 +35,12 @@ void UAPSkillBaseQ::SkillBase_Q(uint8 Second)
 		break;
 
 		case 3:
-		Skill_QShift();
+		Skill_QSpace();
+		
 		break;
 
 		case 4:
-		Skill_QSpace();
+		Skill_QShift();
 		break;
 	}
 }
@@ -46,7 +50,7 @@ void UAPSkillBaseQ::Skill_QQ()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(1);
+	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),1);
 }
 
 void UAPSkillBaseQ::Skill_QE()
@@ -54,17 +58,18 @@ void UAPSkillBaseQ::Skill_QE()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(2);
-}
-
-void UAPSkillBaseQ::Skill_QShift()
-{
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(3);
+	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),2);
 }
 
 void UAPSkillBaseQ::Skill_QSpace()
 {
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!OwnerCharacter) return;
+
+	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),3);
+}
+
+void UAPSkillBaseQ::Skill_QShift()
+{
+
 }

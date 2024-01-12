@@ -14,13 +14,15 @@ class ARCANEPUNK_API USkillNumber2 : public USkillNumberBase
 {
 	GENERATED_BODY()
 public:
-	virtual void PlaySkill() override;
+	virtual void PlaySkill(uint8 SkillType = 0) override;	
 
-	void MarkingOn(FVector Location, AActor* OtherActor, float Time);
+	void MarkingOn(AActor* OtherActor, float Time);
 
 	void Activate_Skill2();
 	
 	void MarkErase();
+
+	void OnSkill(uint8 SkillType = 0);
 
 private:
 	FTimerHandle MarkTimerHandle;
