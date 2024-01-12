@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "APInventoryComponent.generated.h"
 
+class UButton;
 DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 class UAPItemBase;
@@ -108,6 +109,9 @@ public:
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE void SetWeightCapacity(const float NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; };
 
+	UFUNCTION()
+	void SortingInventory();
+
 
 protected:
 	// Called when the game starts
@@ -130,5 +134,9 @@ protected:
 	int32 CalculateNumberForFullStack(UAPItemBase* StackableItem, int32 InitialRequestedAddAmount);
 
 	void AddNewItem(UAPItemBase* Item, const int32 AmountToAdd);
+
+	int32 ItemNumbers;
+
+	int32 SortingTimes;
 
 };

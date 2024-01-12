@@ -29,8 +29,8 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Tutorial Widget | Input")
 	UTextBlock* KeyPressText;
 
-	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Tutorial Widget | Description")
-		UImage* Example;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Tutorial Widget | Exapmle")
+	UImage* Example;
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Tutorial Widget | key")
 	UImage* W;

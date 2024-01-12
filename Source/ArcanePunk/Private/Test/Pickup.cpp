@@ -140,7 +140,7 @@ void APickup::TakePickup(const AArcanePunkCharacter* PlayerCharacter)
 	}
 }
 
-// void APickup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+//void APickup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 // {
 // 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
