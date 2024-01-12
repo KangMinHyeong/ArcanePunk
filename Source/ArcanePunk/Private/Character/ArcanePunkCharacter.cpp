@@ -152,23 +152,25 @@ void AArcanePunkCharacter::PostInitializeComponents()
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
 {
-	// PlayerVec.X = AxisValue;
-	// if (!HUD->TutorialDone)
-	// {
-	// 	if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
-	// 	else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
-	// }
+	FVector2D PlayerVec;
+	PlayerVec.X = AxisValue;
+	if (!HUD->TutorialDone)
+	{
+		if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
+		else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
+	}
 	if(StopState.IsEmpty()) MoveComp->PlayerMoveForward(AxisValue);
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
 {
-	// PlayerVec.Y = AxisValue;
-	// if (!HUD->TutorialDone)
-	// {
-	// 	if (PlayerVec.Y > 0) HUD->UpdateTutorialWidget("PressRight");
-	// 	else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
-	// }
+	FVector2D PlayerVec;
+	PlayerVec.Y = AxisValue;
+	if (!HUD->TutorialDone)
+	{
+		if (PlayerVec.Y > 0) HUD->UpdateTutorialWidget("PressRight");
+		else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
+	}
 
 	if(StopState.IsEmpty()) MoveComp->PlayerMoveRight(AxisValue);
 }
@@ -724,3 +726,13 @@ void AArcanePunkCharacter::ToggleMenu()
 
 	HUD->ToggleMenu();
 }
+
+
+void AArcanePunkCharacter::InventorySort()
+{
+	if(PlayerInventory)
+	{
+		PlayerInventory->SortingInventory();
+	}
+}
+

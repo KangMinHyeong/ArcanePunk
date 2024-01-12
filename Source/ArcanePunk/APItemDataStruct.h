@@ -20,11 +20,12 @@ enum class EItemQuality : uint8
 UENUM()
 enum class EItemType : uint8
 {
-	Goods		UMETA(DisplayName = "Goods"),
 	Equipment	UMETA(DisplayName = "Equipment"),
 	Consumption	UMETA(DisplayName = "Consumption"),
-	RandomBox	UMETA(DisplayName = "RandomBox"),
+	Arcane		UMETA(DisplayName = "Arcane"),
 	Material	UMETA(DisplayName = "Material"),
+	Goods		UMETA(DisplayName = "Goods"),
+	RandomBox	UMETA(DisplayName = "RandomBox"),
 	Quest		UMETA(DisplayName = "Quest"),
 	Etc			UMETA(DisplayName = "Etc")
 };

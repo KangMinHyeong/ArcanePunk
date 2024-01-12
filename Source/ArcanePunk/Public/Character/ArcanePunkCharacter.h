@@ -459,4 +459,7 @@ public :
 	void UpdateInteractionWidget() const;
 
 	void DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop);
+
+	UFUNCTION()
+	void InventorySort();
 };

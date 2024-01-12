@@ -2,6 +2,8 @@
 
 
 #include "Components/APInventoryComponent.h"
+
+#include "Components/Button.h"
 #include "Items/APItemBase.h"
 
 // Sets default values for this component's properties
@@ -9,8 +11,23 @@ UAPInventoryComponent::UAPInventoryComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
+	SortingTimes = 0;
+
+	//if (SortingButton) UE_LOG(LogTemp, Warning, TEXT("I'm Here"));
+
+	//TObjectPtr<UAPItemBase> Item;
+
+	//for (int i = 0; i < InventorySlotsCapacity; i++) InventoryContents.Add(Item);
+
+	/*
+	ItemNumbers = InventoryContents.Num();
+
+	UAPItemBase Item;
+
+	for(int i=0;i<InventorySlotsCapacity;i++) InventoryContents.Add(&Item);
+	*/
 	// ...
 }
 
@@ -18,8 +35,6 @@ UAPInventoryComponent::UAPInventoryComponent()
 void UAPInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 
 }
 
@@ -188,7 +203,8 @@ int32 UAPInventoryComponent::HandleStackableItems(UAPItemBase* ItemIn, int32 Req
 	}
 
 	// add new
-	if (InventoryContents.Num() + 1 <= InventorySlotsCapacity)
+	//if (InventoryContents.Num() + 1 <= InventorySlotsCapacity)
+	if (ItemNumbers + 1 <= InventorySlotsCapacity)
 	{
 		const int32 WeightLimitAddAmount = CalculateWeightAddAmount(ItemIn, AmountToDistribute);
 
@@ -267,8 +283,38 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 	NewItem->SetQuantity(AmountToAdd);
 
 	// actually add to inventory
+
+	UE_LOG(LogTemp, Warning, TEXT("%d %d"), ItemNumbers++, InventoryContents.Num());
 	InventoryContents.Add(NewItem);
+	//InventoryContents[ItemNumbers++] = NewItem;
 	InventoryTotalWeight += NewItem->GetItemStackWeight();
+	OnInventoryUpdated.Broadcast();
+}
+
+void UAPInventoryComponent::SortingInventory()
+{
+	if (!InventoryContents.Num()) return;
+
+	for (int i = InventoryContents.Num() - 1; i > 0; i--)
+	{
+		for (int j = 0; j < i; j++)
+		{
+			bool IsActive = false;
+			const int RangeType = SortingTimes % 3;
+			if (RangeType == 0) IsActive = InventoryContents[j]->ItemType < InventoryContents[j + 1]->ItemType;
+			else if (RangeType == 1) IsActive = InventoryContents[j]->ItemQuality < InventoryContents[j + 1]->ItemQuality;
+			else if (RangeType == 2) IsActive = InventoryContents[j]->ItemNumericData.Cost < InventoryContents[j + 1]->ItemNumericData.Cost;
+
+			if (IsActive)
+			{
+				TObjectPtr<UAPItemBase> tmp = InventoryContents[j];
+				InventoryContents[j] = InventoryContents[j + 1];
+				InventoryContents[j + 1] = tmp;
+			}
+		}
+	}
+
+	SortingTimes++;
 	OnInventoryUpdated.Broadcast();
 }
 

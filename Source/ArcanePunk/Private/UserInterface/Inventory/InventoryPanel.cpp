@@ -4,6 +4,7 @@
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Components/APInventoryComponent.h"
+#include "Components/Button.h"
 #include "Items/APItemBase.h"
 #include "UserInterface/Inventory/ItemDragDropOperation.h"
 
@@ -21,6 +22,11 @@ void UInventoryPanel::NativeOnInitialized()
 			InventoryReference->OnInventoryUpdated.AddUObject(this, &UInventoryPanel::RefreshInventory);
 			SetInfoText();
 		}
+	}
+
+	if (SortingButton)
+	{
+		SortingButton->OnClicked.AddDynamic(this, &UInventoryPanel::InventorySorting);
 	}
 }
 
@@ -64,4 +70,12 @@ bool UInventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropE
 		return true;
 	}
 	return false;
+}
+
+void UInventoryPanel::InventorySorting()
+{
+	if (PlayerCharacter)
+	{
+		PlayerCharacter->InventorySort();
+	}
 }

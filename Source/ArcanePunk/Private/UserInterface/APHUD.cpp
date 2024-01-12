@@ -37,7 +37,8 @@ void AAPHUD::BeginPlay()
 		TutorialWidget->AddToViewport(-2);
 		TutorialWidget->SetVisibility(ESlateVisibility::Visible);
 
-		TutorialDone = false;
+		TutorialDone = true;
+		//TutorialDone = false;
 	}
 
 	//Minhyeong

@@ -11,6 +11,8 @@ void UAPTuTorialUserWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	
+
 	// MoveForward
 	NeedInput.Emplace("PressUp");
 	Keys.Emplace(W);
@@ -114,7 +116,8 @@ bool UAPTuTorialUserWidget::UpdateWidget(const FString PressedKey)
 	if (NowIndex < NeedInput.Num())
 	{
 		KeyPressText->SetText(FText::FromString(NeedInput[NowIndex]));
-		return false;
+		//return false;
+		return true;
 	}
 	return true;
 }

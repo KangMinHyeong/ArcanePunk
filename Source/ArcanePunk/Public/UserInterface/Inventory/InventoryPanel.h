@@ -8,10 +8,10 @@
 #include "Components/WrapBox.h"
 #include "InventoryPanel.generated.h"
 
+class UButton;
 class UAPInventoryComponent;
 class UInventoryItemSlot;
 class AArcanePunkCharacter;
-
 
 UCLASS()
 class ARCANEPUNK_API UInventoryPanel : public UUserWidget
@@ -32,6 +32,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CapacityInfo;
 
+	UPROPERTY(meta = (BindWidget))
+	UButton* SortingButton;
+
 	UPROPERTY()
 	AArcanePunkCharacter* PlayerCharacter;
 
@@ -47,6 +50,9 @@ protected:
 
 	virtual	void NativeOnInitialized() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+	UFUNCTION()
+	void InventorySorting();
 
 
 };
