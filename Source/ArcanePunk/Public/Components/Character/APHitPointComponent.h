@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/Common/APCrowdControlComponent.h"
 #include "APHitPointComponent.generated.h"
 
 
@@ -16,5 +17,5 @@ public:
 	// Sets default values for this component's properties
 	UAPHitPointComponent();
 	void DistinctHitPoint(FVector ImpactPoint, AActor *HitActor);
-
+	void SetCrowdControl(AActor *HitActor, ECharacterState UpdateState, float StateTime, FVector KnockBackVec = FVector(0,0,0), float SlowCoefficient = 0.0f);
 };

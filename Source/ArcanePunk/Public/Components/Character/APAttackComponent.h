@@ -36,10 +36,10 @@ public:
 
 	void ComboCheck();
 
-	void NormalAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f); 	//Attack 트리거 발동
+	void NormalAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f, bool bStun = false, float StunTime = 0.0f, bool Custom = false, float CustomRadius = 0.0f); 	//Attack 트리거 발동
 
 private:
-	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack); // Attack Trace
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack, bool Custom = false, float CustomRadius = 0.0f); // Attack Trace
 
 private:
 	bool bAttack_A = false;

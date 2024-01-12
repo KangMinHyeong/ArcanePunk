@@ -177,7 +177,7 @@ void AEnemy_Boss::ActiveRushTrigger(UPrimitiveComponent *OverlappedComp, AActor 
 	{
         DistinctHitPoint(SweepResult.Location, OtherActor);
 		UGameplayStatics::ApplyDamage(OtherActor, Monster_ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-        Character->KnockBackState(GetActorLocation(), RushKnockBackTime);
+        Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), RushKnockBackTime);
         RushAttackEnd();
 	}
 }

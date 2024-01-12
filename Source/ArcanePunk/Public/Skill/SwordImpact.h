@@ -29,13 +29,14 @@ public:
 	UFUNCTION()
   	void OnPenetrating(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void SetSkillType(uint8 SkillType);
 
 private:
 	void BintHit();
 	void DestroyImpact();
 	void DamageAction(AActor *OtherActor, const FHitResult &HitResult);
 	void SlowPlayer(AActor *OtherActor);
-	
+
 private:
 	UPROPERTY(EditAnywhere)
 	bool IsPenetrate = false;
@@ -55,7 +56,7 @@ private:
 	float DestroyTime = 5.0f;
 
 	UPROPERTY(EditAnywhere)
-	float SlowTime = 3.5f;
+	float StateTime = 3.5f;
 
 	UPROPERTY(EditAnywhere)
 	float DamageCoefficient = 1.0f;
@@ -74,4 +75,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	bool IsPlayerSkill = true;
+
+	UPROPERTY()
+	class UAPSkillType* SkillTypeComp;
+
+	bool bStun = false;
+
 };

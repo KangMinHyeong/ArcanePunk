@@ -5,10 +5,12 @@
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/APTuTorialUserWidget.h"
-#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
+#include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 
 AAPHUD::AAPHUD()
 {
+	// Minhyeong
+	EnhanceChoiceClasses.SetNum(3);
 }
 
 void AAPHUD::BeginPlay()
@@ -71,19 +73,19 @@ void AAPHUD::ToggleMenu()
 	if (bIsMenuVisible)
 	{
 		HideMenu();
-		Character->MouseArr.Pop();
-		if(!Character->MouseArr.IsEmpty()) return;
-		const FInputModeGameOnly InputMode;
-		GetOwningPlayerController()->SetInputMode(InputMode);
-		GetOwningPlayerController()->SetShowMouseCursor(false);
+		// Character->MouseArr.Pop();
+		// if(!Character->MouseArr.IsEmpty()) return;
+		// const FInputModeGameOnly InputMode;
+		// GetOwningPlayerController()->SetInputMode(InputMode);
+		// GetOwningPlayerController()->SetShowMouseCursor(false);
 	}
 	else
 	{
 		DisplayMenu();
-		Character->MouseArr.Add(0);
-		const FInputModeGameAndUI InputMode;
-		GetOwningPlayerController()->SetInputMode(InputMode);
-		GetOwningPlayerController()->SetShowMouseCursor(true);
+		// Character->MouseArr.Add(0);
+		// const FInputModeGameAndUI InputMode;
+		// GetOwningPlayerController()->SetInputMode(InputMode);
+		// GetOwningPlayerController()->SetShowMouseCursor(true);
 	}
 }
 
@@ -140,9 +142,20 @@ void AAPHUD::HideTutorialWidget() const
 	}
 }
 
+// Minhyeong
 void AAPHUD::SetBossHPUI()
 {
 	if(!BossHPUIClass) return;
 	BossHPWidget = CreateWidget<UUserWidget>(GetWorld(), BossHPUIClass);
 	BossHPWidget->AddToViewport(-1);
+}
+
+void AAPHUD::DisplayEnhanceChoice(ESkillTypeState UpdateSkillTypeState, EEnHanceType UpdateEnHanceType)
+{
+	if(!EnhanceChoiceClasses[(uint8)UpdateEnHanceType]) return;
+
+	auto EnhanceUI = CreateWidget<UAPEnhanceChoice>(GetWorld(), EnhanceChoiceClasses[(uint8)UpdateEnHanceType]);
+	EnhanceUI->InitType(UpdateSkillTypeState, UpdateEnHanceType);
+	// ESkillTypeState, EnHanceType 의 정보를 EnhanceUI에게 넘겨주기
+	EnhanceUI->AddToViewport(-1);
 }

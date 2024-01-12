@@ -33,7 +33,9 @@ public:
 	uint8 GetSkillState();
 private:
 	void SkillDetermine(uint8 First, uint8 Second);
-
+	void PlayBasicSkill();
+	void CastSkillNumber(uint8 SkillNumber);
+	
 private:
 	// Q,E, shift, space 스킬 컴포넌트
 	UPROPERTY()
@@ -51,4 +53,7 @@ private:
 
 	UPROPERTY()
 	TArray<uint8>SkillStateArr;
+
+	//TimerHandle
+	FTimerHandle SkillCancleTimerHandle;
 };

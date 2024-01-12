@@ -25,11 +25,13 @@ public:
 
 	UFUNCTION()
 	virtual void OnHitting(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
+	void SetSkillType(uint8 SkillType);
 
 protected:
 	virtual void DestroySword();
 	void ScaleSet();
-	
+
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Sword;
@@ -44,13 +46,9 @@ protected:
 	class UNiagaraSystem* HitEffect;
 
 	FTimerHandle DestroyTimerHandle;
-	FTimerHandle ScaleTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 5.0f;
-
-	UPROPERTY(EditAnywhere)
-	float ScaleTime = 0.001f;
 
 	UPROPERTY(EditAnywhere)
 	float DamageCoefficient = 1.0f;
@@ -63,4 +61,12 @@ protected:
 
 	UPROPERTY()
 	class UAPHitPointComponent* HitPointComp;
+
+	UPROPERTY()
+	class UAPSkillType* SkillTypeComponent;
+
+	bool bStun = false;
+
+	UPROPERTY(EditAnywhere)
+	float StateTime = 3.0f;
 };

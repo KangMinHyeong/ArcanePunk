@@ -14,7 +14,9 @@ class ARCANEPUNK_API USkillNumber1 : public USkillNumberBase
 {
 	GENERATED_BODY()
 public:
-	virtual void PlaySkill() override;
+	virtual void PlaySkill(uint8 SkillType = 0) override;	
 
 	void Activate_Skill1();
+
+	void OnSkill(uint8 SkillType);
 };

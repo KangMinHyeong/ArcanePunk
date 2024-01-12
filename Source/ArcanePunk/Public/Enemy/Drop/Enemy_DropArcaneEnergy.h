@@ -22,10 +22,4 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	int32 MyArcaneEnergy = 10;
-
-	UPROPERTY(EditAnywhere)
-	class UProjectileMovementComponent* DropMovement;
-
-	UPROPERTY(EditAnywhere)
-	float DropSpeed = 500.0f;
 };
