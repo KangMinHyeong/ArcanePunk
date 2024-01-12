@@ -21,4 +21,27 @@ void UAPHitPointComponent::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	if(Enemy) Enemy->SetHitPoint(Forward, Right);	
 }
 
+void UAPHitPointComponent::SetCrowdControl(AActor *HitActor, ECharacterState UpdateState, float StateTime, FVector KnockBackVec, float SlowCoefficient)
+{
+	auto Enemy = Cast<AEnemy_CharacterBase>(HitActor);
+	if(!Enemy) return;
 
+	switch (UpdateState)
+	{
+		case ECharacterState::KnockBack:
+
+		break;
+	
+		case ECharacterState::Stun:
+		Enemy->GetCrowdControlComp()->StunState(StateTime);
+		break;
+
+		case ECharacterState::Sleep:
+
+		break;
+
+		case ECharacterState::Slow:
+
+		break;
+	}
+}

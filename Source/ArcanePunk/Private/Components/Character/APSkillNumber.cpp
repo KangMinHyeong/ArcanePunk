@@ -3,14 +3,17 @@
 #include "Components/Character/SkillNumber/SkillNumber1.h"
 #include "Components/Character/SkillNumber/SkillNumber2.h"
 #include "Components/Character/SkillNumber/SkillNumber3.h"
+#include "Components/Character/SkillNumber/SkillNumber4.h"
+#include "Character/ArcanePunkCharacter.h"
 
 UAPSkillNumber::UAPSkillNumber()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	Skill_1 = CreateDefaultSubobject<USkillNumber1>(TEXT("Skill_1"));
-	Skill_2 = CreateDefaultSubobject<USkillNumber2>(TEXT("Skill_2"));
-	Skill_3 = CreateDefaultSubobject<USkillNumber3>(TEXT("Skill_3"));
+	SkillNum_1 = CreateDefaultSubobject<USkillNumber1>(TEXT("SkillNum_1"));
+	SkillNum_2 = CreateDefaultSubobject<USkillNumber2>(TEXT("SkillNum_2"));
+	SkillNum_3 = CreateDefaultSubobject<USkillNumber3>(TEXT("SkillNum_3"));
+	SkillNum_4 = CreateDefaultSubobject<USkillNumber4>(TEXT("SkillNum_4"));
 }
 
 void UAPSkillNumber::BeginPlay()
@@ -23,39 +26,25 @@ void UAPSkillNumber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UAPSkillNumber::BindSkill(uint8 SkillNumber)
+void UAPSkillNumber::BindSkill(uint8 SkillNumber, uint8 SkillType)
 {
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!OwnerCharacter) return;
+	
 	switch(SkillNumber)
 	{
 		case 1:
-		Skill_1->PlaySkill();
+		SkillNum_1->PlaySkill(SkillType);
 		break;
 
 		case 2:
-		Skill_2->PlaySkill();
+		SkillNum_2->PlaySkill(SkillType);
 		break;
 
 		case 3:
-		Skill_3->PlaySkill();
+		SkillNum_3->PlaySkill(SkillType);
 		break;
 
-		case 4:
-		
-		break;
+		// 현재 스킬 3가지 추가 스킬 생길때마다 추가 
 	}
-}
-
-USkillNumber1 *UAPSkillNumber::GetSkillNumber1()
-{
-    return Skill_1;
-}
-
-USkillNumber2 *UAPSkillNumber::GetSkillNumber2()
-{
-    return Skill_2;
-}
-
-USkillNumber3 *UAPSkillNumber::GetSkillNumber3()
-{
-    return Skill_3;
 }

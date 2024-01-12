@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/Common/APCrowdControlComponent.h"
 #include "Enemy_CharacterBase.generated.h"
 
 #define Defense_constant 1000
 
 DECLARE_MULTICAST_DELEGATE(FOnHPChanged);
+DECLARE_MULTICAST_DELEGATE(FOnCrowdControlCheck);
 
 class ATextRenderActor;
 class UAP_EnemyBaseAnimInstance;
@@ -77,6 +79,12 @@ public:
 	FORCEINLINE float GetMonsterMaxHP() const { return MaxHP;}; //Monster_MaxHP 반환
 	FORCEINLINE float GetMonsterHP() const { return HP;}; //Monster_HP 반환
 
+	// 몬스터 CrowdControl 관련 함수
+	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComp() const { return CrowdControlComp;};
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE ECharacterState ReturnState() const { return CurrentState;};
+	FORCEINLINE void SetState(ECharacterState UpdateState) { CurrentState = UpdateState;};
+	FORCEINLINE UNiagaraComponent* GetStunEffect() const { return StunEffect;};
 protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
@@ -87,7 +95,7 @@ protected:
 	void InitHP();
 
 	//드롭 관련 함수
-	void DropItemActor(TSubclassOf<AEnemy_DropBase> DropClass, float DropItemPercent);
+	void DropItemActor();
 
 	// 몬스터 Dead 관련 함수
 	virtual void EnemyDestroyed();
@@ -103,8 +111,13 @@ protected:
 	// 몬스터 CC기 관련 함수
 	void OnPlayerKnockBack(AActor* Actor);
 	void OnPlayerStun(AActor* Actor);
+	void CrowdControlCheck();
 
 protected:
+	//Component
+	UPROPERTY(EditAnywhere, Category = "Component")
+	UAPCrowdControlComponent* CrowdControlComp;
+
 	// 몬스터 Status 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float MaxHP = 100.0f;
@@ -142,9 +155,6 @@ protected:
 	FTimerHandle HitTimerHandle;
 	FTimerHandle DeathTimerHandle;
 
-	// Timer Time
-
-
 	// 머터리얼
 	UMaterialInterface* DefaultMaterial;
 
@@ -161,24 +171,10 @@ protected:
 
 	// 드롭 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<AEnemy_DropBase> DropEnergyClass;
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<AEnemy_DropBase> DropEquipClass;
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropEnergyPercent = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropEquipPercent = 100.0f;
+	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률
 
 	bool OnDrop = false;
 
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	FRotator DropRot = FRotator(0,0,90);
-
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	float DropAngleMax = 45.0f;
 
 	// 몬스터 Dead 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Dead")
@@ -215,7 +211,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "CC")
 	float StunTime = 1.0f;
 	
-protected:
+	UPROPERTY(EditAnywhere, Category = "CC")
+	UNiagaraComponent* StunEffect;
+	
+	ECharacterState CurrentState = ECharacterState::None;
+
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Weapon;
 	
@@ -224,4 +224,9 @@ protected:
 
 public:
 	FOnHPChanged OnEnemyHPChanged;
+
+	FOnCrowdControlCheck OnCrowdControlCheck;
+
+	UPROPERTY()
+	TArray<bool> StopState;
 };

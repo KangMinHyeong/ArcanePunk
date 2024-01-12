@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Enemy/Enemy_CharacterBase.h"
 
@@ -26,8 +24,11 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidgetComp"));
+	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
+	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
 
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
+	StunEffect->SetupAttachment(GetMesh());
 
 	TeleportMark = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TeleportMark"));
 	TeleportMark->SetupAttachment(GetMesh());
@@ -49,6 +50,8 @@ void AEnemy_CharacterBase::BeginPlay()
 	OnDrop = true;
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 	DefaultMaterial = GetMesh()->GetMaterial(0);
+
+	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
 }
 
 void AEnemy_CharacterBase::Tick(float DeltaTime)
@@ -65,6 +68,18 @@ void AEnemy_CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 void AEnemy_CharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+}
+
+void AEnemy_CharacterBase::CrowdControlCheck()
+{
+	if(StopState.IsEmpty())
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+	else
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	}
 }
 
 void AEnemy_CharacterBase::TeleportMarkActivate(float Time, AActor* MarkOwner)
@@ -237,26 +252,18 @@ void AEnemy_CharacterBase::InitHP()
 	HP = MaxHP;
 }
 
-void AEnemy_CharacterBase::DropItemActor(TSubclassOf<AEnemy_DropBase> DropClass, float DropItemPercent) 
+void AEnemy_CharacterBase::DropItemActor() 
 {
-	if(!DropClass) return;
-
-	float IsSpawn = FMath::RandRange(0.0f, 100.0f);
-	float RandAngle = FMath::RandRange(-DropAngleMax,DropAngleMax);
-	if(IsSpawn <= DropItemPercent)
+	for(TPair<TSubclassOf<AEnemy_DropBase>, float>& DropClass : DropMap)
 	{
-		FRotator DropAngle = DropRot + FRotator(RandAngle, 0, RandAngle);
-		auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass, GetActorLocation() + GetActorUpVector()*100.0f, DropAngle);
+		float DropPercent = FMath::RandRange(0.0f,  100.0f);
+		if(DropPercent <= DropClass.Value) auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass.Key, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
 	}
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
-	if(OnDrop)
-	{
-		DropItemActor(DropEnergyClass, DropEnergyPercent);
-		DropItemActor(DropEquipClass, DropEquipPercent);
-	} 
+	if(OnDrop) DropItemActor();
 
 	TeleportMarkDeactivate();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
@@ -321,11 +328,11 @@ void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor)
 {
 	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->KnockBackState(GetActorLocation(), KnockBackTime);
+	if(Character) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), KnockBackTime);
 }
 
 void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor)
 {
 	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->StunState(StunTime);
+	if(Character) Character->GetCrowdControlComponent()->StunState(StunTime);
 }

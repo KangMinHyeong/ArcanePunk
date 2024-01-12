@@ -6,27 +6,22 @@
 #include "DrawDebugHelpers.h"
 #include "UserInterface/LoadingFade.h"
 #include "UserInterface/Fade/HitFade.h"
-#include "Components/Character/APSkillNumber.h"
-#include "Components/Character/SkillNumber/SkillNumber3.h"
 #include "UserInterface/Status/APStatusUI.h"
+#include "UserInterface/Skill/HomingTargetUI.h"
+#include "UserInterface/Setting/APSmartKeySetting.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
+    SmartKeyArr.Init(false, 4);
 }
 
-void AArcanePunkPlayerController::SetActivate_Skill3(bool bValue)
-{
-    bActivate_R = bValue;
-    if(bActivate_R) bShowMouseCursor = true;
-    else bShowMouseCursor = false;
-}
-
- void AArcanePunkPlayerController::BeginPlay()
+void AArcanePunkPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    SetInputMode(GameInputMode);
-    bShowMouseCursor = false;
+    SetInputMode(GameAndUIInputMode);
+    // CurrentMouseCursor = EMouseCursor::Default;
+    bShowMouseCursor = true;
 
     StartLoading();
     LookStatus(); LookStatus(); // 오류 때문에 삽입
@@ -38,41 +33,13 @@ void AArcanePunkPlayerController::SetupInputComponent()
     Super::SetupInputComponent();
     InputComponent->BindAction(TEXT("Status"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::LookStatus);
     InputComponent->BindAction(TEXT("FreeCameraMode"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::FreeCameraMode);
+    InputComponent->BindAction(TEXT("Setting"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::Setting);
 }
 
 void AArcanePunkPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
 
-    AArcanePunkCharacter* APCharacter = Cast<AArcanePunkCharacter>(GetPawn());
-    if(bActivate_R)
-    {
-        MouseSkillEvent();
-    }
-}
-
-void AArcanePunkPlayerController::MouseSkillEvent()
-{
-    AArcanePunkCharacter* APCharacter = Cast<AArcanePunkCharacter>(GetPawn());
-    if(!APCharacter) return;
-    UKismetSystemLibrary::DrawDebugCircle(GetWorld(), APCharacter->GetMesh()->GetComponentLocation(), APCharacter->GetSkill3_LimitDist()-50.0f, 200, FColor::Green, 0, 15, FVector(1.f,0.f,0.f), FVector(0.f,1.f,0.f), false);
-    FHitResult HitResult;
-    GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-    if(HitResult.bBlockingHit)
-    {
-        float Distance =  FVector::Distance(APCharacter->GetActorLocation(), HitResult.ImpactPoint);
-        bCanSkill_R = ViewInteraction(APCharacter, Distance, HitResult.ImpactPoint);
-        if(bCanSkill_R)
-        {
-            IsCasting(APCharacter, HitResult.ImpactPoint);
-        }        
-    }
-}
-
-void AArcanePunkPlayerController::Casting()
-{
-    if(bCanSkill_R) bCast = true;
-    else bCast = false;
 }
 
 void AArcanePunkPlayerController::LookStatus()
@@ -84,24 +51,22 @@ void AArcanePunkPlayerController::LookStatus()
 	if(!bLookStatus)
 	{
         bLookStatus = true;
-        APCharacter->MouseArr.Add(0);
+        // APCharacter->MouseArr.Add(0);
 		StatusWidget = Cast<UAPStatusUI>(CreateWidget(this, StatusWidgetClass));
         if(StatusWidget != nullptr)
         {
             StatusWidget->AddToViewport();
 
-            SetInputMode(UIInputMode);
-            bShowMouseCursor = true;
+            // SetInputMode(GameAndUIInputMode);
         }
 	}
 	else
 	{
         bLookStatus = false;
         StatusWidget->RemoveFromParent();
-        APCharacter->MouseArr.Pop();
-        if(!APCharacter->MouseArr.IsEmpty()) return;
-        SetInputMode(GameInputMode);
-        bShowMouseCursor = false;
+        // APCharacter->MouseArr.Pop();
+        // if(!APCharacter->MouseArr.IsEmpty()) return;
+        // SetInputMode(GameInputMode);
 	}
 }
 
@@ -133,35 +98,11 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
     }
 }
 
-void AArcanePunkPlayerController::IsCasting(AArcanePunkCharacter* APCharacter, FVector HitPoint)
+void AArcanePunkPlayerController::Setting()
 {
-    APCharacter->GetAPSkillNumberComponent()->GetSkillNumber3()->SetSkill3(true);
-    if(bCast)
-    {
-        bActivate_R = false;
-        bShowMouseCursor = false;
-        APCharacter->SetSkill3_Location(HitPoint);
-        APCharacter->GetAPSkillNumberComponent()->GetSkillNumber3()->Cast_Skill3(HitPoint);
-        APCharacter->GetAPSkillNumberComponent()->GetSkillNumber3()->SetSkill3(bActivate_R);
-        bCast = false;
-    }
-}
-
-bool AArcanePunkPlayerController::ViewInteraction(AArcanePunkCharacter *APCharacter, float Distance, FVector HitPoint)
-{
-    float LimitDist = APCharacter->GetSkill3_LimitDist();
-
-    if(Distance <= LimitDist)
-    {
-        UKismetSystemLibrary::DrawDebugCircle(GetWorld(), HitPoint, 100.0f, 200, FColor::Green, 0, 25.0f, FVector(1.f,0.f,0.f), FVector(0.f,1.f,0.f), true);
-        return true;
-    }
-    else
-    {
-        UKismetSystemLibrary::DrawDebugCircle(GetWorld(), HitPoint, 100.0f, 200, FColor::Red, 0, 25.0f, FVector(1.f,0.f,0.f), FVector(0.f,1.f,0.f), true);
-        return false;
-    }
-    
+    auto SmartKeySettingUI = Cast<UAPSmartKeySetting>(CreateWidget(this, SmartKeySettingClass));
+    if(!SmartKeySettingUI) return;
+    SmartKeySettingUI->AddToViewport();
 }
 
 void AArcanePunkPlayerController::StartFadeIn()
@@ -212,11 +153,33 @@ void AArcanePunkPlayerController::EndSaveUI()
 
 void AArcanePunkPlayerController::HitUI()
 {
-    auto HitWidget = Cast<UHitFade>(CreateWidget(this, HitWidgetClass));
-    if(!HitWidget) return;
+    auto HitUI = Cast<UHitFade>(CreateWidget(this, HitWidgetClass));
+    if(!HitUI) return;
 
-    HitWidget->AddToViewport();
-    HitWidget->FadeOut();
+    HitUI->AddToViewport();
+    HitUI->FadeOut();
 
     if(HitCS) ClientStartCameraShake(HitCS, 1.0f);
+}
+
+void AArcanePunkPlayerController::EnhanceChoiceMode(bool NewBool)
+{
+    SetPause(NewBool);
+
+}
+
+void AArcanePunkPlayerController::DisplayHomingUI(uint8 SkillNumber, uint8 SkillType)
+{
+    HomingUI = Cast<UHomingTargetUI>(CreateWidget(this, HomingUIClass));
+    if(!HomingUI) return;
+    HomingUI->InputSkillInfo(SkillNumber, SkillType);
+    HomingUI->AddToViewport(); 
+}
+
+void AArcanePunkPlayerController::ReturnToDefault()
+{
+    CurrentMouseCursor = EMouseCursor::Default;
+    auto& App = FSlateApplication::Get();
+	App.SetAllUserFocusToGameViewport();
+	App.QueryCursor();
 }

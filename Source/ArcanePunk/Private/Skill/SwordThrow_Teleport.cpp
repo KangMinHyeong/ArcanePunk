@@ -8,6 +8,10 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/BoxComponent.h"
 
+ASwordThrow_Teleport::ASwordThrow_Teleport()
+{
+}
+
 void ASwordThrow_Teleport::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
     Super::OnHitting(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
@@ -37,3 +41,4 @@ void ASwordThrow_Teleport::DestroySword()
     Destroy();
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
+

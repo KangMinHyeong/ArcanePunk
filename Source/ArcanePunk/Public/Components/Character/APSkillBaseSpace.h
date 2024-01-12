@@ -22,5 +22,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SkillBase_Space(uint8 Second);
-		
+
+private:
+	// 4종류 스킬 함수
+	void Skill_SpaceQ();
+	void Skill_SpaceE();
+	void Skill_SpaceShift();
+	void Skill_SpaceSpace();	
 };

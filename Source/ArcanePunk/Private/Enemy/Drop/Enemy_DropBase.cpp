@@ -4,6 +4,7 @@
 #include "Enemy/Drop/Enemy_DropBase.h"
 
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 AEnemy_DropBase::AEnemy_DropBase()
@@ -14,8 +15,18 @@ AEnemy_DropBase::AEnemy_DropBase()
 	DropTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("DropTrigger"));
 	DropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DropMesh"));
 
-	SetRootComponent(DropTrigger);
-	DropMesh->SetupAttachment(DropTrigger);
+	SetRootComponent(DropMesh);
+	DropTrigger->SetupAttachment(DropMesh);
+
+	DropMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("DropMovement"));
+	DropMovement->MaxSpeed = DropSpeed;
+	DropMovement->InitialSpeed = DropSpeed;
+
+	DropMesh->SetSimulatePhysics(true);
+	DropMesh->SetMassOverrideInKg(NAME_None,1.0f, true);
+	DropMesh->BodyInstance.bLockXRotation = true;
+	DropMesh->BodyInstance.bLockYRotation = true;
+	DropMesh->SetPhysicsMaxAngularVelocityInDegrees(MaxAngularVelocity);
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +35,8 @@ void AEnemy_DropBase::BeginPlay()
 	Super::BeginPlay();
 	
 	DropTrigger->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_DropBase::DropOverlap);
+
+	SpawnMovement();
 }
 
 // Called every frame
@@ -35,4 +48,39 @@ void AEnemy_DropBase::Tick(float DeltaTime)
 
 void AEnemy_DropBase::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
+}
+
+void AEnemy_DropBase::SpawnMovement()
+{
+	float Impulse_X = FMath::RandRange(-SpawnImpulse.X, SpawnImpulse.X);
+	float Impulse_Y = FMath::RandRange(-SpawnImpulse.Y,  SpawnImpulse.Y);
+	float Impulse_Z = FMath::RandRange(SpawnImpulse.Z*0.8,  SpawnImpulse.Z*1.2);
+
+	DropMesh->AddImpulse(FVector(Impulse_X, Impulse_Y, Impulse_Z), TEXT("DropMesh"), true);
+	DropMesh->AddAngularImpulseInDegrees(FVector(Impulse_X, Impulse_Y, Impulse_Z), TEXT("DropMesh"), true);
+	DropMesh->AddImpulse(-GetActorUpVector()*GravityAccelerate, TEXT("DropMesh"), true);
+}
+
+void AEnemy_DropBase::InitializePickup(const TSubclassOf<UAPItemBase> BaseClass, const int32 Quantity)
+{
+	if (ItemDataTable && !DesiredItemID.IsNone())
+	{
+		const FItemData* ItemData = ItemDataTable->FindRow<FItemData>(DesiredItemID, DesiredItemID.ToString());
+
+		ItemReference = NewObject<UAPItemBase>(this, BaseClass);
+
+		// Itema Data Register
+
+		ItemReference->ID = ItemData->ID;
+		ItemReference->ItemType = ItemData->ItemType;
+		ItemReference->ItemQuality = ItemData->ItemQuality;
+		ItemReference->ItemNumericData = ItemData->ItemNumericData;
+		ItemReference->ItemTextData = ItemData->ItemTextData;
+		ItemReference->ItemAssetData = ItemData->ItemAssetData;
+		ItemReference->ItemStatistics = ItemData->ItemStatistics;
+
+		DropMesh->SetStaticMesh(ItemData->ItemAssetData.Mesh);
+
+		Quantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(Quantity);
+	}
 }

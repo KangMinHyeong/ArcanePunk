@@ -6,6 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "APSkillNumber.generated.h"
 
+class USkillNumber1;
+class USkillNumber2;
+class USkillNumber3;
+class USkillNumber4;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPSkillNumber : public UActorComponent
 {
@@ -20,16 +25,19 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void BindSkill(uint8 SkillNumber);
+	void BindSkill(uint8 SkillNumber, uint8 SkillType);
 
-	class USkillNumber1* GetSkillNumber1();
-	class USkillNumber2* GetSkillNumber2();
-	class USkillNumber3* GetSkillNumber3();
+	FORCEINLINE USkillNumber1* GetSkillNumber1() const {return SkillNum_1;};
+	FORCEINLINE USkillNumber2* GetSkillNumber2() const {return SkillNum_2;};
+	FORCEINLINE USkillNumber3* GetSkillNumber3() const {return SkillNum_3;};
+	FORCEINLINE USkillNumber4* GetSkillNumber4() const {return SkillNum_4;};
 private:
 	UPROPERTY()
-	class USkillNumber1* Skill_1;
+	USkillNumber1* SkillNum_1;
 	UPROPERTY()
-	class USkillNumber2* Skill_2; 
+	USkillNumber2* SkillNum_2; 
 	UPROPERTY()
-	class USkillNumber3* Skill_3;
+	USkillNumber3* SkillNum_3;
+	UPROPERTY()
+	USkillNumber4* SkillNum_4;
 };

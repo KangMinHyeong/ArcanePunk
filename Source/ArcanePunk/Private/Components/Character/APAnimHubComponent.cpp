@@ -101,6 +101,7 @@ void UAPAnimHubComponent::OnSkill_2_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -109,7 +110,5 @@ void UAPAnimHubComponent::OnSkill_3_MontageEnded()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }

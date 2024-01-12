@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 
@@ -39,7 +37,7 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Attack_A_Montage, 1.0f);
+    Montage_Play(Attack_A_Montage);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()

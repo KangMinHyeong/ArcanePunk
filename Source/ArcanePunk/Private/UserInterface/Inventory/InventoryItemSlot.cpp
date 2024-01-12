@@ -140,7 +140,7 @@ void UInventoryItemSlot::ChangeEquip(uint8 NewValue) // 후에 플레이어 스�
 	auto Character = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
 	if(!Character) return;
 
-	if(InInventory)
+	if(InInventory) // 인벤토리 장비창에서 우클릭
 	{
 		auto EquipData = Character->GetEquipData(NewValue);
 		Character->SetEquipData(NewValue, ItemReference); 
@@ -149,7 +149,7 @@ void UInventoryItemSlot::ChangeEquip(uint8 NewValue) // 후에 플레이어 스�
 
 		UpdateEquipInventory(EquipData);
 	}
-	else
+	else // 스테이터스 장비창에서 우클릭
 	{
 		Character->SetEquipData(NewValue, nullptr);
 		Character->GetPlayerEquipment(NewValue)->SetSkeletalMesh(nullptr);

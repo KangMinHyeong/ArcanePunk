@@ -26,19 +26,19 @@ void UAPStatusText::UpdatePlayerStatus()
 {
     auto Character = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
     if(!Character) return;
-    CharacterIndex->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().MyCharacterIndex)));
-    CharacterName->SetText(FText::FromName(Character->GetPlayerStatus().CharacterName));
-    CharacterGroup->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().CharacterGroup)));
-    Gender->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().Gender)));
-    CharacterRace->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().CharacterRace)));
-    CharacterType->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().CharacterType)));
-    HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().HP))));
-    MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().MaxHP))));
-    MP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().MP)));
-    MaxMP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().MaxMP)));
+    CharacterIndex->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.MyCharacterIndex)));
+    CharacterName->SetText(FText::FromName(Character->GetPlayerStatus().PlayerStaticData.CharacterName));
+    CharacterGroup->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.CharacterGroup)));
+    Gender->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.Gender)));
+    CharacterRace->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.CharacterRace)));
+    CharacterType->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.CharacterType)));
+    HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.HP))));
+    MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.MaxHP))));
+    MP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.MP)));
+    MaxMP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.MaxMP)));
     ATK->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetFinalATK()))));
-    ATKSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().ATKSpeed))));
-    DEF->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().DEF))));
-    MoveSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().MoveSpeed))));
-    SP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().SP)));
+    ATKSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.ATKSpeed))));
+    DEF->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.DEF))));
+    MoveSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.MoveSpeed))));
+    SP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.SP)));
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "APHUD.generated.h"
 
 struct FInteractableData;
@@ -51,6 +52,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UUserWidget* GetSkillPressWidget() const {return SkillPressWidget;};
 
+	void DisplayEnhanceChoice(ESkillTypeState UpdateSkillTypeState, EEnHanceType UpdateEnHanceType);
+
 protected:
 
 	// ���� ���� ������
@@ -75,9 +78,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> BossHPUIClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TArray<TSubclassOf<UUserWidget>> EnhanceChoiceClasses;
+
 	UPROPERTY()
 	UUserWidget* SkillPressWidget;
 
 	UPROPERTY()
 	UUserWidget* BossHPWidget;
+
+
 };

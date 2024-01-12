@@ -6,7 +6,6 @@
 #include "Engine/DataTable.h"
 #include "APItemDataStruct.generated.h"
 
-
 UENUM()
 enum class EItemQuality : uint8
 {
@@ -168,9 +167,12 @@ struct FItemData : public FTableRowBase
 	FItemTextData ItemTextData;
 };
 
-class ARCANEPUNK_API APItemDataStruct
+UCLASS()
+class ARCANEPUNK_API UAPItemDataStruct : public UDataTable
 {
+	GENERATED_BODY()
+	
 public:
-	APItemDataStruct();
-	~APItemDataStruct();
+	UAPItemDataStruct();
+	~UAPItemDataStruct();
 };

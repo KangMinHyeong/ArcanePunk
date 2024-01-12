@@ -3,6 +3,10 @@
 
 #include "Save/APSaveGame.h"
 
+UAPSaveGame::UAPSaveGame()
+{
+}
+
 void UAPSaveGame::InitSaveData()
 {
     //PlayerData
@@ -17,6 +21,12 @@ void UAPSaveGame::InitSaveData()
 	SaveMoveSpeed = 500.0f;
     SaveSP = 500.0f;
     SavePlayerLocation = FVector(0,0,0);
+    SaveHasQSkillType = false;
+	SaveHasESkillType = false;		
+	SaveHasRSkillType = false;	
+
+    // Goods
+    SaveRerollDice = 0;
 
     //GameData
     SaveLevelName = TEXT("Test1");

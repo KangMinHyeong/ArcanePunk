@@ -22,7 +22,9 @@
 #include "Components/Character/APAnimHubComponent.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
+#include "Components/Character/SkillNumber/SkillNumber3.h"
 #include "NiagaraComponent.h"
+#include "PlayerState/ArcanePunkPlayerState.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -55,13 +57,14 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
 	TakeDMComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDMComp"));
 	SpawnFootPrintComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnFootPrintComp"));
+	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
-	StunEffect->SetupAttachment(GetMesh(), FName("HeadMark"));
+	StunEffect->SetupAttachment(GetRootComponent());
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
@@ -93,10 +96,10 @@ void AArcanePunkCharacter::BeginPlay()
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
 
-	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	DefaultMaterial = GetMesh()->GetMaterial(0);
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
-	GetCharacterMovement()->MaxWalkSpeed = MyPlayerStatus.MoveSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
+	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 	UpdateStatus();
 	InitPlayerStatus();
@@ -124,15 +127,13 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
 	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
 
-	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeQ);
-	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeE);
+	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
+	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
 
-	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeSpace);
-	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Skill_typeShift);
+	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Space);
+	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Shift);
 
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
-
-	PlayerInputComponent->BindAction(TEXT("Sleep"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SleepState);
 
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
 
@@ -157,8 +158,7 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 	// 	if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
 	// 	else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
 	// }
-
-	MoveComp->PlayerMoveForward(AxisValue);
+	if(StopState.IsEmpty()) MoveComp->PlayerMoveForward(AxisValue);
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
@@ -170,7 +170,7 @@ void AArcanePunkCharacter::MoveRight(float AxisValue)
 	// 	else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
 	// }
 
-	MoveComp->PlayerMoveRight(AxisValue);
+	if(StopState.IsEmpty()) MoveComp->PlayerMoveRight(AxisValue);
 }
 
 void AArcanePunkCharacter::ZoomInOut(float AxisValue)
@@ -191,7 +191,7 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 
 void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
-	if(bDoing) return;
+	if(bDoing || !StopState.IsEmpty()) return;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
 	AttackComp->StartAttack_A(bCanMove);
 }
@@ -200,18 +200,26 @@ void AArcanePunkCharacter::Attack_typeB()
 {
 	if(bMouseAttack)
 	{
-		if(bDoing) return;
+		if(bDoing || !bCanMove || !StopState.IsEmpty()) return;
 		bDoing = true;
 		AttackComp->StartAttack_B(bCanMove);
 	} 
 	else
 	{
-		if(!PC) return;
-		PC->Casting();
-		bMouseAttack = true;
-		return;
+		SelectSpawnPoint();
 	}
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
+}
+
+void AArcanePunkCharacter::SelectSpawnPoint()
+{
+	switch (Skill_SpawnPoint)
+	{
+		case 1:
+		GetAPSkillNumberComponent()->GetSkillNumber3()->Cast_Skill3();
+		break;
+	
+	}
 }
 
 void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
@@ -256,30 +264,29 @@ void AArcanePunkCharacter::ChangeEquipData(TArray<UAPItemBase *> & EquipArr, UAP
 	if(PC) PC->OnUpdateStatusText.Broadcast();
 }
 
-void AArcanePunkCharacter::Skill_typeQ()
+void AArcanePunkCharacter::SkillBase_Q()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	SkillComp->PressQ();	
+	if(bCanMove && StopState.IsEmpty()) SkillComp->PressQ();	
 }
 
-void AArcanePunkCharacter::Skill_typeE()
+void AArcanePunkCharacter::SkillBase_E()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
-	SkillComp->PressE();
+	if(bCanMove && StopState.IsEmpty()) SkillComp->PressE();
 }
 
-void AArcanePunkCharacter::Skill_typeSpace()
+void AArcanePunkCharacter::SkillBase_Space()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
-	SkillComp->PressSpace();
+	if(bCanMove && StopState.IsEmpty()) SkillComp->PressSpace();
 }
 
-void AArcanePunkCharacter::Skill_typeShift()
+void AArcanePunkCharacter::SkillBase_Shift()
 {
 	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
-	bMouseAttack = false;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
-	SkillComp->PressShift();
+	// if(bCanMove || !StopState.IsEmpty()) SkillComp->PressShift();
 }
 
 void AArcanePunkCharacter::EndJog()
@@ -287,71 +294,48 @@ void AArcanePunkCharacter::EndJog()
 	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 }
 
-void AArcanePunkCharacter::NormalState() // 후에 벡터로 관리
+bool AArcanePunkCharacter::HasSkillType(uint8 SkillType)
 {
-	StunEffect->DeactivateImmediate();
-	CurrentState = 0;
-	bCanMove = true;
-	bCanJog = true;
-	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
-	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
-	GetWorldTimerManager().ClearTimer(State_ETimerHandle);
+	bool Result = false;
+
+	switch (SkillType)
+	{
+		case 1:
+		Result = MyPlayerTotalStatus.PlayerDynamicData.HasQSkillType;
+		break;
+	
+		case 2:
+		Result = MyPlayerTotalStatus.PlayerDynamicData.HasESkillType;
+		break;
+
+		case 3:
+		Result = MyPlayerTotalStatus.PlayerDynamicData.HasRSkillType;
+		break;
+	}
+	return Result;
 }
 
-void AArcanePunkCharacter::StunState(float StunTime)
+void AArcanePunkCharacter::SetSkillTypeState(ESkillTypeState UpdateSkillTypeState, EEnHanceType EnHanceType)
 {
-	StunEffect->Activate();
-	CurrentState = 1;
-	bCanMove = false;
-	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, StunTime, false);
-}
+	if(!HUD) return;
 
-void AArcanePunkCharacter::KnockBackState(FVector KnockBackPoint, float KnockBackTime)
-{
-	CurrentState = 2;
-	bCanMove = false;
-	FVector KnockBackVec = (KnockBackPoint - GetActorLocation()) * FVector(1.0f, 1.0f, 0.0f);
-	KnockBackVec = -( KnockBackVec / KnockBackVec.Size());
-	GetCharacterMovement()->BrakingFrictionFactor = 0.0f;
-	LaunchCharacter(KnockBackVec * 1500.0f, true, true);
-	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, KnockBackTime, false);
-}
+	switch (UpdateSkillTypeState)
+	{
+		case ESkillTypeState::Type_Q:
+		HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
+		MyPlayerTotalStatus.PlayerDynamicData.HasQSkillType = true;
+		break;
+	
+		case ESkillTypeState::Type_E:
+		HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
+		MyPlayerTotalStatus.PlayerDynamicData.HasESkillType = true;
+		break;
 
-void AArcanePunkCharacter::SleepState()
-{
-	CurrentState = 3;
-	bCanMove = false;
-	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, State_Time, false);
-}
-
-void AArcanePunkCharacter::SlowState(float SlowCoefficient, float SlowTime)
-{
-	CurrentState = 4;
-	bCanJog = false;
-	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * SlowCoefficient;
-	GetWorldTimerManager().SetTimer(State_ETimerHandle, this, &AArcanePunkCharacter::NormalState, SlowTime, false);
-}
-//나중에 쓸 함수(피격 시 발동되게) //피격 판정 생성시 이용 예정
-void AArcanePunkCharacter::SwitchState(uint8 Current)
-{
-	// switch(Current)
-	// {
-	// 	case 0:
-	// 	NormalState();
-	// 	break;
-
-	// 	case 1:
-	// 	StunState();
-	// 	break;
-
-	// 	case 2:
-	// 	KnockBackState();
-	// 	break;
-
-	// 	case 3:
-	// 	SleepState();
-	// 	break;
-	// }
+		case ESkillTypeState::Type_R:
+		HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
+		MyPlayerTotalStatus.PlayerDynamicData.HasRSkillType = true;
+		break;
+	}
 }
 
 float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
@@ -370,10 +354,10 @@ void AArcanePunkCharacter::SaveStatus()
 	// 	return;
 	// }
 
-	MyPlayerStatus.PlayerLocation = GetActorLocation();
+	MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation = GetActorLocation();
 	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
 	
-	MyPlayerState->UpdatePlayerData(MyPlayerStatus);
+	MyPlayerState->UpdatePlayerData(MyPlayerTotalStatus);
 
 	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	MyGameState->UpdateGameData(MyGameStatus);
@@ -385,9 +369,9 @@ void AArcanePunkCharacter::SaveStatus()
 
 void AArcanePunkCharacter::CurrentPlayerLocation()
 {
-	if(MyPlayerStatus.SaveOperation)
+	if(MyPlayerTotalStatus.PlayerDynamicData.SaveOperation)
 	{
-		SetActorLocation(MyPlayerStatus.PlayerLocation);
+		SetActorLocation(MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation);
 	}
 }
 
@@ -409,10 +393,15 @@ bool AArcanePunkCharacter::IsDead()
 {
 	if(!MyPlayerState) return false;
 	
-    return MyPlayerStatus.HP<=0;
+    return MyPlayerTotalStatus.PlayerDynamicData.HP<=0;
 }
 
-TSubclassOf<AActor> AArcanePunkCharacter::GetFootClass(bool Left)
+void AArcanePunkCharacter::DeadPenalty()
+{
+	if(MyPlayerState) MyPlayerState->DeathPenalty();
+}
+
+TSubclassOf<AActor> AArcanePunkCharacter::GetFootClass(bool Left) 
 {	
 	if(Left) return LeftFootClass;
     return RightFootClass;
@@ -463,13 +452,13 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 	Params.bReturnPhysicalMaterial = true;
 	
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(AttackRadius * 0.75f);
-
-	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Visibility, Sphere, Params);
+	 
+	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Pawn, Sphere, Params);
 }
 
 void AArcanePunkCharacter::UpdateStatus()
 {
-	WeaponReference.IsEmpty() ? FinalATK = MyPlayerStatus.ATK : FinalATK = MyPlayerStatus.ATK + WeaponReference.Top()->ItemStatistics.DamageValue;
+	WeaponReference.IsEmpty() ? FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK : FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK + WeaponReference.Top()->ItemStatistics.DamageValue;
 	 
 }
 
@@ -477,7 +466,7 @@ void AArcanePunkCharacter::InitPlayerStatus()
 {
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
-	MyPlayerStatus = MyPlayerState->PlayerStatus;
+	MyPlayerTotalStatus = MyPlayerState->PlayerTotalStatus;
 
 	CurrentPlayerLocation();
 }

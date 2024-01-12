@@ -3,10 +3,10 @@
 
 #include "APItemDataStruct.h"
 
-APItemDataStruct::APItemDataStruct()
+UAPItemDataStruct::UAPItemDataStruct()
 {
 }
 
-APItemDataStruct::~APItemDataStruct()
+UAPItemDataStruct::~UAPItemDataStruct()
 {
 }

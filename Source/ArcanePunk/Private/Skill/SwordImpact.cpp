@@ -13,6 +13,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APHitPointComponent.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "Components/SkillActor/APSkillType.h"
 
 // Sets default values
 ASwordImpact::ASwordImpact()
@@ -22,6 +23,7 @@ ASwordImpact::ASwordImpact()
 	ImpactComp = CreateDefaultSubobject<UBoxComponent>(TEXT("ImpactComp"));
 	BaseEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseEffect"));
 	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
+	SkillTypeComp = CreateDefaultSubobject<UAPSkillType>(TEXT("SkillTypeComp"));
 
 	SetRootComponent(ImpactComp);
 	BaseEffect->SetupAttachment(ImpactComp);
@@ -83,6 +85,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 		auto Character = Cast<AArcanePunkCharacter>(MyOwner);
 		if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
 		{
+			if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 			HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
 			UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 			if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
@@ -111,7 +114,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 void ASwordImpact::SlowPlayer(AActor *OtherActor)
 {
 	auto Character = Cast<AArcanePunkCharacter>(OtherActor);
-	if(Character) Character->SlowState(SlowCoefficient, SlowTime);
+	if(Character) Character->GetCrowdControlComponent()->SlowState(SlowCoefficient, StateTime);
 }
 
 void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
@@ -123,4 +126,9 @@ void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, U
 void ASwordImpact::OnPenetrating(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	DamageAction(OtherActor, SweepResult);
+}
+
+void ASwordImpact::SetSkillType(uint8 SkillType)
+{
+	SkillTypeComp->SetSkillType(SkillType, bStun, ImpactComp, ImpactMovementComponent);
 }

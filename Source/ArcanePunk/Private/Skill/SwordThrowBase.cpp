@@ -13,6 +13,8 @@
 #include "Particles/ParticleSystem.h"
 #include "Components/BoxComponent.h"
 #include "Components/Character/APHitPointComponent.h"
+#include "Components/SkillActor/APSkillType.h"
+#include "Components/Common/APCrowdControlComponent.h"
 
 // Sets default values
 ASwordThrowBase::ASwordThrowBase()
@@ -24,6 +26,7 @@ ASwordThrowBase::ASwordThrowBase()
 	TrailEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailEffect"));
 	HitTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("HitTrigger"));
 	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
+	SkillTypeComponent = CreateDefaultSubobject<UAPSkillType>(TEXT("SkillTypeComponent"));
 
 	SetRootComponent(HitTrigger);
 	Sword->SetupAttachment(HitTrigger);
@@ -38,7 +41,7 @@ ASwordThrowBase::ASwordThrowBase()
 void ASwordThrowBase::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(ScaleTimerHandle, this, &ASwordThrowBase::ScaleSet, ScaleTime, false);
+
 	HitTrigger->OnComponentHit.AddDynamic(this, &ASwordThrowBase::OnHitting);
 	//HitTrigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ASwordThrowBase::DestroySword, DestroyTime, false);
@@ -65,6 +68,7 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
 	{
+		if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 		HitPointComp->DistinctHitPoint(Hit.Location, OtherActor);
 		UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 		if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
@@ -74,14 +78,14 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	}
 }
 
-void ASwordThrowBase::ScaleSet()
-{
-	SetActorScale3D(FVector(1.35f, 1.35f, 1.35f));
-	GetWorldTimerManager().ClearTimer(ScaleTimerHandle);
-}
-
 void ASwordThrowBase::DestroySword()
 {
 	Destroy();
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
+
+void ASwordThrowBase::SetSkillType(uint8 SkillType)
+{
+	SkillTypeComponent->SetSkillType(SkillType, bStun, HitTrigger, SwordMovementComponent);
+}
+

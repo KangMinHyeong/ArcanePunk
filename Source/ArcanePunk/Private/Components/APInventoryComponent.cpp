@@ -272,4 +272,17 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 	OnInventoryUpdated.Broadcast();
 }
 
+// Minhyeong
+UAPItemBase * UAPInventoryComponent::FindItembyId(FName DesiredItemID) const
+{
+	if(InventoryContents.IsEmpty()) return nullptr;
 
+	for(UAPItemBase* APItemBase : InventoryContents)
+	{
+		if(APItemBase->ID == DesiredItemID)
+		{
+			return APItemBase;
+		}
+	}
+	return nullptr;
+}

@@ -108,6 +108,9 @@ public:
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE void SetWeightCapacity(const float NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; };
 
+	// Minhyeong
+	UFUNCTION(Category = "Inventory")
+	UAPItemBase* FindItembyId(FName DesiredItemID) const;
 
 protected:
 	// Called when the game starts

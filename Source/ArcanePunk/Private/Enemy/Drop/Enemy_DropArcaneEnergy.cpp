@@ -5,13 +5,10 @@
 
 #include "Character/ArcanePunkCharacter.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 
 AEnemy_DropArcaneEnergy::AEnemy_DropArcaneEnergy()
 {
-    DropMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ImpactMovementComponent"));
-	DropMovement->MaxSpeed = DropSpeed;
-	DropMovement->InitialSpeed = DropSpeed;
+
 }
 
 void AEnemy_DropArcaneEnergy::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -19,8 +16,8 @@ void AEnemy_DropArcaneEnergy::DropOverlap(UPrimitiveComponent *OverlappedComp, A
     auto PlayerCharacter = Cast<AArcanePunkCharacter>(OtherActor);
 	if(!PlayerCharacter) return;
 
-    FPlayerData PD = PlayerCharacter->GetPlayerStatus();
-    PD.MP = PlayerCharacter->GetPlayerStatus().MP + MyArcaneEnergy;
+    FPlayerTotalData PD = PlayerCharacter->GetPlayerStatus();
+    PD.PlayerDynamicData.MP = FMath::Min( PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MP + MyArcaneEnergy, PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MaxMP);
     PlayerCharacter->SetPlayerStatus(PD);
 
     Destroy();
