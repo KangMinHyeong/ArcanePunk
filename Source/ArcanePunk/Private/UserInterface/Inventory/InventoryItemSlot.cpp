@@ -23,6 +23,12 @@ void UInventoryItemSlot::NativeOnInitialized()
 		ToolTip->InventorySlotBeingHovered = this;
 		SetToolTip(ToolTip);
 	}
+
+	PlayerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
+	if (PlayerCharacter)
+	{
+		InventoryReference = PlayerCharacter->GetInventory();
+	}
 }
 
 void UInventoryItemSlot::NativeConstruct()
@@ -116,6 +122,13 @@ void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const
 bool UInventoryItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
 	UDragDropOperation* InOperation)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Mouse Enter"));
+
+	if (InventoryReference)
+	{
+		if (ItemReference) InventoryReference->SetIndexOfHoveredItem(ItemReference);
+	}
+
 	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 

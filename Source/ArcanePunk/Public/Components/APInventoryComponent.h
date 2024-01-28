@@ -116,16 +116,37 @@ public:
 	UFUNCTION(Category = "Inventory")
 	UAPItemBase* FindItembyId(FName DesiredItemID) const;
 
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	int32 GetIndexOfItem(UAPItemBase* HoveredItem);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SetIndexOfHoveredItem(UAPItemBase* HoveredItem);
+
+	FORCEINLINE int32 GetIndexOfHoveredItem() { return HoveredItemIndex; }
+
+
+
+	bool MoveItemBetweenPanels(int32 SourceIndex, int32 DestinationIndex);
+
+	void RefreshInventory();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	void Init();
+
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	float InventoryTotalWeight;
-	UPROPERTY(EditInstanceOnly, Category = "Inventory")
+	//UPROPERTY(EditInstanceOnly, Category = "Inventory")
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	int32 InventorySlotsCapacity;
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	float InventoryWeightCapacity;
+
+	UPROPERTY(EditInstanceOnly, Category = "Inventory")
+	int32 InventoryEmptySlotsCapacity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TArray<TObjectPtr<UAPItemBase>> InventoryContents;
@@ -138,8 +159,11 @@ protected:
 
 	void AddNewItem(UAPItemBase* Item, const int32 AmountToAdd);
 
-	int32 ItemNumbers;
+	int32 HoveredItemIndex = 0;
 
-	int32 SortingTimes;
+	int32 ItemNumbers = 0;
+	int32 EmptySlotNumbers = 0;
+
+	int32 SortingTimes = 0;
 
 };

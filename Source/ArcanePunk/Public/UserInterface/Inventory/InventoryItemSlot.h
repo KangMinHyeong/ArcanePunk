@@ -9,6 +9,8 @@
 #include "Components/TextBlock.h"
 #include "InventoryItemSlot.generated.h"
 
+class AArcanePunkCharacter;
+class UAPInventoryComponent;
 class UInventoryTooltip;
 class UDragItemVisual;
 class UAPItemBase;
@@ -33,8 +35,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 	TSubclassOf<UInventoryTooltip> ToolTipClass;
 
+	UPROPERTY()
+	AArcanePunkCharacter* PlayerCharacter;
+
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
 	UAPItemBase* ItemReference;
+
+	UPROPERTY()
+	UAPInventoryComponent* InventoryReference;
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UBorder* ItemBorder;
