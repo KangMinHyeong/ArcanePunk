@@ -83,7 +83,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	PlayerInventory = CreateDefaultSubobject<UAPInventoryComponent>(TEXT("PlayerInventory"));
 
 	// set capacity of inventory
-	PlayerInventory->SetSlotsCapacity(20);
+	PlayerInventory->SetSlotsCapacity(15);
 	PlayerInventory->SetWeightCapacity(50.0f);
 }
 

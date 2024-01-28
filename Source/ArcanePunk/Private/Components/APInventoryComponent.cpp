@@ -1,10 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Components/APInventoryComponent.h"
-
 #include "Components/Button.h"
 #include "Items/APItemBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UAPInventoryComponent::UAPInventoryComponent()
@@ -13,22 +11,51 @@ UAPInventoryComponent::UAPInventoryComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	SortingTimes = 0;
+	Init();
 
-	//if (SortingButton) UE_LOG(LogTemp, Warning, TEXT("I'm Here"));
+	RefreshInventory();
+}
 
-	//TObjectPtr<UAPItemBase> Item;
+void UAPInventoryComponent::Init()
+{
+	// 인벤토리 최대 용량
+	// 빈 아이템 + 실제 아이템
+	// 최대 용량이 10일 때,
+	// 아이템 1개일때 빈 아이템은 9개여야함
 
-	//for (int i = 0; i < InventorySlotsCapacity; i++) InventoryContents.Add(Item);
+	// 인벤토리 최대 용량만큼 검사 수행
+	// 만약 아이템으로 꽉 차 있지 않다면 비어있는 아이템을 추가
 
-	/*
-	ItemNumbers = InventoryContents.Num();
+	if (InventoryContents.Num() == 0 )
+	{
+		for (int32 i = 0; i < InventorySlotsCapacity; i++)
+		{
+			FString ItemName = FString::Printf(TEXT("NewItem%d"), EmptySlotNumbers++);
+			UAPItemBase* NewItem = NewObject<UAPItemBase>(this, *ItemName);
+			//CreateDefaultSubobject<UAPItemBase>(*ItemName);
 
-	UAPItemBase Item;
+			NewItem->ID = "NONE";
 
-	for(int i=0;i<InventorySlotsCapacity;i++) InventoryContents.Add(&Item);
-	*/
-	// ...
+			InventoryContents.Add(NewItem);
+		}
+	}
+	else
+	{
+		int32 size = InventorySlotsCapacity - InventoryContents.Num();
+
+		for(int32 i = 0;i<InventorySlotsCapacity - InventoryContents.Num();i++)
+		{
+			FString ItemName = FString::Printf(TEXT("NewItem%d"), EmptySlotNumbers++);
+			UAPItemBase* NewItem = NewObject<UAPItemBase>(this, *ItemName);
+			//CreateDefaultSubobject<UAPItemBase>(*ItemName);
+
+			NewItem->ID = "NONE";
+
+			InventoryContents.Add(NewItem);
+		}
+	}
+
+	RefreshInventory();
 }
 
 // Called when the game starts
@@ -37,6 +64,7 @@ void UAPInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 }
+
 
 UAPItemBase* UAPInventoryComponent::FindMatchingItem(UAPItemBase* ItemIn) const
 {
@@ -98,7 +126,10 @@ int32 UAPInventoryComponent::CalculateNumberForFullStack(UAPItemBase* StackableI
 void UAPInventoryComponent::RemoveSingleInstaceOfItem(UAPItemBase* ItemToRemove)
 {
 	InventoryContents.RemoveSingle(ItemToRemove);
-	OnInventoryUpdated.Broadcast();
+	ItemNumbers--;
+
+	Init();
+	RefreshInventory();
 }
 
 int32 UAPInventoryComponent::RemoveAmountOfItem(UAPItemBase* ItemToRemove, int32 DesiredAmountToRemove)
@@ -116,7 +147,7 @@ int32 UAPInventoryComponent::RemoveAmountOfItem(UAPItemBase* ItemToRemove, int32
 
 void UAPInventoryComponent::SplitExistingStack(UAPItemBase* ItemIn, const int32 AmountToSplit)
 {
-	if (!(InventoryContents.Num() + 1 > InventorySlotsCapacity))
+	if (!(ItemNumbers + 1 > InventorySlotsCapacity))
 	{
 		RemoveAmountOfItem(ItemIn, AmountToSplit);
 		AddNewItem(ItemIn, AmountToSplit);
@@ -134,7 +165,7 @@ FItemAddResult UAPInventoryComponent::HandleNonStackableItems(UAPItemBase* Input
 	{
 		return FItemAddResult::AddedNone(FText::Format(FText::FromString("Could not add {0} to the inventory. Item would overflow weight limit."), InputItem->ItemTextData.Name));
 	}
-	if (InventoryContents.Num() + 1 > InventorySlotsCapacity)
+	if (ItemNumbers + 1 > InventorySlotsCapacity)
 	{
 		return FItemAddResult::AddedNone(FText::Format(FText::FromString("Could not add {0} to the inventory. Inventory is full."), InputItem->ItemTextData.Name));
 	}
@@ -224,7 +255,7 @@ int32 UAPInventoryComponent::HandleStackableItems(UAPItemBase* ItemIn, int32 Req
 		}
 	}
 
-	OnInventoryUpdated.Broadcast();
+	RefreshInventory();
 	return RequestedAddAmount - AmountToDistribute;
 }
 
@@ -284,19 +315,51 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 
 	// actually add to inventory
 
-	UE_LOG(LogTemp, Warning, TEXT("%d %d"), ItemNumbers++, InventoryContents.Num());
-	InventoryContents.Add(NewItem);
-	//InventoryContents[ItemNumbers++] = NewItem;
-	InventoryTotalWeight += NewItem->GetItemStackWeight();
-	OnInventoryUpdated.Broadcast();
+	// 빈 아이템이 있다면 앞에서부터 채워야만 함
+
+	//InventoryContents.Add(NewItem);
+	for (int32 i = 0; i < InventoryContents.Num(); i++)
+	{
+		if (InventoryContents[i]->ID == "NONE")
+		{
+			InventoryContents[i] = NewItem;
+			ItemNumbers++;
+			break;
+		}
+	}
+	//InventoryTotalWeight += NewItem->GetItemStackWeight();
+	RefreshInventory();
+}
+
+bool UAPInventoryComponent::MoveItemBetweenPanels(int32 SourceIndex, int32 DestinationIndex)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("slot numbers : %d , item numbers : %d"), InventorySlotsCapacity, ItemNumbers);
+
+	if (InventoryContents[SourceIndex]->ID == "NONE") return true;
+
+	if (SourceIndex >= 0 && SourceIndex < InventorySlotsCapacity && DestinationIndex >= 0 && DestinationIndex < InventorySlotsCapacity)
+	{
+		TObjectPtr<UAPItemBase> tmp = InventoryContents[SourceIndex];
+		InventoryContents[SourceIndex] = InventoryContents[DestinationIndex];
+		InventoryContents[DestinationIndex] = tmp;
+
+		return true;
+	}
+	return false;
 }
 
 void UAPInventoryComponent::SortingInventory()
 {
-	if (!InventoryContents.Num()) return;
+	//if (ItemNumbers == 0) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("아이템 개수 : %d"), InventoryContents.Num());
+	if (ItemNumbers == 0) return;
 
 	for (int i = InventoryContents.Num() - 1; i > 0; i--)
 	{
+
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *InventoryContents[i]->ID.ToString());
+
 		for (int j = 0; j < i; j++)
 		{
 			bool IsActive = false;
@@ -307,14 +370,31 @@ void UAPInventoryComponent::SortingInventory()
 
 			if (IsActive)
 			{
-				TObjectPtr<UAPItemBase> tmp = InventoryContents[j];
-				InventoryContents[j] = InventoryContents[j + 1];
-				InventoryContents[j + 1] = tmp;
+				MoveItemBetweenPanels(j, j + 1);
 			}
 		}
 	}
 
 	SortingTimes++;
+	RefreshInventory();
+}
+
+int32 UAPInventoryComponent::GetIndexOfItem(UAPItemBase* Slot)
+{
+	int32 SlotIndex = InventoryContents.Find(Slot);
+
+	return SlotIndex;
+}
+
+void UAPInventoryComponent::SetIndexOfHoveredItem(UAPItemBase* HoveredItem)
+{
+	int32 SlotIndex = InventoryContents.Find(HoveredItem);
+
+	HoveredItemIndex = SlotIndex;
+}
+
+void UAPInventoryComponent::RefreshInventory()
+{
 	OnInventoryUpdated.Broadcast();
 }
 

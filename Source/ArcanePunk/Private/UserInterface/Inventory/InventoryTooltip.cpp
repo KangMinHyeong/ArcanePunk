@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UserInterface/Inventory/InventoryTooltip.h"
 #include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Items/APItemBase.h"
@@ -10,7 +8,9 @@ void UInventoryTooltip::NativeConstruct()
 	Super::NativeConstruct();
 
 	UAPItemBase* ItemBeingHovered = InventorySlotBeingHovered->GetItemReference();
+
 	if(!ItemBeingHovered) return;
+
 	switch(ItemBeingHovered->ItemType)
 	{
 	case EItemType::Equipment:
@@ -59,4 +59,11 @@ void UInventoryTooltip::NativeConstruct()
 		MaxStackSize->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
+	if (ItemBeingHovered->ID == "NONE")
+	{
+		this->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else this->SetVisibility(ESlateVisibility::Visible);
+
 }
+

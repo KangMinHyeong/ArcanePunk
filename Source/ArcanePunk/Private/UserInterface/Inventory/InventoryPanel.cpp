@@ -65,7 +65,16 @@ bool UInventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropE
 
 	if (ItemDragDrop->SourceItem && InventoryReference)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("this inventory"));
+		UAPItemBase* DraggedItem = ItemDragDrop->SourceItem;
+
+		int32 SourceIndex = InventoryReference->GetIndexOfItem(DraggedItem);
+
+		int32 DestinationIndex = InventoryReference->GetIndexOfHoveredItem();
+
+		if (InventoryReference->MoveItemBetweenPanels(SourceIndex, DestinationIndex))
+		{
+			InventoryReference->RefreshInventory();
+		}
 
 		return true;
 	}
