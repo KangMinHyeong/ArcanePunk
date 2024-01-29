@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "HomingTargetUI.generated.h"
 
@@ -14,7 +15,7 @@ class ARCANEPUNK_API UHomingTargetUI : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void InputSkillInfo(uint8 UpdateSkillNumber, uint8 UpdateSkillType);
+	void InputSkillInfo(ESkillNumber UpdateSkillNumber);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -28,11 +29,10 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UBorder* HomingBorder;
 
-	uint8 SkillNumber = 0;
-	uint8 SkillType = 0;
+	ESkillNumber SkillNumber = ESkillNumber::None;
 
 	UPROPERTY()
-	class AArcanePunkCharacter* OwnerCharacter;
+	AArcanePunkCharacter* OwnerCharacter;
 	UPROPERTY()
-	class AArcanePunkPlayerController* OwnerCharacterPC;
+	AArcanePunkPlayerController* OwnerCharacterPC;
 };

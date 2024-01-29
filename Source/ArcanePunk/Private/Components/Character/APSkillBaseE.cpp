@@ -1,8 +1,7 @@
 
 #include "Components/Character/APSkillBaseE.h"
 
-#include "Character/ArcanePunkCharacter.h"
-#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/APSkillHubComponent.h"
 
 UAPSkillBaseE::UAPSkillBaseE()
 {
@@ -20,25 +19,22 @@ void UAPSkillBaseE::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UAPSkillBaseE::SkillBase_E(uint8 Second)
+void UAPSkillBaseE::SkillBase_E(ESkillKey Second)
 {
 	switch(Second)
 	{
-		case 1:
+		case ESkillKey::Q:
 		Skill_EQ();
 		break;
 		
-		case 2:
+		case ESkillKey::E:
 		Skill_EE();
 		break;
 
-		case 3:
+		case ESkillKey::R:
 		Skill_ESpace();		
 		break;
 
-		case 4:
-		//Skill_EShift();
-		break;
 	}
 }
 void UAPSkillBaseE::Skill_EQ()
@@ -46,7 +42,7 @@ void UAPSkillBaseE::Skill_EQ()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetESkill(),1);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetESkill(), ESkillTypeState::Type_Q, ESkillKey::E);
 }
 
 void UAPSkillBaseE::Skill_EE()
@@ -54,7 +50,7 @@ void UAPSkillBaseE::Skill_EE()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetESkill(),2);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetESkill(), ESkillTypeState::Type_E, ESkillKey::E);
 }
 
 void UAPSkillBaseE::Skill_ESpace()
@@ -62,7 +58,7 @@ void UAPSkillBaseE::Skill_ESpace()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetESkill(),3);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetESkill(), ESkillTypeState::Type_R, ESkillKey::E);
 }
 
 void UAPSkillBaseE::Skill_EShift()

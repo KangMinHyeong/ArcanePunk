@@ -1,156 +1,167 @@
 
 #include "Components/SkillActor/APSkillType.h"
 
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Character/ArcanePunkCharacter.h"
-#include "Enemy/Enemy_CharacterBase.h"
+#include "Skill/APSkillActorBase.h"
+#include "NiagaraComponent.h"
 
 UAPSkillType::UAPSkillType()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
-	OwnerProjectileMoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("OwnerProjectileMoveComp"));
-	
-	OwnerProjectileMoveComp->InitialSpeed = 0.0f;
-	OwnerProjectileMoveComp->MaxSpeed = 5000.0f;
 }
 
 void UAPSkillType::BeginPlay()
 {
 	Super::BeginPlay();
-	OwnerProjectileMoveComp->ProjectileGravityScale = 0.0f;
 }
 
 void UAPSkillType::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(!TraceActor)
+}
+
+void UAPSkillType::SetSkillType(ESkillTypeState UpdateSkillType, ESkillCategory UpdateSkillCategory)
+{
+	SkillType = UpdateSkillType;
+	SkillCategory = UpdateSkillCategory;
+
+	switch (SkillCategory)
 	{
-		if(OriginProjectileMoveComp) {OriginProjectileMoveComp->MaxSpeed = FMath::FInterpTo(OriginProjectileMoveComp->MaxSpeed, 2250.0f, DeltaTime, TraceSpeed*5);}
-		OwnerProjectileMoveComp->HomingAccelerationMagnitude = FMath::FInterpTo(OwnerProjectileMoveComp->HomingAccelerationMagnitude, 0.1f, DeltaTime, TraceSpeed);
+		case ESkillCategory::Projecitle:
+		Type_Projecitle();
+		break;
+
+		case ESkillCategory::Throw:
+		Type_Throw();
+		break;
+
+		case ESkillCategory::Laser:
+		Type_Laser();
+		break;
+
+		case ESkillCategory::InvisibleCollider:
+		Type_InvisibleCollider();
+		break;
+
+		case ESkillCategory::Buff:
+		Type_Buff();
+		break;
+	
 	}
-	else
+
+
+}
+
+void UAPSkillType::Type_Projecitle()
+{
+	auto Skill = Cast<AAPSkillActorBase>(GetOwner()); if(!Skill) return;
+
+	auto Mesh = GetOwner()->GetComponentByClass<UStaticMeshComponent>();
+	if(Mesh && Skill->IsSkillTypeMaterial(SkillType))Mesh->SetMaterial(0,Skill->GetSkillTypeMaterial(SkillType));
+	if(Skill->IsEffectColor(SkillType)) Skill->SetEffectColor(Skill->GetEffectColor(SkillType));
+
+	switch (SkillType)
 	{
-		if(OriginProjectileMoveComp) {OriginProjectileMoveComp->MaxSpeed = FMath::FInterpConstantTo(OriginProjectileMoveComp->MaxSpeed, 0.001f, DeltaTime, TraceSpeed*2.1f); OriginProjectileMoveComp->InitialSpeed = 0.001f;}
-		OwnerProjectileMoveComp->HomingAccelerationMagnitude = FMath::FInterpConstantTo(OwnerProjectileMoveComp->HomingAccelerationMagnitude, OwnerProjectileMoveComp->MaxSpeed, DeltaTime, TraceSpeed*2.5f);
-		OwnerProjectileMoveComp->MaxSpeed = FMath::FInterpConstantTo(OwnerProjectileMoveComp->MaxSpeed, 7500.0f, DeltaTime, TraceSpeed*2.5f);
+		case ESkillTypeState::Type_Q:
+		
+		break;
+
+		case ESkillTypeState::Type_E:
+		
+		break;
+
+		case ESkillTypeState::Type_R:
+		
+		break;
+	
+	}
+
+}
+
+void UAPSkillType::Type_Throw()
+{
+	auto Skill = Cast<AAPSkillActorBase>(GetOwner()); if(!Skill) return;
+
+	auto Mesh = GetOwner()->GetComponentByClass<UStaticMeshComponent>();
+	if(Mesh && Skill->IsSkillTypeMaterial(SkillType))Mesh->SetMaterial(0,Skill->GetSkillTypeMaterial(SkillType));
+
+	switch (SkillType)
+	{
+		case ESkillTypeState::Type_Q:
+
+		break;
+
+		case ESkillTypeState::Type_E:
+
+		break;
+
+		case ESkillTypeState::Type_R:
+
+		break;
+	
 	}
 }
 
-void UAPSkillType::SetSkillType(uint8 SkillType, bool& bStun, UPrimitiveComponent* TriggerComp, UProjectileMovementComponent* ProjectileMovementComponent)
+void UAPSkillType::Type_Laser()
+{
+	auto Skill = Cast<AAPSkillActorBase>(GetOwner()); if(!Skill) return;
+	if(Skill->IsEffectColor(SkillType)) Skill->SetEffectColor(Skill->GetEffectColor(SkillType));
+
+	switch (SkillType)
+	{
+		case ESkillTypeState::Type_Q:
+
+		break;
+
+		case ESkillTypeState::Type_E:
+
+		break;
+
+		case ESkillTypeState::Type_R:
+
+		break;
+	
+	}
+}
+
+void UAPSkillType::Type_InvisibleCollider()
+{
+	auto Skill = Cast<AAPSkillActorBase>(GetOwner()); if(!Skill) return;
+	if(Skill->IsEffectColor(SkillType)) Skill->SetEffectColor(Skill->GetEffectColor(SkillType));
+
+	switch (SkillType)
+	{
+		case ESkillTypeState::Type_Q:
+
+		break;
+
+		case ESkillTypeState::Type_E:
+
+		break;
+
+		case ESkillTypeState::Type_R:
+
+		break;
+	
+	}
+}
+
+void UAPSkillType::Type_Buff()
 {
 	switch (SkillType)
 	{
-		case 0:
+		case ESkillTypeState::Type_Q:
+
 		break;
 
-		case 1:
-		SetOwnerScale();
+		case ESkillTypeState::Type_E:
+
 		break;
 
-		case 2:
-		SetProjectileMove(TriggerComp, ProjectileMovementComponent);
+		case ESkillTypeState::Type_R:
+
 		break;
-
-		case 3:
-		bStun = true;
-		break;
-	}
-}
-
-void UAPSkillType::SetOwnerScale()
-{
-	GetOwner()->SetActorScale3D(GetOwner()->GetActorScale3D() * 2.0f);
-}
-
-void UAPSkillType::SetProjectileMove(UPrimitiveComponent* TriggerComp, UProjectileMovementComponent *ProjectileMovementComponent)
-{
-	if(ProjectileMovementComponent) 
-	{
-		OriginProjectileMoveComp = ProjectileMovementComponent;
-
-		GetWorld()->GetTimerManager().SetTimer(AccelerateTimerHandle, this, &UAPSkillType::Accelrating, 0.15f, false);
-
-		if(!bTriggerOn)
-		{ 
-			TriggerComp->OnComponentBeginOverlap.AddDynamic(this, &UAPSkillType::HomingEnd); bTriggerOn = true;
-		}
-	}
-}
-
-void UAPSkillType::SetOwnerHoming(AActor* OverlapActor)
-{
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()->GetOwner()); if(!OwnerCharacter) return;
-
-	if(Actors.IsEmpty())
-	{
-		UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Enemy"), Actors);
-	}
-	if(Actors.IsEmpty() || Actors.Num() < 2) return;
 	
-	if(Init)
-	{
-		Actors.Sort([OwnerCharacter](AActor& A, AActor& B) 
-		{
-			return (A.GetActorLocation() - OwnerCharacter->GetHomingPoint()).Size() > (B.GetActorLocation() - OwnerCharacter->GetHomingPoint()).Size();
-		});
-		Init = false;
 	}
-	else
-	{
-		Actors.Sort([this](AActor& A, AActor& B) 
-		{
-			return (A.GetActorLocation() - GetOwner()->GetActorLocation()).Size() > (B.GetActorLocation() - GetOwner()->GetActorLocation()).Size();
-		});
-	}
-	
-
-	if(Actors.Top() == OverlapActor) Actors.Pop();
-	if(Actors.IsEmpty())
-	{
-		TraceActor = nullptr;
-	}
-	else
-	{
-		float MaxHomingDistance = 10000.0f;
-		float Dist = (Actors.Top()->GetActorLocation() - GetOwner()->GetActorLocation()).Size();
-
-		if(Dist < MaxHomingDistance)
-		{
-			TraceActor = Actors.Top();
-			Actors.Pop();
-		}
-	}
-	
-	if(TraceActor)
-	{		
-		OwnerProjectileMoveComp->bInterpMovement = true;
-		OwnerProjectileMoveComp->bInterpRotation = true;
-		OwnerProjectileMoveComp->bRotationFollowsVelocity = true;
-		OwnerProjectileMoveComp->bIsHomingProjectile = true;
-		OwnerProjectileMoveComp->HomingTargetComponent = TraceActor->GetRootComponent();
-	}
-	else
-	{
-		OwnerProjectileMoveComp->bRotationFollowsVelocity = false;
-		OwnerProjectileMoveComp->bIsHomingProjectile = false;
-		OwnerProjectileMoveComp->HomingTargetComponent = nullptr;
-	}
-}
-
-void UAPSkillType::Accelrating()
-{
-	SetOwnerHoming();
-	GetWorld()->GetTimerManager().ClearTimer(AccelerateTimerHandle);
-}
-
-void UAPSkillType::HomingEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
-{
-	if(OtherActor->ActorHasTag(TEXT("Enemy")))
-	{
-		GetWorld()->GetTimerManager().ClearTimer(AccelerateTimerHandle);
-		SetOwnerHoming(OtherActor);
-	}	
 }

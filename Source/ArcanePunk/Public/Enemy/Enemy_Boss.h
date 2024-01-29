@@ -12,6 +12,8 @@ class AAPSpawnPointBase;
 class UParticleSystem;
 class ASwordImpact;
 class AAPHUD;
+class UAPSpawnMonsterComponent;
+
 UCLASS()
 class ARCANEPUNK_API AEnemy_Boss : public AEnemy_CharacterBase
 {
@@ -108,6 +110,10 @@ protected:
 	void InitPatternNums();
 
 private:
+	// 부착 Component
+	UPROPERTY(EditAnywhere, Category = "Component")
+	UAPSpawnMonsterComponent* SpawnMonsterComp;
+
 	//Possess
 	UPROPERTY(EditAnywhere, Category = "Possess")
 	AEnemyBaseAIController* MonsterAIController;

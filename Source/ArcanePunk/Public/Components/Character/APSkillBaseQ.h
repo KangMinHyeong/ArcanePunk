@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/ArcanePunkCharacter.h"
 #include "Components/ActorComponent.h"
 #include "APSkillBaseQ.generated.h"
 
@@ -25,7 +26,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// 스킬 분류 함수
-	void SkillBase_Q(uint8 Second);
+	void SkillBase_Q(ESkillKey Second);
 
 private:
 	// 4종류 스킬 함수

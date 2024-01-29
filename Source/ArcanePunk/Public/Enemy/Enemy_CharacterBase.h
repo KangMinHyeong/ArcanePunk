@@ -18,6 +18,7 @@ class UNiagaraComponent;
 class AEnemy_DropBase;
 class UWidgetComponent;
 class AEnemyBaseAIController;
+class AEnemy_DropPackage;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
@@ -99,7 +100,8 @@ protected:
 
 	// 몬스터 Dead 관련 함수
 	virtual void EnemyDestroyed();
-
+	void CheckAllEnemyKilled();
+	
 	// HitPoint 관련 함수
 	void TestHit();
 
@@ -171,10 +173,18 @@ protected:
 
 	// 드롭 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Drop")
-	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률
+	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률 (따로 드랍)
+
+	UPROPERTY(EditAnywhere, Category = "Drop")
+	TMap<FName , float> PackageDropMap; // Item ID , Drop 확률 (보따리 드랍)
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemy_DropPackage> DropPackageClass;
+
+	UPROPERTY()
+	AEnemy_DropPackage* DropPackage;
 
 	bool OnDrop = false;
-
 
 	// 몬스터 Dead 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Dead")

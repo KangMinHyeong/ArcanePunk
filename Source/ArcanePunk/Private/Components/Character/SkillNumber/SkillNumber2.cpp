@@ -4,6 +4,7 @@
 #include "Components/Character/SkillNumber/SkillNumber2.h"
 
 #include "Character/ArcanePunkCharacter.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
@@ -11,7 +12,20 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/CapsuleComponent.h"
 
-void USkillNumber2::PlaySkill(uint8 SkillType)
+void USkillNumber2::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void USkillNumber2::AddAbilityList()
+{
+	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+}
+
+void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -26,28 +40,30 @@ void USkillNumber2::PlaySkill(uint8 SkillType)
 	}
 	else
 	{
+		CurrentSkillType = SkillType;
+		SetAbility(WhichKey);
 		OwnerCharacter->SetDoing(true);
-		if(SkillType == 2)
+		if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
 		{
-			if(CheckSmartKey(SkillType, OwnerCharacter))
+			if(CheckSmartKey(WhichKey, OwnerCharacter))
 			{
-				OnSkill(SkillType);
+				OnSkill();
 			}
 			else
 			{
 				auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-				SetMouseCursor(PC, ECursorType::Crosshairs);
-				PC->DisplayHomingUI(2, SkillType);
+				SetMouseCursor(PC, ESkillCursor::Crosshairs);
+				PC->DisplayHomingUI(ESkillNumber::Skill_2);
 			}
 		}
 		else
 		{
-			OnSkill(SkillType);
+			OnSkill();
 		}
 	}
 }
 
-void USkillNumber2::OnSkill(uint8 SkillType)
+void USkillNumber2::OnSkill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -55,10 +71,12 @@ void USkillNumber2::OnSkill(uint8 SkillType)
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
-	CurrentSkillType = SkillType;
-			
 	OwnerAnim->PlaySkill_2_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+}
+
+void USkillNumber2::Remove_Skill()
+{
 }
 
 void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
@@ -78,8 +96,8 @@ void USkillNumber2::Activate_Skill2()
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(OwnerCharacter->GetSwordThrowClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*35.0f, OwnerCharacter->GetActorRotation() + FRotator(0,90.0f,0), SpawnParams);
-	if(SwordThrow) SwordThrow->SetSkillType(CurrentSkillType);
+	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(OwnerCharacter->GetSwordThrowClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
+	if(SwordThrow) SwordThrow->SetSkill(CurrentSkillType, CurrentSkillAbility);
 }
 
 void USkillNumber2::MarkErase()

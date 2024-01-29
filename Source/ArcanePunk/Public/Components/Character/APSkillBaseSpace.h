@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/ArcanePunkCharacter.h"
 #include "Components/ActorComponent.h"
 #include "APSkillBaseSpace.generated.h"
 
@@ -21,7 +22,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SkillBase_Space(uint8 Second);
+	void SkillBase_Space(ESkillKey Second);
 
 private:
 	// 4종류 스킬 함수

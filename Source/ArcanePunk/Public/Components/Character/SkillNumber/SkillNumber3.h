@@ -13,19 +13,21 @@ UCLASS()
 class ARCANEPUNK_API USkillNumber3 : public USkillNumberBase
 {
 	GENERATED_BODY()
+protected:
+	virtual void BeginPlay() override;
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void PlaySkill(uint8 SkillType = 0) override;	
+	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
 
-	void Remove_Skill3();
-	void Cast_Skill3();
+	virtual void Remove_Skill() override;
 
-
+	virtual void OnSkill() override;
+	
 private:
 	void Spawn_Skill3();
-	void CheckingOtherSkill();
-	void SpawnAttackSphere(bool IsOutRange);
+	void SpawnAttackSphere();
+	virtual void AddAbilityList() override;
 
 private:
 	UPROPERTY()
@@ -34,7 +36,8 @@ private:
 	UPROPERTY()
 	class AAPSpawnPointBase* Skill3Range_SpawnPoint;
 
-	bool Skilling = false;
-
 	FVector MaxDist = FVector(0,0,0);
+
+	UPROPERTY()
+	float Skill3_TargetRange = 150.0f;
 };

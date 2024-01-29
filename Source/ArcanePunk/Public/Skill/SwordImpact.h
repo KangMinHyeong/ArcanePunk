@@ -3,24 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Skill/APSkillActorBase.h"
 #include "SwordImpact.generated.h"
 
+class UBoxComponent;
+class UNiagaraComponent;
+class UProjectileMovementComponent;
+class UNiagaraSystem;
+
 UCLASS()
-class ARCANEPUNK_API ASwordImpact : public AActor
+class ARCANEPUNK_API ASwordImpact : public AAPSkillActorBase
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ASwordImpact();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
@@ -29,11 +31,11 @@ public:
 	UFUNCTION()
   	void OnPenetrating(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void SetSkillType(uint8 SkillType);
+	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
 
 private:
+	UFUNCTION()
 	void BintHit();
-	void DestroyImpact();
 	void DamageAction(AActor *OtherActor, const FHitResult &HitResult);
 	void SlowPlayer(AActor *OtherActor);
 
@@ -42,24 +44,13 @@ private:
 	bool IsPenetrate = false;
 
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* ImpactComp;
+	UBoxComponent* ImpactComp;
 	
 	UPROPERTY(EditAnywhere)
-	class UNiagaraComponent* BaseEffect;
+	UNiagaraComponent* BaseEffect;
 
 	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* HitEffect;
-
-	FTimerHandle DestroyTimerHandle;
-
-	UPROPERTY(EditAnywhere)
-	float DestroyTime = 5.0f;
-
-	UPROPERTY(EditAnywhere)
-	float StateTime = 3.5f;
-
-	UPROPERTY(EditAnywhere)
-	float DamageCoefficient = 1.0f;
+	UNiagaraSystem* HitEffect;
 
 	UPROPERTY(EditAnywhere)
 	float SlowCoefficient = 0.75f;
@@ -68,17 +59,10 @@ private:
 	float ImpactSpeed = 1500.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
-	class UProjectileMovementComponent* ImpactMovementComponent;
+	UProjectileMovementComponent* ImpactMovementComponent;
 	
-	UPROPERTY()
-	class UAPHitPointComponent* HitPointComp;
-
 	UPROPERTY(EditAnywhere)
 	bool IsPlayerSkill = true;
 
-	UPROPERTY()
-	class UAPSkillType* SkillTypeComp;
-
-	bool bStun = false;
 
 };

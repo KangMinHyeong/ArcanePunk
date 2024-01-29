@@ -18,13 +18,12 @@
 #include "Components/Character/APAttackComponent.h"
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
-#include "Components/Character/APSkillNumber.h"
 #include "Components/Character/APAnimHubComponent.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
-#include "Components/Character/SkillNumber/SkillNumber3.h"
 #include "NiagaraComponent.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
+
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -49,11 +48,11 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
 	HitMaterial = CreateDefaultSubobject<UMaterialInterface>(TEXT("HitMaterial"));
 	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
+	LeftBeamPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftBeamPoint"));
 
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
-	SkillComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillComp"));
-	SkillNumberComp = CreateDefaultSubobject<UAPSkillNumber>(TEXT("SkillNumberComp"));
+	SkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComp"));
 	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
 	TakeDMComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDMComp"));
 	SpawnFootPrintComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnFootPrintComp"));
@@ -65,6 +64,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
 	StunEffect->SetupAttachment(GetRootComponent());
+	LeftBeamPoint->SetupAttachment(GetMesh(), FName("BeamPoint"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
@@ -105,6 +105,9 @@ void AArcanePunkCharacter::BeginPlay()
 	InitPlayerStatus();
 	InitEquipData(WeaponReference, DesiredWeaponID);
 
+	SetHavingSkills();
+	SetRSkill();
+
 	// prodo
 	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	HUD->UpdateTutorialWidget("NONE");
@@ -124,16 +127,24 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
 
-	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA);
-	PlayerInputComponent->BindAction(TEXT("Attack_BorCasting"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB);
+	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA); // 연속 공격
+	PlayerInputComponent->BindAction(TEXT("Attack_B"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB); // 차징 공격
 
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
+	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_Q);
+
 	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
+	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_E);
 
-	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Space);
-	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Shift);
+	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
+	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
 
+	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
 	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
+
+	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Jump);
+
+	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Dash);
 
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
 
@@ -160,6 +171,7 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 		else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
 	}
 	if(StopState.IsEmpty()) MoveComp->PlayerMoveForward(AxisValue);
+
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
@@ -173,6 +185,7 @@ void AArcanePunkCharacter::MoveRight(float AxisValue)
 	}
 
 	if(StopState.IsEmpty()) MoveComp->PlayerMoveRight(AxisValue);
+
 }
 
 void AArcanePunkCharacter::ZoomInOut(float AxisValue)
@@ -200,28 +213,12 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 
 void AArcanePunkCharacter::Attack_typeB()
 {
-	if(bMouseAttack)
-	{
-		if(bDoing || !bCanMove || !StopState.IsEmpty()) return;
-		bDoing = true;
-		AttackComp->StartAttack_B(bCanMove);
-	} 
-	else
-	{
-		SelectSpawnPoint();
-	}
-	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
-}
 
-void AArcanePunkCharacter::SelectSpawnPoint()
-{
-	switch (Skill_SpawnPoint)
-	{
-		case 1:
-		GetAPSkillNumberComponent()->GetSkillNumber3()->Cast_Skill3();
-		break;
-	
-	}
+	if(bDoing || !bCanMove || !StopState.IsEmpty()) return;
+	bDoing = true;
+	AttackComp->StartAttack_B(bCanMove);
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
 }
 
 void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
@@ -269,26 +266,28 @@ void AArcanePunkCharacter::ChangeEquipData(TArray<UAPItemBase *> & EquipArr, UAP
 void AArcanePunkCharacter::SkillBase_Q()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	if(bCanMove && StopState.IsEmpty()) SkillComp->PressQ();	
+	if(bCanMove && StopState.IsEmpty()) SkillHubComp->PressQ();	
+	OnQSkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_E()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
-	if(bCanMove && StopState.IsEmpty()) SkillComp->PressE();
+	if(bCanMove && StopState.IsEmpty()) SkillHubComp->PressE();
+	OnESkill = true;
 }
 
-void AArcanePunkCharacter::SkillBase_Space()
+void AArcanePunkCharacter::SkillBase_R()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
-	if(bCanMove && StopState.IsEmpty()) SkillComp->PressSpace();
+	if(bCanMove && StopState.IsEmpty()) SkillHubComp->PressSpace();
+	OnRSkill = true;
 }
 
-void AArcanePunkCharacter::SkillBase_Shift()
+void AArcanePunkCharacter::StartJog()
 {
 	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
-	// if(bCanMove || !StopState.IsEmpty()) SkillComp->PressShift();
 }
 
 void AArcanePunkCharacter::EndJog()
@@ -296,48 +295,41 @@ void AArcanePunkCharacter::EndJog()
 	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
 }
 
-bool AArcanePunkCharacter::HasSkillType(uint8 SkillType)
+void AArcanePunkCharacter::Jump()
 {
-	bool Result = false;
-
-	switch (SkillType)
-	{
-		case 1:
-		Result = MyPlayerTotalStatus.PlayerDynamicData.HasQSkillType;
-		break;
-	
-		case 2:
-		Result = MyPlayerTotalStatus.PlayerDynamicData.HasESkillType;
-		break;
-
-		case 3:
-		Result = MyPlayerTotalStatus.PlayerDynamicData.HasRSkillType;
-		break;
-	}
-	return Result;
+	if(!bCanMove || !StopState.IsEmpty() || bDoing) return;
+	Super::Jump();
 }
 
-void AArcanePunkCharacter::SetSkillTypeState(ESkillTypeState UpdateSkillTypeState, EEnHanceType EnHanceType)
+void AArcanePunkCharacter::Dash()
+{
+	if(!bCanMove || !StopState.IsEmpty() || bDoing || IsDead()) return;
+	FVector DashDirection = GetActorForwardVector() * DashSpeed;
+	GetCharacterMovement()->BrakingFrictionFactor = 0.0f;
+	LaunchCharacter(DashDirection, true, true);
+}
+
+
+void AArcanePunkCharacter::SetSkillAbility(ESkillKey EnhanceSkill, EEnHanceType EnHanceType)
 {
 	if(!HUD) return;
 
-	switch (UpdateSkillTypeState)
-	{
-		case ESkillTypeState::Type_Q:
-		HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
-		MyPlayerTotalStatus.PlayerDynamicData.HasQSkillType = true;
-		break;
-	
-		case ESkillTypeState::Type_E:
-		HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
-		MyPlayerTotalStatus.PlayerDynamicData.HasESkillType = true;
-		break;
+	HUD->DisplayEnhanceChoice(EnhanceSkill, EnHanceType);
 
-		case ESkillTypeState::Type_R:
-		HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
-		MyPlayerTotalStatus.PlayerDynamicData.HasRSkillType = true;
-		break;
-	}
+	// switch (UpdateSkillAbility)
+	// {
+	// 	case ESkillAbility::
+	// 	HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
+	// 	break;
+	
+	// 	case ESkillTypeState::Type_E:
+	// 	HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
+	// 	break;
+
+	// 	case ESkillTypeState::Type_R:
+	// 	HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
+	// 	break;
+	// }
 }
 
 float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
@@ -380,6 +372,18 @@ void AArcanePunkCharacter::CurrentPlayerLocation()
 FTransform AArcanePunkCharacter::ReturnCameraTransform()
 {
     return MyCamera->GetComponentTransform();
+}
+
+void AArcanePunkCharacter::SetHavingSkills()
+{
+	HavingSkill.Empty(); 
+	HavingSkill.Add(QSkill); HavingSkill.Add(ESkill);
+}
+
+void AArcanePunkCharacter::SetRSkill()
+{
+	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
+	else {RSkill = EUltSkillNumber::None;}
 }
 
 float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)

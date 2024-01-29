@@ -2,7 +2,6 @@
 
 #include "Character/ArcanePunkCharacter.h"
 #include "Items/APItemBase.h"
-#include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Components/Overlay.h"
 
 void UAPStatusUI::NativeOnInitialized()
@@ -31,7 +30,7 @@ void UAPStatusUI::InitEquipSlot()
         WeaponSlot = CreateWidget<UInventoryItemSlot>(this, InventorySlotClass);
         WeaponSlot->SetItemReference(OwnerCharacter->GetEquipData(1));
         WeaponOverlay->AddChildToOverlay(WeaponSlot);
-        WeaponSlot->SetInInventory(false);
+        WeaponSlot->SetInInventory(ESlotType::Status);
         // WeaponBorder->AddChildto(WeaponSlot);
     }
 }

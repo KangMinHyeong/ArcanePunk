@@ -21,7 +21,7 @@ public:
 
 public:
 	UPROPERTY(Transient, BlueprintReadWrite)
-	FPlayerTotalData PlayerTotalStatus;
+	FPlayerTotalData PlayerTotalStatus = {};
 
 	UPROPERTY()
 	FString SaveSlotName = TEXT("Player_1");
