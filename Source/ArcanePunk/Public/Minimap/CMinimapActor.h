@@ -13,6 +13,9 @@ class ARCANEPUNK_API ACMinimapActor : public AActor
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Minimap")
 		UClass* MinimapWidgetClass;
+	UPROPERTY(BlueprintReadWrite)
+		UUserWidget* WidgetInstance;
+
 
 public:	
 	ACMinimapActor();
