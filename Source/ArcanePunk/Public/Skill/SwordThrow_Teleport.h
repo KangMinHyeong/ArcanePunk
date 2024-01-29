@@ -21,6 +21,6 @@ public:
 	void ActiveMark(AActor *OtherActor);
 
 protected:
-	virtual void DestroySword() override;
+	virtual void DestroySKill() override;
 
 };

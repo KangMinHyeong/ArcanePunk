@@ -1,11 +1,7 @@
 
 #include "UserInterface/Skill/HomingTargetUI.h"
 
-#include "Character/ArcanePunkCharacter.h"
-#include "PlayerController/ArcanePunkPlayerController.h"
-#include "Components/Character/APSkillNumber.h"
-#include "Components/Character/SkillNumber/SkillNumber1.h"
-#include "Components/Character/SkillNumber/SkillNumber2.h"
+#include "Components/Character/APSkillHubComponent.h"
 
 void UHomingTargetUI::NativeConstruct()
 {
@@ -21,12 +17,15 @@ FReply UHomingTargetUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, con
     
     if(!OwnerCharacterPC) return Reply.Unhandled(); if(!OwnerCharacter) return Reply.Unhandled();
 
-    UE_LOG(LogTemp, Display, TEXT("Your a"));
-
+    if(InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumberBase()->SkillCancel();
+        OwnerCharacterPC->ReturnToDefault();
+        RemoveFromParent();
+		return Reply.Handled();
+	}
     if(InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-        UE_LOG(LogTemp, Display, TEXT("Your b"));
-
         FHitResult HitResult;
         OwnerCharacterPC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 
@@ -42,23 +41,25 @@ FReply UHomingTargetUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, con
     return Reply.Unhandled();
 }
 
-void UHomingTargetUI::InputSkillInfo(uint8 UpdateSkillNumber, uint8 UpdateSkillType)
+void UHomingTargetUI::InputSkillInfo(ESkillNumber UpdateSkillNumber)
 {
     SkillNumber = UpdateSkillNumber;
-    SkillType = UpdateSkillType;
 }
 
 void UHomingTargetUI::HomingSkill()
 {
-    UE_LOG(LogTemp, Display, TEXT("Your c"));
     switch (SkillNumber)
     {
-        case 1:
-        OwnerCharacter->GetAPSkillNumberComponent()->GetSkillNumber1()->OnSkill(SkillType);
+        case ESkillNumber::Skill_1:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber1()->OnSkill();
         break;
     
-        case 2:
-        OwnerCharacter->GetAPSkillNumberComponent()->GetSkillNumber2()->OnSkill(SkillType);
+        case ESkillNumber::Skill_2:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->OnSkill();
+        break;
+
+        case ESkillNumber::Skill_4:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber4()->OnSkill();
         break;
     }
 }

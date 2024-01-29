@@ -13,19 +13,20 @@ class ARCANEPUNK_API APortal_Base : public AActor
 	
 public:	
 	APortal_Base();
+	FORCEINLINE uint8 GetPortalNumber() const {return PortalNumber;};
+	void InitHide(bool IsHidden);
 
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	virtual void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 	virtual void StartTeleport();
 
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PortalMesh;
-
+	
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* PortalTrigger;
 
@@ -36,4 +37,9 @@ protected:
 
 	class AArcanePunkCharacter* OverlapCharacter;
 
+	UPROPERTY(EditAnywhere)
+	bool DefaultHidden = false;
+
+	UPROPERTY(EditAnywhere)
+	uint8 PortalNumber = 0;
 };

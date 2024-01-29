@@ -6,28 +6,20 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "TimerManager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Particles/ParticleSystem.h"
 #include "Components/BoxComponent.h"
-#include "Components/Character/APHitPointComponent.h"
-#include "Components/SkillActor/APSkillType.h"
 #include "Components/Common/APCrowdControlComponent.h"
 
 // Sets default values
 ASwordThrowBase::ASwordThrowBase()
-{
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
-	
+{	
 	Sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword"));
 	TrailEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailEffect"));
 	HitTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("HitTrigger"));
-	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
-	SkillTypeComponent = CreateDefaultSubobject<UAPSkillType>(TEXT("SkillTypeComponent"));
-
+	
 	SetRootComponent(HitTrigger);
 	Sword->SetupAttachment(HitTrigger);
 	TrailEffect->SetupAttachment(HitTrigger);
@@ -35,6 +27,8 @@ ASwordThrowBase::ASwordThrowBase()
 	SwordMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("SwordMovementComponent"));
 	SwordMovementComponent->MaxSpeed = SwordSpeed;
 	SwordMovementComponent->InitialSpeed = SwordSpeed;
+
+	SkillCategory = ESkillCategory::Projecitle;
 }
 
 // Called when the game starts or when spawned
@@ -44,7 +38,6 @@ void ASwordThrowBase::BeginPlay()
 
 	HitTrigger->OnComponentHit.AddDynamic(this, &ASwordThrowBase::OnHitting);
 	//HitTrigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ASwordThrowBase::DestroySword, DestroyTime, false);
 }
 
 // Called every frame
@@ -78,14 +71,7 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	}
 }
 
-void ASwordThrowBase::DestroySword()
+void ASwordThrowBase::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
 {
-	Destroy();
-	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
+	Super::SetSkill(SkillType, SkillAbility);
 }
-
-void ASwordThrowBase::SetSkillType(uint8 SkillType)
-{
-	SkillTypeComponent->SetSkillType(SkillType, bStun, HitTrigger, SwordMovementComponent);
-}
-

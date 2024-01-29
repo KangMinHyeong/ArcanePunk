@@ -33,5 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameData GameData;
 
+	UPROPERTY()
+	TMap<uint8, bool> SubStageClearMap; // 세이브 X , 인스턴스 던전 안의 Stage
+
 	FString SaveSlotName = TEXT("Game1");
 };

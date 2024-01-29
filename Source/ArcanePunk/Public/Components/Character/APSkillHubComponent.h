@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/Character/APSkillNumber.h"
 #include "Components/ActorComponent.h"
 #include "APSkillHubComponent.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPSkillHubComponent : public UActorComponent
@@ -26,34 +26,43 @@ public:
 	void PressShift(); // Shift Press 시 호출
 	void PressSpace(); // SpaceBar Press 시 호출
 
-	void SetSkillState(uint8 NewValue);
-	void AddSkillState(uint8 NewValue);
-	void RemoveSkillState(uint8 NewValue = 0);
+	void SetSkillState(ESkillKey NewValue);
+	void AddSkillState(ESkillKey NewValue);
+	void RemoveSkillState(ESkillKey NewValue = ESkillKey::None);
 	UFUNCTION(BlueprintPure)
-	uint8 GetSkillState();
+	ESkillKey GetSkillState();
+
+	FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumComp;}; // SkillNumberComp 반환
+
 private:
-	void SkillDetermine(uint8 First, uint8 Second);
+	void SkillDetermine(ESkillKey First, ESkillKey Second);
 	void PlayBasicSkill();
-	void CastSkillNumber(uint8 SkillNumber);
-	
+	void CastSkillNumber(ESkillNumber SkillNumber, ESkillKey WhichKey);
+	void CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey);
+
 private:
 	// Q,E, shift, space 스킬 컴포넌트
 	UPROPERTY()
-	class UAPSkillBaseQ* QSkillComp;
+	class UAPSkillBaseQ* QComp;
 	UPROPERTY()
-	class UAPSkillBaseE* ESkillComp;
+	class UAPSkillBaseE* EComp;
 	UPROPERTY()
-	class UAPSkillBaseShift* ShiftSkillComp;
-	UPROPERTY()
-	class UAPSkillBaseSpace* SpaceSkillComp;
+	class UAPSkillBaseSpace* SpaceComp;
 
 	// 스킬 Base State
 	UPROPERTY()
-	uint8 SkillState = 0;
+	ESkillKey SkillState = ESkillKey::None;
 
 	UPROPERTY()
-	TArray<uint8>SkillStateArr;
+	TArray<ESkillKey>SkillStateArr;
 
 	//TimerHandle
 	FTimerHandle SkillCancleTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Component")
+	UAPSkillNumber* SkillNumComp;
+
+public:	
+	UPROPERTY()
+	ESkillKey LastSkill = ESkillKey::None;
 };

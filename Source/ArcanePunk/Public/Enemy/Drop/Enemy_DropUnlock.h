@@ -24,7 +24,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	ESkillTypeState Unlock_SkillType;
+	ESkillKey Unlock_SkillAbility = ESkillKey::Q;
 	
 	UPROPERTY()
 	EEnHanceType EnHanceType = EEnHanceType::Silver;

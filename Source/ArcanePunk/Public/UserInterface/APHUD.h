@@ -52,7 +52,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UUserWidget* GetSkillPressWidget() const {return SkillPressWidget;};
 
-	void DisplayEnhanceChoice(ESkillTypeState UpdateSkillTypeState, EEnHanceType UpdateEnHanceType);
+	void DisplayEnhanceChoice(ESkillKey EnhanceSkill, EEnHanceType UpdateEnHanceType);
 
 protected:
 

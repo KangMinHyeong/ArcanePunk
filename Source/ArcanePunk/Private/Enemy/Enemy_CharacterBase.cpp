@@ -13,11 +13,12 @@
 #include "DamageText/DamageText.h"
 #include "NiagaraComponent.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
-#include "Components/Character/SkillNumber/SkillNumber2.h"
-#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/APSkillHubComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/WidgetComponent.h"
+#include "GameMode/APGameModeBattleStage.h"
+#include "Enemy/Drop/Enemy_DropPackage.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -94,8 +95,7 @@ void AEnemy_CharacterBase::TeleportMarkDeactivate()
 	TeleportMark->DeactivateImmediate();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(MarkActor);
 	if(!OwnerCharacter) return;
-	UE_LOG(LogTemp, Display, TEXT("Your message"));
-	OwnerCharacter->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkErase();
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkErase();
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
 }
 
@@ -143,6 +143,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		TeleportMarkDeactivate();
+		CheckAllEnemyKilled();
 	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
 	}
 	else
@@ -259,15 +261,38 @@ void AEnemy_CharacterBase::DropItemActor()
 		float DropPercent = FMath::RandRange(0.0f,  100.0f);
 		if(DropPercent <= DropClass.Value) auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass.Key, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
 	}
+	for(TPair<FName, float>& DropClass : PackageDropMap)
+	{
+		float DropPercent = FMath::RandRange(0.0f,  100.0f);
+		if(DropPercent <= DropClass.Value)
+		{
+			if(DropPackage)
+			{
+				DropPackage->AddItem(DropClass.Key);
+			}
+			else
+			{
+				DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(DropPackageClass, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+				DropPackage->AddItem(DropClass.Key);
+			}	
+		}
+	}
+	if(DropPackage) DropPackage->SetDropOverlap(true);
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
 	if(OnDrop) DropItemActor();
 
-	TeleportMarkDeactivate();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();
+}
+
+void AEnemy_CharacterBase::CheckAllEnemyKilled()
+{
+	auto GameMode = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(!GameMode) return;
+	GameMode->MonsterKilled();
 }
 
 void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActor)

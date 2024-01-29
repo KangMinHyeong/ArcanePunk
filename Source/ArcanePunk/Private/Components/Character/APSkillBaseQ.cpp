@@ -1,8 +1,7 @@
 
 #include "Components/Character/APSkillBaseQ.h"
 
-#include "Character/ArcanePunkCharacter.h"
-#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/APSkillHubComponent.h"
 
 UAPSkillBaseQ::UAPSkillBaseQ()
 {
@@ -19,28 +18,23 @@ void UAPSkillBaseQ::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UAPSkillBaseQ::SkillBase_Q(uint8 Second)
+void UAPSkillBaseQ::SkillBase_Q(ESkillKey Second)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
 	switch(Second)
 	{
-		case 1:
+		case ESkillKey::Q:
 		Skill_QQ();
 		break;
 		
-		case 2:
+		case ESkillKey::E:
 		Skill_QE();
 		break;
 
-		case 3:
+		case ESkillKey::R:
 		Skill_QSpace();
-		
-		break;
-
-		case 4:
-		Skill_QShift();
 		break;
 	}
 }
@@ -50,7 +44,7 @@ void UAPSkillBaseQ::Skill_QQ()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),1);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),ESkillTypeState::Type_Q ,ESkillKey::Q);
 }
 
 void UAPSkillBaseQ::Skill_QE()
@@ -58,7 +52,7 @@ void UAPSkillBaseQ::Skill_QE()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),2);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(), ESkillTypeState::Type_E, ESkillKey::Q);
 }
 
 void UAPSkillBaseQ::Skill_QSpace()
@@ -66,7 +60,7 @@ void UAPSkillBaseQ::Skill_QSpace()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(),3);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetQSkill(), ESkillTypeState::Type_R, ESkillKey::Q);
 }
 
 void UAPSkillBaseQ::Skill_QShift()

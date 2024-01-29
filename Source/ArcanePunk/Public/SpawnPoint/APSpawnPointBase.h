@@ -9,6 +9,7 @@
 class UCapsuleComponent;
 class UNiagaraComponent;
 
+
 UCLASS()
 class ARCANEPUNK_API AAPSpawnPointBase : public AActor
 {
@@ -16,14 +17,6 @@ class ARCANEPUNK_API AAPSpawnPointBase : public AActor
 	
 public:	
 	AAPSpawnPointBase();
-
-	void SetAttackMouse(bool NewBool);
-	void SetRangeLocation();
-
-	FORCEINLINE bool GetCanCast() const {return CanCast;};
-	FORCEINLINE bool GetbStun() const {return bStun;};
-
-	void SetSkillType(uint8 SkillType);
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,33 +32,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* SpawnPointEffect;
 
-	bool AttackMouse = false;
-	bool RangeSpawnPoint = false;
-
-	FVector DefaultVector = FVector(0,0,0);
-
-	UPROPERTY()
-	class AArcanePunkCharacter* OwnerCharacter;
-
-	UPROPERTY()
-	class AArcanePunkPlayerController* OwnerCharacterPC;
-	
-	bool CanCast = false;
-
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PanelComp;
 
-	UMaterialInterface* DefaultMaterial;
-
-	UPROPERTY(EditAnywhere)
-	UMaterialInterface* ProhibitMaterial;
-
-	UPROPERTY()
-	class UAPSkillType* SkillTypeComp;
-
-	bool bStun = false;
-
-public:
-	UPROPERTY()
-	float DefaultSize = 1.0f;
+	FVector DefaultVector = FVector(0,0,0);
+	
 };

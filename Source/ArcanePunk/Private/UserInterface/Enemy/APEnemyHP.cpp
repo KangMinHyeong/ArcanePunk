@@ -23,6 +23,6 @@ void UAPEnemyHP::GetHealthPercentage()
     }
     else
     {
-        UE_LOG(LogTemp, Display, TEXT("Your asda"));
+        
     }
 }

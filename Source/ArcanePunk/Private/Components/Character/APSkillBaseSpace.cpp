@@ -1,7 +1,6 @@
 #include "Components/Character/APSkillBaseSpace.h"
 
-#include "Character/ArcanePunkCharacter.h"
-#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/APSkillHubComponent.h"
 
 UAPSkillBaseSpace::UAPSkillBaseSpace()
 {
@@ -18,24 +17,20 @@ void UAPSkillBaseSpace::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UAPSkillBaseSpace::SkillBase_Space(uint8 Second)
+void UAPSkillBaseSpace::SkillBase_Space(ESkillKey Second)
 {
 	switch(Second)
 	{
-		case 1:
+		case ESkillKey::Q:
 		Skill_SpaceQ();
 		break;
 		
-		case 2:
+		case ESkillKey::E:
 		Skill_SpaceE();
 		break;
 
-		case 3:
+		case ESkillKey::R:
 		Skill_SpaceSpace();
-		break;
-
-		case 4:
-		// Skill_SpaceShift();
 		break;
 	}
 }
@@ -45,7 +40,7 @@ void UAPSkillBaseSpace::Skill_SpaceQ()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetRSkill(),1);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_Q, ESkillKey::R);
 }
 
 void UAPSkillBaseSpace::Skill_SpaceE()
@@ -53,7 +48,7 @@ void UAPSkillBaseSpace::Skill_SpaceE()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetRSkill(),2);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_E, ESkillKey::R);
 }
 
 void UAPSkillBaseSpace::Skill_SpaceSpace()
@@ -61,7 +56,7 @@ void UAPSkillBaseSpace::Skill_SpaceSpace()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillNumberComponent()->BindSkill(OwnerCharacter->GetRSkill(),3);
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_R, ESkillKey::R);
 }
 
 void UAPSkillBaseSpace::Skill_SpaceShift()

@@ -2,13 +2,13 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
-#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "UserInterface/LoadingFade.h"
 #include "UserInterface/Fade/HitFade.h"
 #include "UserInterface/Status/APStatusUI.h"
 #include "UserInterface/Skill/HomingTargetUI.h"
 #include "UserInterface/Setting/APSmartKeySetting.h"
+#include "UserInterface/Skill/APMouseClickBase.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -162,17 +162,11 @@ void AArcanePunkPlayerController::HitUI()
     if(HitCS) ClientStartCameraShake(HitCS, 1.0f);
 }
 
-void AArcanePunkPlayerController::EnhanceChoiceMode(bool NewBool)
-{
-    SetPause(NewBool);
-
-}
-
-void AArcanePunkPlayerController::DisplayHomingUI(uint8 SkillNumber, uint8 SkillType)
+void AArcanePunkPlayerController::DisplayHomingUI(ESkillNumber SkillNumber)
 {
     HomingUI = Cast<UHomingTargetUI>(CreateWidget(this, HomingUIClass));
     if(!HomingUI) return;
-    HomingUI->InputSkillInfo(SkillNumber, SkillType);
+    HomingUI->InputSkillInfo(SkillNumber);
     HomingUI->AddToViewport(); 
 }
 
@@ -182,4 +176,12 @@ void AArcanePunkPlayerController::ReturnToDefault()
     auto& App = FSlateApplication::Get();
 	App.SetAllUserFocusToGameViewport();
 	App.QueryCursor();
+}
+
+void AArcanePunkPlayerController::PreventOtherClick(ESkillNumber SkillNumber)
+{
+    MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass));
+    if(!MouseClickUI) return;
+    MouseClickUI->InputSkillInfo(SkillNumber);
+    MouseClickUI->AddToViewport(); 
 }

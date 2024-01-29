@@ -3,8 +3,6 @@
 
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "Components/Character/APSkillNumber.h"
-#include "Components/Character/SkillNumber/SkillNumber2.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/BoxComponent.h"
 
@@ -24,15 +22,15 @@ void ASwordThrow_Teleport::OnHitting(UPrimitiveComponent *HitComp, AActor *Other
 void ASwordThrow_Teleport::ActiveMark(AActor *OtherActor)
 {
     auto Enemy = Cast<AEnemy_CharacterBase>(OtherActor);
-    if(!Enemy) {DestroySword(); return;}
+    if(!Enemy) {DestroySKill(); return;}
     auto Character = Cast<AArcanePunkCharacter>(GetOwner());
     if(!Character) return;
 
     Enemy->TeleportMarkActivate(DestroyTime, GetOwner());
-    Character->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkingOn(OtherActor, DestroyTime);
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkingOn(OtherActor, DestroyTime);
 }
 
-void ASwordThrow_Teleport::DestroySword()
+void ASwordThrow_Teleport::DestroySKill()
 {
     auto Character = Cast<AArcanePunkCharacter>(GetOwner());
     if(!Character) return;

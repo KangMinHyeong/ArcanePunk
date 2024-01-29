@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "ArcanePunkPlayerController.generated.h"
 
 class UUserWidget;
 class UAPStatusUI;
-class APawn;
-class AArcanePunkCharacter;
 class UHomingTargetUI;
+class UAPMouseClickBase;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
 
@@ -38,10 +38,9 @@ public:
 
 	FORCEINLINE UAPStatusUI* GetStatusUI() { return StatusWidget; };
 
-	void EnhanceChoiceMode(bool NewBool);
-
-	void DisplayHomingUI(uint8 SkillNumber, uint8 SkillType);
+	void DisplayHomingUI(ESkillNumber SkillNumber);
 	void ReturnToDefault();
+	void PreventOtherClick(ESkillNumber SkillNumber);
 
 protected:
 	virtual void BeginPlay() override;
@@ -83,6 +82,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UHomingTargetUI> HomingUIClass;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UAPMouseClickBase> MouseClickUIClass;
+
 	UUserWidget* LoadingWidget;
 
 	UPROPERTY()
@@ -92,6 +94,9 @@ private:
 
 	UPROPERTY()
 	UHomingTargetUI* HomingUI;
+
+	UPROPERTY()
+	UAPMouseClickBase* MouseClickUI;
 
 	FInputModeGameOnly GameInputMode;
 

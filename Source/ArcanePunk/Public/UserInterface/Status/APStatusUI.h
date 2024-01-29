@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Blueprint/UserWidget.h"
 #include "APStatusUI.generated.h"
 
-class UInventoryItemSlot;
 class UImage;
 class UOverlay;
 
