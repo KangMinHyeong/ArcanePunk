@@ -166,6 +166,33 @@ bool AEnemy_CharacterBase::IsDead()
     return bIsDead;
 }
 
+bool AEnemy_CharacterBase::IsHardCC()
+{
+	if(CurrentState == ECharacterState::KnockBack) {return true;}
+	else if(CurrentState == ECharacterState::Stun) {return true;}
+	else if(CurrentState == ECharacterState::Sleep) {return true;}
+	return false;
+}
+
+AActor* AEnemy_CharacterBase::IsAggro()
+{
+	TArray<AActor*> Actors; float Dist = Distance_Limit;
+	UGameplayStatics::GetAllActorsWithTag(this, TEXT("Aggro"), Actors);
+	AActor* AggroActor = UGameplayStatics::FindNearestActor(GetActorLocation(), Actors, Dist);
+	if(AggroActor)
+	{
+		if(Dist <= Distance_Limit)
+		{
+			return AggroActor;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+	return nullptr;
+}
+
 float AEnemy_CharacterBase::DamageMath(float Damage)
 {
     return Damage * Defense_constant * (1/(Defense_constant + Character_Defense));
@@ -353,7 +380,7 @@ void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor)
 {
 	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), KnockBackTime);
+	if(Character) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), KnockBackDist, KnockBackTime);
 }
 
 void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor)

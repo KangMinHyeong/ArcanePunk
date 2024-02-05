@@ -46,13 +46,13 @@ bool UAP_EnemyBaseAnimInstance::IsRun()
 
 void UAP_EnemyBaseAnimInstance::PlayNormalAttack_Montage()
 {
-     if(Enemy->ReturnState() != ECharacterState::None) return;
+    if(Enemy->IsHardCC()) return;
     Montage_Play(NormalAttack_Montage);
 }
 
 void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()
 {
 	if(IsDead || !Enemy) return;
-	if(Enemy->ReturnState() != ECharacterState::None) return;
+	if(Enemy->IsHardCC()) return;
 	Enemy->NormalAttack();
 }

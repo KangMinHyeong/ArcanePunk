@@ -36,6 +36,7 @@ public:
 	FORCEINLINE float GetTargetDistance() const {return TargetDistance;};
 	FORCEINLINE float GetTargetWide() {return RangeDecal->DecalSize.Y * (GetActorScale3D().Z / DefaultSize);};
 	FORCEINLINE bool GetbStun() const {return bStun;};
+	FORCEINLINE void SetWide(float NewValue) {Wide = NewValue;};
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -59,6 +60,9 @@ protected:
 	bool bStun = false;
 	UPROPERTY()
 	float TargetDistance = 0.0f;
+
+	UPROPERTY()
+	float Wide = 0.0f;	
 
 public:
 	UPROPERTY()

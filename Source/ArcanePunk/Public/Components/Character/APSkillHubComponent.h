@@ -32,14 +32,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	ESkillKey GetSkillState();
 
-	FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumComp;}; // SkillNumberComp 반환
+	FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumComp;}; // SkillNumComp 반환
 
 private:
 	void SkillDetermine(ESkillKey First, ESkillKey Second);
 	void PlayBasicSkill();
 	void CastSkillNumber(ESkillNumber SkillNumber, ESkillKey WhichKey);
 	void CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey);
-
+	bool ActivationCheck(ESkillNumber SkillNumber);
+	
 private:
 	// Q,E, shift, space 스킬 컴포넌트
 	UPROPERTY()

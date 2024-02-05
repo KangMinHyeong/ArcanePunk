@@ -20,7 +20,7 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
     APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-    if(OwnerComp.GetAIOwner() == nullptr) return;
+    if(!OwnerComp.GetAIOwner()) return;
 
     AEnemyBaseAIController* AIController = Cast<AEnemyBaseAIController>(OwnerComp.GetAIOwner());
     if(!AIController) return;
@@ -28,18 +28,31 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
     AEnemy_CharacterBase* Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
     if(!Monster) return;
 
-    AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
-    if(!TargetPlayer) return;
-
-    FVector TargetLocation = TargetPlayer->GetActorLocation();
-    float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
-
-    if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetPlayer) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
+    AActor* TargetActor = Monster->IsAggro();
+    if(!Monster->IsAggro())
     {
-        OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetPlayer);
+        AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));  if(!TargetPlayer) return;
+        if(!TargetPlayer->GetHideMode()){TargetActor = TargetPlayer;}
+        else {TargetActor = nullptr;}
+    }   
+
+    if(TargetActor)
+    {
+            FVector TargetLocation = TargetActor->GetActorLocation();
+        float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
+
+        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
+        {
+            OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor);
+        }
+        else
+        {
+            OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+        }
     }
     else
     {
         OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
     }
+
 }

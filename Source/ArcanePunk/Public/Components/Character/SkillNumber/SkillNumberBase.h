@@ -39,8 +39,8 @@ public:
 	bool CheckSmartKey(ESkillKey WhichKey, class AArcanePunkCharacter* OwnerCharacter);
 	void SkillCancel();
 
-	void ActivateSkillRange_Circle(float Range);
-	void ActivateSkillRange_Target(float Range_1, float Range_2, bool IsCircle = true);
+	void ActivateSkillRange_Round(float Range);
+	void ActivateSkillRange_Target(float Range_1, float Range_2, ESkillRangeType SkillRangeType);
 
 	void CharacterRotation();
 
@@ -72,5 +72,8 @@ public:
 
 	UPROPERTY()
 	AAPSkillRange* SkillRange_Target;
+
+	UPROPERTY()
+	bool bActivate = false;
 
 };

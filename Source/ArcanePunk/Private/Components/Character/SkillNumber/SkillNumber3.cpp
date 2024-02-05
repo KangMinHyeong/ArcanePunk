@@ -70,11 +70,11 @@ void USkillNumber3::Spawn_Skill3()
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	ActivateSkillRange_Target(Skill3_TargetRange, Skill3_TargetRange, true);
+	ActivateSkillRange_Target(Skill3_TargetRange, Skill3_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target) SkillRange_Target->SetMaxDist(OwnerCharacter->GetSkill3_LimitDist());
 	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
-	ActivateSkillRange_Circle(OwnerCharacter->GetSkill3_LimitDist());
+	ActivateSkillRange_Round(OwnerCharacter->GetSkill3_LimitDist());
 	if(SkillRange_Circle) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UserInterface/Setting/APGraphicsSetting.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "ArcanePunkPlayerController.generated.h"
@@ -11,6 +12,7 @@ class UUserWidget;
 class UAPStatusUI;
 class UHomingTargetUI;
 class UAPMouseClickBase;
+class UAPAudioSetting;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
 
@@ -42,6 +44,26 @@ public:
 	void ReturnToDefault();
 	void PreventOtherClick(ESkillNumber SkillNumber);
 
+	void SetHideUI(bool NewBool);
+
+	// Option Setting
+	void InitGraphicsSetting();
+	void InitAudioSetting();
+
+	void OptionSetting();
+
+	void SmartKeySetting();
+	void GraphicsSetting();
+	void AudioSetting();
+
+	FORCEINLINE float GetMasterVolume() const { return MasterVolume;};
+	FORCEINLINE float GetBGMVolume() const { return BGMVolume;};
+	FORCEINLINE float GetEffectVolume() const { return EffectVolume;};
+
+	FORCEINLINE void SetMasterVolume(float NewValue) { MasterVolume = NewValue;};
+	FORCEINLINE void SetBGMVolume(float NewValue) { BGMVolume = NewValue;};
+	FORCEINLINE void SetEffectVolume(float NewValue) { EffectVolume = NewValue;};
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -50,10 +72,8 @@ protected:
 private:
 	void LookStatus();
 	void FreeCameraMode();
-	void Setting();
 
 private:
-	FTimerHandle LoadTimerHandle;
 	FTimerHandle SaveTimerHandle;
 
 	bool bLookStatus = false;
@@ -65,16 +85,10 @@ private:
 	TSubclassOf<UUserWidget> FadeLoadingWidgetClass;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> LoadingWidgetClass;
-
-	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SaveCompleteClass;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> HitWidgetClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> SmartKeySettingClass;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Shake")
 	TSubclassOf<UCameraShakeBase> HitCS;
@@ -85,23 +99,25 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAPMouseClickBase> MouseClickUIClass;
 
-	UUserWidget* LoadingWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> HideUIClass;
 
 	UPROPERTY()
 	UAPStatusUI* StatusWidget;
 	
+	UPROPERTY()
 	UUserWidget* SaveUI;
 
 	UPROPERTY()
 	UHomingTargetUI* HomingUI;
-
 	UPROPERTY()
 	UAPMouseClickBase* MouseClickUI;
 
+	UPROPERTY()
+	UUserWidget* HideUI;
+
 	FInputModeGameOnly GameInputMode;
-
 	FInputModeGameAndUI GameAndUIInputMode;
-
 	FInputModeUIOnly UIInputMode;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -109,11 +125,50 @@ private:
 
 	bool bFreeCameraMode = false;
 
+	UPROPERTY()
 	APawn* FreeCamera;
+	UPROPERTY()
 	AArcanePunkCharacter* MyCharacter;
+
+	// Loading
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> LoadingWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* LoadingWidget;
+
+	FTimerHandle LoadTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float LoadingTime = 2.0f;
+
+	// Option Setting 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> OptionSettingClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> GraphicsSettingClass; // Graphics
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> AudioSettingClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> SmartKeySettingClass;
+
+	UPROPERTY(EditAnywhere)
+	TMap<FName, EGraphicsSetting> DefaultGraphicsSetting; // Graphics
+
+	UPROPERTY()
+	UAPGraphicsSetting* GraphicsSettingUI;
+
+	UPROPERTY()
+	UAPAudioSetting* AudioSettingUI;
+	UPROPERTY(EditAnywhere)
+	float MasterVolume = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float BGMVolume = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float EffectVolume = 1.0f;
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;

@@ -27,9 +27,9 @@ FReply UAPSmartKeySetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, 
 
 void UAPSmartKeySetting::InitSmartKey()
 {
-    auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerCharacterPC) {return;}
+    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) {return;}
 
-    CopySmartKeyArr = OwnerCharacterPC->SmartKeyArr;
+    CopySmartKeyArr = OwnerPC->SmartKeyArr;
 
     if(CopySmartKeyArr[1]) {SmartKeyQ_Switcher->SetActiveWidget(EnableSmartKeyQ);}
     else{SmartKeyQ_Switcher->SetActiveWidget(DisableSmartKeyQ);}
@@ -72,13 +72,16 @@ void UAPSmartKeySetting::OnSmartKeyR()
 
 void UAPSmartKeySetting::OnApply()
 {
-    auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerCharacterPC) {return;}
-    OwnerCharacterPC->SmartKeyArr = CopySmartKeyArr;
+    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) {return;}
+    OwnerPC->SmartKeyArr = CopySmartKeyArr;
 
+    OwnerPC->OptionSetting();
     RemoveFromParent();
 }
 
 void UAPSmartKeySetting::OnCancel()
 {
     RemoveFromParent();
+    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
+    OwnerPC->OptionSetting();
 }

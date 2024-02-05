@@ -27,6 +27,13 @@ public:
 	void PlaySkill_5_Montage();
 	void PlaySkill_6_Montage();
 	void PlaySkill_7_Montage();
+	void PlaySkill_8_Montage();
+	void PlaySkill_9_Montage();
+	void PlaySkill_10_Montage();
+	void PlaySkill_11_Montage();
+	void PlaySkill_12_Montage();
+	void PlaySkill_13_Montage();
+	void PlaySkill_14_Montage();
 	void PlayUltSkill_1_Montage();
 
 	UFUNCTION()
@@ -49,6 +56,20 @@ public:
 	void AnimNotify_Skill_6_Trigger();
 	UFUNCTION()
 	void AnimNotify_Skill_7_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_8_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_9_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_10_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_11_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_12_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_13_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_14_Trigger();
 
 	UFUNCTION()
 	void AnimNotify_UltSkill_1_Trigger();
@@ -63,6 +84,9 @@ public:
 	void AnimNotify_FootRight();
 	UFUNCTION()
 	void AnimNotify_FootLeft();
+
+	UFUNCTION()
+	void AnimNotify_HideClear();
 
 	void JumpToComboSection(int32 NewSection);
 
@@ -114,6 +138,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_7_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_8_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_9_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_10_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_11_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_12_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_13_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_14_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* UltSkill_1_Montage;

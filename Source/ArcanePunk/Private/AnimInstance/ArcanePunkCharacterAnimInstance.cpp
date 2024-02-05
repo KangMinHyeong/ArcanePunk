@@ -86,6 +86,48 @@ void UArcanePunkCharacterAnimInstance::PlaySkill_7_Montage()
     Montage_Play(Skill_7_Montage);
 }
 
+void UArcanePunkCharacterAnimInstance::PlaySkill_8_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_8_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_9_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_9_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_10_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_10_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_11_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_11_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_12_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_12_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_13_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_13_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_14_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_14_Montage);
+}
+
 void UArcanePunkCharacterAnimInstance::PlayUltSkill_1_Montage()
 {
     if(IsDead) return;
@@ -201,6 +243,62 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_7_Trigger()
     Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->Activate_Skill7();
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_8_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->Activate_Skill8();
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_9_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber9()->Activate_Skill9();   
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_10_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->Activate_Skill10();   
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_11_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber11()->Activate_Skill11();   
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_12_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber12()->Activate_Skill12();   
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_13_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber13()->Activate_Skill13();   
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_14_Trigger()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+
+    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->Activate_Skill14();   
+}
+
 void UArcanePunkCharacterAnimInstance::AnimNotify_UltSkill_1_Trigger()
 {
     auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
@@ -266,4 +364,12 @@ FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Sectio
 int32 UArcanePunkCharacterAnimInstance::GetAttackSection()
 {
     return AttackSection;
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_HideClear()
+{
+    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!Character || IsDead) return;
+    
+    Character->HideClear();
 }

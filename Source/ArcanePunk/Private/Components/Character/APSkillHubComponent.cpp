@@ -35,7 +35,8 @@ void UAPSkillHubComponent::PressQ()
 	if(SkillState == ESkillKey::None)
 	{
 		SkillState = ESkillKey::Q;
-		GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);
+		if(ActivationCheck(OwnerCharacter->GetQSkill())) {PlayBasicSkill();}
+		else {GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);}
 	}
 	else
 	{
@@ -55,7 +56,8 @@ void UAPSkillHubComponent::PressE()
 	if(SkillState == ESkillKey::None)
 	{
 		SkillState = ESkillKey::E;
-		GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);
+		if(ActivationCheck(OwnerCharacter->GetESkill())) {PlayBasicSkill();}
+		else {GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);}
 	}
 	else
 	{
@@ -75,6 +77,7 @@ void UAPSkillHubComponent::PressSpace() // R
 	if(SkillState == ESkillKey::None)
 	{
 		SkillState = ESkillKey::R;
+		// R도 후에 만들어주기
 		GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);
 	}
 	else
@@ -208,13 +211,39 @@ void UAPSkillHubComponent::CastSkillNumber(ESkillNumber SkillNumber, ESkillKey W
 		case ESkillNumber::Skill_7:
 		SkillNumComp->GetSkillNumber7()->PlaySkill(WhichKey);
 		break;
+
+		case ESkillNumber::Skill_8:
+		SkillNumComp->GetSkillNumber8()->PlaySkill(WhichKey);
+		break;
+
+		case ESkillNumber::Skill_9:
+		SkillNumComp->GetSkillNumber9()->PlaySkill(WhichKey);
+		break;
+
+		case ESkillNumber::Skill_10:
+		SkillNumComp->GetSkillNumber10()->PlaySkill(WhichKey);
+		break;
+
+		case ESkillNumber::Skill_11:
+		SkillNumComp->GetSkillNumber11()->PlaySkill(WhichKey);
+		break;
+
+		case ESkillNumber::Skill_12:
+		SkillNumComp->GetSkillNumber12()->PlaySkill(WhichKey);
+		break;
+
+		case ESkillNumber::Skill_13:
+		SkillNumComp->GetSkillNumber13()->PlaySkill(WhichKey);
+		break;
+
+		case ESkillNumber::Skill_14:
+		SkillNumComp->GetSkillNumber14()->PlaySkill(WhichKey);
+		break;
 	}
 }
 
 void UAPSkillHubComponent::CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey)
 {
-	if(UltSkillNumber != EUltSkillNumber::UltSkill_1) UE_LOG(LogTemp, Display, TEXT("Your a"));
-
 	switch (UltSkillNumber)
 	{
 		case EUltSkillNumber::UltSkill_1:
@@ -222,4 +251,67 @@ void UAPSkillHubComponent::CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ES
 		break;
 
 	}	
+}
+
+bool UAPSkillHubComponent::ActivationCheck(ESkillNumber SkillNumber)
+{
+	switch (SkillNumber)
+	{
+		case ESkillNumber::Skill_1:
+		return SkillNumComp->GetSkillNumber1()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_2:
+		return SkillNumComp->GetSkillNumber2()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_3:
+		return SkillNumComp->GetSkillNumber3()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_4:
+		return SkillNumComp->GetSkillNumber4()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_5:
+		return SkillNumComp->GetSkillNumber5()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_6:
+		return SkillNumComp->GetSkillNumber6()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_7:
+		return SkillNumComp->GetSkillNumber7()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_8:
+		return SkillNumComp->GetSkillNumber8()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_9:
+		return SkillNumComp->GetSkillNumber9()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_10:
+		return SkillNumComp->GetSkillNumber10()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_11:
+		return SkillNumComp->GetSkillNumber11()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_12:
+		return SkillNumComp->GetSkillNumber12()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_13:
+		return SkillNumComp->GetSkillNumber13()->bActivate;
+		break;
+
+		case ESkillNumber::Skill_14:
+		return SkillNumComp->GetSkillNumber14()->bActivate;
+		break;
+	}
+	return false;
 }

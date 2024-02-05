@@ -82,11 +82,11 @@ void USkillNumber4::Spawn_Skill4()
 		SpawnParams.bNoFail = true;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		ActivateSkillRange_Target(Skill4_TargetRange, Skill4_TargetRange, true);
+		ActivateSkillRange_Target(Skill4_TargetRange, Skill4_TargetRange, ESkillRangeType::Control_Circle);
 		if(SkillRange_Target) SkillRange_Target->SetMaxDist(Skill4_LimitDistance);
 		if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
-		ActivateSkillRange_Circle(Skill4_LimitDistance);
+		ActivateSkillRange_Round(Skill4_LimitDistance);
 		if(SkillRange_Circle) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 		OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -126,10 +126,9 @@ void USkillNumber4::Activate_Skill4()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	auto ArcaneBomb = GetWorld()->SpawnActor<AArcaneBomb>(OwnerCharacter->GetArcaneBombClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, FRotator::ZeroRotator, SpawnParams);
-	if(ArcaneBomb)
-	{
-		ArcaneBomb->SetOwner(OwnerCharacter);
-		ArcaneBomb->SetSkill(CurrentSkillType, CurrentSkillAbility);
-		if(SkillRange_Target) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
-	}
+	if(ArcaneBomb) return;	
+	ArcaneBomb->SetOwner(OwnerCharacter);
+	ArcaneBomb->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
+	
 }
