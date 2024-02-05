@@ -77,7 +77,7 @@ void USkillNumber5::Spawn_Skill5()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	
-	ActivateSkillRange_Target(Skill5_Wide, Skill5_LimitDistance, false);
+	ActivateSkillRange_Target(Skill5_Wide, Skill5_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target) SkillRange_Target->SetMaxDist(Skill5_LimitDistance);
 	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 

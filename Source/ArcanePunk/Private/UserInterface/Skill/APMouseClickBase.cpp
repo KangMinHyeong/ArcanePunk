@@ -47,6 +47,15 @@ void UAPMouseClickBase::SkillCancel()
         case ESkillNumber::Skill_7:
         OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->Remove_Skill();
         break;
+        case ESkillNumber::Skill_8:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->Remove_Skill();
+        break;
+        case ESkillNumber::Skill_10:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->Remove_Skill();
+        break;
+        case ESkillNumber::Skill_14:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->Remove_Skill();
+        break;
     }
 }
 
@@ -62,6 +71,15 @@ void UAPMouseClickBase::SkillPlay()
         break;
         case ESkillNumber::Skill_7:
         OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->OnSkill();
+        break;
+        case ESkillNumber::Skill_8:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->OnSkill();
+        break;
+        case ESkillNumber::Skill_10:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->OnSkill();
+        break;
+        case ESkillNumber::Skill_14:
+        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->OnSkill();
         break;
     }
 }

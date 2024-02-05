@@ -109,7 +109,7 @@ protected:
 	// Pattern Num 관련함수
 	void InitPatternNums();
 
-private:
+protected:
 	// 부착 Component
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPSpawnMonsterComponent* SpawnMonsterComp;

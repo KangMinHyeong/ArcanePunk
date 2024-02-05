@@ -10,6 +10,13 @@
 #include "Components/Character/SkillNumber/SkillNumber5.h"
 #include "Components/Character/SkillNumber/SkillNumber6.h"
 #include "Components/Character/SkillNumber/SkillNumber7.h"
+#include "Components/Character/SkillNumber/SkillNumber8.h"
+#include "Components/Character/SkillNumber/SkillNumber9.h"
+#include "Components/Character/SkillNumber/SkillNumber10.h"
+#include "Components/Character/SkillNumber/SkillNumber11.h"
+#include "Components/Character/SkillNumber/SkillNumber12.h"
+#include "Components/Character/SkillNumber/SkillNumber13.h"
+#include "Components/Character/SkillNumber/SkillNumber14.h"
 #include "Components/Character/SkillNumber/UltSkillNumber_1.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/ActorComponent.h"
@@ -40,6 +47,13 @@ public:
 	FORCEINLINE USkillNumber5* GetSkillNumber5() const {return SkillNum_5;};
 	FORCEINLINE USkillNumber6* GetSkillNumber6() const {return SkillNum_6;};
 	FORCEINLINE USkillNumber7* GetSkillNumber7() const {return SkillNum_7;};
+	FORCEINLINE USkillNumber8* GetSkillNumber8() const {return SkillNum_8;};
+	FORCEINLINE USkillNumber9* GetSkillNumber9() const {return SkillNum_9;};
+	FORCEINLINE USkillNumber10* GetSkillNumber10() const {return SkillNum_10;};
+	FORCEINLINE USkillNumber11* GetSkillNumber11() const {return SkillNum_11;};
+	FORCEINLINE USkillNumber12* GetSkillNumber12() const {return SkillNum_12;};
+	FORCEINLINE USkillNumber13* GetSkillNumber13() const {return SkillNum_13;};
+	FORCEINLINE USkillNumber14* GetSkillNumber14() const {return SkillNum_14;};
 
 	FORCEINLINE UUltSkillNumber_1* GetUltSkillNumber1() const {return UltSkillNum_1;};
 
@@ -60,7 +74,20 @@ private:
 	USkillNumber6* SkillNum_6;
 	UPROPERTY()
 	USkillNumber7* SkillNum_7;
-
+	UPROPERTY()
+	USkillNumber8* SkillNum_8;
+	UPROPERTY()
+	USkillNumber9* SkillNum_9;
+	UPROPERTY()
+	USkillNumber10* SkillNum_10;
+	UPROPERTY()
+	USkillNumber11* SkillNum_11;
+	UPROPERTY()
+	USkillNumber12* SkillNum_12;
+	UPROPERTY()
+	USkillNumber13* SkillNum_13;
+	UPROPERTY()
+	USkillNumber14* SkillNum_14;
 
 	UPROPERTY()
 	UUltSkillNumber_1* UltSkillNum_1;

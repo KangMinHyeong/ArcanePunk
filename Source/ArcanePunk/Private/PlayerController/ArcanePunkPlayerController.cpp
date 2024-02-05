@@ -9,6 +9,8 @@
 #include "UserInterface/Skill/HomingTargetUI.h"
 #include "UserInterface/Setting/APSmartKeySetting.h"
 #include "UserInterface/Skill/APMouseClickBase.h"
+#include "UserInterface/Setting/APOptionSetting.h"
+#include "UserInterface/Setting/APAudioSetting.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -18,6 +20,9 @@ AArcanePunkPlayerController::AArcanePunkPlayerController()
 void AArcanePunkPlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+    InitGraphicsSetting();
+    InitAudioSetting();
 
     SetInputMode(GameAndUIInputMode);
     // CurrentMouseCursor = EMouseCursor::Default;
@@ -33,7 +38,7 @@ void AArcanePunkPlayerController::SetupInputComponent()
     Super::SetupInputComponent();
     InputComponent->BindAction(TEXT("Status"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::LookStatus);
     InputComponent->BindAction(TEXT("FreeCameraMode"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::FreeCameraMode);
-    InputComponent->BindAction(TEXT("Setting"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::Setting);
+    InputComponent->BindAction(TEXT("Setting"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::OptionSetting);
 }
 
 void AArcanePunkPlayerController::PlayerTick(float DeltaTime)
@@ -44,29 +49,21 @@ void AArcanePunkPlayerController::PlayerTick(float DeltaTime)
 
 void AArcanePunkPlayerController::LookStatus()
 {
-    auto APCharacter = Cast<AArcanePunkCharacter>(GetPawn());
-    if(!APCharacter) return;
-
-    if(bFreeCameraMode) return;
+    auto APCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!APCharacter) return; if(bFreeCameraMode) return;
+    
 	if(!bLookStatus)
 	{
         bLookStatus = true;
-        // APCharacter->MouseArr.Add(0);
 		StatusWidget = Cast<UAPStatusUI>(CreateWidget(this, StatusWidgetClass));
         if(StatusWidget != nullptr)
         {
             StatusWidget->AddToViewport();
-
-            // SetInputMode(GameAndUIInputMode);
         }
 	}
 	else
 	{
         bLookStatus = false;
         StatusWidget->RemoveFromParent();
-        // APCharacter->MouseArr.Pop();
-        // if(!APCharacter->MouseArr.IsEmpty()) return;
-        // SetInputMode(GameInputMode);
 	}
 }
 
@@ -74,10 +71,9 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
 {  
     if(!bFreeCameraMode)
     {
-        MyCharacter = Cast<AArcanePunkCharacter>(GetPawn());
-        if(!MyCharacter) return;
-        FreeCamera = GetWorld()->SpawnActor<APawn>(FreeCameraClass, MyCharacter->ReturnCameraTransform());
-        if(!FreeCamera) return;
+        MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter) return;
+        FreeCamera = GetWorld()->SpawnActor<APawn>(FreeCameraClass, MyCharacter->ReturnCameraTransform()); if(!FreeCamera) return;
+        
         Possess(FreeCamera);
         bFreeCameraMode = true;
     }
@@ -98,18 +94,52 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
     }
 }
 
-void AArcanePunkPlayerController::Setting()
+void AArcanePunkPlayerController::OptionSetting()
 {
-    auto SmartKeySettingUI = Cast<UAPSmartKeySetting>(CreateWidget(this, SmartKeySettingClass));
-    if(!SmartKeySettingUI) return;
+    auto OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); if(!OptionSettingUI) return;
+    
+    OptionSettingUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::InitGraphicsSetting()
+{
+    GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI) return;
+
+    GraphicsSettingUI->InitGraphicsSetting();
+    GraphicsSettingUI->InitWindowSetting();
+    GraphicsSettingUI->InitBindSetting();
+}
+
+void AArcanePunkPlayerController::GraphicsSetting()
+{
+    if(!GraphicsSettingUI) GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI) return;
+    
+    GraphicsSettingUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::InitAudioSetting()
+{
+    AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
+}
+
+void AArcanePunkPlayerController::AudioSetting()
+{
+    if(!AudioSettingUI) return; AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
+    
+    AudioSettingUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::SmartKeySetting()
+{
+    auto SmartKeySettingUI = Cast<UAPSmartKeySetting>(CreateWidget(this, SmartKeySettingClass)); if(!SmartKeySettingUI) return;
+    
     SmartKeySettingUI->AddToViewport();
 }
 
 void AArcanePunkPlayerController::StartFadeIn()
 {
-    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass));
-    if(!FadeLoadingWidget) return;
-
+    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget) return;
+    
     FadeLoadingWidget->AddToViewport();
     FadeLoadingWidget->FadeIn();
 
@@ -120,17 +150,16 @@ void AArcanePunkPlayerController::StartFadeIn()
 
 void AArcanePunkPlayerController::StartFadeOut()
 {
-    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass));
-    if(!FadeLoadingWidget) return;
-
+    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget) return;
+    
     FadeLoadingWidget->AddToViewport();
     FadeLoadingWidget->FadeOut();
 }
 
 void AArcanePunkPlayerController::StartLoading()
 {
-    LoadingWidget = CreateWidget(this, LoadingWidgetClass);
-    if(!LoadingWidget) return;
+    LoadingWidget = CreateWidget(this, LoadingWidgetClass); if(!LoadingWidget) return;
+    
     LoadingWidget->AddToViewport();
 
     GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &AArcanePunkPlayerController::StartFadeIn, LoadingTime, false);
@@ -138,8 +167,7 @@ void AArcanePunkPlayerController::StartLoading()
 
 void AArcanePunkPlayerController::StartSaveUI()
 {
-    SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass));
-    if(!SaveUI) return;
+    SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass)); if(!SaveUI) return;
 
     SaveUI->AddToViewport();
 
@@ -153,9 +181,8 @@ void AArcanePunkPlayerController::EndSaveUI()
 
 void AArcanePunkPlayerController::HitUI()
 {
-    auto HitUI = Cast<UHitFade>(CreateWidget(this, HitWidgetClass));
-    if(!HitUI) return;
-
+    auto HitUI = Cast<UHitFade>(CreateWidget(this, HitWidgetClass)); if(!HitUI) return;
+    
     HitUI->AddToViewport();
     HitUI->FadeOut();
 
@@ -164,8 +191,8 @@ void AArcanePunkPlayerController::HitUI()
 
 void AArcanePunkPlayerController::DisplayHomingUI(ESkillNumber SkillNumber)
 {
-    HomingUI = Cast<UHomingTargetUI>(CreateWidget(this, HomingUIClass));
-    if(!HomingUI) return;
+    HomingUI = Cast<UHomingTargetUI>(CreateWidget(this, HomingUIClass)); if(!HomingUI) return;
+    
     HomingUI->InputSkillInfo(SkillNumber);
     HomingUI->AddToViewport(); 
 }
@@ -180,8 +207,21 @@ void AArcanePunkPlayerController::ReturnToDefault()
 
 void AArcanePunkPlayerController::PreventOtherClick(ESkillNumber SkillNumber)
 {
-    MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass));
-    if(!MouseClickUI) return;
+    MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass)); if(!MouseClickUI) return;
+    
     MouseClickUI->InputSkillInfo(SkillNumber);
     MouseClickUI->AddToViewport(); 
+}
+
+void AArcanePunkPlayerController::SetHideUI(bool NewBool)
+{
+    if(NewBool)
+    {
+        if(!HideUI) HideUI = CreateWidget(this, HideUIClass); 
+        if(HideUI) HideUI->AddToViewport(); 
+    }
+    else
+    {
+        if(HideUI) HideUI->RemoveFromParent();
+    }
 }

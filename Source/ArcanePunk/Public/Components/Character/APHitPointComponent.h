@@ -17,5 +17,17 @@ public:
 	// Sets default values for this component's properties
 	UAPHitPointComponent();
 	void DistinctHitPoint(FVector ImpactPoint, AActor *HitActor);
-	void SetCrowdControl(AActor *HitActor, ECharacterState UpdateState, float StateTime, FVector KnockBackVec = FVector(0,0,0), float SlowCoefficient = 0.0f);
+	void SetCrowdControl(AActor *HitActor, ECharacterState UpdateState, float StateTime);
+
+	FORCEINLINE void SetKnockBackVec(FVector NewValue) {KnockBackVec =  NewValue;};
+	FORCEINLINE void SetKnockBackDist(float NewValue) {KnockBackDist =  NewValue;};
+	FORCEINLINE void SetSlowCoefficient(float NewValue) {SlowCoefficient =  NewValue;};
+
+private:
+	UPROPERTY()
+	FVector KnockBackVec = FVector(0,0,0);
+	UPROPERTY()
+	float KnockBackDist = 0.0f;
+	UPROPERTY()
+	float SlowCoefficient = 0.0f;
 };

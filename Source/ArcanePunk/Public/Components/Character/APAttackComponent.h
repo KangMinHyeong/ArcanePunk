@@ -39,6 +39,7 @@ public:
 	void NormalAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f, bool bStun = false, float StunTime = 0.0f, bool Custom = false, float CustomRadius = 0.0f); 	//Attack 트리거 발동
 	void MultiAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f, bool bStun = false, float StunTime = 0.0f, bool Custom = false, float CustomRadius = 0.0f);
 	void MultiAttack(FVector Start, FVector End, float Radius, float Multiple = 1.0f, uint8 HitNumbers = 1, bool bStun = false, float StunTime = 0.0f);
+	void MultiAttack_KnockBack(FVector Start, FVector End, float Radius, float KnockBackDist, float Multiple = 1.0f, uint8 HitNumbers = 1, float KnockBackTime = 0.0f,  bool PlayerKnockBack = false);
 	
 private:
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack, bool Custom = false, float CustomRadius = 0.0f); // Attack Trace
@@ -68,6 +69,6 @@ private:
 	int32 HitNum = 1;
 
 	UPROPERTY()
-	class UAPHitPointComponent* HitPointComp;
+	class UAPHitPointComponent* HitComp;
 
 };

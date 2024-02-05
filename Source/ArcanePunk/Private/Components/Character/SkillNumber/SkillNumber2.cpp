@@ -30,7 +30,7 @@ void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 	
-	if(bMark)
+	if(bActivate)
 	{
 		auto Enemy = Cast<AEnemy_CharacterBase>(MarkedActor);
 		if(!Enemy) return;
@@ -81,7 +81,7 @@ void USkillNumber2::Remove_Skill()
 
 void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
 {
-	bMark = true;
+	bActivate = true;
 	MarkedActor = OtherActor;
 	GetWorld()->GetTimerManager().SetTimer(MarkTimerHandle, this, &USkillNumber2::MarkErase, Time, false);
 }
@@ -102,7 +102,7 @@ void USkillNumber2::Activate_Skill2()
 
 void USkillNumber2::MarkErase()
 {
-	bMark = false;
+	bActivate = false;
 	GetWorld()->GetTimerManager().ClearTimer(MarkTimerHandle);
 }
 

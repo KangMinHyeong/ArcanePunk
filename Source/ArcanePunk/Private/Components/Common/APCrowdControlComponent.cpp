@@ -60,22 +60,22 @@ void UAPCrowdControlComponent::NormalState() // 후에 벡터로 관리 ?
 
 }
 
-void UAPCrowdControlComponent::KnockBackState(FVector KnockBackPoint, float KnockBackTime)
+void UAPCrowdControlComponent::KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime)
 {
 	if(!CalculateStateTime(ECharacterState::KnockBack, KnockBackTimerHandle, KnockBackTime)){return;}
 
 	GetWorld()->GetTimerManager().SetTimer(KnockBackTimerHandle, this, &UAPCrowdControlComponent::KnockBackEnd, KnockBackTime, false);
 
-	if(GetOwner()->ActorHasTag(TEXT("Player"))) {OnPlayerState(ECharacterState::KnockBack, true);}
-	else if(GetOwner()->ActorHasTag(TEXT("Enemy"))) {OnEnemyState(ECharacterState::KnockBack, true);}
+	if(GetOwner()->ActorHasTag(TEXT("Player"))) {KnockBackDist = KnockBackDist * 4.0f; OnPlayerState(ECharacterState::KnockBack, true);}
+	else if(GetOwner()->ActorHasTag(TEXT("Enemy"))) {KnockBackDist = KnockBackDist * 6.0f; OnEnemyState(ECharacterState::KnockBack, true);}
 
-	
 	auto Owner = Cast<ACharacter>(GetOwner()); if(!Owner) return;
 	FVector KnockBackVec = (KnockBackPoint - Owner->GetActorLocation()) * FVector(1.0f, 1.0f, 0.0f);
 	KnockBackVec = -( KnockBackVec / KnockBackVec.Size());
 	DefaultSlip = Owner->GetCharacterMovement()->BrakingFrictionFactor;
 	Owner->GetCharacterMovement()->BrakingFrictionFactor = 0.0f;
-	Owner->LaunchCharacter(KnockBackVec * 1500.0f, true, true);
+	Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	Owner->LaunchCharacter(KnockBackVec * KnockBackDist, false, false);
 }
 
 void UAPCrowdControlComponent::KnockBackEnd()

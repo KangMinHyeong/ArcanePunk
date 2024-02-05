@@ -30,8 +30,14 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 	auto PD = OwnerCharacter->GetPlayerStatus();
 
 	DamageApplied = FMath::Min(PD.PlayerDynamicData.HP, DamageApplied);
+	TestHit(); // 나중에 삭제
+	GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, OwnerCharacter->GetHitMotionTime(), false);
 
-	PD.PlayerDynamicData.HP = PD.PlayerDynamicData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.PlayerDynamicData.DEF)));
+	if(DamageApplied == PD.PlayerDynamicData.HP && OwnerCharacter->GetRageMode()) { PD.PlayerDynamicData.HP = 1.0f;}
+	else
+	{
+		PD.PlayerDynamicData.HP = PD.PlayerDynamicData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.PlayerDynamicData.DEF)));
+	}
 	OwnerCharacter->SetPlayerStatus(PD);
 	
 	if(OwnerCharacter->IsDead())
@@ -48,12 +54,11 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 	}
 	else
 	{ 
-		TestHit(); // 나중에 삭제
+		if(OwnerCharacter->GetRageMode()) return;
 		OwnerCharacter->SetHitting(true);
 		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
 		if(MyController) MyController->HitUI();
 		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.HP);
-		GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, OwnerCharacter->GetHitMotionTime(), false);
 	}
 }
 
@@ -79,7 +84,9 @@ void UAPTakeDamageComponent::OnHitting()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetHitting(false);
-	OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetDefaultMaterial());
+	if(OwnerCharacter->GetHideMode()) { OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetHideMaterial()); }
+	else {OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetDefaultMaterial());}
+	
 	GetWorld()->GetTimerManager().ClearTimer(HittingTimerHandle);
 }
 

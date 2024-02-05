@@ -35,8 +35,16 @@ class AShouting;
 class AAPSkillRange;
 class AAPSkillRange_Target;
 class AAPSkillRange_Arrow;
+class AAPSkillRange_Circle;
 class AArcaneCutter;
 class AArcaneRain;
+class AArcaneBall;
+class AArcaneMine;
+class AArcaneTurret;
+class AArcaneField;
+class AArcaneRage;
+class AArcaneTent;
+class ASwordClutch;
 
 // prodo
 
@@ -130,14 +138,21 @@ public:
 	
 	// Skill 관련 함수
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return SkillHubComp;}; // SkillComp 반환
+	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return APSkillHubComp;}; // SkillComp 반환
 	FORCEINLINE TSubclassOf<ASwordImpact> GetSwordImpactClass() const {return SwordImpactClass;}; //SwordImpactClass 반환
 	FORCEINLINE TSubclassOf<ASwordThrowBase> GetSwordThrowClass() const {return SwordThrowClass;}; // SwordThrowClass 반환
 	FORCEINLINE TSubclassOf<AArcaneBomb> GetArcaneBombClass() const {return ArcaneBombClass;}; // ArcaneBombClass 반환
 	FORCEINLINE TSubclassOf<AArcaneBeam> GetArcaneBeamClass() const {return ArcaneBeamClass;}; // ArcaneBeamClass 반환
 	FORCEINLINE TSubclassOf<AShouting> GetShoutingClass() const {return ShoutingClass;}; // ShoutingClass 반환
 	FORCEINLINE TSubclassOf<AArcaneCutter> GetArcaneCutterClass() const {return ArcaneCutterClass;}; // ArcaneCutterClass 반환
-	FORCEINLINE TSubclassOf<AArcaneRain> GetArcaneRainClass() const {return ArcaneRainClass;}; // ArcaneCutterClass 반환
+	FORCEINLINE TSubclassOf<AArcaneBall> GetArcaneBallClass() const {return ArcaneBallClass;}; // ArcaneBallClass 반환
+	FORCEINLINE TSubclassOf<AArcaneMine> GetArcaneMineClass() const {return ArcaneMineClass;}; // ArcaneMineClass 반환
+	FORCEINLINE TSubclassOf<AArcaneTurret> GetArcaneTurretClass() const {return ArcaneTurretClass;}; // ArcaneTurretClass 반환
+	FORCEINLINE TSubclassOf<AArcaneField> GetArcaneFieldClass() const {return ArcaneFieldClass;}; // ArcaneFieldClass 반환
+	FORCEINLINE TSubclassOf<AArcaneRage> GetArcaneRageClass() const {return ArcaneRageClass;}; // ArcaneRageClass 반환
+	FORCEINLINE TSubclassOf<AArcaneTent> GetArcaneTentClass() const {return ArcaneTentClass;}; // ArcaneTentClass 반환
+	FORCEINLINE TSubclassOf<ASwordClutch> GetSwordClutchClass() const {return SwordClutchClass;}; // SwordClutchClass 반환
+	FORCEINLINE TSubclassOf<AArcaneRain> GetArcaneRainClass() const {return ArcaneRainClass;}; // ArcaneRainClass 반환
 
 	FORCEINLINE float GetSkillCancelTime() const {return SkillCancelTime;}; // SkillCancleTime 반환
 	FORCEINLINE ESkillNumber GetQSkill() const {return QSkill;}; // QSkill 반환
@@ -161,6 +176,7 @@ public:
 	FORCEINLINE TSubclassOf<AAPSkillRange> GetAPSkillRange() const {return SkillRange;};
 	FORCEINLINE TSubclassOf<AAPSkillRange_Target> GetAPSkillRange_Target() const {return SkillRange_Target;};
 	FORCEINLINE TSubclassOf<AAPSkillRange_Arrow> GetAPSkillRange_Arrow() const {return SkillRange_Arrow;};
+	FORCEINLINE TSubclassOf<AAPSkillRange_Circle> GetAPSkillRange_Circle() const {return SkillRange_Circle;};
 
 	void SetSkillAbility(ESkillKey EnhanceSkill, EEnHanceType EnHanceType);
 	
@@ -172,7 +188,18 @@ public:
 	FORCEINLINE USceneComponent* GetLeftBeamPoint() const {return LeftBeamPoint;}; 
 
 	void SetHavingSkills(); 
-	
+
+	FORCEINLINE bool GetRageMode() const {return bRageMode;};
+	FORCEINLINE void SetRageMode(bool NewBool) {bRageMode = NewBool;};
+
+	FORCEINLINE void SetReturnToHideTime(float NewTime) {ReturnToHideTime = NewTime;};
+	void SetInArcaneTent(bool NewBool);
+	void SetHideMode(bool NewBool);
+	FORCEINLINE bool GetInArcaneTent() const {return InArcaneTent;};
+	FORCEINLINE bool GetHideMode() const {return bHideMode;};
+	FORCEINLINE UMaterialInterface* GetHideMaterial() const {return HideMaterial;};
+	void HideClear();
+
 	// Hit, Dead 관련 함수
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
@@ -219,6 +246,9 @@ private:
 	void SaveStatus();
 	void CurrentPlayerLocation();
 
+	// Skill 관련 함수
+	void HideCheck();
+
 	// Move 관련 함수
 	void MoveForward(float AxisValue); // 위 아래 Move
 	void MoveRight(float AxisValue); // 오른, 왼쪽 Move
@@ -229,6 +259,7 @@ private:
 	virtual void Jump() override;
 
 	void Dash();
+
 	
 	// 공격 관련 함수
 	void Attack_typeA(); // 마우스 오른쪽 공격
@@ -247,7 +278,7 @@ private:
 	UAPMovementComponent* MoveComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPSkillHubComponent* SkillHubComp;
+	UAPSkillHubComponent* APSkillHubComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPAnimHubComponent* AnimHubComp;
@@ -370,6 +401,27 @@ private:
 	TSubclassOf<AArcaneCutter> ArcaneCutterClass;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneBall> ArcaneBallClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneMine> ArcaneMineClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneTurret> ArcaneTurretClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneField> ArcaneFieldClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneRage> ArcaneRageClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneTent> ArcaneTentClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<ASwordClutch> SwordClutchClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<AArcaneRain> ArcaneRainClass;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
@@ -394,11 +446,29 @@ private:
 	FVector HomingPoint = FVector(0,0,0);
 
 	UPROPERTY()
+	bool bRageMode = false;
+
+	UPROPERTY()
+	bool InArcaneTent = false;
+	UPROPERTY()
+	bool bHideMode = false;
+	UPROPERTY()
+	float ReturnToHideTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	UMaterialInterface* HideMaterial;
+
+	FTimerHandle HideTimerHandle;
+
+	UPROPERTY()
 	bool OnQSkill = false;
 	UPROPERTY()
 	bool OnESkill = false;
 	UPROPERTY()
 	bool OnRSkill = false;
+
+	UPROPERTY()
+	bool bCanSkill = true;
 
 	UPROPERTY(EditAnywhere, Category = "Skill Range")
 	TSubclassOf<AAPSkillRange> SkillRange;
@@ -408,6 +478,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Skill Range")
 	TSubclassOf<AAPSkillRange_Arrow> SkillRange_Arrow;
+
+	UPROPERTY(EditAnywhere, Category = "Skill Range")
+	TSubclassOf<AAPSkillRange_Circle> SkillRange_Circle;
 
 	// Foot Print 변수
 	UPROPERTY(EditAnywhere, Category = "Foot Print")

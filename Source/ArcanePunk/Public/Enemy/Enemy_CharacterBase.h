@@ -48,6 +48,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsHitting();
 
+	FORCEINLINE void SetHitting(bool NewBool) {bHitting = NewBool;};
+
 	UFUNCTION(BlueprintPure)
 	float GetForward();
 
@@ -86,6 +88,12 @@ public:
 	FORCEINLINE ECharacterState ReturnState() const { return CurrentState;};
 	FORCEINLINE void SetState(ECharacterState UpdateState) { CurrentState = UpdateState;};
 	FORCEINLINE UNiagaraComponent* GetStunEffect() const { return StunEffect;};
+	UFUNCTION(BlueprintPure)
+	bool IsHardCC();
+
+	// 몬스터 어그로
+	AActor* IsAggro();
+
 protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
@@ -220,6 +228,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "CC")
 	float StunTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "KnockBackAttack")
+	float KnockBackDist = 1500.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "CC")
 	UNiagaraComponent* StunEffect;

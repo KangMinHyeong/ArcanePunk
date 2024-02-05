@@ -52,7 +52,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
-	SkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComp"));
+	APSkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("APSkillHubComp"));
 	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
 	TakeDMComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDMComp"));
 	SpawnFootPrintComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnFootPrintComp"));
@@ -208,7 +208,7 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
 	if(bDoing || !StopState.IsEmpty()) return;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
-	AttackComp->StartAttack_A(bCanMove);
+	AttackComp->StartAttack_A(bCanMove);	
 }
 
 void AArcanePunkCharacter::Attack_typeB()
@@ -219,6 +219,21 @@ void AArcanePunkCharacter::Attack_typeB()
 	AttackComp->StartAttack_B(bCanMove);
 
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
+}
+
+void AArcanePunkCharacter::HideClear()
+{
+	if(bHideMode)
+	{
+		SetHideMode(false);
+		GetWorldTimerManager().ClearTimer(HideTimerHandle);
+		GetWorldTimerManager().SetTimer(HideTimerHandle, this, &AArcanePunkCharacter::HideCheck, ReturnToHideTime, false);
+	}
+}
+
+void AArcanePunkCharacter::HideCheck()
+{
+	if(InArcaneTent) SetHideMode(true);
 }
 
 void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
@@ -266,21 +281,21 @@ void AArcanePunkCharacter::ChangeEquipData(TArray<UAPItemBase *> & EquipArr, UAP
 void AArcanePunkCharacter::SkillBase_Q()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	if(bCanMove && StopState.IsEmpty()) SkillHubComp->PressQ();	
+	if(bCanSkill && bCanMove && StopState.IsEmpty()) APSkillHubComp->PressQ();	
 	OnQSkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_E()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
-	if(bCanMove && StopState.IsEmpty()) SkillHubComp->PressE();
+	if(bCanSkill && bCanMove && StopState.IsEmpty()) APSkillHubComp->PressE();
 	OnESkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_R()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
-	if(bCanMove && StopState.IsEmpty()) SkillHubComp->PressSpace();
+	if(bCanSkill && bCanMove && StopState.IsEmpty()) APSkillHubComp->PressSpace();
 	OnRSkill = true;
 }
 
@@ -384,6 +399,30 @@ void AArcanePunkCharacter::SetRSkill()
 {
 	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
 	else {RSkill = EUltSkillNumber::None;}
+}
+
+void AArcanePunkCharacter::SetInArcaneTent(bool NewBool)
+{
+	InArcaneTent = NewBool;
+
+	SetHideMode(InArcaneTent);
+}
+
+void AArcanePunkCharacter::SetHideMode(bool NewBool)
+{
+	bHideMode = NewBool;
+	if(bHideMode)
+	{
+		if(PC) PC->SetHideUI(true);
+		GetMesh()->SetMaterial(0,HideMaterial);
+		// HideUI 생성 및 캐릭터 머터리얼 변경
+	}
+	else
+	{
+		if(PC) PC->SetHideUI(false);
+		GetMesh()->SetMaterial(0,GetDefaultMaterial());
+		// HideUI 삭제 및 캐릭터 머터리얼 원상태
+	}
 }
 
 float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)

@@ -13,7 +13,7 @@
 UAPAttackComponent::UAPAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
+	HitComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitComp"));
 }
 
 void UAPAttackComponent::BeginPlay()
@@ -235,8 +235,8 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(Character->GetController());
 			if(!MyController) return;
-			HitPointComp->DistinctHitPoint(HitResult.Location, Actor);
-			if(bStun) HitPointComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+			HitComp->DistinctHitPoint(HitResult.Location, Actor);
+			if(bStun) HitComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
 			if(Character->GetComboHitEffect() && Actor->ActorHasTag(TEXT("Enemy"))) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 		}
@@ -267,8 +267,8 @@ void UAPAttackComponent::MultiAttack(FVector Start, bool CloseAttack, float Mult
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(Character->GetController());
 				if(!MyController) return;
-				HitPointComp->DistinctHitPoint(HitResult.Location, Actor);
-				if(bStun) HitPointComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+				HitComp->DistinctHitPoint(HitResult.Location, Actor);
+				if(bStun) HitComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
 				Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
 				if(Character->GetComboHitEffect() && Actor->ActorHasTag(TEXT("Enemy"))) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 			}
@@ -288,7 +288,6 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius);
 	if(Line)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Your %d"), HitResults.Num());
 		TArray<AActor*> Actors;
 		for(FHitResult & HitResult : HitResults)
 		{
@@ -296,35 +295,69 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 			
 			if(Actors.Contains(Actor)) {continue;}
 			else {Actors.Add(Actor);}
-			UE_LOG(LogTemp, Display, TEXT("Your a"));
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
-				UE_LOG(LogTemp, Display, TEXT("Your b"));
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(Character->GetController()); if(!MyController) return;
-				HitPointComp->DistinctHitPoint(HitResult.Location, Actor);
-				if(bStun) HitPointComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+				HitComp->DistinctHitPoint(HitResult.Location, Actor);
+				if(bStun) HitComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
 				if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 
 				
-				UE_LOG(LogTemp, Display, TEXT("Your %d"), HitNumbers);
 				ApplyDamageToActor(Actor, Damage, myDamageEvent, MyController, HitNumbers);
 			}			
 		}
-		UE_LOG(LogTemp, Display, TEXT("Your d"));
 	}
+}
+
+void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float Radius, float KnockBackDist, float Multiple, uint8 HitNumbers, float KnockBackTime, bool PlayerKnockBack)
+{
+	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!Character) return;
+	if(Character->returnState() != ECharacterState::None) return;
+
+	float Damage = Character->GetFinalATK() * Multiple;
+	TArray<FHitResult> HitResults;
+	FVector HitVector;
+	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius);
+	if(Line)
+	{
+		TArray<AActor*> Actors;
+		for(FHitResult & HitResult : HitResults)
+		{
+			AActor* Actor = HitResult.GetActor();
+			
+			if(Actors.Contains(Actor)) {continue;}
+			else {Actors.Add(Actor);}
+			if(Actor->ActorHasTag(TEXT("Enemy")))
+			{
+				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
+				AController* MyController = Cast<AController>(Character->GetController()); if(!MyController) return;
+				HitComp->DistinctHitPoint(HitResult.Location, Actor);
+
+				float Dist = KnockBackDist - (Actor->GetActorLocation()*FVector(1.0f,1.0f,0.0f) - Start*FVector(1.0f,1.0f,0.0f)).Size();
+
+				HitComp->SetKnockBackVec(Start); HitComp->SetKnockBackDist(Dist); 
+				HitComp->SetCrowdControl(Actor, ECharacterState::KnockBack, KnockBackTime);
+				
+				if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
+				
+				ApplyDamageToActor(Actor, Damage, myDamageEvent, MyController, HitNumbers);
+			}			
+		}
+	}
+	float Dist = KnockBackDist - (Character->GetActorLocation()*FVector(1.0f,1.0f,0.0f) - Start*FVector(1.0f,1.0f,0.0f)).Size();
+	if(PlayerKnockBack) Character->GetCrowdControlComponent()->KnockBackState(Start, Dist, 0.35f);
 }
 
 void UAPAttackComponent::ApplyDamageToActor(AActor* DamagedActor, float Damage, FPointDamageEvent myDamageEvent, AController* MyController, uint8 HitNumbers)
 {
-	UE_LOG(LogTemp, Display, TEXT("Your %d"), HitNumbers);
 	if(HitNumbers <= 0) {return;}
 	DamagedActor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
 	HitNumbers--;
 	FTimerHandle Timer;
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UAPAttackComponent::ApplyDamageToActor, DamagedActor, Damage, myDamageEvent, MyController, HitNumbers);
 	GetWorld()->GetTimerManager().SetTimer(Timer, TimerDelegate, 0.2f, false);
-
 
 }
 //AttackTrace 코드 끝

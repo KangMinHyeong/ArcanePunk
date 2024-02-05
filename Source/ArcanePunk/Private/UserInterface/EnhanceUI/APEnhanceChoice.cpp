@@ -111,6 +111,33 @@ void UAPEnhanceChoice::EnhanceListing()
         case ESkillNumber::Skill_7:
         EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->EnableSkillAbilityList;
         break;
+
+        case ESkillNumber::Skill_8:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->EnableSkillAbilityList;
+        break;
+
+        case ESkillNumber::Skill_9:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber9()->EnableSkillAbilityList;
+        break;
+
+        case ESkillNumber::Skill_10:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->EnableSkillAbilityList;
+        break;
+
+        case ESkillNumber::Skill_11:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber11()->EnableSkillAbilityList;
+        break;
+
+        case ESkillNumber::Skill_12:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber12()->EnableSkillAbilityList;
+
+        case ESkillNumber::Skill_13:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber13()->EnableSkillAbilityList;
+        break;
+
+        case ESkillNumber::Skill_14:
+        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->EnableSkillAbilityList;
+        break;
     }
     
 }

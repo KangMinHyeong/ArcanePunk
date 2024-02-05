@@ -9,6 +9,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Character/SkillRange/APSkillRange_Arrow.h"
+#include "Character/SkillRange/APSkillRange_Circle.h"
 
 USkillNumberBase::USkillNumberBase()
 {
@@ -145,7 +146,7 @@ void USkillNumberBase::AddAbilityList()
 {
 }
 
-void USkillNumberBase::ActivateSkillRange_Circle(float Range)
+void USkillNumberBase::ActivateSkillRange_Round(float Range)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
 	
@@ -158,19 +159,25 @@ void USkillNumberBase::ActivateSkillRange_Circle(float Range)
 	
 }
 
-void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, bool IsCircle)
+void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, ESkillRangeType SkillRangeType)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
 	
-	if(IsCircle)
+	if(SkillRangeType == ESkillRangeType::Control_Circle)
 	{
 		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillRange_Target(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 	}
-	else
+	else if(SkillRangeType == ESkillRangeType::Arrow)
 	{
 		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillRange_Arrow(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 		if(SkillRange_Target) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	}
+	else if(SkillRangeType == ESkillRangeType::Around_Circle)
+	{
+		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillRange_Circle(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
+		if(SkillRange_Target) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+	}
+
 	if(!SkillRange_Target) return;
 	SkillRange_Target->SetOwner(OwnerCharacter);
 	SkillRange_Target->GetDecalComponent()->DecalSize = FVector(5.0f, Range_1, Range_2);

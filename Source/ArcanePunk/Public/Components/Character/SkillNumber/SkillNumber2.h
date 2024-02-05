@@ -34,7 +34,6 @@ private:
 private:
 	FTimerHandle MarkTimerHandle;
 
-	bool bMark = false;
 	AActor* MarkedActor;
 	FVector MarkingLocation;
 
