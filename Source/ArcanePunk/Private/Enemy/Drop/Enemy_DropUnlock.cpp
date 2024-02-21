@@ -13,7 +13,7 @@ void AEnemy_DropUnlock::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor 
 {
     auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
-    Character->SetSkillTypeState(Unlock_SkillType, EnHanceType);
+    Character->SetSkillAbility(Unlock_SkillAbility, EnHanceType);
 
     Destroy();
 }

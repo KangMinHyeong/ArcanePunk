@@ -9,15 +9,16 @@
 ACMinimapActor::ACMinimapActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+    FString WidgetBlueprintPath = "/Game/Minimap/WB_Minimap.WB_Minimap_C";
+
+    WidgetInstance = CreateWidget<UUserWidget>(GetWorld(), LoadClass<UUserWidget>(nullptr, *WidgetBlueprintPath));
 }
 
 void ACMinimapActor::BeginPlay()
 {
     Super::BeginPlay();
 
-    FString WidgetBlueprintPath = "/Game/Minimap/WB_Minimap.WB_Minimap_C";
-
-    UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(GetWorld(), LoadClass<UUserWidget>(nullptr, *WidgetBlueprintPath));
     if (WidgetInstance)
     {
         WidgetInstance->AddToViewport();

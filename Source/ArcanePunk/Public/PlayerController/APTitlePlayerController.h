@@ -6,9 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "APTitlePlayerController.generated.h"
 
-/**
- * 
- */
+class UUserWidget;
+class UAPOptionSetting;
+
 UCLASS()
 class ARCANEPUNK_API AAPTitlePlayerController : public APlayerController
 {
@@ -16,10 +16,31 @@ class ARCANEPUNK_API AAPTitlePlayerController : public APlayerController
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	TSubclassOf<class UUserWidget> UIWidgetClass;
+	void CreateTitleUI();
+	void CreateIntroUI();
 
-	class UUserWidget* TitleUI;
+	void OptionSetting();
+
+private:
+	void RemoveIntroUI(UUserWidget* IntroWidget);
+
+private:
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UUserWidget> TitleUIClass;
+
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UUserWidget> IntroUIClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> OptionSettingClass;
+
+	UPROPERTY()
+	UAPOptionSetting* OptionSettingUI;
+
+	FTimerHandle IntroeTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float IntroTime = 5.0f;
 };

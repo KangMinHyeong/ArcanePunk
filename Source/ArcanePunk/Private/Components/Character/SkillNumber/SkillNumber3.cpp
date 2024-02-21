@@ -9,29 +9,45 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APAttackComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
+#include "Character/SkillRange/APSkillRange.h"
+#include "Character/SkillRange/APSkillRange_Target.h"
+
+void USkillNumber3::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void USkillNumber3::AddAbilityList()
+{
+	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+}
+
 
 void USkillNumber3::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	CheckingOtherSkill();
 }
 
-void USkillNumber3::PlaySkill(uint8 SkillType)
+void USkillNumber3::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;	
 
+	SkillKey = WhichKey;
+
 	if(Skilling)
 	{
-		Remove_Skill3();
+		Remove_Skill();
 	}
 	else
 	{
 		OwnerCharacter->SetDoing(true);
 
+		SetAbility(WhichKey);
 		Skilling = true;
-		OwnerCharacter->SetbMouseAttack(false);
-
 		CurrentSkillType = SkillType;
 		Spawn_Skill3();
 	}
@@ -47,105 +63,52 @@ void USkillNumber3::Spawn_Skill3()
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
+	if(!CheckSmartKey(SkillKey, OwnerCharacter)) OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_3);
+
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = OwnerCharacter;
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	Skill3_SpawnPoint = GetWorld()->SpawnActor<AAPSpawnPointBase>(OwnerCharacter->GetSkill3_SpawnPont(), OwnerCharacter->GetActorTransform(), SpawnParams);
-	if(Skill3_SpawnPoint) Skill3_SpawnPoint->SetSkillType(CurrentSkillType);
-	if(Skill3_SpawnPoint) Skill3_SpawnPoint->SetAttackMouse(true);
-	if(Skill3_SpawnPoint) OwnerCharacter->SetSkill_SpawnPoint(1);
+	ActivateSkillRange_Target(Skill3_TargetRange, Skill3_TargetRange, ESkillRangeType::Control_Circle);
+	if(SkillRange_Target) SkillRange_Target->SetMaxDist(OwnerCharacter->GetSkill3_LimitDist());
+	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
-	Skill3Range_SpawnPoint = GetWorld()->SpawnActor<AAPSpawnPointBase>(OwnerCharacter->GetSkill3Range_SpawnPont(), OwnerCharacter->GetActorTransform(), SpawnParams);
-	if(Skill3Range_SpawnPoint) Skill3Range_SpawnPoint->SetRangeLocation();
-	if(Skill3Range_SpawnPoint) Skill3Range_SpawnPoint->SetSkillType(CurrentSkillType);
+	ActivateSkillRange_Round(OwnerCharacter->GetSkill3_LimitDist());
+	if(SkillRange_Circle) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
 }
 
-void USkillNumber3::CheckingOtherSkill()
-{
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
-	if(CheckSmartKey(3, OwnerCharacter)) 
-	{ 
-		Cast_Skill3(); return; 
-	}
-	if(OwnerCharacter->GetDoing() && Skilling)
-	{
-		Remove_Skill3(); return;
-	}
-	if(OwnerCharacter->returnState() != ECharacterState::None && Skilling)
-	{
-		Remove_Skill3(); return;
-	}
-}
-
-void USkillNumber3::Remove_Skill3()
-{
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
-	if(!OwnerCharacterPC) return;
-
-	Skilling = false;
-
-	if(Skill3_SpawnPoint) Skill3_SpawnPoint->Destroy();
-	if(Skill3Range_SpawnPoint) Skill3Range_SpawnPoint->Destroy();
- 
-	OwnerCharacter->SetbMouseAttack(true);
-	OwnerCharacterPC->bShowMouseCursor = true;
-	SetComponentTickEnabled(false);
-}
-
-void USkillNumber3::Cast_Skill3()
+void USkillNumber3::OnSkill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
 	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerCharacterPC) return;
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
-	if(!Skill3_SpawnPoint) return;
+	if(!SkillRange_Target) return; if(!Skilling) return;
 	
-	bool IsOutRange = false; // 스마트키에서 마우스 커서가 스킬 범위 밖에 있는지 체크
-
-	OwnerCharacterPC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-	float Distance =  FVector::Distance(OwnerCharacter->GetActorLocation(), HitResult.Location); float Limit = OwnerCharacter->GetSkill3_LimitDist() * (Skill3_SpawnPoint->GetActorScale3D().X / Skill3_SpawnPoint->DefaultSize);
-	if(Distance > Limit) 
-	{
-		if(!CheckSmartKey(3, OwnerCharacter)){UE_LOG(LogTemp, Display, TEXT("Your a")); return;} // 스마트키가 아닌데 바깥범위면 리턴 (빨간색으로 뜸)
-		else // 스마트키 On, 바깥범위면 마우스 커서 방향으로 최대사거리 스킬 시전 , 백터 Lerp 계산 
-		{
-			IsOutRange = true;
-			MaxDist = FMath::Lerp(OwnerCharacter->GetActorLocation(), HitResult.Location,  (Limit /(OwnerCharacter->GetActorLocation() - HitResult.Location).Size()));
-			UE_LOG(LogTemp, Display, TEXT("Your b"));
-		} 
-	} 
-
 	OwnerAnim->PlaySkill_3_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	SpawnAttackSphere(IsOutRange);
-	Remove_Skill3();
+	SpawnAttackSphere();
+	Remove_Skill();
 }
 
-void USkillNumber3::SpawnAttackSphere(bool IsOutRange)
+void USkillNumber3::Remove_Skill()
+{
+	Super::Remove_Skill();
+}
+
+void USkillNumber3::SpawnAttackSphere()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter || !SkillRange_Target) return; 
 
 	bool bStun = false;
-	if(Skill3_SpawnPoint) bStun = Skill3_SpawnPoint->GetbStun();
+	if(SkillRange_Target) bStun = SkillRange_Target->GetbStun();
 
-	if(IsOutRange) 
-	{
-		OwnerCharacter->GetAttackComponent()->NormalAttack(FVector(MaxDist.X, MaxDist.Y, Skill3_SpawnPoint->GetActorLocation().Z - Skill3_SpawnPoint->GetBlockingArea()->GetScaledCapsuleHalfHeight()), false, 1.2f, bStun, 3.0f ,true, Skill3_SpawnPoint->GetBlockingArea()->GetScaledCapsuleRadius());
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OwnerCharacter->Skill3_Effect, FVector(MaxDist.X, MaxDist.Y, Skill3_SpawnPoint->GetActorLocation().Z - Skill3_SpawnPoint->GetBlockingArea()->GetScaledCapsuleHalfHeight()), OwnerCharacter->GetActorRotation());
-	}
-	else 
-	{
-		OwnerCharacter->GetAttackComponent()->NormalAttack(HitResult.Location+FVector(0,0,25.0f), false, 1.2f, bStun, 3.0f ,true, Skill3_SpawnPoint->GetBlockingArea()->GetScaledCapsuleRadius());
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OwnerCharacter->Skill3_Effect, HitResult.Location+FVector(0,0,25.0f), OwnerCharacter->GetActorRotation());
-	}
+	OwnerCharacter->GetAttackComponent()->MultiAttack(SkillRange_Target->GetActorLocation(), false, 1.2f, bStun, 3.0f ,true, Skill3_TargetRange * SkillRange_Target->GetActorScale3D().X);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OwnerCharacter->Skill3_Effect, SkillRange_Target->GetActorLocation(), OwnerCharacter->GetActorRotation());
+	
 }

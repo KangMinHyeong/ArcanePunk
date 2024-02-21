@@ -13,8 +13,10 @@ UCLASS()
 class ARCANEPUNK_API USkillNumber2 : public USkillNumberBase
 {
 	GENERATED_BODY()
+protected:
+	virtual void BeginPlay() override;
 public:
-	virtual void PlaySkill(uint8 SkillType = 0) override;	
+	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
 
 	void MarkingOn(AActor* OtherActor, float Time);
 
@@ -22,12 +24,16 @@ public:
 	
 	void MarkErase();
 
-	void OnSkill(uint8 SkillType = 0);
+	virtual void OnSkill() override;
+
+	virtual void Remove_Skill() override;
+
+private:
+	virtual void AddAbilityList() override;
 
 private:
 	FTimerHandle MarkTimerHandle;
 
-	bool bMark = false;
 	AActor* MarkedActor;
 	FVector MarkingLocation;
 

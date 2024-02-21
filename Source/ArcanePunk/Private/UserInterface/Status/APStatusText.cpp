@@ -9,8 +9,7 @@ void UAPStatusText::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayerPawn()->GetController());
-    if(!PC) return;
+    auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!PC) return;
 
     PC->OnUpdateStatusText.AddUObject(this, &UAPStatusText::UpdatePlayerStatus);
 

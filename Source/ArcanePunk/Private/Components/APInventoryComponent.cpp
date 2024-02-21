@@ -18,13 +18,13 @@ UAPInventoryComponent::UAPInventoryComponent()
 
 void UAPInventoryComponent::Init()
 {
-	// ÀÎº¥Åä¸® ÃÖ´ë ¿ë·®
-	// ºó ¾ÆÀÌÅÛ + ½ÇÁ¦ ¾ÆÀÌÅÛ
-	// ÃÖ´ë ¿ë·®ÀÌ 10ÀÏ ¶§,
-	// ¾ÆÀÌÅÛ 1°³ÀÏ¶§ ºó ¾ÆÀÌÅÛÀº 9°³¿©¾ßÇÔ
+	// ï¿½Îºï¿½ï¿½ä¸® ï¿½Ö´ï¿½ ï¿½ë·®
+	// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½Ö´ï¿½ ï¿½ë·®ï¿½ï¿½ 10ï¿½ï¿½ ï¿½ï¿½,
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½ï¿½Ï¶ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 9ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	// ÀÎº¥Åä¸® ÃÖ´ë ¿ë·®¸¸Å­ °Ë»ç ¼öÇà
-	// ¸¸¾à ¾ÆÀÌÅÛÀ¸·Î ²Ë Â÷ ÀÖÁö ¾Ê´Ù¸é ºñ¾îÀÖ´Â ¾ÆÀÌÅÛÀ» Ãß°¡
+	// ï¿½Îºï¿½ï¿½ä¸® ï¿½Ö´ï¿½ ï¿½ë·®ï¿½ï¿½Å­ ï¿½Ë»ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 
 	if (InventoryContents.Num() == 0 )
 	{
@@ -315,7 +315,7 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 
 	// actually add to inventory
 
-	// ºó ¾ÆÀÌÅÛÀÌ ÀÖ´Ù¸é ¾Õ¿¡¼­ºÎÅÍ Ã¤¿ö¾ß¸¸ ÇÔ
+	// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½Õ¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½ï¿½ß¸ï¿½ ï¿½ï¿½
 
 	InventoryContents.Add(NewItem);
 	/*
@@ -354,7 +354,7 @@ void UAPInventoryComponent::SortingInventory()
 {
 	//if (ItemNumbers == 0) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("¾ÆÀÌÅÛ °³¼ö : %d"), InventoryContents.Num());
+	UE_LOG(LogTemp, Warning, TEXT("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ : %d"), InventoryContents.Num());
 	if (ItemNumbers == 0) return;
 
 	for (int i = InventoryContents.Num() - 1; i > 0; i--)

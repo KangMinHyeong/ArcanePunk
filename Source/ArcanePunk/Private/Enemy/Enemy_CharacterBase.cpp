@@ -13,11 +13,12 @@
 #include "DamageText/DamageText.h"
 #include "NiagaraComponent.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
-#include "Components/Character/SkillNumber/SkillNumber2.h"
-#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/APSkillHubComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/WidgetComponent.h"
+#include "GameMode/APGameModeBattleStage.h"
+#include "Enemy/Drop/Enemy_DropPackage.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -94,8 +95,7 @@ void AEnemy_CharacterBase::TeleportMarkDeactivate()
 	TeleportMark->DeactivateImmediate();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(MarkActor);
 	if(!OwnerCharacter) return;
-	UE_LOG(LogTemp, Display, TEXT("Your message"));
-	OwnerCharacter->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkErase();
+	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkErase();
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
 }
 
@@ -143,6 +143,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		TeleportMarkDeactivate();
+		CheckAllEnemyKilled();
 	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
 	}
 	else
@@ -162,6 +164,33 @@ bool AEnemy_CharacterBase::IsDead()
 		bIsDead = true;
 	}
     return bIsDead;
+}
+
+bool AEnemy_CharacterBase::IsHardCC()
+{
+	if(CurrentState == ECharacterState::KnockBack) {return true;}
+	else if(CurrentState == ECharacterState::Stun) {return true;}
+	else if(CurrentState == ECharacterState::Sleep) {return true;}
+	return false;
+}
+
+AActor* AEnemy_CharacterBase::IsAggro()
+{
+	TArray<AActor*> Actors; float Dist = Distance_Limit;
+	UGameplayStatics::GetAllActorsWithTag(this, TEXT("Aggro"), Actors);
+	AActor* AggroActor = UGameplayStatics::FindNearestActor(GetActorLocation(), Actors, Dist);
+	if(AggroActor)
+	{
+		if(Dist <= Distance_Limit)
+		{
+			return AggroActor;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+	return nullptr;
 }
 
 float AEnemy_CharacterBase::DamageMath(float Damage)
@@ -203,7 +232,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 
 void AEnemy_CharacterBase::NormalAttack()
 {
-	float Damage = Monster_ATK;
+	float Damage = Monster_ATK * CriticalCalculate(NormalAttack_CriticalMultiple);
 	FHitResult HitResult;
 	FVector HitVector;
 	if(AttackTrace(HitResult, HitVector))
@@ -215,9 +244,19 @@ void AEnemy_CharacterBase::NormalAttack()
 			if(MyController == nullptr) return;
 			DistinctHitPoint(HitResult.Location, Actor);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
-			if(bKnockBackAttack) OnPlayerKnockBack(Actor);
+			if(bKnockBackAttack) OnPlayerKnockBack(Actor, KnockBackDist, KnockBackTime);
 		}
 	}
+}
+
+float AEnemy_CharacterBase::CriticalCalculate(float Multiple)
+{
+	float Percent = FMath::RandRange(0.0f, 100.0f);
+	if(Percent <= CriticalPercent)
+	{
+		return CriticalStep * (Multiple - 1.0f) + 1;
+	}
+    return  1.0f;
 }
 
 float AEnemy_CharacterBase::GetDistanceLimit()
@@ -259,15 +298,38 @@ void AEnemy_CharacterBase::DropItemActor()
 		float DropPercent = FMath::RandRange(0.0f,  100.0f);
 		if(DropPercent <= DropClass.Value) auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass.Key, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
 	}
+	for(TPair<FName, float>& DropClass : PackageDropMap)
+	{
+		float DropPercent = FMath::RandRange(0.0f,  100.0f);
+		if(DropPercent <= DropClass.Value)
+		{
+			if(DropPackage)
+			{
+				DropPackage->AddItem(DropClass.Key);
+			}
+			else
+			{
+				DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(DropPackageClass, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+				DropPackage->AddItem(DropClass.Key);
+			}	
+		}
+	}
+	if(DropPackage) DropPackage->SetDropOverlap(true);
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
 	if(OnDrop) DropItemActor();
 
-	TeleportMarkDeactivate();
 	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();
+}
+
+void AEnemy_CharacterBase::CheckAllEnemyKilled()
+{
+	auto GameMode = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(!GameMode) return;
+	GameMode->MonsterKilled();
 }
 
 void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActor)
@@ -279,8 +341,8 @@ void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	float Forward = (HitActorForwardVec.X * HitPoint.X) + (HitActorForwardVec.Y * HitPoint.Y); // 앞 뒤 Hit 판별
 	float Right = (HitActorRightVec.X * HitPoint.X) + (HitActorRightVec.Y * HitPoint.Y); // 좌 우 Hit 판별
 
-	auto Character = Cast<AArcanePunkCharacter>(HitActor);
-	if(Character) Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right);
+	auto Character = Cast<AArcanePunkCharacter>(HitActor); if(!Character) return;
+	if(!Character->IsBlockMode()) Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right);
 }
 
 void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
@@ -325,14 +387,14 @@ void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 {
 }
 
-void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor)
+void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor, float Dist, float Time)
 {
-	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), KnockBackTime);
+	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
+	if(!Character->IsBlockMode()) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), Dist, Time);
 }
 
-void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor)
+void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor, float Time)
 {
-	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->GetCrowdControlComponent()->StunState(StunTime);
+	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
+	if(!Character->IsBlockMode())  Character->GetCrowdControlComponent()->StunState(Time);
 }

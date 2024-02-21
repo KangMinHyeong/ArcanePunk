@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/ArcanePunkCharacter.h"
 #include "Components/ActorComponent.h"
 #include "APSkillBaseShift.generated.h"
 

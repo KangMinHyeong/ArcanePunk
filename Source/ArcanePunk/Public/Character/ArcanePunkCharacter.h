@@ -6,6 +6,7 @@
 #include "GameState/APGameState.h"
 #include "PlayerState/APPlayerData.h"
 #include "Components/Common/APCrowdControlComponent.h"
+#include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
 
@@ -15,7 +16,6 @@ class UAPAttackComponent;
 class UParticleSystem;
 class UAPMovementComponent;
 class UAPSkillHubComponent;
-class UAPSkillNumber;
 class ASwordImpact;
 class ASwordThrowBase;
 class UAPTakeDamageComponent;
@@ -27,9 +27,25 @@ class USpringArmComponent;
 class UCameraComponent;
 class AArcanePunkPlayerController;
 class UNiagaraComponent;
-class AAPSpawnPointBase;
 class AArcanePunkPlayerState;
 class AEnemy_DropUnlock;
+class AArcaneBomb;
+class AArcaneBeam;
+class AShouting;
+class AAPSkillRange;
+class AAPSkillRange_Target;
+class AAPSkillRange_Arrow;
+class AAPSkillRange_Circle;
+class AArcaneCutter;
+class AArcaneRain;
+class AArcaneBall;
+class AArcaneMine;
+class AArcaneTurret;
+class AArcaneField;
+class AArcaneRage;
+class AArcaneTent;
+class ASwordClutch;
+
 // prodo
 
 class UAPItemBase;
@@ -51,15 +67,6 @@ struct FInteractionData
 
 	UPROPERTY()
 	float LastInteractionCheckTime;
-};
-
-UENUM(BlueprintType)
-enum class ESkillTypeState : uint8
-{
-	Type_None	= 0,
-    Type_Q      = 1,
-    Type_E      = 2,
-    Type_R	 	= 3,
 };
 
 UENUM(BlueprintType)
@@ -111,7 +118,7 @@ public:
 
 	void UpdateStatus();
 
-	FORCEINLINE float GetFinalATK() const {return FinalATK;}; // FinalATK 반환
+	float GetFinalATK(float Multiple = 2.0f);// FinalATK 반환
 
 	// Attack 관련 함수
 	FORCEINLINE UAPAttackComponent* GetAttackComponent() const {return AttackComp;};  // AttackComp 반환
@@ -119,7 +126,6 @@ public:
 	FORCEINLINE float GetAttackRadius() const {return AttackRadius;}; // 공격 반경 반환
 	FORCEINLINE UParticleSystem* GetComboHitEffect() const {return ComboHitEffect;}; // 콤보어택 히트 파티클 반환;
 	FORCEINLINE FVector GetComboHitEffectScale() const {return HitEffectScale;}; // 콤보어택 히트 스케일 반환;
-	FORCEINLINE void SetbMouseAttack(bool NewValue) {bMouseAttack = NewValue;}; // bMouseAttack 설정 
 
 	// Move 관련 함수
 	FORCEINLINE UAPMovementComponent* GetAPMoveComponent() const {return MoveComp;}; // MoveComp 반환
@@ -132,29 +138,71 @@ public:
 	
 	// Skill 관련 함수
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return SkillComp;}; // SkillComp 반환
-	FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumberComp;}; // SkillNumberComp 반환
+	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return APSkillHubComp;}; // SkillComp 반환
 	FORCEINLINE TSubclassOf<ASwordImpact> GetSwordImpactClass() const {return SwordImpactClass;}; //SwordImpactClass 반환
 	FORCEINLINE TSubclassOf<ASwordThrowBase> GetSwordThrowClass() const {return SwordThrowClass;}; // SwordThrowClass 반환
-	FORCEINLINE TSubclassOf<AAPSpawnPointBase> GetSkill3_SpawnPont() const {return Skill3_SpawnPontClass;}; // Skill3_SpawnPontClass 반환
-	FORCEINLINE TSubclassOf<AAPSpawnPointBase> GetSkill3Range_SpawnPont() const {return Skill3Range_SpawnPontClass;}; // Skill3Range_SpawnPontClass 반환
+	FORCEINLINE TSubclassOf<AArcaneBomb> GetArcaneBombClass() const {return ArcaneBombClass;}; // ArcaneBombClass 반환
+	FORCEINLINE TSubclassOf<AArcaneBeam> GetArcaneBeamClass() const {return ArcaneBeamClass;}; // ArcaneBeamClass 반환
+	FORCEINLINE TSubclassOf<AShouting> GetShoutingClass() const {return ShoutingClass;}; // ShoutingClass 반환
+	FORCEINLINE TSubclassOf<AArcaneCutter> GetArcaneCutterClass() const {return ArcaneCutterClass;}; // ArcaneCutterClass 반환
+	FORCEINLINE TSubclassOf<AArcaneBall> GetArcaneBallClass() const {return ArcaneBallClass;}; // ArcaneBallClass 반환
+	FORCEINLINE TSubclassOf<AArcaneMine> GetArcaneMineClass() const {return ArcaneMineClass;}; // ArcaneMineClass 반환
+	FORCEINLINE TSubclassOf<AArcaneTurret> GetArcaneTurretClass() const {return ArcaneTurretClass;}; // ArcaneTurretClass 반환
+	FORCEINLINE TSubclassOf<AArcaneField> GetArcaneFieldClass() const {return ArcaneFieldClass;}; // ArcaneFieldClass 반환
+	FORCEINLINE TSubclassOf<AArcaneRage> GetArcaneRageClass() const {return ArcaneRageClass;}; // ArcaneRageClass 반환
+	FORCEINLINE TSubclassOf<AArcaneTent> GetArcaneTentClass() const {return ArcaneTentClass;}; // ArcaneTentClass 반환
+	FORCEINLINE TSubclassOf<ASwordClutch> GetSwordClutchClass() const {return SwordClutchClass;}; // SwordClutchClass 반환
+	FORCEINLINE TSubclassOf<AArcaneRain> GetArcaneRainClass() const {return ArcaneRainClass;}; // ArcaneRainClass 반환
 
 	FORCEINLINE float GetSkillCancelTime() const {return SkillCancelTime;}; // SkillCancleTime 반환
-	FORCEINLINE uint8 GetQSkill() const {return QSkill;}; // QSkill 반환
-	FORCEINLINE uint8 GetESkill() const {return ESkill;}; // ESkill 반환
-	FORCEINLINE uint8 GetRSkill() const {return RSkill;}; // RSkill 반환
+	FORCEINLINE ESkillNumber GetQSkill() const {return QSkill;}; // QSkill 반환
+	FORCEINLINE void SetQSkill(ESkillNumber NewSkill) {QSkill = NewSkill;}; // QSkill 설정
+	FORCEINLINE ESkillNumber GetESkill() const {return ESkill;}; // ESkill 반환
+	FORCEINLINE void SetESkill(ESkillNumber NewSkill) {ESkill = NewSkill;}; // ESkill 설정
+	FORCEINLINE EUltSkillNumber GetRSkill() const {return RSkill;}; // RSkill 반환
+	void SetRSkill(); // RSkill 설정
 
-	void SetSkillTypeState(ESkillTypeState UpdateSkillTypeState, EEnHanceType EnHanceType);
+	FORCEINLINE TArray<ESkillAbility> GetAbilitySkillQ() const {return SkillAbilityQ;}; // SkillAbilityQ 반환
+	FORCEINLINE void SetAbilitySkillQ(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityQ = NewSkillAbility;}; // SkillAbilityQ 설정
+	FORCEINLINE TArray<ESkillAbility> GetAbilitySkillE() const {return SkillAbilityE;}; // SkillAbilityE 반환
+	FORCEINLINE void SetAbilitySkillE(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityE = NewSkillAbility;}; // SkillAbilityE 설정
+	FORCEINLINE TArray<ESkillAbility> GetAbilitySkillR() const {return SkillAbilityR;}; // SkillAbilityR 반환
+	FORCEINLINE void SetAbilitySkillR(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityR = NewSkillAbility;}; // SkillAbilityR 설정
 
+	FORCEINLINE bool GetOnQSkill() const {return OnQSkill;};
+	FORCEINLINE bool GetOnESkill() const {return OnESkill;};
+	FORCEINLINE bool GetOnRSkill() const {return OnRSkill;};
+
+	FORCEINLINE TSubclassOf<AAPSkillRange> GetAPSkillRange() const {return SkillRange;};
+	FORCEINLINE TSubclassOf<AAPSkillRange_Target> GetAPSkillRange_Target() const {return SkillRange_Target;};
+	FORCEINLINE TSubclassOf<AAPSkillRange_Arrow> GetAPSkillRange_Arrow() const {return SkillRange_Arrow;};
+	FORCEINLINE TSubclassOf<AAPSkillRange_Circle> GetAPSkillRange_Circle() const {return SkillRange_Circle;};
+
+	void SetSkillAbility(ESkillKey EnhanceSkill, EEnHanceType EnHanceType);
+	
 	FORCEINLINE float GetSkill3_LimitDist() const {return Skill3_LimitDist;}; // Skill3_LimitDist 반환
-
-	FORCEINLINE void SetSkill_SpawnPoint(uint8 NewPoint) {Skill_SpawnPoint = NewPoint;};// Skill_SpawnPoint 설정
-
-	FORCEINLINE bool HasSkillType(uint8 SkillType);
 	
 	FORCEINLINE FVector GetHomingPoint() const {return HomingPoint;};
 	FORCEINLINE void SetHomingPoint(FVector NewHomingPoint) {HomingPoint = NewHomingPoint;};
-	
+
+	FORCEINLINE USceneComponent* GetLeftBeamPoint() const {return LeftBeamPoint;}; 
+
+	void SetHavingSkills(); 
+
+	FORCEINLINE bool GetRageMode() const {return bRageMode;};
+	FORCEINLINE void SetRageMode(bool NewBool) {bRageMode = NewBool;};
+
+	FORCEINLINE void SetReturnToHideTime(float NewTime) {ReturnToHideTime = NewTime;};
+	void SetInArcaneTent(bool NewBool);
+	void SetHideMode(bool NewBool);
+	FORCEINLINE bool GetInArcaneTent() const {return InArcaneTent;};
+	FORCEINLINE bool GetHideMode() const {return bHideMode;};
+	FORCEINLINE UMaterialInterface* GetHideMaterial() const {return HideMaterial;};
+	void HideClear();
+
+	// 무적 관련 함수
+	FORCEINLINE bool IsBlockMode() const {return bBlockMode;};
+
 	// Hit, Dead 관련 함수
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
@@ -184,29 +232,50 @@ public:
 
 	// CC 관련 함수
 	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComponent() const {return CrowdControlComp;}; // CrowdControlComp 반환
+
+	// Save 관련 함수
+	void SaveStatus(FString PlayerSlotName, FString GameSlotName);
+
 private:
 	void InitPlayerStatus();
 	
 	void ZoomInOut(float AxisValue);
 	
 	void SkillBase_Q();
+	void Release_Q() {OnQSkill = false;};
+
 	void SkillBase_E();
-	void SkillBase_Space();
-		
-	void SaveStatus();
+	void Release_E() {OnESkill = false;};
+
+	void SkillBase_R();
+	void Release_R() {OnRSkill = false;};
+
+	void Save();
 	void CurrentPlayerLocation();
+
+	// Skill 관련 함수
+	void HideCheck();
+
+	// 크리티컬 데미지 계산
+	float CriticalCalculate(float Multiple);
 
 	// Move 관련 함수
 	void MoveForward(float AxisValue); // 위 아래 Move
 	void MoveRight(float AxisValue); // 오른, 왼쪽 Move
-	void SkillBase_Shift(); // 빨리 달리기 시작
+
+	void StartJog(); // 빨리 달리기 시작
 	void EndJog(); // 빨리 달리기 끝
+
+	virtual void Jump() override;
+
+	void Dash();
+
+	void OnBlockMode();
+	void ClearBlockMode();
 
 	// 공격 관련 함수
 	void Attack_typeA(); // 마우스 오른쪽 공격
 	void Attack_typeB(); // 마우스 왼쪽 공격
-
-	void SelectSpawnPoint();
 
 	//캐릭터장비 데이터 초기화
 	void InitEquipData(TArray<UAPItemBase*> & EquipArr, FName EquipID);
@@ -221,10 +290,7 @@ private:
 	UAPMovementComponent* MoveComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPSkillHubComponent* SkillComp;
-
-	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPSkillNumber* SkillNumberComp;
+	UAPSkillHubComponent* APSkillHubComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPAnimHubComponent* AnimHubComp;
@@ -237,6 +303,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPCrowdControlComponent* CrowdControlComp;
+
+	UPROPERTY(EditAnywhere, Category = "Component")
+	USceneComponent* LeftBeamPoint;
 
 	//PlayerController 변수
 	AArcanePunkPlayerController* PC;
@@ -283,6 +352,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Move")
 	float AttackPushCoefficient = 1.2f;
 
+	UPROPERTY(EditAnywhere, Category = "Move")
+	float DashSpeed = 650.0f;
+
 	// 캐릭터 상태 관련 변수
 	UPROPERTY(EditAnywhere)
 	float HitMotionTime = 1.0f;
@@ -323,34 +395,113 @@ private:
 	float Skill3_LimitDist = 1500.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	TSubclassOf<AAPSpawnPointBase> Skill3_SpawnPontClass;
-
-	UPROPERTY(EditAnywhere, Category = "Skill")
-	TSubclassOf<AAPSpawnPointBase> Skill3Range_SpawnPontClass;
-
-	UPROPERTY()
-	uint8 Skill_SpawnPoint = 0;
-
-	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<ASwordImpact> SwordImpactClass;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	TSubclassOf<ASwordThrowBase> SwordThrowClass;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneBomb> ArcaneBombClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneBeam> ArcaneBeamClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AShouting> ShoutingClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneCutter> ArcaneCutterClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneBall> ArcaneBallClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneMine> ArcaneMineClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneTurret> ArcaneTurretClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneField> ArcaneFieldClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneRage> ArcaneRageClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneTent> ArcaneTentClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<ASwordClutch> SwordClutchClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneRain> ArcaneRainClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
 	float SkillCancelTime = 0.1f;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	uint8 QSkill = 1;
+	ESkillNumber QSkill = ESkillNumber::Skill_1;
+	UPROPERTY()
+	TArray<ESkillAbility> SkillAbilityQ;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	uint8 ESkill = 2;
+	ESkillNumber ESkill = ESkillNumber::Skill_2;
+	UPROPERTY()
+	TArray<ESkillAbility> SkillAbilityE;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
-	uint8 RSkill = 3;
+	EUltSkillNumber RSkill = EUltSkillNumber::UltSkill_1;
+	UPROPERTY()
+	TArray<ESkillAbility> SkillAbilityR;
 
 	UPROPERTY()
 	FVector HomingPoint = FVector(0,0,0);
+
+	UPROPERTY()
+	bool bRageMode = false;
+
+	UPROPERTY()
+	bool InArcaneTent = false;
+	UPROPERTY()
+	bool bHideMode = false;
+	UPROPERTY()
+	float ReturnToHideTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	UMaterialInterface* HideMaterial;
+
+	FTimerHandle HideTimerHandle;
+
+	UPROPERTY()
+	bool OnQSkill = false;
+	UPROPERTY()
+	bool OnESkill = false;
+	UPROPERTY()
+	bool OnRSkill = false;
+
+	UPROPERTY()
+	bool bCanSkill = true;
+
+	UPROPERTY(EditAnywhere, Category = "Skill Range")
+	TSubclassOf<AAPSkillRange> SkillRange;
+
+	UPROPERTY(EditAnywhere, Category = "Skill Range")
+	TSubclassOf<AAPSkillRange_Target> SkillRange_Target;
+
+	UPROPERTY(EditAnywhere, Category = "Skill Range")
+	TSubclassOf<AAPSkillRange_Arrow> SkillRange_Arrow;
+
+	UPROPERTY(EditAnywhere, Category = "Skill Range")
+	TSubclassOf<AAPSkillRange_Circle> SkillRange_Circle;
+
+	// 무적기 관련 변수
+	FTimerHandle BlockTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Super Stance")
+	float BlockTime = 1.5f;
+
+	UPROPERTY()
+	bool bBlockMode = false;
 
 	// Foot Print 변수
 	UPROPERTY(EditAnywhere, Category = "Foot Print")
@@ -387,8 +538,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FVector HitEffectScale = FVector(1,1,1);
 
-	bool bMouseAttack = true;
-
 	// 머터리얼
 	UMaterialInterface* DefaultMaterial;
 
@@ -398,6 +547,8 @@ private:
 	// 드랍
 	UPROPERTY(EditAnywhere, Category = "Drop")
 	TSubclassOf<APickup> DropClass;
+
+
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Skin")
@@ -411,6 +562,9 @@ public:
 
 	UPROPERTY()
 	TArray<bool> StopState;
+
+	UPROPERTY()
+	TArray<ESkillNumber> HavingSkill;
 
 	// UPROPERTY()
 	// TArray<ESkillTypeState> SkillTypeState; // 나중에 쓸수도?

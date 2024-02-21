@@ -15,6 +15,15 @@ class UInventoryTooltip;
 class UDragItemVisual;
 class UAPItemBase;
 
+UENUM()
+enum class ESlotType : uint8
+{
+	Inventory		= 0,
+    Status      	= 1,
+    DropPackage 	= 2,
+};
+
+
 UCLASS()
 class ARCANEPUNK_API UInventoryItemSlot : public UUserWidget
 {
@@ -67,10 +76,11 @@ protected:
 	void SetEquipment();
 	void ChangeEquip(uint8 NewValue);
 	void UpdateEquipInventory(UAPItemBase* NewData);
+	void DropToInventort();
 
 	UPROPERTY()
-	bool InInventory = true;
+	ESlotType SlotType = ESlotType::Inventory;
 
 public:
-	FORCEINLINE void SetInInventory(bool NewBool) { InInventory = NewBool; };
+	FORCEINLINE void SetInInventory(ESlotType NewType) { SlotType = NewType; };
 };

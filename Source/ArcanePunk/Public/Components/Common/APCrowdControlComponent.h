@@ -31,7 +31,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// 플레이어 상태이상 함수
-	void KnockBackState(FVector KnockBackPoint, float KnockBackTime);//후에 인자 추가 (상태시간)
+	void KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime);//후에 인자 추가 (상태시간)
 	void StunState(float StunTime);//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
 	void SlowState(float SlowCoefficient, float SlowTime);

@@ -13,22 +13,22 @@ struct FPlayerStaticData
 
 	FPlayerStaticData() {}
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 MyCharacterIndex = 0;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	FName CharacterName = TEXT("Player");
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	uint8 CharacterGroup = 0;//0:OC / 1:NPC
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	uint8 Gender = 0;//0: Male / 1:Female;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	uint8 CharacterRace = 0; //0:Human
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	uint8 CharacterType = 0; //0:TypeA 
 
 };
@@ -41,11 +41,11 @@ struct FPlayerSkillLimitList
 
 	FPlayerSkillLimitList() {}
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	bool Limit_Q = false;
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	bool Limit_E = false;
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	bool Limit_R = false;
 };
 
@@ -56,7 +56,7 @@ struct FPlayerSkillLimit
 
 	FPlayerSkillLimit() {}
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	TMap<uint8, FPlayerSkillLimitList> SkillLimitMap;
 };
 //
@@ -68,50 +68,46 @@ struct FPlayerDynamicData
 
 	FPlayerDynamicData() {}
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	bool SaveOperation = false;
 
 	// Player Status
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float HP = 100.0f;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float MaxHP = 100.0f;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 MP = 100;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 MaxMP = 100;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float ATK = 25.0f;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 ATKSpeed = 1;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float DEF = 0.0f;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float MoveSpeed = 500.0f;
 
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 SP = 500.0f;
 
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	float CriticalPercent = 5.0f;
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	int32 CriticalStep = 1;
+
 	// Player Location
-	UPROPERTY(Transient, BlueprintReadWrite)
+	UPROPERTY(SaveGame, BlueprintReadWrite)
 	FVector PlayerLocation = FVector(0,0,0);
-
-	// Skill Limit
-	UPROPERTY(Transient, BlueprintReadWrite)
-	bool HasQSkillType = false; 	// DeathPenalty
-
-	UPROPERTY(Transient, BlueprintReadWrite)
-	bool HasESkillType = false; 	// DeathPenalty	
-
-	UPROPERTY(Transient, BlueprintReadWrite)
-	bool HasRSkillType = false; 	// DeathPenalty
 
 	//
 };
@@ -124,7 +120,7 @@ struct FPlayerGoodsData
 	FPlayerGoodsData() {}
 
 	// Reroll Dice
-	// UPROPERTY(Transient, BlueprintReadWrite)
+	// UPROPERTY(SaveGame, BlueprintReadWrite)
 	// int32 RerollDice = 0; 	// DeathPenalty
 };
 
@@ -135,11 +131,17 @@ struct FPlayerTotalData
 
 	FPlayerTotalData() {}
 
-	FPlayerStaticData PlayerStaticData;
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FPlayerStaticData PlayerStaticData = {};
 
-	FPlayerDynamicData PlayerDynamicData;
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FPlayerDynamicData PlayerDynamicData = {};
 
-	FPlayerGoodsData PlayerGoodsData;
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FPlayerGoodsData PlayerGoodsData = {};
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FString SaveSlotName = TEXT("PlayerSlot_0");
 };
 
 UCLASS()

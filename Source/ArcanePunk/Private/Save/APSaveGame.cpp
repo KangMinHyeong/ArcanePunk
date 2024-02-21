@@ -2,6 +2,7 @@
 
 
 #include "Save/APSaveGame.h"
+#include "ArcanePunk/Public/Components/APInventoryComponent.h"
 
 UAPSaveGame::UAPSaveGame()
 {
@@ -9,25 +10,14 @@ UAPSaveGame::UAPSaveGame()
 
 void UAPSaveGame::InitSaveData()
 {
-    //PlayerData
-    bSave = false;
-    SaveHP = 100.0f;
-    SaveMaxHP = 100.0f;
-	SaveMP = 100;
-    SaveMaxMP = 100;
-	SaveATK = 25.0f;
-	SaveATKSpeed = 1;
-    SaveDEF = 0.0f;
-	SaveMoveSpeed = 500.0f;
-    SaveSP = 500.0f;
-    SavePlayerLocation = FVector(0,0,0);
-    SaveHasQSkillType = false;
-	SaveHasESkillType = false;		
-	SaveHasRSkillType = false;	
+    SavePlayerTotalData = {};
 
+    SavePlayerSlot = "PlayerSlot_0";
+
+    SaveGameSlot = "GameSlot_0";
     // Goods
-    SaveRerollDice = 0;
+    // SaveRerollDice = 0;
 
     //GameData
-    SaveLevelName = TEXT("Test1");
+    SaveLevelName = TEXT("TestMap1");
 }

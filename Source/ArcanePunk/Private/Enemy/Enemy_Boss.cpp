@@ -15,14 +15,17 @@
 #include "UserInterface/APHUD.h"
 #include "UserInterface/Enemy/APEnemyHP.h"
 #include "Enemy/AIController/EnemyBossBaseAIController.h"
+#include "Components/Common/APSpawnMonsterComponent.h"
 
 AEnemy_Boss::AEnemy_Boss()
 {
     PrimaryActorTick.bCanEverTick = true;
     PatternMaterial.SetNum(5);
 
+    SpawnMonsterComp = CreateDefaultSubobject<UAPSpawnMonsterComponent>(TEXT("SpawnMonsterComp"));
     RushEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("RushEffect"));
     RushTrigger = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RushTrigger"));
+    
 
     RushEffect->SetupAttachment(GetMesh());
     RushTrigger->SetupAttachment(GetMesh());
@@ -161,25 +164,21 @@ void AEnemy_Boss::ActiveRushEffect()
         RushTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TestRushEffect, RushEffect->GetComponentLocation(), RushEffect->GetComponentRotation());
     }
-    else
-    {
-        RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    }
+    else { RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);}
 }
 
 void AEnemy_Boss::ActiveRushTrigger(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	auto MyOwnerInstigator = GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
-	auto Character = Cast<AArcanePunkCharacter>(OtherActor);
 	
-	if (OtherActor && OtherActor != this && Character)
+	if (OtherActor && OtherActor != this)
 	{
         DistinctHitPoint(SweepResult.Location, OtherActor);
 		UGameplayStatics::ApplyDamage(OtherActor, Monster_ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-        Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), RushKnockBackTime);
-        RushAttackEnd();
+        OnPlayerKnockBack(OtherActor, KnockBackDist, RushKnockBackTime);
 	}
+    RushAttackEnd();
 }
 // Rush Attack Func End
 
@@ -215,39 +214,13 @@ void AEnemy_Boss::SpawnFastSlash()
 // SpawnMonster Func Start
 void AEnemy_Boss::SpawnLocationEffect()
 {
-    float Location = 0.0f;
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    SpawnParams.bNoFail = true;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-    for(int32 i = 0; i<SpawnMonsterNum; i++)
-    {
-        i%2 == 1 ? Location = Location + i * 200.0f : Location = Location - i * 200.0f;
-        int32 NullLocation = 1;
-        AAPSpawnPointBase* SpawnPoint = nullptr;
-        while(!SpawnPoint)
-        {
-            SpawnPoint = GetWorld()->SpawnActor<AAPSpawnPointBase>(SpawnPointClass, GetActorLocation() + GetActorForwardVector()*400.0f * NullLocation + GetActorRightVector() * Location, GetActorRotation(), SpawnParams);
-            NullLocation++;
-        }
-        SpawnLocation.Add(SpawnPoint);
-    }
+    SpawnMonsterComp->SpawnLocation(SpawnPointClass, SpawnMonsterNum, SpawnLocation);
     GetWorldTimerManager().SetTimer(SpawnMonsterTimerHandle, this, &AEnemy_Boss::SpawnMonster, SpawnMonsterTime, false);
 }
 
 void AEnemy_Boss::SpawnMonster()
 {
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    SpawnParams.bNoFail = true;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-    while(!SpawnLocation.IsEmpty())
-    {
-        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, SpawnLocation.Top()->GetActorLocation(), GetActorRotation());
-        SpawnLocation.Top()->Destroy();
-        SpawnLocation.Pop();
-        MonsterArr.Add(SpawnMonster);
-    }
+    SpawnMonsterComp->SpawnMonsterFromLocation(SpawnMonsterClass, SpawnLocation, MonsterArr);
     GetWorldTimerManager().SetTimer(DrainMonsterTimerHandle, this, &AEnemy_Boss::DrainMonster, DrainMonsterTime, false);
     GetWorldTimerManager().ClearTimer(SpawnMonsterTimerHandle);
 }
@@ -270,6 +243,7 @@ void AEnemy_Boss::DrainMonster()
         }
         MonsterArr.Pop();
     }
+    GetWorldTimerManager().ClearTimer(DrainMonsterTimerHandle);
 }
 // SpawnMonster Func End
 
@@ -326,7 +300,7 @@ void AEnemy_Boss::SpawnRangeAttack_1()
                 if(MyController == nullptr) return;
                 DistinctHitPoint(HitResult.Location, Actor);
                 Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
-                OnPlayerStun(Actor);
+                OnPlayerStun(Actor, StunTime);
             }
         }
         SpawnRangeAttackLocation.Top()->Destroy();
@@ -364,15 +338,9 @@ void AEnemy_Boss::SpawnRangeAttack_2()
         RA_Num = 0;
     }
     
-    if(ForwardDirection)
-    {
-        OnSwordImpactSpawn();
-    }
+    if(ForwardDirection) { OnSwordImpactSpawn();}
     
-    if(DiagonalDirection)
-    {
-        OnSwordImpactSpawn(45.0f);
-    }   
+    if(DiagonalDirection) { OnSwordImpactSpawn(45.0f);}   
 }
 
 void AEnemy_Boss::OnSwordImpactSpawn(float AddAngle)

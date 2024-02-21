@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/Character/SkillNumber/SkillNumberBase.h"
 #include "Components/ActorComponent.h"
 #include "APSkillType.generated.h"
-
-class UProjectileMovementComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPSkillType : public UActorComponent
@@ -21,37 +20,19 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SetSkillType(uint8 SkillType,  bool& bStun, UPrimitiveComponent* TriggerComp = nullptr, UProjectileMovementComponent* ProjectileMovementComponent = nullptr);
+	void SetSkillType(ESkillTypeState UpdateSkillType, ESkillCategory UpdateSkillCategory);
 
 private:
-	void SetOwnerScale();
-	void SetProjectileMove(UPrimitiveComponent* TriggerComp = nullptr, UProjectileMovementComponent* ProjectileMovementComponent = nullptr);
-	void SetOwnerHoming(AActor* OverlapActor = nullptr);
+	void Type_Projecitle();
+	void Type_Throw();
+	void Type_Laser();
+	void Type_InvisibleCollider();
+	void Type_Buff();
 
-	void Accelrating();
-	UFUNCTION()
-	void HomingEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
-
-private:
 	UPROPERTY()
-	UProjectileMovementComponent* OwnerProjectileMoveComp;
-	
-	UProjectileMovementComponent* OriginProjectileMoveComp;
+	ESkillTypeState SkillType;
 
-	float OriginProjectileSpeed = 0.0f;
-
-	bool bTriggerOn = false;
-	bool Init = true;
-	
 	UPROPERTY()
-	TArray<AActor*> Actors;
-	
-	UPROPERTY()
-	AActor* TraceActor = nullptr;
-
-	FTimerHandle AccelerateTimerHandle;
-
-	float TraceSpeed = 1000.0f;
-
+	ESkillCategory SkillCategory;
 
 };

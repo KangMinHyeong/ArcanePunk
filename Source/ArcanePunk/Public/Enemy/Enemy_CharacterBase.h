@@ -18,6 +18,7 @@ class UNiagaraComponent;
 class AEnemy_DropBase;
 class UWidgetComponent;
 class AEnemyBaseAIController;
+class AEnemy_DropPackage;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
@@ -46,6 +47,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsHitting();
+
+	FORCEINLINE void SetHitting(bool NewBool) {bHitting = NewBool;};
 
 	UFUNCTION(BlueprintPure)
 	float GetForward();
@@ -85,11 +88,20 @@ public:
 	FORCEINLINE ECharacterState ReturnState() const { return CurrentState;};
 	FORCEINLINE void SetState(ECharacterState UpdateState) { CurrentState = UpdateState;};
 	FORCEINLINE UNiagaraComponent* GetStunEffect() const { return StunEffect;};
+	UFUNCTION(BlueprintPure)
+	bool IsHardCC();
+
+	// 몬스터 어그로
+	AActor* IsAggro();
+
 protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
 	void ResetHitStiffness();
 	void SpawnDamageText(float Damage, FVector AddLocation);
+
+	// Critical Damage Calculate
+	float CriticalCalculate(float Multiple = 2);
 
 	//HP 세팅 초기화
 	void InitHP();
@@ -99,7 +111,8 @@ protected:
 
 	// 몬스터 Dead 관련 함수
 	virtual void EnemyDestroyed();
-
+	void CheckAllEnemyKilled();
+	
 	// HitPoint 관련 함수
 	void TestHit();
 
@@ -109,8 +122,8 @@ protected:
 	void OnNormalAttack_MontageEnded();
 
 	// 몬스터 CC기 관련 함수
-	void OnPlayerKnockBack(AActor* Actor);
-	void OnPlayerStun(AActor* Actor);
+	void OnPlayerKnockBack(AActor* Actor, float Dist, float Time);
+	void OnPlayerStun(AActor *Actor, float Time);
 	void CrowdControlCheck();
 
 protected:
@@ -146,6 +159,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* TeleportMark;
 
+	UPROPERTY(EditAnywhere)
+	float CriticalPercent = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	int32 CriticalStep = 1;
+
+	UPROPERTY(EditAnywhere)
+	int32 NormalAttack_CriticalMultiple = 2;
+
 	UPROPERTY()
 	bool bKnockBackAttack = false;
 
@@ -171,10 +193,18 @@ protected:
 
 	// 드롭 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Drop")
-	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률
+	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률 (따로 드랍)
+
+	UPROPERTY(EditAnywhere, Category = "Drop")
+	TMap<FName , float> PackageDropMap; // Item ID , Drop 확률 (보따리 드랍)
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemy_DropPackage> DropPackageClass;
+
+	UPROPERTY()
+	AEnemy_DropPackage* DropPackage;
 
 	bool OnDrop = false;
-
 
 	// 몬스터 Dead 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Dead")
@@ -210,6 +240,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "CC")
 	float StunTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "KnockBackAttack")
+	float KnockBackDist = 1500.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "CC")
 	UNiagaraComponent* StunEffect;

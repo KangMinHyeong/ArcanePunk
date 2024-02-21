@@ -13,6 +13,8 @@ class UInteractionWidget;
 class UMainMenu;
 class UAPTuTorialUserWidget;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
+
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
 {
@@ -52,9 +54,9 @@ public:
 	void SetBossHPUI();
 
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UUserWidget* GetSkillPressWidget() const {return SkillPressWidget;};
+	FORCEINLINE UUserWidget* GetStatusWidget() const {return StatusBarWidget;};
 
-	void DisplayEnhanceChoice(ESkillTypeState UpdateSkillTypeState, EEnHanceType UpdateEnHanceType);
+	void DisplayEnhanceChoice(ESkillKey EnhanceSkill, EEnHanceType UpdateEnHanceType);
 
 protected:
 
@@ -75,7 +77,7 @@ protected:
 //Minhyeong
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
-	TSubclassOf<UUserWidget> SkillPressClass;
+	TSubclassOf<UUserWidget> StatusBarUIClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> BossHPUIClass;
@@ -84,7 +86,7 @@ private:
 	TArray<TSubclassOf<UUserWidget>> EnhanceChoiceClasses;
 
 	UPROPERTY()
-	UUserWidget* SkillPressWidget;
+	UUserWidget* StatusBarWidget;
 
 	UPROPERTY()
 	UUserWidget* BossHPWidget;
@@ -100,4 +102,6 @@ public:
 
 
 
+public:
+	FOnUpdateHPBar OnUpdateHPBar;
 };

@@ -11,19 +11,12 @@
 #include "TimerManager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Components/Character/APHitPointComponent.h"
 #include "Enemy/Enemy_CharacterBase.h"
-#include "Components/SkillActor/APSkillType.h"
 
-// Sets default values
 ASwordImpact::ASwordImpact()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
 	ImpactComp = CreateDefaultSubobject<UBoxComponent>(TEXT("ImpactComp"));
 	BaseEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseEffect"));
-	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
-	SkillTypeComp = CreateDefaultSubobject<UAPSkillType>(TEXT("SkillTypeComp"));
 
 	SetRootComponent(ImpactComp);
 	BaseEffect->SetupAttachment(ImpactComp);
@@ -31,16 +24,16 @@ ASwordImpact::ASwordImpact()
 	ImpactMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ImpactMovementComponent"));
 	ImpactMovementComponent->MaxSpeed = ImpactSpeed;
 	ImpactMovementComponent->InitialSpeed = ImpactSpeed;
+
+	SkillCategory = ESkillCategory::Projecitle;
 }
 
-// Called when the game starts or when spawned
 void ASwordImpact::BeginPlay()
 {
 	Super::BeginPlay();
 	BintHit();
 }
 
-// Called every frame
 void ASwordImpact::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -53,21 +46,15 @@ void ASwordImpact::BintHit()
 	//ECollisionChannel 
 	if(!IsPenetrate)
 	{
-		ImpactComp->OnComponentHit.AddDynamic(this, &ASwordImpact::OnHitting);
 		ImpactComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+		ImpactComp->OnComponentHit.AddDynamic(this, &ASwordImpact::OnHitting);
 	}
 	else
 	{
-		ImpactComp->OnComponentBeginOverlap.AddDynamic(this, &ASwordImpact::OnPenetrating);
 		ImpactComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+		ImpactComp->OnComponentBeginOverlap.AddDynamic(this, &ASwordImpact::OnPenetrating);
 	}
-	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ASwordImpact::DestroyImpact, DestroyTime, false);
-}
 
-void ASwordImpact::DestroyImpact()
-{
-	Destroy();
-	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
 void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
@@ -128,7 +115,9 @@ void ASwordImpact::OnPenetrating(UPrimitiveComponent *OverlappedComp, AActor *Ot
 	DamageAction(OtherActor, SweepResult);
 }
 
-void ASwordImpact::SetSkillType(uint8 SkillType)
+void ASwordImpact::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
 {
-	SkillTypeComp->SetSkillType(SkillType, bStun, ImpactComp, ImpactMovementComponent);
+	Super::SetSkill(SkillType, SkillAbility);
+
+	BaseEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
 }

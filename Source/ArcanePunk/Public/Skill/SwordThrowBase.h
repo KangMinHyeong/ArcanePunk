@@ -3,33 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Skill/APSkillActorBase.h"
 #include "SwordThrowBase.generated.h"
 
 UCLASS()
-class ARCANEPUNK_API ASwordThrowBase : public AActor
+class ARCANEPUNK_API ASwordThrowBase : public AAPSkillActorBase
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ASwordThrowBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	virtual void OnHitting(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	
-	void SetSkillType(uint8 SkillType);
+
+	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
 
 protected:
-	virtual void DestroySword();
 	void ScaleSet();
 
 protected:
@@ -45,28 +41,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* HitEffect;
 
-	FTimerHandle DestroyTimerHandle;
-
-	UPROPERTY(EditAnywhere)
-	float DestroyTime = 5.0f;
-
-	UPROPERTY(EditAnywhere)
-	float DamageCoefficient = 1.0f;
-
 	UPROPERTY(EditAnywhere)
 	float SwordSpeed = 1500.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	class UProjectileMovementComponent* SwordMovementComponent;
-
-	UPROPERTY()
-	class UAPHitPointComponent* HitPointComp;
-
-	UPROPERTY()
-	class UAPSkillType* SkillTypeComponent;
-
-	bool bStun = false;
-
-	UPROPERTY(EditAnywhere)
-	float StateTime = 3.0f;
+	
 };
