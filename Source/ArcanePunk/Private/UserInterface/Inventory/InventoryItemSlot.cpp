@@ -17,12 +17,14 @@ void UInventoryItemSlot::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	/*
 	if (ToolTipClass)
 	{
 		UInventoryTooltip* ToolTip = CreateWidget<UInventoryTooltip>(this, ToolTipClass);
 		ToolTip->InventorySlotBeingHovered = this;
 		SetToolTip(ToolTip);
 	}
+	*/
 
 	PlayerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
 	if (PlayerCharacter)
@@ -35,8 +37,10 @@ void UInventoryItemSlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	
 	if (ItemReference)
 	{
+		/*
 		switch(ItemReference->ItemQuality)
 		{
 		case EItemQuality::Common:
@@ -51,7 +55,7 @@ void UInventoryItemSlot::NativeConstruct()
 		default: 
 			break;
 		}
-
+		*/
 		ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 
 		if (ItemReference->ItemNumericData.IsStackable)
@@ -63,6 +67,7 @@ void UInventoryItemSlot::NativeConstruct()
 			ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
+	
 }
 
 FReply UInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -104,7 +109,7 @@ void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const
 	{
 		const TObjectPtr<UDragItemVisual> DragVisual = CreateWidget<UDragItemVisual>(this, DragItemVisualClass);
 		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
-		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
+		//DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
 
 		ItemReference->ItemNumericData.IsStackable ? DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity)) : DragVisual->ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
 

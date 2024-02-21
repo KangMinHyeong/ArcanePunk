@@ -11,7 +11,7 @@ UAPInventoryComponent::UAPInventoryComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	Init();
+	//Init();
 
 	RefreshInventory();
 }
@@ -128,7 +128,7 @@ void UAPInventoryComponent::RemoveSingleInstaceOfItem(UAPItemBase* ItemToRemove)
 	InventoryContents.RemoveSingle(ItemToRemove);
 	ItemNumbers--;
 
-	Init();
+	//Init();
 	RefreshInventory();
 }
 
@@ -317,7 +317,8 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 
 	// 빈 아이템이 있다면 앞에서부터 채워야만 함
 
-	//InventoryContents.Add(NewItem);
+	InventoryContents.Add(NewItem);
+	/*
 	for (int32 i = 0; i < InventoryContents.Num(); i++)
 	{
 		if (InventoryContents[i]->ID == "NONE")
@@ -327,6 +328,7 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 			break;
 		}
 	}
+	*/
 	//InventoryTotalWeight += NewItem->GetItemStackWeight();
 	RefreshInventory();
 }

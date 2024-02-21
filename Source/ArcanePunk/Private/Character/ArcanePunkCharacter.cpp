@@ -724,8 +724,65 @@ void AArcanePunkCharacter::ToggleMenu()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressTab");
 
-	HUD->ToggleMenu();
+	//HUD->ToggleMenu();
+	
+	if (HUD)
+	{
+		UpdateInventoryWidgetPosition(PlayerInventory->GetInventoryContents().Num());
+	}
+	
 }
+
+void AArcanePunkCharacter::UpdateInventoryWidgetPosition(int32 Numbers)
+{
+	if (HUD)
+	{
+		UMainMenu* Inventory;
+		Inventory = HUD->GetInventoryWidget();
+
+		// 아이템 개수에 따라서 UI의 위치 수정
+		// one item y size = 80
+
+		FVector2D ViewportSize = HUD->GetViewportSize();
+		FVector2D WidgetSize = Inventory->GetDesiredSize();
+
+		FVector2D BasePosition = FVector2D(ViewportSize.X - (WidgetSize.X / 2.0f), ViewportSize.Y - (WidgetSize.Y / 2.0f));
+		
+		FVector2D NewPosition = BasePosition;
+
+		// 1개당 50 +
+
+		switch (Numbers)
+		{
+		case 0:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y + 120.0f);
+			break;
+		case 1:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y + 80.0f);
+			break;
+		case 2:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y + 40.0f);
+			break;
+		case 3:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y);
+			break;
+		case 4:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y - 40.0f);
+			break;
+		case 5:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y - 80.0f);
+			break;
+		case 6:
+		default:
+			NewPosition = FVector2D(BasePosition.X, BasePosition.Y - 120.0f);
+			break;
+		}
+		
+
+		Inventory->SetPositionInViewport(NewPosition);
+	}
+}
+
 
 
 void AArcanePunkCharacter::InventorySort()
