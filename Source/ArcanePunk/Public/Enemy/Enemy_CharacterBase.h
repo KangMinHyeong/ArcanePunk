@@ -192,8 +192,8 @@ protected:
 	float DefaultSlip;
 
 	// 드롭 관련 변수
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률 (따로 드랍)
+	// UPROPERTY(EditAnywhere, Category = "Drop")
+	// TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률 (따로 드랍)
 
 	UPROPERTY(EditAnywhere, Category = "Drop")
 	TMap<FName , float> PackageDropMap; // Item ID , Drop 확률 (보따리 드랍)

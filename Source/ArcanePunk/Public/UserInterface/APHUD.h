@@ -56,7 +56,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UUserWidget* GetStatusWidget() const {return StatusBarWidget;};
 
-	void DisplayEnhanceChoice(ESkillKey EnhanceSkill, EEnHanceType UpdateEnHanceType);
+	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType);
 
 protected:
 

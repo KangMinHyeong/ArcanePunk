@@ -89,6 +89,19 @@ enum class ESkillRangeType : uint8 // 스킬 범위표시 타입
 	Around_Circle	= 3 UMETA(DisplayName = "플레이어 기준 범위형 원형"), //
 };
 
+UENUM(BlueprintType)
+enum class EEnhanceCategory : uint8 // 증강 타입 넘버
+{
+	None	 			= 0 UMETA(DisplayName = "None"),
+	Enhance_Q			= 1 UMETA(DisplayName = "QSkill 스킬 강화"),
+	Enhance_E			= 2 UMETA(DisplayName = "ESkill 스킬 강화"),
+	Enhance_R			= 3 UMETA(DisplayName = "RSkill 스킬 강화"),
+	Enhance_Passive		= 4 UMETA(DisplayName = "Passive 강화"),
+	Enhance_Dash		= 5 UMETA(DisplayName = "이동기 강화"),
+	Enhance_LeftMouse	= 6 UMETA(DisplayName = "LeftMouse 공격 강화"),
+	Enhance_RightMouse	= 7 UMETA(DisplayName = "RightMouse 공격 강화"),
+};
+
 
 UCLASS()
 class ARCANEPUNK_API USkillDataTable : public UDataTable

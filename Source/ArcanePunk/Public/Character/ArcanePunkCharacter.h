@@ -7,6 +7,7 @@
 #include "PlayerState/APPlayerData.h"
 #include "Components/Common/APCrowdControlComponent.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
+#include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
 
@@ -178,7 +179,7 @@ public:
 	FORCEINLINE TSubclassOf<AAPSkillRange_Arrow> GetAPSkillRange_Arrow() const {return SkillRange_Arrow;};
 	FORCEINLINE TSubclassOf<AAPSkillRange_Circle> GetAPSkillRange_Circle() const {return SkillRange_Circle;};
 
-	void SetSkillAbility(ESkillKey EnhanceSkill, EEnHanceType EnHanceType);
+	void SetSkillAbility(EEnhanceCategory EnhanceCategory, EEnHanceType EnHanceType);
 	
 	FORCEINLINE float GetSkill3_LimitDist() const {return Skill3_LimitDist;}; // Skill3_LimitDist 반환
 	
@@ -264,6 +265,7 @@ private:
 	void MoveRight(float AxisValue); // 오른, 왼쪽 Move
 
 	void StartJog(); // 빨리 달리기 시작
+
 	void EndJog(); // 빨리 달리기 끝
 
 	virtual void Jump() override;

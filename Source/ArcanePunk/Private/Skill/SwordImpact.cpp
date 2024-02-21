@@ -31,7 +31,6 @@ ASwordImpact::ASwordImpact()
 void ASwordImpact::BeginPlay()
 {
 	Super::BeginPlay();
-	BintHit();
 }
 
 void ASwordImpact::Tick(float DeltaTime)

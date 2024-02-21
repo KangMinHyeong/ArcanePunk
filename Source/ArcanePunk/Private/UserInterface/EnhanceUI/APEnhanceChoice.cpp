@@ -42,10 +42,10 @@ void UAPEnhanceChoice::TextSetting()
     else { RerollDice_Text->SetText(FText::FromString(FString::FromInt(Item->Quantity)));}
 }
 
-void UAPEnhanceChoice::InitType(ESkillKey UpdateEnhanceSkill, EEnHanceType UpdateEnHanceType)
+void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType)
 {
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter) return;
-    EnhanceSkill = UpdateEnhanceSkill;
+    EnhanceCategory = UpdateEnhanceCategory;
     EnHanceType = UpdateEnHanceType;
 
     NewSkills.Empty(); SkillAbilities.Empty();
@@ -60,20 +60,39 @@ void UAPEnhanceChoice::SetAbility()
 {
     if(!OwnerCharacter) return;
 
-    switch (EnhanceSkill)
+    switch (EnhanceCategory)
     {
-        case ESkillKey::Q:
+        case EEnhanceCategory::Enhance_Q:
         SkillNumber = OwnerCharacter->GetQSkill();
         OriginSkillAbilityList = OwnerCharacter->GetAbilitySkillQ();
+        EnHanceCategory_Text->SetText(FText::FromString("R Skill Enhance"));
         break;
-        case ESkillKey::E:
+
+        case EEnhanceCategory::Enhance_E:
         SkillNumber = OwnerCharacter->GetESkill();
         OriginSkillAbilityList = OwnerCharacter->GetAbilitySkillE();
+        EnHanceCategory_Text->SetText(FText::FromString("E Skill Enhance"));
+
         break;
-        // case ESkillKey::R:
-        // SkillNumber = OwnerCharacter->GetRSkill();
-        // OriginSkillAbilityList = OwnerCharacter->GetAbilitySkillR();
-        // break;
+        case EEnhanceCategory::Enhance_R:
+        EnHanceCategory_Text->SetText(FText::FromString("R Skill Enhance"));
+        break;
+
+        case EEnhanceCategory::Enhance_Passive:
+        EnHanceCategory_Text->SetText(FText::FromString("Passive Skill Enhance"));
+        break;
+
+        case EEnhanceCategory::Enhance_Dash:
+        EnHanceCategory_Text->SetText(FText::FromString("Dash Skill Enhance"));
+        break;
+
+        case EEnhanceCategory::Enhance_LeftMouse:
+        EnHanceCategory_Text->SetText(FText::FromString("LeftMouse Attack Enhance"));
+        break;
+
+        case EEnhanceCategory::Enhance_RightMouse:
+        EnHanceCategory_Text->SetText(FText::FromString("RightMouse Attack Enhance"));
+        break;
     }
     EnhanceListing();
 }
@@ -268,16 +287,28 @@ void UAPEnhanceChoice::ApplyEnhance(ESkillAbility UpdateSkillAbility)
 
     UE_LOG(LogTemp, Display, TEXT("Your %d"), OriginSkillAbilityList.Num());
 
-    switch (EnhanceSkill)
+    switch (EnhanceCategory)
     {
-        case ESkillKey::Q:
+        case EEnhanceCategory::Enhance_Q:
         OwnerCharacter->SetAbilitySkillQ(OriginSkillAbilityList);
         break;
-        case ESkillKey::E:
+        case EEnhanceCategory::Enhance_E:
         OwnerCharacter->SetAbilitySkillE(OriginSkillAbilityList);
         break;
-        case ESkillKey::R:
+        case EEnhanceCategory::Enhance_R:
         OwnerCharacter->SetAbilitySkillR(OriginSkillAbilityList);
+        break;
+        case EEnhanceCategory::Enhance_Passive:
+
+        break;
+        case EEnhanceCategory::Enhance_Dash:
+
+        break;
+        case EEnhanceCategory::Enhance_LeftMouse:
+
+        break;
+        case EEnhanceCategory::Enhance_RightMouse:
+
         break;
     }
 
@@ -289,13 +320,13 @@ void UAPEnhanceChoice::ApplyEnhance(ESkillAbility UpdateSkillAbility)
 void UAPEnhanceChoice::ApplyNewSkill(ESkillNumber UpdateSkillNumber)
 {
     OriginSkillAbilityList.Empty();
-    switch (EnhanceSkill)
+    switch (EnhanceCategory)
     {
-        case ESkillKey::Q:
+        case EEnhanceCategory::Enhance_Q:
         OwnerCharacter->SetQSkill(UpdateSkillNumber);
         OwnerCharacter->SetAbilitySkillQ(OriginSkillAbilityList);
         break;
-        case ESkillKey::E:
+        case EEnhanceCategory::Enhance_E:
         OwnerCharacter->SetESkill(UpdateSkillNumber);
         OwnerCharacter->SetAbilitySkillE(OriginSkillAbilityList);
         break;

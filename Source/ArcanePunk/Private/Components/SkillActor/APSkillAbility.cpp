@@ -92,7 +92,7 @@ void UAPSkillAbility::SetProjectileMove()
 	
 	if(GetOwner()->GetComponentByClass<UShapeComponent>()) 
 	{
-		GetOwner()->GetComponentByClass<UShapeComponent>()->OnComponentBeginOverlap.AddDynamic(this, &UAPSkillAbility::HomingEnd);
+		if(!GetOwner()->GetComponentByClass<UShapeComponent>()->OnComponentBeginOverlap.IsBound()) GetOwner()->GetComponentByClass<UShapeComponent>()->OnComponentBeginOverlap.AddDynamic(this, &UAPSkillAbility::HomingEnd);
 	}
 }
 
