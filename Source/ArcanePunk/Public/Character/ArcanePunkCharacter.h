@@ -572,6 +572,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	UParticleSystem* Skill3_Effect;
 
+	void UpdateInventoryWidgetPosition(int32 Numbers);
+
 // prodo
 
 protected:

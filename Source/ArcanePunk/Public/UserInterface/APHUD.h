@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MainMenu.h"
 #include "GameFramework/HUD.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "APHUD.generated.h"
@@ -34,6 +35,7 @@ public:
 	bool bIsMenuVisible;
 
 	AAPHUD();
+
 
 	void DisplayMenu();
 	void HideMenu();
@@ -88,6 +90,17 @@ private:
 
 	UPROPERTY()
 	UUserWidget* BossHPWidget;
+
+	UPROPERTY()
+	FVector2D ViewportSize;
+
+public:
+
+	UMainMenu* GetInventoryWidget() { return MainMenuWidget; };
+
+	FVector2D GetViewportSize() { return ViewportSize; }
+
+
 
 public:
 	FOnUpdateHPBar OnUpdateHPBar;

@@ -9,6 +9,7 @@
 
 AAPHUD::AAPHUD()
 {
+
 	// Minhyeong
 	EnhanceChoiceClasses.SetNum(3);
 }
@@ -20,8 +21,8 @@ void AAPHUD::BeginPlay()
 	if (MainMenuClass)
 	{
 		MainMenuWidget = CreateWidget<UMainMenu>(GetWorld(), MainMenuClass);
-		MainMenuWidget->AddToViewport(5);
-		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		MainMenuWidget->AddToViewport(-4);
+		MainMenuWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	if (InteractionWidgetClass)
@@ -39,6 +40,17 @@ void AAPHUD::BeginPlay()
 
 		TutorialDone = true;
 		//TutorialDone = false;
+	}
+
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if (PlayerController)
+	{
+		int32 ViewportSizeX;
+		int32 ViewportSizeY;
+		PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
+
+		ViewportSize.X = static_cast<double>(ViewportSizeX);
+		ViewportSize.Y = static_cast<double>(ViewportSizeY);
 	}
 
 	//Minhyeong
@@ -63,6 +75,7 @@ void AAPHUD::HideMenu()
 	{
 		bIsMenuVisible = false;
 		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+
 	}
 }
 
