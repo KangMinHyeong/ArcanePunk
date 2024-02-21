@@ -100,6 +100,9 @@ protected:
 	void ResetHitStiffness();
 	void SpawnDamageText(float Damage, FVector AddLocation);
 
+	// Critical Damage Calculate
+	float CriticalCalculate(float Multiple = 2);
+
 	//HP 세팅 초기화
 	void InitHP();
 
@@ -119,8 +122,8 @@ protected:
 	void OnNormalAttack_MontageEnded();
 
 	// 몬스터 CC기 관련 함수
-	void OnPlayerKnockBack(AActor* Actor);
-	void OnPlayerStun(AActor* Actor);
+	void OnPlayerKnockBack(AActor* Actor, float Dist, float Time);
+	void OnPlayerStun(AActor *Actor, float Time);
 	void CrowdControlCheck();
 
 protected:
@@ -155,6 +158,15 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* TeleportMark;
+
+	UPROPERTY(EditAnywhere)
+	float CriticalPercent = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	int32 CriticalStep = 1;
+
+	UPROPERTY(EditAnywhere)
+	int32 NormalAttack_CriticalMultiple = 2;
 
 	UPROPERTY()
 	bool bKnockBackAttack = false;

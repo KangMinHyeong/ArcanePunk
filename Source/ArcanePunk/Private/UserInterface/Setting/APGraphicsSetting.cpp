@@ -822,9 +822,10 @@ void UAPGraphicsSetting::Change_RS(float RS)
 //  Back to the Option Setting
 void UAPGraphicsSetting::OnClickButton_Back()
 {
+    RemoveFromParent();
+    
     auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
     OwnerPC->OptionSetting();
-    RemoveFromParent();
 }
 
 //  Svae Graphics Setting

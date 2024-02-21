@@ -99,6 +99,12 @@ struct FPlayerDynamicData
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 SP = 500.0f;
 
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	float CriticalPercent = 5.0f;
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	int32 CriticalStep = 1;
+
 	// Player Location
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	FVector PlayerLocation = FVector(0,0,0);
@@ -133,6 +139,9 @@ struct FPlayerTotalData
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	FPlayerGoodsData PlayerGoodsData = {};
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FString SaveSlotName = TEXT("PlayerSlot_0");
 };
 
 UCLASS()

@@ -171,15 +171,14 @@ void AEnemy_Boss::ActiveRushTrigger(UPrimitiveComponent *OverlappedComp, AActor 
 {
 	auto MyOwnerInstigator = GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
-	auto Character = Cast<AArcanePunkCharacter>(OtherActor);
 	
-	if (OtherActor && OtherActor != this && Character)
+	if (OtherActor && OtherActor != this)
 	{
         DistinctHitPoint(SweepResult.Location, OtherActor);
 		UGameplayStatics::ApplyDamage(OtherActor, Monster_ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-        Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(),KnockBackDist, RushKnockBackTime);
-        RushAttackEnd();
+        OnPlayerKnockBack(OtherActor, KnockBackDist, RushKnockBackTime);
 	}
+    RushAttackEnd();
 }
 // Rush Attack Func End
 
@@ -301,7 +300,7 @@ void AEnemy_Boss::SpawnRangeAttack_1()
                 if(MyController == nullptr) return;
                 DistinctHitPoint(HitResult.Location, Actor);
                 Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
-                OnPlayerStun(Actor);
+                OnPlayerStun(Actor, StunTime);
             }
         }
         SpawnRangeAttackLocation.Top()->Destroy();

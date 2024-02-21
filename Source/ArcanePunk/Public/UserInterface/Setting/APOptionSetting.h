@@ -7,6 +7,8 @@
 #include "APOptionSetting.generated.h"
 
 class UButton;
+class UAPGraphicsSetting;
+class UAPAudioSetting;
 
 UCLASS()
 class ARCANEPUNK_API UAPOptionSetting : public UUserWidget
@@ -28,8 +30,23 @@ public:
 	UFUNCTION()
 	void OnClickButton_Back();
 
+	// Option Setting
+	void InitGraphicsSetting();
+	void InitAudioSetting();
+
+	void SmartKeySetting();
+	void GraphicsSetting();
+	void AudioSetting();
+
+	FORCEINLINE float GetMasterVolume() const { return MasterVolume;};
+	FORCEINLINE float GetBGMVolume() const { return BGMVolume;};
+	FORCEINLINE float GetEffectVolume() const { return EffectVolume;};
+
+	FORCEINLINE void SetMasterVolume(float NewValue) { MasterVolume = NewValue;};
+	FORCEINLINE void SetBGMVolume(float NewValue) { BGMVolume = NewValue;};
+	FORCEINLINE void SetEffectVolume(float NewValue) { EffectVolume = NewValue;};
+
 private:
-//  Frame Rate Limit
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Button_Graphics;
 
@@ -39,9 +56,30 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Key;
 
-
-
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Back;
+
+
+	// Option Setting 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> GraphicsSettingClass; // Graphics
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> AudioSettingClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> SmartKeySettingClass;
+
+	UPROPERTY()
+	UAPGraphicsSetting* GraphicsSettingUI;
+
+	UPROPERTY()
+	UAPAudioSetting* AudioSettingUI;
+	UPROPERTY(EditAnywhere)
+	float MasterVolume = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float BGMVolume = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float EffectVolume = 1.0f;
 
 };

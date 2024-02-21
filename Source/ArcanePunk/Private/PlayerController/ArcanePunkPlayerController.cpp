@@ -7,10 +7,11 @@
 #include "UserInterface/Fade/HitFade.h"
 #include "UserInterface/Status/APStatusUI.h"
 #include "UserInterface/Skill/HomingTargetUI.h"
-#include "UserInterface/Setting/APSmartKeySetting.h"
 #include "UserInterface/Skill/APMouseClickBase.h"
 #include "UserInterface/Setting/APOptionSetting.h"
-#include "UserInterface/Setting/APAudioSetting.h"
+#include "UserInterface/Save/APSaveSlotUI.h"
+#include "UserInterface/Stage/APStageSelectingUI.h"
+#include "UserInterface/Stage/APEntranceUI.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -20,9 +21,6 @@ AArcanePunkPlayerController::AArcanePunkPlayerController()
 void AArcanePunkPlayerController::BeginPlay()
 {
     Super::BeginPlay();
-
-    InitGraphicsSetting();
-    InitAudioSetting();
 
     SetInputMode(GameAndUIInputMode);
     // CurrentMouseCursor = EMouseCursor::Default;
@@ -96,44 +94,17 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
 
 void AArcanePunkPlayerController::OptionSetting()
 {
-    auto OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); if(!OptionSettingUI) return;
-    
-    OptionSettingUI->AddToViewport();
-}
+    if(OptionSettingUI) {OptionSettingUI->AddToViewport(); return;}
+    else
+    {
+        OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); 
+        if(!OptionSettingUI) return;
 
-void AArcanePunkPlayerController::InitGraphicsSetting()
-{
-    GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI) return;
-
-    GraphicsSettingUI->InitGraphicsSetting();
-    GraphicsSettingUI->InitWindowSetting();
-    GraphicsSettingUI->InitBindSetting();
-}
-
-void AArcanePunkPlayerController::GraphicsSetting()
-{
-    if(!GraphicsSettingUI) GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI) return;
-    
-    GraphicsSettingUI->AddToViewport();
-}
-
-void AArcanePunkPlayerController::InitAudioSetting()
-{
-    AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
-}
-
-void AArcanePunkPlayerController::AudioSetting()
-{
-    if(!AudioSettingUI) return; AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
-    
-    AudioSettingUI->AddToViewport();
-}
-
-void AArcanePunkPlayerController::SmartKeySetting()
-{
-    auto SmartKeySettingUI = Cast<UAPSmartKeySetting>(CreateWidget(this, SmartKeySettingClass)); if(!SmartKeySettingUI) return;
-    
-    SmartKeySettingUI->AddToViewport();
+        OptionSettingUI->InitGraphicsSetting();
+        OptionSettingUI->InitAudioSetting();
+        OptionSettingUI->BindButton();
+        OptionSettingUI->AddToViewport();
+    }    
 }
 
 void AArcanePunkPlayerController::StartFadeIn()
@@ -146,6 +117,8 @@ void AArcanePunkPlayerController::StartFadeIn()
     if(!LoadingWidget) return;
     LoadingWidget->RemoveFromParent();
     GetWorldTimerManager().ClearTimer(LoadTimerHandle);
+    
+    CreateEntranceUI();
 }
 
 void AArcanePunkPlayerController::StartFadeOut()
@@ -165,6 +138,30 @@ void AArcanePunkPlayerController::StartLoading()
     GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &AArcanePunkPlayerController::StartFadeIn, LoadingTime, false);
 }
 
+void AArcanePunkPlayerController::CreateEntranceUI()
+{
+    auto EntranceUI = Cast<UAPEntranceUI>(CreateWidget(this, EntranceUIClass)); if(!EntranceUI) return;
+    
+    EntranceUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::OpenSaveSlot()
+{
+    if(SelectSlotUI) {SelectSlotUI->BindSlot(); SelectSlotUI->AddToViewport();}
+    else
+    {
+        SelectSlotUI =  Cast<UAPSaveSlotUI>(CreateWidget(this, SelectSaveSlotClass)); if(!SelectSlotUI) return;
+        SelectSlotUI->BindButton();
+        SelectSlotUI->BindSlot();
+        SelectSlotUI->AddToViewport();
+    }
+}
+
+void AArcanePunkPlayerController::CloseSaveSlot()
+{
+    if(SelectSlotUI) SelectSlotUI->RemoveFromParent();
+}
+
 void AArcanePunkPlayerController::StartSaveUI()
 {
     SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass)); if(!SaveUI) return;
@@ -172,6 +169,24 @@ void AArcanePunkPlayerController::StartSaveUI()
     SaveUI->AddToViewport();
 
     GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AArcanePunkPlayerController::EndSaveUI, LoadingTime, false);
+}
+
+void AArcanePunkPlayerController::OpenStageSelectingUI()
+{
+    auto StageSelectingUI = Cast<UAPStageSelectingUI>(CreateWidget<UUserWidget>(this, StageSelectingUIClasss));
+
+    if(StageSelectingUI)
+    {
+        StageSelectingUI->BindButton();
+        StageSelectingUI->AddToViewport();
+
+        SetPause(true);
+    }
+}
+
+void AArcanePunkPlayerController::CloseStageSelectingUI()
+{
+    SetPause(false);
 }
 
 void AArcanePunkPlayerController::EndSaveUI()

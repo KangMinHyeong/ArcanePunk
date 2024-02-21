@@ -4,6 +4,7 @@
 #include "Components/Button.h"
 #include "Components/Slider.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "UserInterface/Setting/APOptionSetting.h"
 
 void UAPAudioSetting::NativeConstruct()
 {
@@ -28,9 +29,12 @@ void UAPAudioSetting::InitSliders()
 {
     auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
 
-    Slider_Master->SetValue(OwnerPC->GetMasterVolume());
-    Slider_BGM->SetValue(OwnerPC->GetBGMVolume());
-    Slider_Effect->SetValue(OwnerPC->GetEffectVolume());
+    if(OwnerPC->GetOptionSettingUI())
+    {
+        Slider_Master->SetValue(OwnerPC->GetOptionSettingUI()->GetMasterVolume());
+        Slider_BGM->SetValue(OwnerPC->GetOptionSettingUI()->GetBGMVolume());
+        Slider_Effect->SetValue(OwnerPC->GetOptionSettingUI()->GetEffectVolume());
+    }
 }
 
 void UAPAudioSetting::BindButton()
@@ -44,10 +48,10 @@ void UAPAudioSetting::BindButton()
 
 void UAPAudioSetting::OnClickBack()
 {
-    UE_LOG(LogTemp, Display, TEXT("Your message"));
+    RemoveFromParent();
+    
     auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
     OwnerPC->OptionSetting();
-    RemoveFromParent();
 }
 
 void UAPAudioSetting::OnSlide_Master(float Value)

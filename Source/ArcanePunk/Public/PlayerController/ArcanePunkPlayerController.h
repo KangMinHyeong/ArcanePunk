@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UserInterface/Setting/APGraphicsSetting.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "ArcanePunkPlayerController.generated.h"
@@ -11,8 +10,9 @@
 class UUserWidget;
 class UAPStatusUI;
 class UHomingTargetUI;
+class UAPOptionSetting;
 class UAPMouseClickBase;
-class UAPAudioSetting;
+class UAPSaveSlotUI;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
 
@@ -32,10 +32,22 @@ public:
 
 	void StartFadeIn();
 	void StartFadeOut();
-	void StartLoading();
-	void StartSaveUI();
-	void EndSaveUI();
+	void StartLoading();	
 
+	// Stage Enter UI
+	void CreateEntranceUI();
+
+	// Save UI
+	void OpenSaveSlot();
+	void CloseSaveSlot();
+
+	void StartSaveUI();
+
+	// Stage Selecting UI
+	void OpenStageSelectingUI();
+	void CloseStageSelectingUI();
+	
+	// Hit UI
 	void HitUI();
 
 	FORCEINLINE UAPStatusUI* GetStatusUI() { return StatusWidget; };
@@ -46,23 +58,10 @@ public:
 
 	void SetHideUI(bool NewBool);
 
-	// Option Setting
-	void InitGraphicsSetting();
-	void InitAudioSetting();
-
+	// Option Menu
 	void OptionSetting();
 
-	void SmartKeySetting();
-	void GraphicsSetting();
-	void AudioSetting();
-
-	FORCEINLINE float GetMasterVolume() const { return MasterVolume;};
-	FORCEINLINE float GetBGMVolume() const { return BGMVolume;};
-	FORCEINLINE float GetEffectVolume() const { return EffectVolume;};
-
-	FORCEINLINE void SetMasterVolume(float NewValue) { MasterVolume = NewValue;};
-	FORCEINLINE void SetBGMVolume(float NewValue) { BGMVolume = NewValue;};
-	FORCEINLINE void SetEffectVolume(float NewValue) { EffectVolume = NewValue;};
+	UAPOptionSetting* GetOptionSettingUI() {return OptionSettingUI;};
 
 protected:
 	virtual void BeginPlay() override;
@@ -72,6 +71,8 @@ protected:
 private:
 	void LookStatus();
 	void FreeCameraMode();
+
+	void EndSaveUI();
 
 private:
 	FTimerHandle SaveTimerHandle;
@@ -83,6 +84,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> FadeLoadingWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> EntranceUIClass;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SaveCompleteClass;
@@ -142,33 +146,23 @@ private:
 	UPROPERTY(EditAnywhere)
 	float LoadingTime = 2.0f;
 
+	// Save
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> SelectSaveSlotClass;
+
+	UPROPERTY()
+	UAPSaveSlotUI* SelectSlotUI;
+
 	// Option Setting 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OptionSettingClass;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> GraphicsSettingClass; // Graphics
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> AudioSettingClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> SmartKeySettingClass;
-
-	UPROPERTY(EditAnywhere)
-	TMap<FName, EGraphicsSetting> DefaultGraphicsSetting; // Graphics
-
 	UPROPERTY()
-	UAPGraphicsSetting* GraphicsSettingUI;
+	UAPOptionSetting* OptionSettingUI;
 
-	UPROPERTY()
-	UAPAudioSetting* AudioSettingUI;
+	// Stage Select 
 	UPROPERTY(EditAnywhere)
-	float MasterVolume = 1.0f;
-	UPROPERTY(EditAnywhere)
-	float BGMVolume = 1.0f;
-	UPROPERTY(EditAnywhere)
-	float EffectVolume = 1.0f;
+	TSubclassOf<UUserWidget> StageSelectingUIClasss;
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;

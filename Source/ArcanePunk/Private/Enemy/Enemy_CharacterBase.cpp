@@ -232,7 +232,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 
 void AEnemy_CharacterBase::NormalAttack()
 {
-	float Damage = Monster_ATK;
+	float Damage = Monster_ATK * CriticalCalculate(NormalAttack_CriticalMultiple);
 	FHitResult HitResult;
 	FVector HitVector;
 	if(AttackTrace(HitResult, HitVector))
@@ -244,9 +244,19 @@ void AEnemy_CharacterBase::NormalAttack()
 			if(MyController == nullptr) return;
 			DistinctHitPoint(HitResult.Location, Actor);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
-			if(bKnockBackAttack) OnPlayerKnockBack(Actor);
+			if(bKnockBackAttack) OnPlayerKnockBack(Actor, KnockBackDist, KnockBackTime);
 		}
 	}
+}
+
+float AEnemy_CharacterBase::CriticalCalculate(float Multiple)
+{
+	float Percent = FMath::RandRange(0.0f, 100.0f);
+	if(Percent <= CriticalPercent)
+	{
+		return CriticalStep * (Multiple - 1.0f) + 1;
+	}
+    return  1.0f;
 }
 
 float AEnemy_CharacterBase::GetDistanceLimit()
@@ -331,8 +341,8 @@ void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	float Forward = (HitActorForwardVec.X * HitPoint.X) + (HitActorForwardVec.Y * HitPoint.Y); // 앞 뒤 Hit 판별
 	float Right = (HitActorRightVec.X * HitPoint.X) + (HitActorRightVec.Y * HitPoint.Y); // 좌 우 Hit 판별
 
-	auto Character = Cast<AArcanePunkCharacter>(HitActor);
-	if(Character) Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right);
+	auto Character = Cast<AArcanePunkCharacter>(HitActor); if(!Character) return;
+	if(!Character->IsBlockMode()) Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right);
 }
 
 void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
@@ -377,14 +387,14 @@ void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 {
 }
 
-void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor)
+void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor, float Dist, float Time)
 {
-	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), KnockBackDist, KnockBackTime);
+	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
+	if(!Character->IsBlockMode()) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), Dist, Time);
 }
 
-void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor)
+void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor, float Time)
 {
-	auto Character = Cast<AArcanePunkCharacter>(Actor);
-	if(Character) Character->GetCrowdControlComponent()->StunState(StunTime);
+	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
+	if(!Character->IsBlockMode())  Character->GetCrowdControlComponent()->StunState(Time);
 }

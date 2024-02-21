@@ -24,6 +24,9 @@ protected:
 private:
 	void Loading();
 
+	// Test
+	void Test_StageUnlocking();
+
 private:
 	UPROPERTY(EditAnywhere)
 	FName NextLevel;
@@ -34,4 +37,7 @@ private:
 	FTimerHandle LoadTimerHandle;
 	
 	class AArcanePunkPlayerController* CharacterPC;
+
+	UPROPERTY(EditAnywhere)
+	FName UnlockedStageName = "";
 };

@@ -146,7 +146,9 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Dash);
 
-	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SaveStatus);
+	PlayerInputComponent->BindAction(TEXT("Block"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::OnBlockMode);
+	
+	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Save);
 
 	// prodo
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
@@ -234,6 +236,12 @@ void AArcanePunkCharacter::HideClear()
 void AArcanePunkCharacter::HideCheck()
 {
 	if(InArcaneTent) SetHideMode(true);
+}
+
+float AArcanePunkCharacter::CriticalCalculate(float Multiple)
+{
+	float CriticalMultiple = MyPlayerTotalStatus.PlayerDynamicData.CriticalStep * (Multiple - 1.0f) + 1;
+    return CriticalMultiple;
 }
 
 void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
@@ -324,6 +332,17 @@ void AArcanePunkCharacter::Dash()
 	LaunchCharacter(DashDirection, true, true);
 }
 
+void AArcanePunkCharacter::OnBlockMode()
+{ 
+	bBlockMode = true;
+	GetWorldTimerManager().SetTimer(BlockTimerHandle, this, &AArcanePunkCharacter::ClearBlockMode, BlockTime, false);
+}
+
+void AArcanePunkCharacter::ClearBlockMode()
+{
+	bBlockMode = false;
+	GetWorldTimerManager().ClearTimer(BlockTimerHandle);
+}
 
 void AArcanePunkCharacter::SetSkillAbility(ESkillKey EnhanceSkill, EEnHanceType EnHanceType)
 {
@@ -356,32 +375,39 @@ float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
     return Speed;
 }
 
-void AArcanePunkCharacter::SaveStatus()
+void AArcanePunkCharacter::Save()
+{
+	if(!PC) return;
+	PC->OpenSaveSlot();
+}
+
+void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName, FString GameSlotName)
 {
 	// if (!HUD->TutorialDone) {
 	// 	HUD->UpdateTutorialWidget("PressCtrl + 9");
 	// 	return;
 	// }
-
+	MyPlayerTotalStatus.SaveSlotName = PlayerSlotName;
 	MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation = GetActorLocation();
-	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
 	
 	MyPlayerState->UpdatePlayerData(MyPlayerTotalStatus);
 
 	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
-	MyGameState->UpdateGameData(MyGameStatus);
+	MyGameStatus.SaveSlotName = GameSlotName;
+	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
+
+	MyGameState->UpdateGameData(MyGameStatus);	
 
 	if(!PC) return;
 	PC->StartSaveUI();
-	
 }
 
-void AArcanePunkCharacter::CurrentPlayerLocation()
+void AArcanePunkCharacter::CurrentPlayerLocation() // 후에 사용할지 말지 결정, 현재는 필요없는듯?
 {
-	if(MyPlayerTotalStatus.PlayerDynamicData.SaveOperation)
-	{
-		SetActorLocation(MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation);
-	}
+	// if(MyPlayerTotalStatus.PlayerDynamicData.SaveOperation)
+	// {
+	// 	SetActorLocation(MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation);
+	// }
 }
 
 FTransform AArcanePunkCharacter::ReturnCameraTransform()
@@ -429,8 +455,15 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	TakeDMComp->DamageCalculation(DamageApplied);
-	if(PC) PC->OnUpdateStatusText.Broadcast();
+	float OriginHP = MyPlayerTotalStatus.PlayerDynamicData.HP;
+	if(!bBlockMode)
+	{
+		TakeDMComp->DamageCalculation(DamageApplied);
+		if(PC) PC->OnUpdateStatusText.Broadcast();
+		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
+	}
+	
+
     return DamageApplied;
 }
 
@@ -490,7 +523,7 @@ void AArcanePunkCharacter::SetEquipData(uint8 NewValue, UAPItemBase *NewData)
 	}
 }
 
-bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, FVector OverlapEnd)
+bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, FVector OverlapEnd) // 캐릭터 발 밑 피지컬머터리얼 체크
 {
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
@@ -505,6 +538,17 @@ void AArcanePunkCharacter::UpdateStatus()
 {
 	WeaponReference.IsEmpty() ? FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK : FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK + WeaponReference.Top()->ItemStatistics.DamageValue;
 	 
+}
+
+float AArcanePunkCharacter::GetFinalATK(float Multiple)
+{
+	float Percent = FMath::RandRange(0.0f, 100.0f);
+	if(Percent <= MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent)
+	{
+		return FinalATK * CriticalCalculate(Multiple);
+	}
+	
+	return FinalATK;
 }
 
 void AArcanePunkCharacter::InitPlayerStatus()

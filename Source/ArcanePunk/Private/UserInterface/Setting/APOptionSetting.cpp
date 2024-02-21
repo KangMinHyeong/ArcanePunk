@@ -3,12 +3,14 @@
 
 #include "Components/Button.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "UserInterface/Setting/APAudioSetting.h"
+#include "UserInterface/Setting/APSmartKeySetting.h"
+#include "UserInterface/Setting/APGraphicsSetting.h"
 
 void UAPOptionSetting::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    BindButton();
 }
 
 FReply UAPOptionSetting::NativeOnMouseWheel(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
@@ -29,29 +31,59 @@ void UAPOptionSetting::BindButton()
 
 void UAPOptionSetting::OnClickButton_Graphics()
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
-    OwnerPC->GraphicsSetting();
+    GraphicsSetting();
     RemoveFromParent();
 }
 
 void UAPOptionSetting::OnClickButton_Audio()
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
-    OwnerPC->AudioSetting();
+    AudioSetting();
     RemoveFromParent();
 }
 
 void UAPOptionSetting::OnClickButton_Key()
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
-    OwnerPC->SmartKeySetting();
+    SmartKeySetting();
     RemoveFromParent();
 }
-
-
-
 
 void UAPOptionSetting::OnClickButton_Back()
 {
     RemoveFromParent();
+}
+
+void UAPOptionSetting::InitGraphicsSetting()
+{
+    GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI) return;
+
+    GraphicsSettingUI->InitGraphicsSetting();
+    GraphicsSettingUI->InitWindowSetting();
+    GraphicsSettingUI->InitBindSetting();
+}
+
+void UAPOptionSetting::InitAudioSetting()
+{
+    AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
+}
+
+void UAPOptionSetting::GraphicsSetting()
+{
+    if(!GraphicsSettingUI) GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); 
+    if(!GraphicsSettingUI) return;
+    
+    GraphicsSettingUI->AddToViewport();
+}
+
+void UAPOptionSetting::AudioSetting()
+{
+    if(!AudioSettingUI) return; AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
+    
+    AudioSettingUI->AddToViewport();
+}
+
+void UAPOptionSetting::SmartKeySetting()
+{
+    auto SmartKeySettingUI = Cast<UAPSmartKeySetting>(CreateWidget(this, SmartKeySettingClass)); if(!SmartKeySettingUI) return;
+    
+    SmartKeySettingUI->AddToViewport();
 }
