@@ -293,14 +293,32 @@ void AEnemy_CharacterBase::InitHP()
 
 void AEnemy_CharacterBase::DropItemActor() 
 {
-	for(TPair<TSubclassOf<AEnemy_DropBase>, float>& DropClass : DropMap)
-	{
-		float DropPercent = FMath::RandRange(0.0f,  100.0f);
-		if(DropPercent <= DropClass.Value) auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass.Key, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-	}
+	// for(TPair<TSubclassOf<AEnemy_DropBase>, float>& DropClass : DropMap)
+	// {
+	// 	float DropPercent = FMath::RandRange(0.0f,  100.0f);
+	// 	if(DropPercent <= DropClass.Value) auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass.Key, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+	// }
 	for(TPair<FName, float>& DropClass : PackageDropMap)
 	{
 		float DropPercent = FMath::RandRange(0.0f,  100.0f);
+		if(DropClass.Key == "Enhance")
+		{
+			if(DropPercent <= DropClass.Value)
+			{
+				uint8 EnhanceCategoryNum = FMath::RandRange(1, 7);
+				if(DropPackage)
+				{
+					DropPackage->AddEnhance(EnhanceCategoryNum);
+				}
+				else
+				{
+					DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(DropPackageClass, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+					DropPackage->AddEnhance(EnhanceCategoryNum);
+				}	
+			}
+			continue;
+		}
+
 		if(DropPercent <= DropClass.Value)
 		{
 			if(DropPackage)

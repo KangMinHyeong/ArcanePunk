@@ -344,11 +344,11 @@ void AArcanePunkCharacter::ClearBlockMode()
 	GetWorldTimerManager().ClearTimer(BlockTimerHandle);
 }
 
-void AArcanePunkCharacter::SetSkillAbility(ESkillKey EnhanceSkill, EEnHanceType EnHanceType)
+void AArcanePunkCharacter::SetSkillAbility(EEnhanceCategory EnhanceCategory, EEnHanceType EnHanceType)
 {
 	if(!HUD) return;
 
-	HUD->DisplayEnhanceChoice(EnhanceSkill, EnHanceType);
+	HUD->DisplayEnhanceChoice(EnhanceCategory, EnHanceType);
 
 	// switch (UpdateSkillAbility)
 	// {

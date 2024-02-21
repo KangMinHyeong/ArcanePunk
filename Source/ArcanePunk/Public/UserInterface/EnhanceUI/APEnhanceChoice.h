@@ -19,7 +19,7 @@ class ARCANEPUNK_API UAPEnhanceChoice : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void InitType(ESkillKey UpdateEnhanceSkill, EEnHanceType UpdateEnHanceType);
+	void InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType);
 
 	void ApplyEnhance(ESkillAbility UpdateSkillAbility);
 	void ApplyNewSkill(ESkillNumber UpdateSkillNumber);
@@ -41,6 +41,9 @@ private:
 	UTextBlock* EnHanceType_Text;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* EnHanceCategory_Text;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Reroll_Button;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -50,7 +53,7 @@ private:
 	AArcanePunkCharacter* OwnerCharacter;
 
 	UPROPERTY()
-	ESkillKey EnhanceSkill = ESkillKey::None;
+	EEnhanceCategory EnhanceCategory = EEnhanceCategory::None;
 
 	UPROPERTY()
 	ESkillNumber SkillNumber = ESkillNumber::None;

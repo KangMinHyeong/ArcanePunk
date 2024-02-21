@@ -164,12 +164,12 @@ void AAPHUD::SetBossHPUI()
 	BossHPWidget->AddToViewport(-1);
 }
 
-void AAPHUD::DisplayEnhanceChoice(ESkillKey EnhanceSkill, EEnHanceType UpdateEnHanceType)
+void AAPHUD::DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType)
 {
 	if(!EnhanceChoiceClasses[(uint8)UpdateEnHanceType]) return;
 
 	auto EnhanceUI = CreateWidget<UAPEnhanceChoice>(GetWorld(), EnhanceChoiceClasses[(uint8)UpdateEnHanceType]);
-	EnhanceUI->InitType(EnhanceSkill, UpdateEnHanceType);
+	EnhanceUI->InitType(EnhanceCategory, UpdateEnHanceType);
 	// ESkillTypeState, EnHanceType 의 정보를 EnhanceUI에게 넘겨주기
 	EnhanceUI->AddToViewport(-1);
 }

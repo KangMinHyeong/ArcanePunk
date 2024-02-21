@@ -8,6 +8,7 @@
 AEnemy_DropPackage::AEnemy_DropPackage()
 {
     IsInit = false;
+	EnHanceTypePercent.SetNum(3);
 }
 
 void AEnemy_DropPackage::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -20,6 +21,8 @@ void AEnemy_DropPackage::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor
 	auto PackageUI = CreateWidget<UAPDropPackageUI>(PC, PackageUIClass);
 	if(PackageUI) PackageUI->InitPackage(ItemsInPackage);
 	PackageUI->AddToViewport();
+
+	if(EnhanceCategory != EEnhanceCategory::None) Character->SetSkillAbility(EnhanceCategory, EnHanceType);
 
 	Destroy();
 }
@@ -41,4 +44,29 @@ void AEnemy_DropPackage::AddItem(FName ItemID)
 	AddItemReference->SetQuantity(1);	
 
     ItemsInPackage.Add(AddItemReference);
+}
+
+void AEnemy_DropPackage::AddEnhance(uint8 EnhanceCategoryNum)
+{
+	EnhanceCategory = static_cast<EEnhanceCategory>(EnhanceCategoryNum);
+
+    float SilverPercent = EnHanceTypePercent[0];
+    float GoldPercent = EnHanceTypePercent[0] + EnHanceTypePercent[1];
+    float PlatinumPercent = EnHanceTypePercent[0] + EnHanceTypePercent[1] + EnHanceTypePercent[2];
+
+    float CurrentEnHanceType = FMath::RandRange(0.0f, PlatinumPercent);
+
+    if(CurrentEnHanceType >= 0.0f && CurrentEnHanceType <= SilverPercent)
+    {
+        EnHanceType = EEnHanceType::Silver;
+    }
+    else if(CurrentEnHanceType > SilverPercent && CurrentEnHanceType <= GoldPercent)
+    {
+        EnHanceType = EEnHanceType::Gold;
+    }
+    else if (CurrentEnHanceType > GoldPercent && CurrentEnHanceType <= PlatinumPercent)
+    {
+        EnHanceType = EEnHanceType::Platinum;
+    }
+
 }
