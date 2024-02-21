@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Save/APSaveGame.h"
+#include "GameInstance/APGameInstance.h"
 
 void AAPGameState::SaveGameData()
 {
@@ -12,7 +13,7 @@ void AAPGameState::SaveGameData()
     
     SaveGameData->SaveLevelName = GameData.LevelName;
 
-	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, SaveSlotName, 0))
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, GameData.SaveSlotName, 0))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Save Fail"));
 	}
@@ -20,7 +21,9 @@ void AAPGameState::SaveGameData()
 
 void AAPGameState::InitGameData()
 {
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+
+    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->DefaultGameSlot, 0));
 	if (!SaveGameData)
 	{
 		SaveGameData = GetMutableDefault<UAPSaveGame>();

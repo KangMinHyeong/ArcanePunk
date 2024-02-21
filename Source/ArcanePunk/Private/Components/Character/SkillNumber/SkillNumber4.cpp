@@ -107,7 +107,8 @@ void USkillNumber4::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	CharacterRotation();
 	
-	Remove_Skill();
+	if(SkillRange_Target) SkillRange_Target->SetActorHiddenInGame(true);
+	if(SkillRange_Circle) SkillRange_Circle->SetActorHiddenInGame(true);
 }
 
 void USkillNumber4::Remove_Skill()
@@ -126,9 +127,10 @@ void USkillNumber4::Activate_Skill4()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	auto ArcaneBomb = GetWorld()->SpawnActor<AArcaneBomb>(OwnerCharacter->GetArcaneBombClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, FRotator::ZeroRotator, SpawnParams);
-	if(ArcaneBomb) return;	
+	if(!ArcaneBomb) return;	
 	ArcaneBomb->SetOwner(OwnerCharacter);
 	ArcaneBomb->SetSkill(CurrentSkillType, CurrentSkillAbility);
 	if(SkillRange_Target) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
 	
+	Remove_Skill();
 }

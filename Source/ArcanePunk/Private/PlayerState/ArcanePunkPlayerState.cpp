@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Save/APSaveGame.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 AArcanePunkPlayerState::AArcanePunkPlayerState()
 {
@@ -17,7 +18,7 @@ void AArcanePunkPlayerState::SavePlayerData()
 
     SaveGameData->SavePlayerTotalData = PlayerTotalStatus;
 
-	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, SaveSlotName, 0))
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, PlayerTotalStatus.SaveSlotName, 0))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Save Fail"));
 	}
@@ -25,8 +26,9 @@ void AArcanePunkPlayerState::SavePlayerData()
 
 void AArcanePunkPlayerState::InitPlayerData()
 {
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
+    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->DefaultPlayerSlot, 0));
 	if (!SaveGameData)
 	{
 		SaveGameData = GetMutableDefault<UAPSaveGame>();

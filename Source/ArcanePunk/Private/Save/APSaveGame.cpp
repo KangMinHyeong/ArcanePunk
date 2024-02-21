@@ -12,9 +12,12 @@ void UAPSaveGame::InitSaveData()
 {
     SavePlayerTotalData = {};
 
+    SavePlayerSlot = "PlayerSlot_0";
+
+    SaveGameSlot = "GameSlot_0";
     // Goods
     // SaveRerollDice = 0;
 
     //GameData
-    SaveLevelName = TEXT("Test1");
+    SaveLevelName = TEXT("TestMap1");
 }

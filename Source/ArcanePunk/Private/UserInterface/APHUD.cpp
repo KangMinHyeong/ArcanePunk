@@ -42,9 +42,9 @@ void AAPHUD::BeginPlay()
 	}
 
 	//Minhyeong
-	if(!SkillPressClass) return;
-	SkillPressWidget = CreateWidget<UUserWidget>(GetWorld(), SkillPressClass);
-	SkillPressWidget->AddToViewport(-1);
+	if(!StatusBarUIClass) return;
+	StatusBarWidget = CreateWidget<UUserWidget>(GetWorld(), StatusBarUIClass);
+	StatusBarWidget->AddToViewport(-1);
 
 }
 

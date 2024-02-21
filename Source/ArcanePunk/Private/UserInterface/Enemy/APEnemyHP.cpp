@@ -21,8 +21,4 @@ void UAPEnemyHP::GetHealthPercentage()
         MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetMonsterMaxHP()))));
         HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetMonsterHP()))));
     }
-    else
-    {
-        
-    }
 }

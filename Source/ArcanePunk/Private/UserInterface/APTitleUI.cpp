@@ -5,25 +5,22 @@
 
 #include "Save/APSaveGame.h"
 #include "Components/Button.h"
-#include "PlayerController/ArcanePunkPlayerController.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "GameState/APGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "UserInterface/Save/APSaveSlotUI.h"
+#include "PlayerController/APTitlePlayerController.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPTitleUI::NativeConstruct()
 {
     Super::NativeConstruct();
 
-	NewGameBtn = Cast<UButton>(GetWidgetFromName(TEXT("btnNewGame")));
-	if (NewGameBtn != nullptr)
-	{
-		NewGameBtn->OnClicked.AddDynamic(this, &UAPTitleUI::NewGame);
-	}
-	ContinueBtn = Cast<UButton>(GetWidgetFromName(TEXT("btnContinueGame")));
-	if (ContinueBtn != nullptr)
-	{
-		ContinueBtn->OnClicked.AddDynamic(this, &UAPTitleUI::Continue);
-	}
+	
+	
+	Button_NewGame->OnClicked.AddDynamic(this, &UAPTitleUI::NewGame);
+	Button_Continue->OnClicked.AddDynamic(this, &UAPTitleUI::Continue);
+	Button_Setting->OnClicked.AddDynamic(this, &UAPTitleUI::Setting);
 }
 
 void UAPTitleUI::NewGame()
@@ -39,7 +36,7 @@ void UAPTitleUI::NewGame()
     auto PS = GetDefault<AArcanePunkPlayerState>();
     if(!PS) return;
 
-	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, PS->SaveSlotName, 0))
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, PS->PlayerTotalStatus.SaveSlotName, 0))
 	{
 		return;
 	}
@@ -47,19 +44,30 @@ void UAPTitleUI::NewGame()
     auto GS = GetDefault<AAPGameState>();
     if(!GS) return;
 
-    if (!UGameplayStatics::SaveGameToSlot(SaveGameData, GS->SaveSlotName, 0))
+    if (!UGameplayStatics::SaveGameToSlot(SaveGameData, GS->GameData.SaveSlotName, 0))
 	{
 		return;
 	}
 
-    UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap1"));
+	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+	GI->bNewGame = true;
+
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Intro"));
 }
 
 void UAPTitleUI::Continue()
 {
-    AAPGameState* GS = Cast<AAPGameState>(UGameplayStatics::GetGameState(this));
-	if(GS != nullptr)
-	{
-        UGameplayStatics::OpenLevel(this, GS->GameData.LevelName);
-    }	
+	auto SelectSlotUI =  Cast<UAPSaveSlotUI>(CreateWidget(this, SelectSaveSlotClass)); if(!SelectSlotUI) return;
+	SelectSlotUI->BindButton();
+	SelectSlotUI->BindSlot();
+    SelectSlotUI->AddToViewport();
+	RemoveFromParent();
+    
+}
+
+void UAPTitleUI::Setting()
+{
+	auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer()); if(!TitlePC) return;
+
+	TitlePC->OptionSetting();
 }

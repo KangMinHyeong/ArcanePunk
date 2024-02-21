@@ -13,9 +13,11 @@ struct FGameData
 
 	FGameData() {}
 
-	UPROPERTY(Transient, BlueprintReadWrite)
-	FName LevelName = TEXT("Test1");
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FString SaveSlotName = TEXT("GameSlot_0");
 
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FName LevelName = TEXT("Test1");
 };
 
 UCLASS()
@@ -30,11 +32,10 @@ public:
 	void UpdateGameData(FGameData& GD);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Transient, BlueprintReadWrite)
 	FGameData GameData;
 
 	UPROPERTY()
 	TMap<uint8, bool> SubStageClearMap; // 세이브 X , 인스턴스 던전 안의 Stage
 
-	FString SaveSlotName = TEXT("Game1");
 };

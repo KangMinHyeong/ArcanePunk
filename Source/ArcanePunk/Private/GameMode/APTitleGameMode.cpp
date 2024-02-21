@@ -15,12 +15,12 @@ void AAPTitleGameMode::PostLogin(APlayerController *NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    AArcanePunkPlayerState* MyPlayerState = Cast<AArcanePunkPlayerState>(NewPlayer->PlayerState);
-	if(!MyPlayerState) return;
+    // AArcanePunkPlayerState* MyPlayerState = Cast<AArcanePunkPlayerState>(NewPlayer->PlayerState);
+	// if(!MyPlayerState) return;
 
-    AAPGameState* MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(this));
-	if(!MyGameState) return;
+    // AAPGameState* MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(this));
+	// if(!MyGameState) return;
     
-	MyPlayerState->InitPlayerData();
-    MyGameState->InitGameData();
+	// MyPlayerState->InitPlayerData();
+    // MyGameState->InitGameData();
 }

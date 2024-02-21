@@ -21,6 +21,11 @@ public:
 	UPROPERTY(SaveGame)
 	FPlayerTotalData SavePlayerTotalData = {};
 
+	UPROPERTY(SaveGame)
+	FString SavePlayerSlot = "PlayerSlot_0";
+
+	UPROPERTY(SaveGame)
+	FString SaveGameSlot = "GameSlot_0";
 	// Goods
 	// UPROPERTY()
 	// int32 SaveRerollDice = 0;	

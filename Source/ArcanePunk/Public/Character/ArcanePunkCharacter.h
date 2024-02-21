@@ -118,7 +118,7 @@ public:
 
 	void UpdateStatus();
 
-	FORCEINLINE float GetFinalATK() const {return FinalATK;}; // FinalATK 반환
+	float GetFinalATK(float Multiple = 2.0f);// FinalATK 반환
 
 	// Attack 관련 함수
 	FORCEINLINE UAPAttackComponent* GetAttackComponent() const {return AttackComp;};  // AttackComp 반환
@@ -200,6 +200,9 @@ public:
 	FORCEINLINE UMaterialInterface* GetHideMaterial() const {return HideMaterial;};
 	void HideClear();
 
+	// 무적 관련 함수
+	FORCEINLINE bool IsBlockMode() const {return bBlockMode;};
+
 	// Hit, Dead 관련 함수
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
@@ -229,6 +232,10 @@ public:
 
 	// CC 관련 함수
 	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComponent() const {return CrowdControlComp;}; // CrowdControlComp 반환
+
+	// Save 관련 함수
+	void SaveStatus(FString PlayerSlotName, FString GameSlotName);
+
 private:
 	void InitPlayerStatus();
 	
@@ -242,12 +249,15 @@ private:
 
 	void SkillBase_R();
 	void Release_R() {OnRSkill = false;};
-		
-	void SaveStatus();
+
+	void Save();
 	void CurrentPlayerLocation();
 
 	// Skill 관련 함수
 	void HideCheck();
+
+	// 크리티컬 데미지 계산
+	float CriticalCalculate(float Multiple);
 
 	// Move 관련 함수
 	void MoveForward(float AxisValue); // 위 아래 Move
@@ -260,7 +270,9 @@ private:
 
 	void Dash();
 
-	
+	void OnBlockMode();
+	void ClearBlockMode();
+
 	// 공격 관련 함수
 	void Attack_typeA(); // 마우스 오른쪽 공격
 	void Attack_typeB(); // 마우스 왼쪽 공격
@@ -482,6 +494,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Skill Range")
 	TSubclassOf<AAPSkillRange_Circle> SkillRange_Circle;
 
+	// 무적기 관련 변수
+	FTimerHandle BlockTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Super Stance")
+	float BlockTime = 1.5f;
+
+	UPROPERTY()
+	bool bBlockMode = false;
+
 	// Foot Print 변수
 	UPROPERTY(EditAnywhere, Category = "Foot Print")
 	TSubclassOf<AActor> LeftFootClass;
@@ -526,6 +547,8 @@ private:
 	// 드랍
 	UPROPERTY(EditAnywhere, Category = "Drop")
 	TSubclassOf<APickup> DropClass;
+
+
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Skin")

@@ -6,9 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "APTitleUI.generated.h"
 
-/**
- * 
- */
+class UAPSaveSlotUI;
+class UButton;
+
 UCLASS()
 class ARCANEPUNK_API UAPTitleUI : public UUserWidget
 {
@@ -22,10 +22,19 @@ protected:
 	UFUNCTION()
 	void Continue();
 
-public:
-	UPROPERTY()
-	class UButton* NewGameBtn;
+	UFUNCTION()
+	void Setting();
 
-	UPROPERTY()
-	class UButton* ContinueBtn;	
+public:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_NewGame;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_Continue;	
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_Setting;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UAPSaveSlotUI> SelectSaveSlotClass;
 };
