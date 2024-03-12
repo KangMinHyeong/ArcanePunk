@@ -41,6 +41,7 @@ public:
 	void MultiAttack(FVector Start, FVector End, float Radius, float Multiple = 1.0f, uint8 HitNumbers = 1, bool bStun = false, float StunTime = 0.0f);
 	void MultiAttack_KnockBack(FVector Start, FVector End, float Radius, float KnockBackDist, float Multiple = 1.0f, uint8 HitNumbers = 1, float KnockBackTime = 0.0f,  bool PlayerKnockBack = false);
 	
+	FORCEINLINE float GetMaxDistance() const {return MaxDistance;}; // 공격 사거리 반환
 private:
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack, bool Custom = false, float CustomRadius = 0.0f); // Attack Trace
 	bool MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, bool CloseAttack, bool Custom = false, float CustomRadius = 0.0f); // Attack Trace
@@ -49,26 +50,27 @@ private:
 	void ApplyDamageToActor(AActor* DamagedActor, float Damage, FPointDamageEvent myDamageEvent, AController* MyController, uint8 HitNumbers);
 
 private:
-	UPROPERTY()
 	bool bAttack_A = false;
-	UPROPERTY()
 	bool bAttack_B = false;
 
 	//Combo
-	UPROPERTY()
 	bool CanCombo = true;
-	UPROPERTY()
 	bool IsComboInputOn = false;
 
-	UPROPERTY()
 	int32 CurrentCombo = 0;
-	UPROPERTY()
 	int32 MaxCombo = 3;
-
-	UPROPERTY()
 	int32 HitNum = 1;
 
-	UPROPERTY()
-	class UAPHitPointComponent* HitComp;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float MaxDistance = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackRadius = 40.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UParticleSystem* ComboHitEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	FVector HitEffectScale = FVector(1,1,1);
 
 };

@@ -6,9 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "AP_EnemyBaseAnimInstance.generated.h"
 
-/**
- * 
- */
+class AEnemy_CharacterBase;
+
 UCLASS()
 class ARCANEPUNK_API UAP_EnemyBaseAnimInstance : public UAnimInstance
 {
@@ -37,8 +36,7 @@ protected:
 	class UAnimSequence* RunPose;
 
 private:
-	UPROPERTY()
-	class AEnemy_CharacterBase* Enemy;
+	TWeakObjectPtr<AEnemy_CharacterBase> Enemy;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))

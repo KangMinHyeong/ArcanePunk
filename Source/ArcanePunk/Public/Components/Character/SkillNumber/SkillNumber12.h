@@ -18,7 +18,7 @@ public:
 
 	virtual void OnSkill() override;
 	
-	void Activate_Skill12();
+	virtual void Activate_Skill() override;
 
 private:
 	virtual void AddAbilityList() override;	

@@ -13,7 +13,6 @@
 UAPAttackComponent::UAPAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	HitComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitComp"));
 }
 
 void UAPAttackComponent::BeginPlay()
@@ -119,13 +118,10 @@ void UAPAttackComponent::ComboCheck()
 //AttackTrace 코드 시작
 bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
 {
-	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!Character) return false;
-
 	FRotator Rotation = GetOwner()->GetActorRotation();
 	FVector End = Start;
-	if(CloseAttack) End = End + Rotation.Vector() * Character->GetMaxDistance() + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
-	else End = End + Character->GetActorUpVector()* 70.0f;
+	if(CloseAttack) End = End + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+	else End = End + FVector::UpVector* 70.0f;
 
 	// 아군은 타격 판정이 안되게 하는 코드
 	FCollisionQueryParams Params;
@@ -146,8 +142,8 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 	}
 	else
 	{
-		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius());}
-		else {Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius()*1.25);}
+		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(AttackRadius);}
+		else {Sphere = FCollisionShape::MakeSphere(AttackRadius*1.25);}
 	}
 
 	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
@@ -155,14 +151,11 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 
 bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
 {
-	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!Character) return false;
-
 	FRotator Rotation = GetOwner()->GetActorRotation();
 	FVector End = Start;
-	if(CloseAttack) End = End + Rotation.Vector() * Character->GetMaxDistance() + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
-	else End = End + Character->GetActorUpVector()* 70.0f;
-
+	if(CloseAttack) End = End + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+	else End = End + FVector::UpVector* 70.0f;
+	
 	// 아군은 타격 판정이 안되게 하는 코드
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(GetOwner());
@@ -182,8 +175,8 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	}
 	else
 	{
-		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius());}
-		else {Sphere = FCollisionShape::MakeSphere(Character->GetAttackRadius()*1.25);}
+		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(AttackRadius);}
+		else {Sphere = FCollisionShape::MakeSphere(AttackRadius*1.25);}
 	}
 
 	return GetWorld()->SweepMultiByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
@@ -191,9 +184,6 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 
 bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, FVector End, float Radius)
 {
-	auto Character = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!Character) return false;
-
 	FRotator Rotation = GetOwner()->GetActorRotation();
 
 	// 아군은 타격 판정이 안되게 하는 코드
@@ -235,10 +225,10 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(Character->GetController());
 			if(!MyController) return;
-			HitComp->DistinctHitPoint(HitResult.Location, Actor);
-			if(bStun) HitComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+			Character->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
+			if(bStun) Character->GetHitPointComponent()->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
 			Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
-			if(Character->GetComboHitEffect() && Actor->ActorHasTag(TEXT("Enemy"))) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
+			if(ComboHitEffect && Actor->ActorHasTag(TEXT("Enemy"))) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ComboHitEffect, HitResult.ImpactPoint, FRotator::ZeroRotator, HitEffectScale);
 		}
 	}
 }
@@ -267,10 +257,9 @@ void UAPAttackComponent::MultiAttack(FVector Start, bool CloseAttack, float Mult
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(Character->GetController());
 				if(!MyController) return;
-				HitComp->DistinctHitPoint(HitResult.Location, Actor);
-				if(bStun) HitComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+				Character->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
+				if(bStun) Character->GetHitPointComponent()->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
 				Actor->TakeDamage(Damage, myDamageEvent, MyController, GetOwner());
-				if(Character->GetComboHitEffect() && Actor->ActorHasTag(TEXT("Enemy"))) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
 			}
 		}
 	}
@@ -299,11 +288,9 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 			{
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(Character->GetController()); if(!MyController) return;
-				HitComp->DistinctHitPoint(HitResult.Location, Actor);
-				if(bStun) HitComp->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
-				if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
-
-				
+				Character->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
+				if(bStun) Character->GetHitPointComponent()->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+		
 				ApplyDamageToActor(Actor, Damage, myDamageEvent, MyController, HitNumbers);
 			}			
 		}
@@ -333,14 +320,13 @@ void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float
 			{
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(Character->GetController()); if(!MyController) return;
-				HitComp->DistinctHitPoint(HitResult.Location, Actor);
+				Character->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
 
 				float Dist = KnockBackDist - (Actor->GetActorLocation()*FVector(1.0f,1.0f,0.0f) - Start*FVector(1.0f,1.0f,0.0f)).Size();
 
-				HitComp->SetKnockBackVec(Start); HitComp->SetKnockBackDist(Dist); 
-				HitComp->SetCrowdControl(Actor, ECharacterState::KnockBack, KnockBackTime);
-				
-				if(Character->GetComboHitEffect()) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetComboHitEffect(), HitResult.ImpactPoint, FRotator::ZeroRotator, Character->GetComboHitEffectScale());
+				Character->GetHitPointComponent()->SetKnockBackVec(Start); 
+				Character->GetHitPointComponent()->SetKnockBackDist(Dist); 
+				Character->GetHitPointComponent()->SetCrowdControl(Actor, ECharacterState::KnockBack, KnockBackTime);
 				
 				ApplyDamageToActor(Actor, Damage, myDamageEvent, MyController, HitNumbers);
 			}			

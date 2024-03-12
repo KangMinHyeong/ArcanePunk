@@ -3,6 +3,11 @@
 
 #include "SpawnPoint/APSpawnPointBase.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "GameInstance/APGameInstance.h"
+#include "GameMode/APGameModeBattleStage.h"
+#include "Kismet/GameplayStatics.h"
 
 UAPSpawnMonsterComponent::UAPSpawnMonsterComponent()
 {
@@ -66,10 +71,29 @@ void UAPSpawnMonsterComponent::SpawnMonsterFromLocation(TSubclassOf<AEnemy_Chara
     while(!SpawnLocations.IsEmpty())
     {
         auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, SpawnLocations.Top()->GetActorLocation(), SpawnLocations.Top()->GetActorRotation());
+        if(SpawnMonster) PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
         SpawnLocations.Top()->Destroy();
         SpawnLocations.Pop();
         MonsterArr.Add(SpawnMonster);
     }
+}
+
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithoutLocationActor(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector MinimumRange, FVector MaximumRange)
+{
+    while(SpawnMonsterNum != 0)
+    {
+        float Location_X =  FMath::RandRange(MinimumRange.X, MaximumRange.X); float Location_Y =  FMath::RandRange(MinimumRange.Y, MaximumRange.Y);
+        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, FVector(Location_X, Location_Y, 0.0f), GetOwner()->GetActorRotation(), SpawnParams);
+        if(SpawnMonster) PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
+        if(SpawnMonster) SpawnMonsterNum--;
+    }
+}
+
+void UAPSpawnMonsterComponent::PlaySpawnEffect(FVector Location)
+{
+    auto GM = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return;
+
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GM->GetSpawnEffect(),  Location);
 }
 
 // TArray 없이 스폰

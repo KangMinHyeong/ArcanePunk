@@ -19,7 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;	
-
+	
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;	
@@ -39,9 +39,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UDecalComponent* TentDecal;		
-
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;
 
 	UPROPERTY(EditAnywhere)
 	float ReturnToHideTime = 0.5f;

@@ -26,8 +26,7 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UOverlay* WeaponOverlay;
 
-	UPROPERTY()
-	UInventoryItemSlot* WeaponSlot;
+	TWeakObjectPtr<UInventoryItemSlot> WeaponSlot;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;

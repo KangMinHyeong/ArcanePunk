@@ -22,19 +22,17 @@ public:
 
 	virtual void Remove_Skill() override;
 
-	void Activate_Skill7();
-	void Skill7_End();
+	virtual void Activate_Skill() override;
+	virtual void SkillEnd() override;
 	
 private:
 	virtual void AddAbilityList() override;
 	void Spawn_Skill7();	
 
-	UPROPERTY()
+private:
 	float Skill7_LimitDistance = 1350.0f / 2.0f;
 
-	UPROPERTY()
 	float Skill7_Wide = 100.0f / 2.0f;
 
-	UPROPERTY()
-	AArcaneCutter* ArcaneCutter;
+	TWeakObjectPtr<AArcaneCutter> ArcaneCutter;
 };

@@ -42,22 +42,26 @@ void AArcaneTent::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> Skil
 
 void AArcaneTent::DestroySKill()
 {
-    Super::DestroySKill();
+    DeActivate(ESkillNumber::Skill_13);
 
-    if(OwnerCharacter) OwnerCharacter->SetInArcaneTent(false);
-    if(OwnerCharacter) OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber13()->bActivate = false;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+    if(OwnerCharacter.IsValid()) OwnerCharacter->SetInArcaneTent(false);
+    
+    Super::DestroySKill();
 }
 
 void AArcaneTent::OnBeginHiding(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-    if(OtherActor != GetOwner()) return; if(!OwnerCharacter) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+    if(OtherActor != GetOwner()) return; if(!OwnerCharacter.IsValid()) return;
 
     OwnerCharacter->SetInArcaneTent(true);
 }
 
 void AArcaneTent::OnEndHiding(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex)
 {
-    if(OtherActor != GetOwner()) return; if(!OwnerCharacter) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+    if(OtherActor != GetOwner()) return; if(!OwnerCharacter.IsValid()) return;
 
     OwnerCharacter->SetInArcaneTent(false);
 }

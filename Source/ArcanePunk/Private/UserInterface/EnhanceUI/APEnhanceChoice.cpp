@@ -14,7 +14,7 @@ void UAPEnhanceChoice::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
 
     // InitSuffle();
     SetPauseGame();
@@ -22,7 +22,7 @@ void UAPEnhanceChoice::NativeConstruct()
 
 void UAPEnhanceChoice::SetPauseGame()
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
     auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
 
     PC->SetPause(true);
@@ -30,7 +30,7 @@ void UAPEnhanceChoice::SetPauseGame()
 
 void UAPEnhanceChoice::TextSetting()
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
     
     if(EnHanceType == EEnHanceType::Silver) {EnHanceType_Text->SetText(FText::FromName(TEXT_Silver));}
     else if(EnHanceType == EEnHanceType::Gold) {EnHanceType_Text->SetText(FText::FromName(TEXT_Gold));}
@@ -44,7 +44,7 @@ void UAPEnhanceChoice::TextSetting()
 
 void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType)
 {
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
     EnhanceCategory = UpdateEnhanceCategory;
     EnHanceType = UpdateEnHanceType;
 
@@ -58,7 +58,7 @@ void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHance
 
 void UAPEnhanceChoice::SetAbility()
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
 
     switch (EnhanceCategory)
     {
@@ -99,65 +99,71 @@ void UAPEnhanceChoice::SetAbility()
 
 void UAPEnhanceChoice::EnhanceListing()
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
 
-    switch (SkillNumber)
-    {
-        case ESkillNumber::Skill_1:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber1()->EnableSkillAbilityList;
-        break;
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+	if(SkillNum.IsValid())
+	{
+		EnableSkillAbilityList = SkillNum->EnableSkillAbilityList;
+	} 
 
-        case ESkillNumber::Skill_2:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->EnableSkillAbilityList;
-        break;
+    // switch (SkillNumber)
+    // {
+    //     case ESkillNumber::Skill_1:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber1()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_3:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber3()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_2:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_4:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber4()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_3:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber3()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_5:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_4:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber4()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_6:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber6()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_5:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_7:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_6:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber6()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_8:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_7:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_9:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber9()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_8:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_10:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_9:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber9()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_11:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber11()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_10:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_12:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber12()->EnableSkillAbilityList;
+    //     case ESkillNumber::Skill_11:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber11()->EnableSkillAbilityList;
+    //     break;
 
-        case ESkillNumber::Skill_13:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber13()->EnableSkillAbilityList;
-        break;
+    //     case ESkillNumber::Skill_12:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber12()->EnableSkillAbilityList;
 
-        case ESkillNumber::Skill_14:
-        EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->EnableSkillAbilityList;
-        break;
-    }
+    //     case ESkillNumber::Skill_13:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber13()->EnableSkillAbilityList;
+    //     break;
+
+    //     case ESkillNumber::Skill_14:
+    //     EnableSkillAbilityList = OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->EnableSkillAbilityList;
+    //     break;
+    // }
     
 }
 
@@ -264,7 +270,7 @@ bool UAPEnhanceChoice::SkillSuffle()
 
 void UAPEnhanceChoice::OnReroll()
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
     
     auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("test_005")); if(!Item) return;
     if(Item->Quantity == 0) return;
@@ -281,7 +287,7 @@ void UAPEnhanceChoice::OnReroll()
 
 void UAPEnhanceChoice::ApplyEnhance(ESkillAbility UpdateSkillAbility)
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
 
     OriginSkillAbilityList.Add(UpdateSkillAbility);   
 
@@ -325,10 +331,12 @@ void UAPEnhanceChoice::ApplyNewSkill(ESkillNumber UpdateSkillNumber)
         case EEnhanceCategory::Enhance_Q:
         OwnerCharacter->SetQSkill(UpdateSkillNumber);
         OwnerCharacter->SetAbilitySkillQ(OriginSkillAbilityList);
+        OwnerCharacter->GetAPSkillHubComponent()->UpdateSkill_Q();
         break;
         case EEnhanceCategory::Enhance_E:
         OwnerCharacter->SetESkill(UpdateSkillNumber);
         OwnerCharacter->SetAbilitySkillE(OriginSkillAbilityList);
+        OwnerCharacter->GetAPSkillHubComponent()->UpdateSkill_E();
         break;
         // case ESkillKey::R:
         // OwnerCharacter->SetRSkill(UpdateSkillNumber);

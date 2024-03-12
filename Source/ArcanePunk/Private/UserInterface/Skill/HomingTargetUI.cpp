@@ -7,19 +7,24 @@ void UHomingTargetUI::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter) return;
-    OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerCharacterPC) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerCharacterPC.IsValid()) return;
 }
 
 FReply UHomingTargetUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
     
-    if(!OwnerCharacterPC) return Reply.Unhandled(); if(!OwnerCharacter) return Reply.Unhandled();
+    if(!OwnerCharacterPC.IsValid()) return Reply.Unhandled(); if(!OwnerCharacter.IsValid()) return Reply.Unhandled();
 
     if(InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
-        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumberBase()->SkillCancel();
+        TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+        if(SkillNum.IsValid())
+        {
+            SkillNum->SkillCancel();
+        }
+        // OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumberBase()->SkillCancel();
         OwnerCharacterPC->ReturnToDefault();
         RemoveFromParent();
 		return Reply.Handled();
@@ -48,18 +53,24 @@ void UHomingTargetUI::InputSkillInfo(ESkillNumber UpdateSkillNumber)
 
 void UHomingTargetUI::HomingSkill()
 {
-    switch (SkillNumber)
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+    if(SkillNum.IsValid())
     {
-        case ESkillNumber::Skill_1:
-        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber1()->OnSkill();
-        break;
-    
-        case ESkillNumber::Skill_2:
-        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->OnSkill();
-        break;
-
-        case ESkillNumber::Skill_4:
-        OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber4()->OnSkill();
-        break;
+        SkillNum->OnSkill();
     }
+
+    // switch (SkillNumber)
+    // {
+    //     case ESkillNumber::Skill_1:
+    //     OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber1()->OnSkill();
+    //     break;
+    
+    //     case ESkillNumber::Skill_2:
+    //     OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->OnSkill();
+    //     break;
+
+    //     case ESkillNumber::Skill_4:
+    //     OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber4()->OnSkill();
+    //     break;
+    // }
 }

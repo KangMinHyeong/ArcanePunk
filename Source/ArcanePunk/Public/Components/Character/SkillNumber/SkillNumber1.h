@@ -19,7 +19,7 @@ protected:
 public:
 	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
 
-	void Activate_Skill1();
+	virtual void Activate_Skill() override;
 
 	virtual void OnSkill() override;
 

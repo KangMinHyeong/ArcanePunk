@@ -18,12 +18,12 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-	auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-	if (!Character) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-	if (!IsDead)
+    if (!IsDead)
 	{
-		CurrentPawnSpeed = Character->GetVelocity().Size();
+		CurrentPawnSpeed = OwnerCharacter->GetVelocity().Size();
 		// auto Character = Cast<ACharacter>(Pawn);
 		// if (Character)
 		// {
@@ -136,34 +136,46 @@ void UArcanePunkCharacterAnimInstance::PlayUltSkill_1_Montage()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AttackTrigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
-    
-    Character->GetAttackComponent()->NormalAttack(Character->GetActorLocation(), true);
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetAttackComponent()->NormalAttack(OwnerCharacter->GetActorLocation(), true);
 }
 
-void UArcanePunkCharacterAnimInstance::AnimNotify_Active_Q()
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_1_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber1()->Activate_Skill1();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_1);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
-void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_E_Trigger()
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_2_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->Activate_Skill2();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_4_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber4()->Activate_Skill4();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_4);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Trigger()
@@ -172,29 +184,43 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Trigger()
 
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Enhance()
+{
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Enhance();
+	} 
+}
+
 void UArcanePunkCharacterAnimInstance::FireCheck()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
     bool Check = false;
 
-    switch (Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->SkillKey)
-    {
-        case ESkillKey::Q:
-        if(!Character->GetOnQSkill()) Check = true;
-        break;
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+        switch (SkillNum->SkillKey)
+        {
+            case ESkillKey::Q:
+            if(!OwnerCharacter->GetOnQSkill()) Check = true;
+            break;
 
-        case ESkillKey::E:
-        if(!Character->GetOnESkill()) Check = true;
-        break;
+            case ESkillKey::E:
+            if(!OwnerCharacter->GetOnESkill()) Check = true;
+            break;
 
-        case ESkillKey::R:
-        if(!Character->GetOnRSkill()) Check = true;
-        break;
-    }
+            case ESkillKey::R:
+            if(!OwnerCharacter->GetOnRSkill()) Check = true;
+            break;
+        }
+	} 
 
-    
     if(Check)
     {
         Montage_JumpToSection(TEXT("Fire"), Skill_5_Montage);
@@ -205,106 +231,155 @@ void UArcanePunkCharacterAnimInstance::FireCheck()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_FireStart()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    if(Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->SkillRange_Target) Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->SkillRange_Target->SetActorHiddenInGame(true);
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->CharacterRotation();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+        if(SkillNum->SkillRange_Target.IsValid()) SkillNum->SkillRange_Target->SetActorHiddenInGame(true);
+        SkillNum->CharacterRotation();
+	} 
+
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Fire()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->Activate_Skill5();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_FireEnd()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->Skill5_End();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->SkillEnd();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_6_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber6()->Activate_Skill6();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_6);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_7_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber7()->Activate_Skill7();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_7);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_8_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->Activate_Skill8();
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_8);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_9_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber9()->Activate_Skill9();   
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_9);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_10_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber10()->Activate_Skill10();   
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_10);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_11_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber11()->Activate_Skill11();   
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_11);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_12_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber12()->Activate_Skill12();   
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_12);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_13_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber13()->Activate_Skill13();   
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_13);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_14_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->Activate_Skill14();   
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_14);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
 }
 
-void UArcanePunkCharacterAnimInstance::AnimNotify_UltSkill_1_Trigger()
+void UArcanePunkCharacterAnimInstance::AnimNotify_UltSkill_Trigger()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetUltSkillNumber1()->Activate_UltSkill1();
+    OwnerCharacter->GetRSkillNumber()->Activate_Skill();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
@@ -314,34 +389,34 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AnimMove()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPMoveComponent()->AnimMovement();
+    OwnerCharacter->GetAPMoveComponent()->AnimMovement();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AnimStop()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    Character->GetAPMoveComponent()->AnimMoveStop();
+    OwnerCharacter->GetAPMoveComponent()->AnimMoveStop();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
-    
-    Character->GetSpawnFootPrintComponent()->SpawnFootPrint(true);
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(true);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
-    
-    Character->GetSpawnFootPrintComponent()->SpawnFootPrint(false);
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(false);
 }
 
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
@@ -368,8 +443,8 @@ int32 UArcanePunkCharacterAnimInstance::GetAttackSection()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_HideClear()
 {
-    auto Character = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!Character || IsDead) return;
-    
-    Character->HideClear();
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->HideClear();
 }

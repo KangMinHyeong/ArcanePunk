@@ -1,6 +1,9 @@
 
 #include "Skill/APSkillActorBase.h"
 
+#include "Character/ArcanePunkCharacter.h"
+#include "Components/Character/APSkillHubComponent.h"
+
 AAPSkillActorBase::AAPSkillActorBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -15,7 +18,7 @@ void AAPSkillActorBase::BeginPlay()
 	Super::BeginPlay();
 	
 	SetActorTickEnabled(false);
-	DefaultSize = GetActorScale3D().Y;
+	DefaultSize = GetActorScale3D().Y; 
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AAPSkillActorBase::DestroySKill, DestroyTime, false);
 }
 
@@ -36,4 +39,15 @@ void AAPSkillActorBase::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility
 	SkillAbilityComp->SetSkillAbility(SkillAbility, SkillCategory);
 
     SkillTypeComp->SetSkillType(SkillType, SkillCategory);
+}
+
+void AAPSkillActorBase::DeActivate(ESkillNumber SkillNumber)
+{
+	auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
+	UE_LOG(LogTemp, Display, TEXT("Your message"));
+	TWeakObjectPtr<USkillNumberBase> SkillNum = Character->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->bActivate = false;
+	} 
 }

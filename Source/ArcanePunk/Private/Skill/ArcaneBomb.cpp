@@ -67,11 +67,11 @@ void AArcaneBomb::Explosion(UPrimitiveComponent *OverlappedComp, AActor *OtherAc
 	auto MyOwnerInstigator = MyOwner->GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
 
-	auto Character = Cast<AArcanePunkCharacter>(MyOwner); if(!Character) return;
+	OwnerCharacter  = Cast<AArcanePunkCharacter>(MyOwner); if(!OwnerCharacter.IsValid()) return;
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
 	{
         ActiveExplosion();
-        Character->GetAttackComponent()->MultiAttack(GetActorLocation(), GetActorLocation() - FVector(0,0,-20.0f), ExplosionRadius, DamageCoefficient, 1, true, StateTime );
+        OwnerCharacter->GetAttackComponent()->MultiAttack(GetActorLocation(), GetActorLocation() - FVector(0,0,-20.0f), ExplosionRadius, DamageCoefficient, 1, true, StateTime );
 		Destroy();
         // if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 		// HitPointComp->DistinctHitPoint(SweepResult.Location, OtherActor);

@@ -34,8 +34,7 @@ private:
 
 	ESkillNumber SkillNumber = ESkillNumber::None;
 
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;
-	UPROPERTY()
-	AArcanePunkPlayerController* OwnerCharacterPC;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+
+	TWeakObjectPtr<AArcanePunkPlayerController> OwnerCharacterPC;
 };

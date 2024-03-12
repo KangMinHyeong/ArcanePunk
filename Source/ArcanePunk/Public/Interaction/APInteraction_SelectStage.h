@@ -9,10 +9,18 @@
 class UUserWidget;
 
 UCLASS()
-class ARCANEPUNK_API AAPInteraction_SelectStage : public AAPInteractionTriggerBase
+class ARCANEPUNK_API AAPInteraction_SelectStage : public AAPInteractionTriggerBase, public IInteractionInterface
 {
 	GENERATED_BODY()
-public:
-	virtual void OnInteractionTrigger(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult) override;
+
+public:	
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void BeginFocus() override;
+	virtual void EndFocus() override;
+	virtual FInteractData GetInteractData() override;
+	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
+
+private:
 
 };

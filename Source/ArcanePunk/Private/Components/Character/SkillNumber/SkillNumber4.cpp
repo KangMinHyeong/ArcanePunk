@@ -83,13 +83,13 @@ void USkillNumber4::Spawn_Skill4()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 		ActivateSkillRange_Target(Skill4_TargetRange, Skill4_TargetRange, ESkillRangeType::Control_Circle);
-		if(SkillRange_Target) SkillRange_Target->SetMaxDist(Skill4_LimitDistance);
-		if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+		if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill4_LimitDistance);
+		if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 		ActivateSkillRange_Round(Skill4_LimitDistance);
-		if(SkillRange_Circle) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+		if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
-		OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+		// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 		OwnerCharacter->SetDoing(false);
 		SetComponentTickEnabled(true);
 	}
@@ -107,8 +107,8 @@ void USkillNumber4::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	CharacterRotation();
 	
-	if(SkillRange_Target) SkillRange_Target->SetActorHiddenInGame(true);
-	if(SkillRange_Circle) SkillRange_Circle->SetActorHiddenInGame(true);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetActorHiddenInGame(true);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetActorHiddenInGame(true);
 }
 
 void USkillNumber4::Remove_Skill()
@@ -116,7 +116,7 @@ void USkillNumber4::Remove_Skill()
 	Super::Remove_Skill();
 }
 
-void USkillNumber4::Activate_Skill4()
+void USkillNumber4::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -130,7 +130,7 @@ void USkillNumber4::Activate_Skill4()
 	if(!ArcaneBomb) return;	
 	ArcaneBomb->SetOwner(OwnerCharacter);
 	ArcaneBomb->SetSkill(CurrentSkillType, CurrentSkillAbility);
-	if(SkillRange_Target) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
+	if(SkillRange_Target.IsValid()) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
 	
 	Remove_Skill();
 }

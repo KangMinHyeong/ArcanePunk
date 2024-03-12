@@ -29,16 +29,17 @@ void AArcaneRage::BeginPlay()
 
 void AArcaneRage::SetRageMode()
 {
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetRageMode(true);
 }
 
 void AArcaneRage::DestroySKill()
 {
-    Super::DestroySKill();
+    if(OwnerCharacter.IsValid()) OwnerCharacter->SetRageMode(false);
 
-    if(OwnerCharacter) OwnerCharacter->SetRageMode(false);
-    if(OwnerCharacter) OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber12()->bActivate = false;
+    DeActivate(ESkillNumber::Skill_12);
+
+    Super::DestroySKill();
 }
 
 void AArcaneRage::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)

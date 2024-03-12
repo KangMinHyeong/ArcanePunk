@@ -36,19 +36,30 @@ void ADamageText::Tick(float DeltaTime)
 	TimeLine.TickTimeline(DeltaTime);
 }
 
-void ADamageText::SetDamageText(float Damage)
+void ADamageText::SetDamageText(float Damage, bool bCriticalAttack)
 {
     MyTextRender->SetText(FText::FromString(FString::FromInt((int)Damage)));
-	MyTextRender->SetTextRenderColor(FColor::Red);
-	InitColor = FColor::Red;
-	MyTextRender->SetXScale(6.0f);
-	MyTextRender->SetYScale(6.0f);
+	
+	if(bCriticalAttack)
+	{
+		MyTextRender->SetTextRenderColor(CriticalAttackColor);
+		InitColor = CriticalAttackColor;
+		MyTextRender->SetXScale(CriticalAttackScale); MyTextRender->SetYScale(CriticalAttackScale);
+		InitScale = CriticalAttackScale;
+	}
+	else
+	{
+		MyTextRender->SetTextRenderColor(NormalAttackColor);
+		InitColor = NormalAttackColor;
+		MyTextRender->SetXScale(NormalAttackScale); MyTextRender->SetYScale(NormalAttackScale);
+		InitScale = NormalAttackScale;
+	}
 }
 
 void ADamageText::TimeLineUpdateFunc(float Output)
 {
-	MyTextRender->SetXScale(6.0f*Output);
-	MyTextRender->SetYScale(6.0f*Output);
+	MyTextRender->SetXScale(InitScale*Output);
+	MyTextRender->SetYScale(InitScale*Output);
 }
 
 void ADamageText::TimeLineUpdateFunc2(FVector Output)

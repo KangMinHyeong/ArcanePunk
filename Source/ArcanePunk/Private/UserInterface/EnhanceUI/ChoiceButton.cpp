@@ -45,7 +45,7 @@ void UChoiceButton::BindButton()
 
 void UChoiceButton::OnEnhanceChoice()
 {
-    auto EC = Cast<UAPEnhanceChoice>(ParentWidget); if(!EC) return;
+    TWeakObjectPtr<UAPEnhanceChoice> EC = Cast<UAPEnhanceChoice>(ParentWidget); if(!EC.IsValid()) return;
 
     if(bEnhance)
     {

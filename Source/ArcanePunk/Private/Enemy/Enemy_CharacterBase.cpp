@@ -11,7 +11,6 @@
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DamageText/DamageText.h"
-#include "NiagaraComponent.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Character/ArcanePunkCharacter.h"
@@ -19,6 +18,9 @@
 #include "Components/WidgetComponent.h"
 #include "GameMode/APGameModeBattleStage.h"
 #include "Enemy/Drop/Enemy_DropPackage.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -46,7 +48,7 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitHP();	
+	InitMonster();	
 	BindMontageEnded();
 	OnDrop = true;
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
@@ -93,9 +95,13 @@ void AEnemy_CharacterBase::TeleportMarkActivate(float Time, AActor* MarkOwner)
 void AEnemy_CharacterBase::TeleportMarkDeactivate()
 {
 	TeleportMark->DeactivateImmediate();
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(MarkActor);
-	if(!OwnerCharacter) return;
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkErase();
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(MarkActor); if(!OwnerCharacter.IsValid()) return;
+
+	TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->MarkErase();
+	} 
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
 }
 
@@ -135,7 +141,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
-	SpawnDamageText(DamageAmount, DamageTextAddLocation);
+	SpawnDamageText(EventInstigator, DamageAmount, DamageTextAddLocation);
 
 	if(IsDead())
 	{
@@ -150,7 +156,6 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	else
 	{
 		bHitting = true;
-		TestHit();
 		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AEnemy_CharacterBase::ResetHitStiffness, HitStiffnessTime, false);
 	}
 	
@@ -254,8 +259,10 @@ float AEnemy_CharacterBase::CriticalCalculate(float Multiple)
 	float Percent = FMath::RandRange(0.0f, 100.0f);
 	if(Percent <= CriticalPercent)
 	{
+		bCriticalAttack = true;
 		return CriticalStep * (Multiple - 1.0f) + 1;
 	}
+	else {bCriticalAttack = false;}
     return  1.0f;
 }
 
@@ -277,18 +284,28 @@ void AEnemy_CharacterBase::ResetHitStiffness()
 	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
-void AEnemy_CharacterBase::SpawnDamageText(float Damage, FVector AddLocation)
+void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation)
 {
 	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 180.0f, 0.0f));
 	if(!DamageText) return;
 
+	auto Character = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); if(!Character) return;
+
 	DamageText->SetOwner(this);
-	DamageText->SetDamageText(Damage);
+	DamageText->SetDamageText(Damage, Character->IsCriticalAttack());
 }
 
-void AEnemy_CharacterBase::InitHP()
+void AEnemy_CharacterBase::InitMonster()
 {
 	HP = MaxHP;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
+}
+
+void AEnemy_CharacterBase::StopClear()
+{
+	GetWorldTimerManager().ClearTimer(StopTimerHandle);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void AEnemy_CharacterBase::DropItemActor() 
@@ -306,7 +323,7 @@ void AEnemy_CharacterBase::DropItemActor()
 			if(DropPercent <= DropClass.Value)
 			{
 				uint8 EnhanceCategoryNum = FMath::RandRange(1, 7);
-				if(DropPackage)
+				if(DropPackage.IsValid())
 				{
 					DropPackage->AddEnhance(EnhanceCategoryNum);
 				}
@@ -321,7 +338,7 @@ void AEnemy_CharacterBase::DropItemActor()
 
 		if(DropPercent <= DropClass.Value)
 		{
-			if(DropPackage)
+			if(DropPackage.IsValid())
 			{
 				DropPackage->AddItem(DropClass.Key);
 			}
@@ -332,7 +349,7 @@ void AEnemy_CharacterBase::DropItemActor()
 			}	
 		}
 	}
-	if(DropPackage) DropPackage->SetDropOverlap(true);
+	if(DropPackage.IsValid()) DropPackage->SetDropOverlap(true);
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
@@ -360,7 +377,7 @@ void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	float Right = (HitActorRightVec.X * HitPoint.X) + (HitActorRightVec.Y * HitPoint.Y); // 좌 우 Hit 판별
 
 	auto Character = Cast<AArcanePunkCharacter>(HitActor); if(!Character) return;
-	if(!Character->IsBlockMode()) Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right);
+	if(!Character->IsBlockMode()) {Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right); Character->GetTakeDamageComponent()->SetHitEffect(ImpactPoint);}
 }
 
 void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
@@ -369,22 +386,22 @@ void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
 	MonsterIsRight = Right;
 }
 
-void AEnemy_CharacterBase::TestHit()
+void AEnemy_CharacterBase::SetHitEffect(FVector HitLocation)
 {
 	if(MonsterIsForward > 0)
 	{
 		if(MonsterIsRight > 0)
 		{
-			if(HitMaterial_Test1) GetMesh()->SetMaterial(0, HitMaterial_Test1); 
+			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_R, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 		}
 		else
 		{
-			if(HitMaterial_Test2) GetMesh()->SetMaterial(0, HitMaterial_Test2); 
+			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_L, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 		}
 	}
 	else
 	{
-		if(HitMaterial) GetMesh()->SetMaterial(0, HitMaterial);
+		UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_B, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 	}
 }
 
@@ -396,7 +413,7 @@ void AEnemy_CharacterBase::BindMontageEnded()
 
 void AEnemy_CharacterBase::EnemyMontageEnded(UAnimMontage *Montage, bool bInterrupted)
 {
-    if(!EnemyAnim) return;
+    if(!EnemyAnim.IsValid()) return;
 	
 	if(Montage == EnemyAnim->NormalAttack_Montage) OnNormalAttack_MontageEnded();
 }

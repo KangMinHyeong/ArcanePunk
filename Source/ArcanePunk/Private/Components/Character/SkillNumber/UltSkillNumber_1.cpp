@@ -46,7 +46,7 @@ void UUltSkillNumber_1::Remove_Skill()
 {
 }
 
-void UUltSkillNumber_1::Activate_UltSkill1()
+void UUltSkillNumber_1::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -57,13 +57,13 @@ void UUltSkillNumber_1::Activate_UltSkill1()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
     ArcaneRain = GetWorld()->SpawnActor<AArcaneRain>(OwnerCharacter->GetArcaneRainClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
-	if(!ArcaneRain) return;
+	if(!ArcaneRain.IsValid()) return;
 	ArcaneRain->SetSkill(CurrentSkillType, CurrentSkillAbility);	
 	ArcaneRain->SetOwner(OwnerCharacter);
 	ArcaneRain->SetRainEffect();
 }
 
-void UUltSkillNumber_1::UltSkill1_End()
+void UUltSkillNumber_1::SkillEnd()
 {
-	if(ArcaneRain) ArcaneRain->DestroySKill();
+	if(ArcaneRain.IsValid()) ArcaneRain->DestroySKill();
 }

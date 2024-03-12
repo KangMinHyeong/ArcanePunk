@@ -10,12 +10,12 @@ void UAPEnemyHP::SetEnemy(AEnemy_CharacterBase *OwnerEnemy)
 {
     Enemy = OwnerEnemy;
 
-    if(Enemy) Enemy->OnEnemyHPChanged.AddUObject(this, &UAPEnemyHP::GetHealthPercentage);
+    if(Enemy.IsValid()) Enemy->OnEnemyHPChanged.AddUObject(this, &UAPEnemyHP::GetHealthPercentage);
 }
 
 void UAPEnemyHP::GetHealthPercentage()
 {
-    if(Enemy)
+    if(Enemy.IsValid())
     {
         HPPercent->SetPercent(Enemy->GetMonsterHP() / Enemy->GetMonsterMaxHP());
         MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetMonsterMaxHP()))));

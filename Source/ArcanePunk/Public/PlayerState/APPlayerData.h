@@ -100,7 +100,7 @@ struct FPlayerDynamicData
 	int32 SP = 500.0f;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	float CriticalPercent = 5.0f;
+	float CriticalPercent = 10.0f;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	int32 CriticalStep = 1;

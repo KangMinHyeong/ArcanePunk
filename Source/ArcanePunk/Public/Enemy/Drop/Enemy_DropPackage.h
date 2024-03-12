@@ -10,30 +10,39 @@
 class UAPDropPackageUI;
 
 UCLASS()
-class ARCANEPUNK_API AEnemy_DropPackage : public AEnemy_DropBase
+class ARCANEPUNK_API AEnemy_DropPackage : public AEnemy_DropBase, public IInteractionInterface
 {
 	GENERATED_BODY()
 public:
 	AEnemy_DropPackage();
 
-	virtual void DropOverlap(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void Tick(float DeltaTime) override;
 
 	void AddItem(FName ItemID);
 	void AddEnhance(uint8 EnhanceCategoryNum);
+	
+	virtual void BeginFocus() override;
+	virtual void EndFocus() override;
+	virtual FInteractData GetInteractData() override;
+	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
+
+protected:
+	virtual void BeginPlay() override;
 
 private:
 	UPROPERTY()
 	TArray<UAPItemBase*> ItemsInPackage;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UAPDropPackageUI> PackageUIClass;
-
-	UPROPERTY()
 	EEnhanceCategory EnhanceCategory = EEnhanceCategory::None;
 
-	UPROPERTY()
 	EEnHanceType EnHanceType = EEnHanceType::Silver;
 
 	UPROPERTY(EditAnywhere, Category = "EnHanceType Percent")
 	TArray<float> EnHanceTypePercent; // 0.0f ~ 100.0f percent;
+
+	FTimerHandle InteractTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float InteractFrequency = 0.1f;
+
 };

@@ -22,12 +22,12 @@ public:
 
 	virtual void Remove_Skill() override;
 
-	void Activate_Skill6();
-	void Skill6_End();
+	virtual void Activate_Skill() override;
+	virtual void SkillEnd() override;
 
 private:
 	void AddAbilityList();	
 
-	UPROPERTY()
-	AShouting* Shouting;	
+private:
+	TWeakObjectPtr<AShouting> Shouting;	
 };

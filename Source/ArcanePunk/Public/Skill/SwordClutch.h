@@ -18,7 +18,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;	
-
+	
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;	
@@ -36,13 +36,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* ClutchRoot;
 
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;	
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;	
 
-	UPROPERTY()
 	float Distance = 0.0f;
 
-	UPROPERTY()
 	float Wide = 0.0f;
 
 	UPROPERTY(EditAnywhere)

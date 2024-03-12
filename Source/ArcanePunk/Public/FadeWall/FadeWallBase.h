@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "FadeWallBase.generated.h"
 
+class UMaterial;
+
 UCLASS()
 class ARCANEPUNK_API AFadeWallBase : public AActor
 {
@@ -25,9 +27,9 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UMaterial* SkinMaterial;
+	UMaterial* SkinMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UStaticMeshComponent* SkinMesh;
+	UStaticMeshComponent* SkinMesh;
 
 };

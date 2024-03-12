@@ -7,6 +7,8 @@
 #include "SkillNumber5.generated.h"
 
 class AArcaneBeam;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class ARCANEPUNK_API USkillNumber5 : public USkillNumberBase
@@ -16,26 +18,41 @@ protected:
 	virtual void BeginPlay() override;
 	
 public:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
 
 	virtual void OnSkill() override;
 
 	virtual void Remove_Skill() override;
 
-	void Activate_Skill5();
-	void Skill5_End();
+	virtual void Activate_Skill() override;
+	virtual void SkillEnd() override;
 	
+	virtual void Enhance() override;
+
+	virtual void RemoveEffect() override;
+
 private:
 	virtual void AddAbilityList() override;
 	void Spawn_Skill5();
 	void OnSkill5();
+	void SpawnChargeEffect();
 
-	UPROPERTY()
-	AArcaneBeam* ArcaneBeam;
+private:
+	TWeakObjectPtr<AArcaneBeam> ArcaneBeam;
 
-	UPROPERTY()
 	float Skill5_LimitDistance = 1350.0f / 2.0f;
 
-	UPROPERTY()
 	float Skill5_Wide = 100.0f / 2.0f;
+
+	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
+
+	float DamageCoefficient = 1.0f;
+
+	float MaxDamageCoefficient = 5.0f; 
+
+	float IncreasingSpeed = 0.25f; 
+
+	float InitIncreasingSpeed = 0.0f;
+
 };

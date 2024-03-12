@@ -54,13 +54,13 @@ void USkillNumber10::Spawn_Skill10()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	ActivateSkillRange_Target(Skill10_TargetRange, Skill10_TargetRange, ESkillRangeType::Control_Circle);
-	if(SkillRange_Target) SkillRange_Target->SetMaxDist(Skill10_LimitDistance);
-	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill10_LimitDistance);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 	ActivateSkillRange_Round(Skill10_LimitDistance);
-	if(SkillRange_Circle) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
 }
@@ -78,7 +78,7 @@ void USkillNumber10::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
     CharacterRotation();
 
-    if(SkillRange_Target) SkillRange_TargetLocation = SkillRange_Target->GetActorLocation();
+    if(SkillRange_Target.IsValid()) SkillRange_TargetLocation = SkillRange_Target->GetActorLocation();
     Remove_Skill();
 }
 
@@ -87,7 +87,7 @@ void USkillNumber10::Remove_Skill()
 	Super::Remove_Skill();
 }
 
-void USkillNumber10::Activate_Skill10()
+void USkillNumber10::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; 

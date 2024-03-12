@@ -31,9 +31,17 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void CreateInit();
+
 	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None);	
 	virtual void OnSkill();
 	virtual void Remove_Skill();	
+	virtual void SkillEnd();
+	virtual void RemoveEffect();
+	virtual void Activate_Skill();
+	virtual void Enhance();
+	virtual void MarkingOn(AActor* OtherActor, float Time);
+	virtual void MarkErase();
 
 	void SetMouseCursor(AArcanePunkPlayerController *PC, ESkillCursor NewCursor);
 	bool CheckSmartKey(ESkillKey WhichKey, class AArcanePunkCharacter* OwnerCharacter);
@@ -45,35 +53,25 @@ public:
 	void CharacterRotation();
 
 protected:
-	UPROPERTY()
 	ESkillTypeState CurrentSkillType = ESkillTypeState::Type_None;
 
-	UPROPERTY()
 	TArray<ESkillAbility> CurrentSkillAbility;
 
-	UPROPERTY()
 	FHitResult HitResult;
 
-	UPROPERTY()
 	bool Skilling = false;
 
-	UPROPERTY()
 	float SpawnAddLocation = 35.0f;
 
 public:
-	UPROPERTY()
 	TArray<ESkillAbility> EnableSkillAbilityList;
 
-	UPROPERTY()
 	ESkillKey SkillKey = ESkillKey::None;
 
-	UPROPERTY()
-	AAPSkillRange* SkillRange_Circle;
+	TWeakObjectPtr<AAPSkillRange> SkillRange_Circle;
 
-	UPROPERTY()
-	AAPSkillRange* SkillRange_Target;
+	TWeakObjectPtr<AAPSkillRange> SkillRange_Target;
 
-	UPROPERTY()
 	bool bActivate = false;
 
 };

@@ -29,10 +29,9 @@ private:
 	void Type_InvisibleCollider();
 	void Type_Buff();
 
-	UPROPERTY()
+private:
 	ESkillTypeState SkillType;
 
-	UPROPERTY()
 	ESkillCategory SkillCategory;
 
 };

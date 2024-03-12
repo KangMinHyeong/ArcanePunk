@@ -12,9 +12,16 @@ void AEnemy_DropDice::BeginPlay()
 	InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
 }
 
-void AEnemy_DropDice::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AEnemy_DropDice::Tick(float DeltaTime)
 {
-    auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
+	Super::Tick(DeltaTime);
+
+	OnDropDice();
+}
+
+void AEnemy_DropDice::OnDropDice()
+{
+    TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
 
     if(IsPendingKillPending() || !ItemReference) return;
 
@@ -27,7 +34,7 @@ void AEnemy_DropDice::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *O
 			UE_LOG(LogTemp, Warning, TEXT("No add item"));
 			break;
 		case EItemAddResult::IAR_PartialAmountAdded:
-			Character->UpdateInteractionWidget();
+			// Character->UpdateInteractionWidget();
 			UE_LOG(LogTemp, Warning, TEXT("Yes Paritial"));
 			break;
 		case EItemAddResult::IAR_AllItemAdded:
@@ -38,8 +45,6 @@ void AEnemy_DropDice::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *O
 
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *AddResult.ResultMessage.ToString());
 	}
-
-	
     // auto PD = Character->GetPlayerStatus();
     // PD.PlayerGoodsData.RerollDice = PD.PlayerGoodsData.RerollDice + ItemQuantity;
     // Character->SetPlayerStatus(PD);

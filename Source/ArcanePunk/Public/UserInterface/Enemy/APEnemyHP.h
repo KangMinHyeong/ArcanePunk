@@ -30,6 +30,5 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* HP;
 
-	UPROPERTY()
-	AEnemy_CharacterBase* Enemy;
+	TWeakObjectPtr<AEnemy_CharacterBase> Enemy;
 };

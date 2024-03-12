@@ -19,7 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;	
-
+	
 public:
 	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;	
 
@@ -34,6 +34,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	UParticleSystemComponent* RageEffect;	
 
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;
 };

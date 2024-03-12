@@ -18,7 +18,7 @@ void UAPHitPointComponent::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	float Right = (HitActorRightVec.X * HitPoint.X) + (HitActorRightVec.Y * HitPoint.Y); // 좌 우 Hit 판별
 
 	auto Enemy = Cast<AEnemy_CharacterBase>(HitActor);
-	if(Enemy) Enemy->SetHitPoint(Forward, Right);	
+	if(Enemy) {Enemy->SetHitPoint(Forward, Right); Enemy->SetHitEffect(ImpactPoint);}
 }
 
 void UAPHitPointComponent::SetCrowdControl(AActor *HitActor, ECharacterState UpdateState, float StateTime)

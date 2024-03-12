@@ -6,6 +6,7 @@
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/APTuTorialUserWidget.h"
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
+#include "UserInterface/Inform/APStageInformationUI.h"
 
 AAPHUD::AAPHUD()
 {
@@ -25,12 +26,12 @@ void AAPHUD::BeginPlay()
 		MainMenuWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 
-	if (InteractionWidgetClass)
-	{
-		InteractionWidget = CreateWidget<UInteractionWidget>(GetWorld(), InteractionWidgetClass);
-		InteractionWidget->AddToViewport(-1);
-		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
-	}
+	// if (InteractionWidgetClass)
+	// {
+	// 	InteractionWidget = CreateWidget<UInteractionWidget>(GetWorld(), InteractionWidgetClass);
+	// 	InteractionWidget->AddToViewport(-1);
+	// 	InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	// }
 
 	if (TutorialWidgetClass)
 	{
@@ -103,35 +104,35 @@ void AAPHUD::ToggleMenu()
 	}
 }
 
-void AAPHUD::ShowInteractionWidget() const
-{
-	if (InteractionWidget)
-	{
-		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
-	}
-}
+// void AAPHUD::ShowInteractionWidget() const
+// {
+// 	if (InteractionWidget)
+// 	{
+// 		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+// 	}
+// }
 
-void AAPHUD::HideInteractionWidget() const
-{
+// void AAPHUD::HideInteractionWidget() const
+// {
 
-	if (InteractionWidget)
-	{
-		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
-	}
-}
+// 	if (InteractionWidget)
+// 	{
+// 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+// 	}
+// }
 
-void AAPHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) const
-{
-	if (InteractionWidget)
-	{
-		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)
-		{
-			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
-		}
+// void AAPHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) const
+// {
+// 	if (InteractionWidget)
+// 	{
+// 		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)
+// 		{
+// 			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+// 		}
 
-		InteractionWidget->UpdateWidget(InteractableData);
-	}
-}
+// 		InteractionWidget->UpdateWidget(InteractableData);
+// 	}
+// }
 
 void AAPHUD::UpdateTutorialWidget(const FString PressedKey)
 {
@@ -172,4 +173,18 @@ void AAPHUD::DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType
 	EnhanceUI->InitType(EnhanceCategory, UpdateEnHanceType);
 	// ESkillTypeState, EnHanceType 의 정보를 EnhanceUI에게 넘겨주기
 	EnhanceUI->AddToViewport(-1);
+}
+
+void AAPHUD::OpenWorldMap()
+{
+	if(StageInformationUI.IsValid())
+	{
+		StageInformationUI->RemoveFromParent();
+		StageInformationUI = nullptr;
+	}
+	else
+	{
+		StageInformationUI = CreateWidget<UAPStageInformationUI>(GetWorld(), StageInformationUIClass);
+		StageInformationUI->AddToViewport();
+	}
 }

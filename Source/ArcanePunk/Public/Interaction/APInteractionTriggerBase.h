@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/Common/APInteractionBoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "APInteractionTriggerBase.generated.h"
 
-class UBoxComponent;
+class UCameraComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPInteractionTriggerBase : public AActor
@@ -22,11 +23,21 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	virtual void OnInteractionTrigger(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+	FORCEINLINE void SetPartnerName(FName Name) {ConversationPartnerName = Name;};
+	FORCEINLINE UAPInteractionBoxComponent* GetInteractionBox() {return InteractionTrigger;};
 
-private:
+protected:
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* InteractionTrigger;
+	UAPInteractionBoxComponent* InteractionTrigger;
 
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* InteractionCamera;
+
+	UPROPERTY(EditAnywhere)
+	FName ConversationPartnerName;
+
+	UPROPERTY(EditAnywhere)
+	float InteractFrequency = 0.1f;
+
+	FTimerHandle InteractTimerHandle;
 };

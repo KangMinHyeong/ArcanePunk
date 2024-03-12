@@ -50,9 +50,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FVector ExploisionScale = FVector(0,0,0);
 
-	UPROPERTY()
 	float ExplosionRadius = 0.0f;
 
-	UPROPERTY()
 	FVector TargetPoint = FVector(0,0,0);
 };

@@ -45,12 +45,12 @@ void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, 
 	auto MyOwnerInstigator = MyOwner->GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
 
-	auto Character = Cast<AArcanePunkCharacter>(MyOwner);
-	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
+	OwnerCharacter = Cast<AArcanePunkCharacter>(MyOwner);
+	if (OtherActor && OtherActor != this && OtherActor != MyOwner && OwnerCharacter.IsValid())
 	{
 		if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 		HitPointComp->DistinctHitPoint(Hit.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
         // HitImpact & DestroyEffect
 	}
     Destroy();

@@ -2,6 +2,10 @@
 
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "GameInstance/APGameInstance.h"
 
 UAPSpawnFootPrintComponent::UAPSpawnFootPrintComponent()
 {
@@ -30,8 +34,27 @@ void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot)
 		{
 			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
 			{
-				auto FootPrint = GetWorld()->SpawnActor<AActor>(OwnerCharacter->GetFootClass(true), OwnerCharacter->GetFootTransform(true));
-			}	
+				auto FootPrint = GetWorld()->SpawnActor<AActor>(GetFootClass(true), OwnerCharacter->GetFootTransform(true));
+			}
+
+			if(OwnerCharacter->GetVelocity().Size() >= 0.1f)
+			{
+				if(Num != (uint8)UGameplayStatics::GetSurfaceType(HitResult))
+				{
+					Num = (uint8)UGameplayStatics::GetSurfaceType(HitResult);
+					if(StepEffect.Num() <= Num) return; if(StepSound.Num() <= Num) return;
+
+					if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
+					if(StepSound[Num]) RunEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(StepEffect[Num], OwnerCharacter->GetMesh(), TEXT("StepEffect"), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*UpCoeff - OwnerCharacter->GetActorForwardVector()*BackCoeff, OwnerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+				}
+				if(StepSound[Num]) SpawnSound(StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
+			}
+			else
+			{
+				if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
+				Num = -1;
+			}
+			// 
 		}
 	}
 	else
@@ -40,8 +63,22 @@ void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot)
 		{
 			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
 			{
-				auto FootPrint = GetWorld()->SpawnActor<AActor>(OwnerCharacter->GetFootClass(false), OwnerCharacter->GetFootTransform(false));
+				auto FootPrint = GetWorld()->SpawnActor<AActor>(GetFootClass(false), OwnerCharacter->GetFootTransform(false));
 			}
 		}
 	}
+}
+
+void UAPSpawnFootPrintComponent::SpawnSound(USoundBase* Sound, FVector Location)
+{
+	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+
+	float SoundVolume = GI->GameSoundVolume.MasterVolume * GI->GameSoundVolume.EffectVolume;
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Sound, Location, FRotator::ZeroRotator, SoundVolume * SoundCoefficient);
+}
+
+TSubclassOf<AActor> UAPSpawnFootPrintComponent::GetFootClass(bool Left) 
+{	
+	if(Left) return LeftFootClass;
+    return RightFootClass;
 }

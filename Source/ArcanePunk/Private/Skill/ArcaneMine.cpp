@@ -51,10 +51,10 @@ void AArcaneMine::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UP
 
 void AArcaneMine::Explosion(AActor* OtherActor)
 {
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner());  
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());  if(!OwnerCharacter.IsValid()) return;
     float Size =  GetActorScale3D().Y / DefaultSize;
 
-    Character->GetAttackComponent()->MultiAttack_KnockBack(GetActorLocation(), GetActorLocation() + Character->GetActorUpVector() * 25.0f, ExplosionRadius * Size, ExplosionRadius, DamageCoefficient, HitNumbers, StateTime, true);
+    OwnerCharacter->GetAttackComponent()->MultiAttack_KnockBack(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius * Size, ExplosionRadius, DamageCoefficient, HitNumbers, StateTime, true);
     // DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius* Size, 18, FColor::Green,false, 2.0f);
     if(ExplosionEffect) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(), GetActorRotation(), ExplosionScale);
     Destroy();

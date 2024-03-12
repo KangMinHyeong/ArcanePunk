@@ -62,8 +62,8 @@ void USkillNumber7::Spawn_Skill7()
 
 	
 	ActivateSkillRange_Target(Skill7_Wide, Skill7_LimitDistance, ESkillRangeType::Arrow);
-	if(SkillRange_Target) SkillRange_Target->SetMaxDist(Skill7_LimitDistance);
-	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill7_LimitDistance);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 	if(CheckSmartKey(SkillKey, OwnerCharacter))
 	{
@@ -72,7 +72,7 @@ void USkillNumber7::Spawn_Skill7()
 		SkillRange_Target->SetActorHiddenInGame(true);
 	}
 
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
 }
@@ -88,7 +88,7 @@ void USkillNumber7::OnSkill()
 
 	OwnerAnim->PlaySkill_7_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-    if(SkillRange_Target) SkillRange_Target->SetActorHiddenInGame(true);
+    if(SkillRange_Target.IsValid()) SkillRange_Target->SetActorHiddenInGame(true);
     CharacterRotation();
 }
 
@@ -97,7 +97,7 @@ void USkillNumber7::Remove_Skill()
 	Super::Remove_Skill();
 }
 
-void USkillNumber7::Activate_Skill7()
+void USkillNumber7::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; 
@@ -108,7 +108,7 @@ void USkillNumber7::Activate_Skill7()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ArcaneCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation());
-	if(!ArcaneCutter) return; 
+	if(!ArcaneCutter.IsValid()) return; 
 	ArcaneCutter->SetSkill(CurrentSkillType, CurrentSkillAbility);	
     float Size = ArcaneCutter->GetActorScale3D().Y/ ArcaneCutter->DefaultSize;
     ArcaneCutter->SetActorLocation( ArcaneCutter->GetActorLocation() + (OwnerCharacter->GetActorUpVector()*150.0f*Size));
@@ -119,7 +119,7 @@ void USkillNumber7::Activate_Skill7()
 	Remove_Skill();
 }
 
-void USkillNumber7::Skill7_End()
+void USkillNumber7::SkillEnd()
 {
-	// if(ArcaneBeam) ArcaneBeam->DestroySKill();
+	// if(ArcaneBeam.IsValid()) ArcaneBeam->DestroySKill();
 }

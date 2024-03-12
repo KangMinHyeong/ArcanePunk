@@ -3,43 +3,61 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/InteractionInterface.h"
 #include "GameFramework/Actor.h"
 #include "Portal_Base.generated.h"
 
+class AArcanePunkCharacter;
+class UAPInteractionBoxComponent;
+class UNiagaraSystem;
+class USoundBase;
+
 UCLASS()
-class ARCANEPUNK_API APortal_Base : public AActor
+class ARCANEPUNK_API APortal_Base : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	APortal_Base();
-	FORCEINLINE uint8 GetPortalNumber() const {return PortalNumber;};
+	FORCEINLINE FName GetPortalID() const {return PortalID;};
 	void InitHide(bool IsHidden);
 
 protected:
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	virtual void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	virtual void StartTeleport();
+	virtual void StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint);
+	virtual void SpawnSound(FVector Location);
 
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PortalMesh;
 	
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* PortalTrigger;
+	UAPInteractionBoxComponent* PortalInteractionTrigger;
 
 	FTimerHandle Delay_TimerHandle;
+
+	FTimerHandle InteractTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float Delay_Time = 2.0f;
 
-	class AArcanePunkCharacter* OverlapCharacter;
+	UPROPERTY(EditAnywhere)
+	float InteractFrequency = 0.05f;
 
 	UPROPERTY(EditAnywhere)
 	bool DefaultHidden = false;
 
 	UPROPERTY(EditAnywhere)
-	uint8 PortalNumber = 0;
+	float SoundStartTime = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	FName PortalID;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* PortalEffect;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* PortalSound;
+
 };

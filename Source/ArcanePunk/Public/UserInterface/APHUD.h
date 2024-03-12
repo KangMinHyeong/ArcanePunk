@@ -12,6 +12,7 @@ struct FInteractableData;
 class UInteractionWidget;
 class UMainMenu;
 class UAPTuTorialUserWidget;
+class UAPStageInformationUI;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
 
@@ -24,8 +25,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> MainMenuClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
+	// UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	// TSubclassOf<UInteractionWidget> InteractionWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UAPTuTorialUserWidget> TutorialWidgetClass;
@@ -36,27 +37,34 @@ public:
 
 	AAPHUD();
 
+	virtual void BeginPlay() override;
 
 	void DisplayMenu();
 	void HideMenu();
 	void ToggleMenu();
 
-	void ShowInteractionWidget() const;
-	void HideInteractionWidget() const;
-	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
+	// void ShowInteractionWidget() const;
+	// void HideInteractionWidget() const;
+	// void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
 
 	void UpdateTutorialWidget(const FString PressedKey);
 	void HideTutorialWidget() const;
 
+	UMainMenu* GetInventoryWidget() { return MainMenuWidget; };
+
+	FVector2D GetViewportSize() { return ViewportSize; }
+
 	// Minhyeong
 	UFUNCTION(BlueprintPure)
-	UUserWidget* GetBossHPUI() {return BossHPWidget;};
+	UUserWidget* GetBossHPUI() {return BossHPWidget.Get();};
 	void SetBossHPUI();
 
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UUserWidget* GetStatusWidget() const {return StatusBarWidget;};
+	FORCEINLINE UUserWidget* GetStatusWidget() const {return StatusBarWidget.Get();};
 
 	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType);
+
+	void OpenWorldMap();
 
 protected:
 
@@ -65,14 +73,14 @@ protected:
 	UPROPERTY()
 	UMainMenu* MainMenuWidget;
 
-	UPROPERTY()
-	UInteractionWidget* InteractionWidget;
+	// UPROPERTY()
+	// UInteractionWidget* InteractionWidget;
 
 	UPROPERTY()
 	UAPTuTorialUserWidget* TutorialWidget;
 
-
-	virtual void BeginPlay() override;
+	UPROPERTY()
+	FVector2D ViewportSize;
 
 //Minhyeong
 private:
@@ -85,22 +93,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TArray<TSubclassOf<UUserWidget>> EnhanceChoiceClasses;
 
-	UPROPERTY()
-	UUserWidget* StatusBarWidget;
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> StageInformationUIClass;
 
-	UPROPERTY()
-	UUserWidget* BossHPWidget;
+	TWeakObjectPtr<UUserWidget> StatusBarWidget;
 
-	UPROPERTY()
-	FVector2D ViewportSize;
+	TWeakObjectPtr<UUserWidget> BossHPWidget;
 
-public:
-
-	UMainMenu* GetInventoryWidget() { return MainMenuWidget; };
-
-	FVector2D GetViewportSize() { return ViewportSize; }
-
-
+	TWeakObjectPtr<UAPStageInformationUI> StageInformationUI;
 
 public:
 	FOnUpdateHPBar OnUpdateHPBar;

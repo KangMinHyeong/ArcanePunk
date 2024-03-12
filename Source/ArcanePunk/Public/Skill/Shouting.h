@@ -35,8 +35,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* ShoutEffect;
 
-	UPROPERTY()
-	UNiagaraComponent* ShoutComp;
+	TWeakObjectPtr<UNiagaraComponent> ShoutComp;
 
 	UPROPERTY(EditAnywhere)
 	FVector ShoutScale = FVector(1,1,1);

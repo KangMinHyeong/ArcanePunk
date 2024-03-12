@@ -26,11 +26,13 @@ public:
 	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
-
+	
 private:
 	void AutoAttack();
 	AActor* FindEnemy();
 	void Fire();
+
+	void SpawnDamageText(AController* EventInstigator, float Damage);
 
 protected:
 	UPROPERTY(EditAnywhere)

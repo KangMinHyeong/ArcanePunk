@@ -22,20 +22,18 @@ public:
 
 	virtual void Remove_Skill() override;
 
-	void Activate_Skill8();
-	void Skill8_End();
+	virtual void Activate_Skill() override;
+	virtual void SkillEnd() override;
 
 private:
 	virtual void AddAbilityList() override;
 	void Spawn_Skill8();	
 
-	UPROPERTY()
+private:
 	float Skill8_LimitDistance = 1350.0f / 2.0f;
 
-	UPROPERTY()
 	float Skill8_Wide = 200.0f / 2.0f;	
 
-	UPROPERTY()
-	AArcaneBall* ArcaneBall;
+	TWeakObjectPtr<AArcaneBall> ArcaneBall;
 
 };

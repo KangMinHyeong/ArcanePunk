@@ -36,8 +36,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OptionSettingClass;
 
-	UPROPERTY()
-	UAPOptionSetting* OptionSettingUI;
+	TWeakObjectPtr<UAPOptionSetting> OptionSettingUI;
 
 	FTimerHandle IntroeTimerHandle;
 

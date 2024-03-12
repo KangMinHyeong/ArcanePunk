@@ -28,9 +28,9 @@ void UAPStatusBar::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
 
 void UAPStatusBar::InitStatusBar()
 {
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
     auto PD = OwnerCharacter->GetPlayerStatus();
-    HUD = Cast<AAPHUD>(GetOwningPlayer()->GetHUD()); if(!HUD) return;
+    HUD = Cast<AAPHUD>(GetOwningPlayer()->GetHUD()); if(!HUD.IsValid()) return;
 
     HPBar->SetPercent(PD.PlayerDynamicData.HP / PD.PlayerDynamicData.MaxHP); OriginHP = PD.PlayerDynamicData.HP;
     MPBar->SetPercent(PD.PlayerDynamicData.MP / PD.PlayerDynamicData.MaxMP);
@@ -40,7 +40,7 @@ void UAPStatusBar::InitStatusBar()
 
 void UAPStatusBar::SetHPPercent(float Origin)
 {
-    if(!OwnerCharacter) return; auto PD = OwnerCharacter->GetPlayerStatus();
+    if(!OwnerCharacter.IsValid()) return; auto PD = OwnerCharacter->GetPlayerStatus();
 
     OriginHP = Origin;
 
@@ -49,7 +49,7 @@ void UAPStatusBar::SetHPPercent(float Origin)
 
 void UAPStatusBar::UpdatePercentBar(float InDeltaTime)
 {
-    if(!OwnerCharacter) return; auto PD = OwnerCharacter->GetPlayerStatus();
+    if(!OwnerCharacter.IsValid()) return; auto PD = OwnerCharacter->GetPlayerStatus();
     if(OriginHP == PD.PlayerDynamicData.HP) {bChange = false; return;}
 
     OriginHP = FMath::FInterpTo(OriginHP, PD.PlayerDynamicData.HP, InDeltaTime, BarSpeed);

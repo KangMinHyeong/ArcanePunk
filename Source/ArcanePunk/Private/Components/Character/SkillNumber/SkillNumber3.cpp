@@ -71,13 +71,13 @@ void USkillNumber3::Spawn_Skill3()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	ActivateSkillRange_Target(Skill3_TargetRange, Skill3_TargetRange, ESkillRangeType::Control_Circle);
-	if(SkillRange_Target) SkillRange_Target->SetMaxDist(OwnerCharacter->GetSkill3_LimitDist());
-	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(OwnerCharacter->GetSkill3_LimitDist());
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 	ActivateSkillRange_Round(OwnerCharacter->GetSkill3_LimitDist());
-	if(SkillRange_Circle) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
 }
@@ -87,7 +87,7 @@ void USkillNumber3::OnSkill()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
 	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerCharacterPC) return;
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
-	if(!SkillRange_Target) return; if(!Skilling) return;
+	if(!SkillRange_Target.IsValid()) return; if(!Skilling) return;
 	
 	OwnerAnim->PlaySkill_3_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -103,10 +103,10 @@ void USkillNumber3::Remove_Skill()
 void USkillNumber3::SpawnAttackSphere()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter || !SkillRange_Target) return; 
+	if(!OwnerCharacter || !SkillRange_Target.IsValid()) return; 
 
 	bool bStun = false;
-	if(SkillRange_Target) bStun = SkillRange_Target->GetbStun();
+	if(SkillRange_Target.IsValid()) bStun = SkillRange_Target->GetbStun();
 
 	OwnerCharacter->GetAttackComponent()->MultiAttack(SkillRange_Target->GetActorLocation(), false, 1.2f, bStun, 3.0f ,true, Skill3_TargetRange * SkillRange_Target->GetActorScale3D().X);
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OwnerCharacter->Skill3_Effect, SkillRange_Target->GetActorLocation(), OwnerCharacter->GetActorRotation());

@@ -23,13 +23,13 @@ void UAPStatusUI::InitEquipSlot()
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
     if(!OwnerCharacter) return;
 
-    if(WeaponSlot) WeaponSlot->RemoveFromParent();
+    if(WeaponSlot.IsValid()) WeaponSlot->RemoveFromParent();
     
     if(OwnerCharacter->GetEquipData(1) && InventorySlotClass)
     { 
         WeaponSlot = CreateWidget<UInventoryItemSlot>(this, InventorySlotClass);
         WeaponSlot->SetItemReference(OwnerCharacter->GetEquipData(1));
-        WeaponOverlay->AddChildToOverlay(WeaponSlot);
+        WeaponOverlay->AddChildToOverlay(WeaponSlot.Get());
         WeaponSlot->SetInInventory(ESlotType::Status);
         // WeaponBorder->AddChildto(WeaponSlot);
     }

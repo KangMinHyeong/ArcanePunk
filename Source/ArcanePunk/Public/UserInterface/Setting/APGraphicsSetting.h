@@ -201,7 +201,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Unlimited;
 
-	UPROPERTY()
 	EGraphicsSetting FrameRateSetting;
 
 //  OverAll Scalability
@@ -214,7 +213,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* OS_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting OS_Setting;
 
 //  Post Process
@@ -227,7 +225,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* PP_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting PP_Setting;
 
 //  Texture Quality
@@ -240,7 +237,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* TQ_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting TQ_Setting;
 
 //  Anti Aliasing
@@ -253,7 +249,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* AA_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting AA_Setting;
 
 //  Shadow Quality
@@ -266,7 +261,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* SQ_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting SQ_Setting;
 
 //  Effect Quality
@@ -279,7 +273,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* EQ_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting EQ_Setting;
 
 //  Foliage Quality
@@ -292,7 +285,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* FQ_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting FQ_Setting;
 
 //  Shading Quality
@@ -305,7 +297,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Shading_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting Shading_Setting;
 
 //	Reflection Quality
@@ -318,7 +309,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* RQ_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting RQ_Setting;
 
 //	View Distance
@@ -331,7 +321,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* VD_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting VD_Setting;
 
 //  Global Illumination Quality
@@ -344,7 +333,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* GI_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting GI_Setting;
 
 //  Resolution Scale 
@@ -357,7 +345,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* RS_Epic;
 
-	UPROPERTY()
 	EGraphicsSetting RS_Setting;	
 
 //  Back to the Option Setting

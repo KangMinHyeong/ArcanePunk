@@ -6,9 +6,22 @@
 #include "Engine/GameInstance.h"
 #include "APGameInstance.generated.h"
 
-/**
- * 
- */
+// 후에 쓸 수도?
+USTRUCT(BlueprintType)
+struct FGameSoundVolume
+{
+	GENERATED_USTRUCT_BODY()
+
+	FGameSoundVolume() {}
+
+	UPROPERTY()
+	float MasterVolume = 1.0f;
+	UPROPERTY()
+	float BGMVolume = 1.0f;
+	UPROPERTY()
+	float EffectVolume = 1.0f;
+};
+
 UCLASS()
 class ARCANEPUNK_API UAPGameInstance : public UGameInstance
 {
@@ -31,4 +44,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TMap<FName, bool> CanEnterStage; // Stage이름, 입장가능여부
+
+	UPROPERTY()
+	FGameSoundVolume GameSoundVolume;
 };

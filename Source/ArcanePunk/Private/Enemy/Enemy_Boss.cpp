@@ -70,8 +70,7 @@ bool AEnemy_Boss::OnPossessing()
 // Montage Bind Func Start
 void AEnemy_Boss::BindMontageEnd()
 {
-	OwnerAnim = Cast<UAP_EnemyBossAnimInstance>(GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	OwnerAnim = Cast<UAP_EnemyBossAnimInstance>(GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 
 	// MontageEnd
 	OwnerAnim->OnMontageEnded.AddDynamic(this, &AEnemy_Boss::BossMontageEnded);
@@ -79,7 +78,7 @@ void AEnemy_Boss::BindMontageEnd()
 
 void AEnemy_Boss::BossMontageEnded(UAnimMontage *Montage, bool bInterrupted)
 {
-    if(!OwnerAnim) return;
+    if(!OwnerAnim.IsValid()) return;
 	
 	if(Montage == OwnerAnim->RushAttack_Montage) OnRushAttack_MontageEnd();
     else if(Montage == OwnerAnim->MismatchedAttack_Montage) OnMismatchedAttack_MontageEnd();
@@ -192,7 +191,7 @@ void AEnemy_Boss::KnockBackAttack()
 {
     Monster_AttackRadius = Monster_AttackRadius * KnockBackRangeCoefficient;
     Monster_AttackRange = Monster_AttackRange * KnockBackRangeCoefficient;
-    if(!OwnerAnim) return;
+    if(!OwnerAnim.IsValid()) return;
     OwnerAnim->PlayKnockBackAttack_Montage();
 }
 
@@ -229,7 +228,7 @@ void AEnemy_Boss::DrainMonster()
 {
     if(MonsterArr.IsEmpty()) return;
 
-    if(OwnerAnim) OwnerAnim->PlayDrainMonster_Montage();
+    if(OwnerAnim.IsValid()) OwnerAnim->PlayDrainMonster_Montage();
     UNiagaraFunctionLibrary::SpawnSystemAttached(DrainEffect, GetMesh(), TEXT("DrainEffect"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
     
     while(!MonsterArr.IsEmpty())
@@ -280,7 +279,7 @@ void AEnemy_Boss::RangeAttack_1()
             SpawnRangeAttackLocation.Add(SpawnPoint);
         }
     }
-    if(OwnerAnim) OwnerAnim->PlayRangeAttack1_Montage();
+    if(OwnerAnim.IsValid()) OwnerAnim->PlayRangeAttack1_Montage();
 }
 
 void AEnemy_Boss::SpawnRangeAttack_1()
@@ -320,7 +319,7 @@ void AEnemy_Boss::RangeAttack_2_Ready()
 void AEnemy_Boss::RangeAttack_2()
 {
     GetWorldTimerManager().ClearTimer(RangeAttack_2_ReadyTimerHandle);
-    if(OwnerAnim) OwnerAnim->PlayRangeAttack2_Montage();
+    if(OwnerAnim.IsValid()) OwnerAnim->PlayRangeAttack2_Montage();
 }
 
 void AEnemy_Boss::SpawnRangeAttack_2()
@@ -361,7 +360,7 @@ void AEnemy_Boss::OnSwordImpactSpawn(float AddAngle)
 bool AEnemy_Boss::SetHPUI()
 { 
     PlayerHUD = Cast<AAPHUD>(NewObject<AHUD>(this, UGameplayStatics::GetGameMode(GetWorld())->HUDClass));
-    if(!PlayerHUD) return false;
+    if(!PlayerHUD.IsValid()) return false;
     PlayerHUD->SetBossHPUI();
 	UAPEnemyHP* HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
 	if(HPUI) HPUI->SetEnemy(this);
@@ -372,7 +371,7 @@ bool AEnemy_Boss::SetHPUI()
 void AEnemy_Boss::EnemyDestroyed()
 {
     Super::EnemyDestroyed();
-    if(!PlayerHUD) return;
+    if(!PlayerHUD.IsValid()) return;
     UAPEnemyHP* HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
 	if(HPUI) HPUI->RemoveFromParent();
 }

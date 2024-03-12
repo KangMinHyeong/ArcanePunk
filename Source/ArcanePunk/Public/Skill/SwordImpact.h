@@ -46,7 +46,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* ImpactComp;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,  meta=(AllowPrivateAccess="true"))
 	UNiagaraComponent* BaseEffect;
 
 	UPROPERTY(EditAnywhere)

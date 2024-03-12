@@ -70,7 +70,6 @@ FReply UAPDropPackageUI::NativeOnKeyDown( const FGeometry& InGeometry, const FKe
 {
     FReply Reply = Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 
-    UE_LOG(LogTemp, Display, TEXT("Your message"));
     // 후에 인벤토리 제한사항에서 못넣는 상황 코드 추가
     if(InKeyEvent.GetKey() == EKeys::F)
     {

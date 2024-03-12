@@ -5,6 +5,8 @@
 #include "Components/Slider.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "UserInterface/Setting/APOptionSetting.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPAudioSetting::NativeConstruct()
 {
@@ -27,14 +29,12 @@ FReply UAPAudioSetting::NativeOnMouseWheel(const FGeometry &InGeometry, const FP
 
 void UAPAudioSetting::InitSliders()
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    if(OwnerPC->GetOptionSettingUI())
-    {
-        Slider_Master->SetValue(OwnerPC->GetOptionSettingUI()->GetMasterVolume());
-        Slider_BGM->SetValue(OwnerPC->GetOptionSettingUI()->GetBGMVolume());
-        Slider_Effect->SetValue(OwnerPC->GetOptionSettingUI()->GetEffectVolume());
-    }
+    Slider_Master->SetValue(GI->GameSoundVolume.MasterVolume);
+    Slider_BGM->SetValue(GI->GameSoundVolume.BGMVolume);
+    Slider_Effect->SetValue(GI->GameSoundVolume.EffectVolume);
+    
 }
 
 void UAPAudioSetting::BindButton()
@@ -56,14 +56,18 @@ void UAPAudioSetting::OnClickBack()
 
 void UAPAudioSetting::OnSlide_Master(float Value)
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
-    UE_LOG(LogTemp, Display, TEXT("Your %f"), Value);
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    GI->GameSoundVolume.MasterVolume = Value;
 }
 
 void UAPAudioSetting::OnSlide_BGM(float Value)
 {
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    GI->GameSoundVolume.BGMVolume = Value;
 }
 
 void UAPAudioSetting::OnSlide_Effect(float Value)
 {
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    GI->GameSoundVolume.EffectVolume = Value;
 }

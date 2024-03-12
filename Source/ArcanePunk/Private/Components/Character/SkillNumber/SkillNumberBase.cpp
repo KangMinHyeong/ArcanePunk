@@ -20,8 +20,7 @@ void USkillNumberBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetComponentTickEnabled(false);
-	AddAbilityList();
+	CreateInit();
 }
 
 void USkillNumberBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -31,6 +30,13 @@ void USkillNumberBase::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	CheckingOtherSkill();
 }
 
+void USkillNumberBase::CreateInit()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	SetComponentTickEnabled(false);
+	AddAbilityList();
+}
+
 void USkillNumberBase::CheckingOtherSkill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
@@ -38,7 +44,6 @@ void USkillNumberBase::CheckingOtherSkill()
 
 	if(CheckSmartKey(SkillKey, OwnerCharacter)) 
 	{ 
-		UE_LOG(LogTemp, Display, TEXT("1"));
 		OnSkill(); return; 
 	}
 	if(OwnerCharacter->GetAPSkillHubComponent()->GetSkillState() != ESkillKey::None && Skilling)
@@ -68,14 +73,38 @@ void USkillNumberBase::Remove_Skill()
 
 	SetComponentTickEnabled(false);
 
-	if(SkillRange_Target) SkillRange_Target->Destroy();
-	if(SkillRange_Circle) SkillRange_Circle->Destroy();
+	if(SkillRange_Target.IsValid()) SkillRange_Target->Destroy();
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->Destroy();
  
 	OwnerCharacterPC->bShowMouseCursor = true;
 	Skilling = false;
 }
 
-bool USkillNumberBase::CheckSmartKey(ESkillKey WhichKey, AArcanePunkCharacter* OwnerCharacter)
+void USkillNumberBase::SkillEnd()
+{
+}
+
+void USkillNumberBase::RemoveEffect()
+{
+}
+
+void USkillNumberBase::Activate_Skill()
+{
+}
+
+void USkillNumberBase::Enhance()
+{
+}
+
+void USkillNumberBase::MarkingOn(AActor *OtherActor, float Time)
+{
+}
+
+void USkillNumberBase::MarkErase()
+{
+}
+
+bool USkillNumberBase::CheckSmartKey(ESkillKey WhichKey, AArcanePunkCharacter *OwnerCharacter)
 {
 	auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
 	if(!PC) return false;
@@ -120,7 +149,7 @@ void USkillNumberBase::SkillCancel()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 }
 
 void USkillNumberBase::SetAbility(ESkillKey WhichKey)
@@ -151,7 +180,7 @@ void USkillNumberBase::ActivateSkillRange_Round(float Range)
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
 	
 	SkillRange_Circle = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillRange(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator + FRotator(90,0,0));
-	if(!SkillRange_Circle) return;
+	if(!SkillRange_Circle.IsValid()) return;
 	SkillRange_Circle->SetOwner(OwnerCharacter);
 	SkillRange_Circle->GetDecalComponent()->DecalSize = FVector(15.0f, Range, Range);
 	SkillRange_Circle->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
@@ -170,15 +199,15 @@ void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, E
 	else if(SkillRangeType == ESkillRangeType::Arrow)
 	{
 		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillRange_Arrow(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
-		if(SkillRange_Target) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+		if(SkillRange_Target.IsValid()) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 	else if(SkillRangeType == ESkillRangeType::Around_Circle)
 	{
 		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillRange_Circle(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
-		if(SkillRange_Target) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+		if(SkillRange_Target.IsValid()) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 
-	if(!SkillRange_Target) return;
+	if(!SkillRange_Target.IsValid()) return;
 	SkillRange_Target->SetOwner(OwnerCharacter);
 	SkillRange_Target->GetDecalComponent()->DecalSize = FVector(5.0f, Range_1, Range_2);
 	
@@ -186,7 +215,7 @@ void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, E
 
 void USkillNumberBase::CharacterRotation()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return; if(!SkillRange_Target) return;
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return; if(!SkillRange_Target.IsValid()) return;
 
 	FVector Loc = SkillRange_Target->GetDecalComponent()->GetComponentLocation() - OwnerCharacter->GetMesh()->GetComponentLocation();
 

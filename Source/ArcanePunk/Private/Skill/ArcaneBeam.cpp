@@ -6,7 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "Components/BoxComponent.h"
+#include "Components/BoxComponent.h" 
+#include "Components/CapsuleComponent.h"
 
 AArcaneBeam::AArcaneBeam()
 {    
@@ -28,26 +29,29 @@ void AArcaneBeam::DestroySKill()
 {
     Super::DestroySKill();
     GetWorldTimerManager().ClearTimer(BeamHitLoopTimerHandle);
-    if(BeamComp) {BeamComp->DestroyComponent();}
+    if(BeamComp.IsValid()) {BeamComp->DestroyComponent();}
 }
 
-void AArcaneBeam::SetBeamEffect()
+void AArcaneBeam::SetBeamEffect(float Coefficient)
 { 
-    float Size =  GetActorScale3D().Y / DefaultSize;
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-    BeamComp = UNiagaraFunctionLibrary::SpawnSystemAttached(BeamEffect, Character->GetLeftBeamPoint(), TEXT("ArcaneBeam"), FVector(0,0,0), FRotator::ZeroRotator, Size * BeamScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
-    if(!BeamComp) return; 
-    BeamStart = Character->GetLeftBeamPoint()->GetComponentLocation();
-    BeamEnd = FVector(Character->GetMesh()->GetComponentLocation().X,Character->GetMesh()->GetComponentLocation().Y,BeamStart.Z) + Character->GetActorForwardVector() * Distance * Size;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+    float Size =  GetActorScale3D().Y / DefaultSize * ( 1.0f / OwnerCharacter->GetMesh()->GetComponentScale().Y);
+    
+    BeamComp = UNiagaraFunctionLibrary::SpawnSystemAttached(BeamEffect, OwnerCharacter->GetLeftBeamPoint(), TEXT("ArcaneBeam"), FVector(0,0,0), FRotator::ZeroRotator, Size * BeamScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
+    if(!BeamComp.IsValid()) return; 
+    BeamStart = OwnerCharacter->GetLeftBeamPoint()->GetComponentLocation();
+    BeamEnd = FVector(OwnerCharacter->GetCapsuleComponent()->GetComponentLocation().X,OwnerCharacter->GetCapsuleComponent()->GetComponentLocation().Y,BeamStart.Z) + OwnerCharacter->GetActorForwardVector() * Distance * Size;
     BeamComp->SetNiagaraVariableVec3(TEXT("Beam End"),  BeamEnd);
     BeamComp->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+
+    DamageCoefficient = Coefficient;
     SetBeamAttack();
 }
 
 void AArcaneBeam::SetBeamAttack()
 {
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-    Character->GetAttackComponent()->MultiAttack(BeamStart, BeamEnd, BeamRadius, DamageCoefficient, 1, bStun, StateTime);
+    if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->GetAttackComponent()->MultiAttack(BeamStart, BeamEnd, BeamRadius, DamageCoefficient, 1, bStun, StateTime);
     GetWorldTimerManager().SetTimer(BeamHitLoopTimerHandle, this, &AArcaneBeam::SetBeamAttack, BeamHitLoopTime, false);
 }
 

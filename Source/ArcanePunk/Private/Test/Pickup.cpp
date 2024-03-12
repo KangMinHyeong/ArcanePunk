@@ -62,11 +62,11 @@ void APickup::InitializeDrop(UAPItemBase* ItemToDrop, const int32 Quantity)
 
 void APickup::UpdateInteractableData()
 {
-	InstanceInteractableData.InteractableType = EInteractableType::Pickup;
-	InstanceInteractableData.Action = ItemReference->ItemTextData.InteractionText;
-	InstanceInteractableData.Name = ItemReference->ItemTextData.Name;
-	InstanceInteractableData.Quantity = ItemReference->Quantity;
-	InteractableData = InstanceInteractableData;
+	// InstanceInteractableData.InteractableType = EInteractableType::Pickup;
+	// InstanceInteractableData.Action = ItemReference->ItemTextData.InteractionText;
+	// InstanceInteractableData.Name = ItemReference->ItemTextData.Name;
+	// InstanceInteractableData.Quantity = ItemReference->Quantity;
+	// InteractableData = InstanceInteractableData;
 }
 
 void APickup::BeginFocus()
@@ -112,7 +112,7 @@ void APickup::TakePickup(const AArcanePunkCharacter* PlayerCharacter)
 					break;
 				case EItemAddResult::IAR_PartialAmountAdded:
 					UpdateInteractableData();
-					PlayerCharacter->UpdateInteractionWidget();
+					// PlayerCharacter->UpdateInteractionWidget();
 					UE_LOG(LogTemp, Warning, TEXT("Yes Paritial"));
 					break;
 				case EItemAddResult::IAR_AllItemAdded:

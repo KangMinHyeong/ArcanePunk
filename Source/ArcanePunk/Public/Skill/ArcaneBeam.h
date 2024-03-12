@@ -25,7 +25,7 @@ protected:
 public:
 	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
 
-	void SetBeamEffect();
+	void SetBeamEffect(float Coefficient);
 	void SetBeamAttack();
 	void SetDistance(float Dist) {Distance = Dist;};
 	void SetWide(float Radius) {BeamRadius = Radius;};
@@ -36,8 +36,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* BeamEffect;
 
-	UPROPERTY()
-	UNiagaraComponent* BeamComp;
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* BeamEasdaffect;
+
+	TWeakObjectPtr<UNiagaraComponent> BeamComp;
 	
 	UPROPERTY(EditAnywhere)
 	float Distance = 1000.0f;
@@ -45,10 +47,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FVector BeamScale = FVector(1,1,1);
 
-	UPROPERTY()
 	FVector BeamStart = FVector(0,0,0);
 
-	UPROPERTY()
 	FVector BeamEnd = FVector(0,0,0);
 
 	UPROPERTY(EditAnywhere)

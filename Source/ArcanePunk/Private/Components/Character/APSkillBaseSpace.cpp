@@ -40,7 +40,7 @@ void UAPSkillBaseSpace::Skill_SpaceQ()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_Q, ESkillKey::R);
+	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_Q, ESkillKey::R);
 }
 
 void UAPSkillBaseSpace::Skill_SpaceE()
@@ -48,7 +48,7 @@ void UAPSkillBaseSpace::Skill_SpaceE()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_E, ESkillKey::R);
+	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_E, ESkillKey::R);
 }
 
 void UAPSkillBaseSpace::Skill_SpaceSpace()
@@ -56,7 +56,7 @@ void UAPSkillBaseSpace::Skill_SpaceSpace()
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_R, ESkillKey::R);
+	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->BindUltSkill(OwnerCharacter->GetRSkill(),  ESkillTypeState::Type_R, ESkillKey::R);
 }
 
 void UAPSkillBaseSpace::Skill_SpaceShift()

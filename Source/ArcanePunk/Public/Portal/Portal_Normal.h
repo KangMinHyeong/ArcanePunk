@@ -6,24 +6,27 @@
 #include "Portal/Portal_Base.h"
 #include "Portal_Normal.generated.h"
 
-/**
- * 
- */
+class UAPInteractionBoxComponent;
+class AArcanePunkCharacter;
+
 UCLASS()
 class ARCANEPUNK_API APortal_Normal : public APortal_Base
 {
 	GENERATED_BODY()
 public:
 	APortal_Normal();
+
+	virtual void BeginFocus() override;
+	virtual void EndFocus() override;
+	virtual FInteractData GetInteractData() override;
+	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
+
 protected:	
 	virtual void BeginPlay() override;
 
-	virtual void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint) override;
 
-	UFUNCTION()
-	void OnTeleport_B(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	virtual void StartTeleport() override;
+	virtual void SpawnSound(FVector Location) override;
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -33,7 +36,7 @@ protected:
 	UStaticMeshComponent* Destination;
 
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* DestinationTrigger;
+	UAPInteractionBoxComponent* DestinationTrigger;
 
 	bool Start = true;
 

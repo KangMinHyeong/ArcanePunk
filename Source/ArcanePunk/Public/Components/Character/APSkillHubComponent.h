@@ -3,9 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/Character/APSkillNumber.h"
+#include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
+#include "Components/Character/SkillNumber/SkillNumber1.h"
+#include "Components/Character/SkillNumber/SkillNumber2.h"
+#include "Components/Character/SkillNumber/SkillNumber3.h"
+#include "Components/Character/SkillNumber/SkillNumber4.h"
+#include "Components/Character/SkillNumber/SkillNumber5.h"
+#include "Components/Character/SkillNumber/SkillNumber6.h"
+#include "Components/Character/SkillNumber/SkillNumber7.h"
+#include "Components/Character/SkillNumber/SkillNumber8.h"
+#include "Components/Character/SkillNumber/SkillNumber9.h"
+#include "Components/Character/SkillNumber/SkillNumber10.h"
+#include "Components/Character/SkillNumber/SkillNumber11.h"
+#include "Components/Character/SkillNumber/SkillNumber12.h"
+#include "Components/Character/SkillNumber/SkillNumber13.h"
+#include "Components/Character/SkillNumber/SkillNumber14.h"
+#include "Components/Character/SkillNumber/UltSkillNumber_1.h"
 #include "Components/ActorComponent.h"
 #include "APSkillHubComponent.generated.h"
+
+class USkillNumberBase;
+class AArcanePunkCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPSkillHubComponent : public UActorComponent
@@ -26,44 +44,48 @@ public:
 	void PressShift(); // Shift Press 시 호출
 	void PressSpace(); // SpaceBar Press 시 호출
 
-	void SetSkillState(ESkillKey NewValue);
-	void AddSkillState(ESkillKey NewValue);
-	void RemoveSkillState(ESkillKey NewValue = ESkillKey::None);
+	// void SetSkillState(ESkillKey NewValue);
+	// void AddSkillState(ESkillKey NewValue);
+	// void RemoveSkillState(ESkillKey NewValue = ESkillKey::None);
 	UFUNCTION(BlueprintPure)
 	ESkillKey GetSkillState();
 
-	FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumComp;}; // SkillNumComp 반환
+	// FORCEINLINE UAPSkillNumber* GetAPSkillNumberComponent() const {return SkillNumComp;}; // SkillNumComp 반환
+
+	void UpdateSkill_Q();
+	void UpdateSkill_E();
+	void UpdateSkill_R();
+
+	USkillNumberBase* GetSKillNumberComponent(ESkillNumber SkillNumber);
 
 private:
-	void SkillDetermine(ESkillKey First, ESkillKey Second);
+	// void SkillDetermine(ESkillKey First, ESkillKey Second);
 	void PlayBasicSkill();
-	void CastSkillNumber(ESkillNumber SkillNumber, ESkillKey WhichKey);
-	void CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey);
-	bool ActivationCheck(ESkillNumber SkillNumber);
+	// void CastSkillNumber(ESkillNumber SkillNumber, ESkillKey WhichKey);
+	// void CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey);
+	// bool ActivationCheck(ESkillNumber SkillNumber);
 	
 private:
 	// Q,E, shift, space 스킬 컴포넌트
-	UPROPERTY()
-	class UAPSkillBaseQ* QComp;
-	UPROPERTY()
-	class UAPSkillBaseE* EComp;
-	UPROPERTY()
-	class UAPSkillBaseSpace* SpaceComp;
+	// UPROPERTY(EditAnywhere)
+	// class UAPSkillBaseQ* QComp;
+	// UPROPERTY(EditAnywhere)
+	// class UAPSkillBaseE* EComp;
+	// UPROPERTY(EditAnywhere)
+	// class UAPSkillBaseSpace* SpaceComp;
 
 	// 스킬 Base State
-	UPROPERTY()
 	ESkillKey SkillState = ESkillKey::None;
 
-	UPROPERTY()
 	TArray<ESkillKey>SkillStateArr;
 
 	//TimerHandle
 	FTimerHandle SkillCancleTimerHandle;
 
-	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPSkillNumber* SkillNumComp;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	// UPROPERTY(EditAnywhere, Category = "Component")
+	// UAPSkillNumber* SkillNumComp;
 
 public:	
-	UPROPERTY()
 	ESkillKey LastSkill = ESkillKey::None;
 };

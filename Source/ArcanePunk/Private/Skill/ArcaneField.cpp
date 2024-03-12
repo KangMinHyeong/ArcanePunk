@@ -24,7 +24,7 @@ void AArcaneField::BeginPlay()
 {
     Super::BeginPlay();
 
-    Character = Cast<AArcanePunkCharacter>(GetOwner());
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
     SetActorTickEnabled(true);
     
     HitPointComp->SetSlowCoefficient(SlowCoefficient);
@@ -55,7 +55,7 @@ void AArcaneField::SetFieldDamage()
         if (Actor->ActorHasTag(TEXT("Enemy")))
         {               
             auto Enemy = Cast<AEnemy_CharacterBase>(Actor); bool AlreadyHitCheck = Enemy->IsHitting();
-            UGameplayStatics::ApplyDamage(Actor, Character->GetFinalATK() * DamageCoefficient, Character->GetInstigatorController(), this, UDamageType::StaticClass());
+            UGameplayStatics::ApplyDamage(Actor, OwnerCharacter->GetFinalATK() * DamageCoefficient, OwnerCharacter->GetInstigatorController(), this, UDamageType::StaticClass());
             if(!AlreadyHitCheck) Enemy->SetHitting(false);            
         }
     }    
@@ -70,8 +70,9 @@ void AArcaneField::Tick(float DeltaTime)
 
 void AArcaneField::FollowCharacter(float DeltaTime)
 {
-    if(!Character) return;
-    SetActorLocation(FMath::VInterpTo(GetActorLocation(), FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, GetActorLocation().Z) , DeltaTime, FollowSpeed));
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+    if(!OwnerCharacter.IsValid()) return;
+    SetActorLocation(FMath::VInterpTo(GetActorLocation(), FVector(OwnerCharacter->GetActorLocation().X, OwnerCharacter->GetActorLocation().Y, GetActorLocation().Z) , DeltaTime, FollowSpeed));
 }
 
 void AArcaneField::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
@@ -83,7 +84,7 @@ void AArcaneField::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> Ski
 
 void AArcaneField::DestroySKill()
 {
-    Super::DestroySKill();
+    DeActivate(ESkillNumber::Skill_11);
 
-    if(Character) Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber11()->bActivate = false;
+    Super::DestroySKill();
 }

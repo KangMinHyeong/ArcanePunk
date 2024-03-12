@@ -5,6 +5,7 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
+#include "Components/Character/APAttackComponent.h"
 
 UAPMovementComponent::UAPMovementComponent()
 {
@@ -63,7 +64,7 @@ void UAPMovementComponent::AttackMoving(float DeltaTime)
 	FHitResult HitResult;
 	FVector DashVector = OwnerCharacter->GetActorForwardVector()*Speed * DeltaTime;
 	FVector OverlapStart = OwnerCharacter->GetActorLocation();
-	FVector OverlapEnd = OverlapStart + OwnerCharacter->GetActorForwardVector() * OwnerCharacter->GetMaxDistance();
+	FVector OverlapEnd = OverlapStart + OwnerCharacter->GetActorForwardVector() * OwnerCharacter->GetAttackComponent()->GetMaxDistance();
 
 	if(OwnerCharacter->PMCheck(HitResult, OverlapStart, OverlapEnd))
 	{

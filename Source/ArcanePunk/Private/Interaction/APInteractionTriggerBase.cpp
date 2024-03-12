@@ -1,22 +1,24 @@
 
 #include "Interaction/APInteractionTriggerBase.h"
 
-#include "Components/BoxComponent.h"
+#include "Camera/CameraComponent.h"
 
 AAPInteractionTriggerBase::AAPInteractionTriggerBase()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
-	InteractionTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionTrigger"));
+	InteractionTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("InteractionTrigger"));
+	InteractionCamera =  CreateDefaultSubobject<UCameraComponent>(TEXT("InteractionCamera"));
 
 	SetRootComponent(InteractionTrigger);
+	InteractionCamera->SetupAttachment(InteractionTrigger);
 }
 
 void AAPInteractionTriggerBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	InteractionTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPInteractionTriggerBase::OnInteractionTrigger);
+
+	SetActorTickEnabled(false);
 }
 
 void AAPInteractionTriggerBase::Tick(float DeltaTime)
@@ -25,7 +27,3 @@ void AAPInteractionTriggerBase::Tick(float DeltaTime)
 
 }
 
-void AAPInteractionTriggerBase::OnInteractionTrigger(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
-{
-
-}

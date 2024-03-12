@@ -65,7 +65,7 @@ void USkillNumber6::Remove_Skill()
 {
 }
 
-void USkillNumber6::Activate_Skill6()
+void USkillNumber6::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -76,13 +76,13 @@ void USkillNumber6::Activate_Skill6()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
     Shouting = GetWorld()->SpawnActor<AShouting>(OwnerCharacter->GetShoutingClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
-	if(!Shouting) return;
+	if(!Shouting.IsValid()) return;
 	Shouting->SetSkill(CurrentSkillType, CurrentSkillAbility);	
 	Shouting->SetOwner(OwnerCharacter);
 	Shouting->SetShoutingEffect();
 }
 
-void USkillNumber6::Skill6_End()
+void USkillNumber6::SkillEnd()
 {
-	if(Shouting) Shouting->DestroySKill();
+	if(Shouting.IsValid()) Shouting->DestroySKill();
 }

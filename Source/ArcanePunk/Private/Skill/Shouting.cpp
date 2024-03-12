@@ -30,7 +30,7 @@ void AShouting::DestroySKill()
 {
     Super::DestroySKill();
 
-    // if(ShoutComp) {ShoutComp->DestroyComponent();}
+    // if(ShoutComp.IsValid()) {ShoutComp->DestroyComponent();}
 }
 
 void AShouting::SetShoutingEffect()
@@ -38,7 +38,7 @@ void AShouting::SetShoutingEffect()
     // float Size =  GetActorScale3D().Y / DefaultSize;
     // auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
     // if(ShoutEffect) ShoutComp = UNiagaraFunctionLibrary::SpawnSystemAttached(ShoutEffect, Character->GetMesh(), TEXT("Shouting"), FVector(0,0,0), FRotator::ZeroRotator, Size * ShoutScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
-    // if(!ShoutComp) return; 
+    // if(!ShoutComp.IsValid()) return; 
     // ShoutComp->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
     SetShoutingAttack();
 }
@@ -46,9 +46,9 @@ void AShouting::SetShoutingEffect()
 void AShouting::SetShoutingAttack()
 {
     float Size =  GetActorScale3D().Y / DefaultSize;
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-    Character->GetAttackComponent()->MultiAttack(Character->GetActorLocation(), Character->GetActorLocation() + Character->GetActorUpVector() * 25.0f, ShoutRadius * Size, DamageCoefficient, 1, true, StateTime);
-    DrawDebugSphere(GetWorld(), Character->GetMesh()->GetComponentLocation(), ShoutRadius* Size, 18, FColor::Green,false, 2.5f);
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->GetAttackComponent()->MultiAttack(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius * Size, DamageCoefficient, 1, true, StateTime);
+    DrawDebugSphere(GetWorld(), OwnerCharacter->GetMesh()->GetComponentLocation(), ShoutRadius* Size, 18, FColor::Green,false, 2.5f);
 }
 
 void AShouting::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
