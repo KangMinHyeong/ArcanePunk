@@ -78,7 +78,6 @@ protected:
 	void UpdateEquipInventory(UAPItemBase* NewData);
 	void DropToInventort();
 
-	UPROPERTY()
 	ESlotType SlotType = ESlotType::Inventory;
 
 public:

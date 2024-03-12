@@ -54,12 +54,12 @@ void AArcaneBall::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherAc
 	auto MyOwnerInstigator = MyOwner->GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
 	
-	auto Character = Cast<AArcanePunkCharacter>(MyOwner);
-    if(OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+    if(OtherActor && OtherActor != this && OtherActor != MyOwner && OwnerCharacter.IsValid())
 	{
 		// if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 		HitPointComp->DistinctHitPoint(SweepResult.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 	}
 }
 
@@ -82,10 +82,16 @@ void AArcaneBall::SetBallRadius(float Radius)
 void AArcaneBall::Explosion()
 {
     float Size =  GetActorScale3D().Y / DefaultSize;
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-    Character->GetAttackComponent()->MultiAttack(GetActorLocation(), GetActorLocation() + Character->GetActorUpVector() * 25.0f, ExplosionRadius * Size, DamageCoefficient, HitNumbers, bStun, StateTime);
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->GetAttackComponent()->MultiAttack(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius * Size, DamageCoefficient, HitNumbers, bStun, StateTime);
     DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius* Size, 18, FColor::Green,false, 2.5f);
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber8()->Skill8_End();
+
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_8);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->SkillEnd();
+	} 
+
     Destroy();
     GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }

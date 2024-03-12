@@ -7,7 +7,7 @@
 #include "InteractionWidget.generated.h"
 
 class AArcanePunkCharacter;
-struct FInteractableData;
+struct FInteractData;
 class UTextBlock;
 class UProgressBar;
 
@@ -16,35 +16,26 @@ class ARCANEPUNK_API UInteractionWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+
 public:
+	UFUNCTION()
+	float UpdateInteractionProgress();
 
-	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget | Player Reference")
-	AArcanePunkCharacter* PlayerReference;
-
-	void UpdateWidget(const FInteractableData* InteractableData);
+	void UpdateWidget(FInteractData InteractData);
 
 protected:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category="Interaction Widget | Interactable Data")
 	UTextBlock* NameText;
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
-	UTextBlock* ActionText;
-
-	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
-	UTextBlock* QuantityText;
-
-	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
 	UTextBlock* KeyPressText;
 
-	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
-	UProgressBar* InteractionProgressBar;
+	// UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	// UProgressBar* InteractionProgressBar;
 
-	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
-	float CurrentInteractionDuration;
-
-	UFUNCTION(Category="Interaction Widget | Interactable Data")
-	float UpdateInteractionProgress();
-
-	virtual void NativeOnInitialized() override;
-	virtual void NativeConstruct() override;
+	float CurrentInteractionDuration = 0.0f;;
+	
 };

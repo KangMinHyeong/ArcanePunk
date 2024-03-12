@@ -24,10 +24,11 @@ public:
 	FORCEINLINE void SetSlowCoefficient(float NewValue) {SlowCoefficient =  NewValue;};
 
 private:
-	UPROPERTY()
+
 	FVector KnockBackVec = FVector(0,0,0);
-	UPROPERTY()
+
 	float KnockBackDist = 0.0f;
-	UPROPERTY()
+
 	float SlowCoefficient = 0.0f;
+
 };

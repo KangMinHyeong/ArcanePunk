@@ -46,36 +46,29 @@ private:
 	void SetStun();
 
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	UProjectileMovementComponent* OwnerProjectileMove;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	UProjectileMovementComponent* OriginProjectileMoveComp;
 
-	UPROPERTY()
 	float OriginProjectileSpeed = 0.0f;
 
-	UPROPERTY()
 	bool bTriggerOn = false;
-	UPROPERTY()
+
 	bool Init = true;
-	
+
 	UPROPERTY()
 	TArray<AActor*> Actors;
 
-	UPROPERTY()
-	AActor* TraceActor = nullptr;
+	TWeakObjectPtr<AActor> TraceActor;
 
-	UPROPERTY()
 	FTimerHandle AccelerateTimerHandle;
 
-	UPROPERTY()
 	float TraceSpeed = 1000.0f;
 
-	UPROPERTY()
 	float HomingTime = 0.15f;
 
-	UPROPERTY()
 	ESkillCategory SkillCategory = ESkillCategory::None;
 
 };

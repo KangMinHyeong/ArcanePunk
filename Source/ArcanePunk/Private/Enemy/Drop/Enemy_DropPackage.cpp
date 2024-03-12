@@ -4,6 +4,7 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "UserInterface/Drop/APDropPackageUI.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "Components/SphereComponent.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {
@@ -11,20 +12,15 @@ AEnemy_DropPackage::AEnemy_DropPackage()
 	EnHanceTypePercent.SetNum(3);
 }
 
-void AEnemy_DropPackage::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AEnemy_DropPackage::BeginPlay()
 {
-	if(!IsInit) return;
-	auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
-	auto PC = Cast<AArcanePunkPlayerController>(Character->GetController()); if(!PC) return; 
-	PC->SetPause(true);
-	
-	auto PackageUI = CreateWidget<UAPDropPackageUI>(PC, PackageUIClass);
-	if(PackageUI) PackageUI->InitPackage(ItemsInPackage);
-	PackageUI->AddToViewport();
+	Super::BeginPlay();
 
-	if(EnhanceCategory != EEnhanceCategory::None) Character->SetSkillAbility(EnhanceCategory, EnHanceType);
+}
 
-	Destroy();
+void AEnemy_DropPackage::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void AEnemy_DropPackage::AddItem(FName ItemID)
@@ -59,14 +55,56 @@ void AEnemy_DropPackage::AddEnhance(uint8 EnhanceCategoryNum)
     if(CurrentEnHanceType >= 0.0f && CurrentEnHanceType <= SilverPercent)
     {
         EnHanceType = EEnHanceType::Silver;
+		DropMesh->SetCustomDepthStencilValue(80);
+		// To Do : 실버 이펙트 및 사운드
     }
     else if(CurrentEnHanceType > SilverPercent && CurrentEnHanceType <= GoldPercent)
     {
         EnHanceType = EEnHanceType::Gold;
+		DropMesh->SetCustomDepthStencilValue(160);
+		// To Do : 골드 이펙트 및 사운드
     }
     else if (CurrentEnHanceType > GoldPercent && CurrentEnHanceType <= PlatinumPercent)
     {
         EnHanceType = EEnHanceType::Platinum;
+		DropMesh->SetCustomDepthStencilValue(240);
+		// To Do : 플레 이펙트 및 사운드
     }
+	DropMesh->SetRenderCustomDepth(true);
+	
+}
 
+void AEnemy_DropPackage::BeginFocus()
+{
+	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+	Character->ActivateInteractionSweep();
+
+	GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &AEnemy_DropPackage::BeginFocus, InteractFrequency, true);
+}
+
+void AEnemy_DropPackage::EndFocus()
+{
+	GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
+}
+
+FInteractData AEnemy_DropPackage::GetInteractData()
+{
+    return InteractTrigger->GetInteractionData();
+}
+
+void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
+{
+	if(!IsInit) return; if(!PlayerCharacter) return;
+
+	for(auto DropItems : ItemsInPackage)
+	{
+		PlayerCharacter->GetInventory()->HandleAddItem(DropItems);
+		PlayerCharacter->InteractionActorRemove(this);
+	}
+
+	if(EnhanceCategory != EEnhanceCategory::None) PlayerCharacter->SetSkillAbility(EnhanceCategory, EnHanceType);
+
+	auto PC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); 
+	if(PC) PC->CloseInteraction(this);
+	Destroy();
 }

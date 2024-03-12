@@ -19,7 +19,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;	
-
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;	
@@ -51,8 +50,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DamageRateTime = 3.0f;
 
-	UPROPERTY()
-	AArcanePunkCharacter* Character;
+	TWeakObjectPtr<AArcanePunkCharacter> Character;
 
 	UPROPERTY(EditAnywhere)
 	float SlowCoefficient = 0.5f;

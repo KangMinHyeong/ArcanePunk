@@ -34,6 +34,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	FName LoadLevelName; // 후에 데이터 테이블 만들어서 관리해도 좋을듯?
 
-	UPROPERTY()
 	bool IsLevelLoad = false;
 };

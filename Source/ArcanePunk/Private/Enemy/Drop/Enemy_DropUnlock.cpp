@@ -1,19 +1,15 @@
 
 #include "Enemy/Drop/Enemy_DropUnlock.h"
 
-#include "Components/SphereComponent.h"
-
 AEnemy_DropUnlock::AEnemy_DropUnlock()
 {
     EnHanceTypeMaterial.SetNum(3);
     EnHanceTypePercent.SetNum(3);
 }
 
-void AEnemy_DropUnlock::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AEnemy_DropUnlock::Tick(float DeltaTime)
 {
-    auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
-
-    // Character->SetSkillAbility(Unlock_SkillAbility, EnHanceType);
+    Super::Tick(DeltaTime);
 
     Destroy();
 }

@@ -11,7 +11,7 @@ void AAPSkillRange_Target::Tick(float DeltaTime)
 
     if(Targeting)
 	{ 
-		if(!OwnerPC) return;
+		if(!OwnerPC.IsValid()) return;
 		FHitResult HitResult;
 		OwnerPC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 		if(HitResult.bBlockingHit)
@@ -41,8 +41,8 @@ void AAPSkillRange_Target::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbil
     
     MaxDistance = MaxDistance * (GetActorScale3D().Z / DefaultSize);
 
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
-    OwnerPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerPC) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+    OwnerPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerPC.IsValid()) return;
 
     Targeting = true;
     SetActorTickEnabled(true);

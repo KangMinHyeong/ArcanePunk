@@ -24,16 +24,15 @@ public:
 
 	virtual void Remove_Skill() override;
 
-	void Activate_Skill4();
+	virtual void Activate_Skill() override;
 
 private:
 	void Spawn_Skill4();
 	virtual void AddAbilityList() override;
 	
-	UPROPERTY()
+private:
 	float Skill4_TargetRange = 350.0f;
 
-	UPROPERTY()
 	float Skill4_LimitDistance = 550.0f;
 
 };

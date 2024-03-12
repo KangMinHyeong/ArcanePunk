@@ -43,13 +43,13 @@ void USkillNumber13::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
-void USkillNumber13::Activate_Skill13()
+void USkillNumber13::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; 
 
     OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = OwnerCharacter;

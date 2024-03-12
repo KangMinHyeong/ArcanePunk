@@ -23,18 +23,23 @@ void ASwordThrow_Teleport::ActiveMark(AActor *OtherActor)
 {
     auto Enemy = Cast<AEnemy_CharacterBase>(OtherActor);
     if(!Enemy) {DestroySKill(); return;}
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner());
-    if(!Character) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+    if(!OwnerCharacter.IsValid()) return;
 
     Enemy->TeleportMarkActivate(DestroyTime, GetOwner());
-    Character->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber2()->MarkingOn(OtherActor, DestroyTime);
+
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->MarkingOn(OtherActor, DestroyTime);
+	} 
 }
 
 void ASwordThrow_Teleport::DestroySKill()
 {
-    auto Character = Cast<AArcanePunkCharacter>(GetOwner());
-    if(!Character) return;
-    Character->GetAPSkillHubComponent()->RemoveSkillState();
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+    if(!OwnerCharacter.IsValid()) return;
+    // Character->GetAPSkillHubComponent()->RemoveSkillState();
 
     Destroy();
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);

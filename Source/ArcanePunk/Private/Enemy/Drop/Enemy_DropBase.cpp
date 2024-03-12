@@ -3,20 +3,19 @@
 
 #include "Enemy/Drop/Enemy_DropBase.h"
 
-#include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 AEnemy_DropBase::AEnemy_DropBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
-	DropTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("DropTrigger"));
+	InteractTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("InteractTrigger"));
 	DropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DropMesh"));
 
 	SetRootComponent(DropMesh);
-	DropTrigger->SetupAttachment(DropMesh);
+	InteractTrigger->SetupAttachment(DropMesh);
 
 	DropMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("DropMovement"));
 	DropMovement->MaxSpeed = DropSpeed;
@@ -27,14 +26,14 @@ AEnemy_DropBase::AEnemy_DropBase()
 	DropMesh->BodyInstance.bLockXRotation = true;
 	DropMesh->BodyInstance.bLockYRotation = true;
 	DropMesh->SetPhysicsMaxAngularVelocityInDegrees(MaxAngularVelocity);
+	// 애니메이션으로 대체
 }
 
 // Called when the game starts or when spawned
 void AEnemy_DropBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	DropTrigger->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_DropBase::DropOverlap);
+	SetActorTickEnabled(false);
 
 	SpawnMovement();
 }
@@ -44,10 +43,6 @@ void AEnemy_DropBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AEnemy_DropBase::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
-{
 }
 
 void AEnemy_DropBase::SpawnMovement()

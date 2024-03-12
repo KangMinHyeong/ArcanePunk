@@ -22,6 +22,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void DestroySKill();
+	void DeActivate(ESkillNumber SkillNumber);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -57,7 +58,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float DamageCoefficient = 1.0f;
 
-	UPROPERTY()
 	FLinearColor EffectColor;
 
 	UPROPERTY(EditAnywhere)
@@ -69,7 +69,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TMap<ESkillTypeState, FLinearColor> SkillTypeColor;
 
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+
 public:
-	UPROPERTY()
 	float DefaultSize = 1.0f;
 };

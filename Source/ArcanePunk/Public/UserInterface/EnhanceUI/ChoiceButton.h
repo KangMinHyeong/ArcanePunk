@@ -34,16 +34,11 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* SkillAbility_Text;
 
-	UPROPERTY()
 	ESkillNumber SkillNumber = ESkillNumber::None;
 
-	UPROPERTY()
 	ESkillAbility SkillAbility = ESkillAbility::Ability_None;
 
-	UPROPERTY()
-	UUserWidget* ParentWidget;
+	TWeakObjectPtr<UUserWidget> ParentWidget;
 
-	UPROPERTY()
 	bool bEnhance;
-
 };

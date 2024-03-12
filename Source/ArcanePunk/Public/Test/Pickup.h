@@ -42,8 +42,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Pickup | Item Reference")
 	UAPItemBase* ItemReference;
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Pickup | Item Reference")
-	FInteractableData InstanceInteractableData;
+	// UPROPERTY(VisibleInstanceOnly, Category = "Pickup | Item Reference")
+	// FInteractableData InstanceInteractableData;
 
 	// need to assign after create
 	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Initialization")

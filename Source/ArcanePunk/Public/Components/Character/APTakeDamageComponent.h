@@ -8,6 +8,8 @@
 
 #define Defense_constant 1000
 
+class UNiagaraSystem;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPTakeDamageComponent : public UActorComponent
 {
@@ -32,13 +34,33 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetRight();
 
+	void SetHitEffect(FVector HitLocation); 
+
 private:
 	void OnHitting();
-	void TestHit(); // 맞는 방향 확인용 후에 삭제
 
 private:
 	FTimerHandle HittingTimerHandle;
 
 	float PlayerIsForward = 0.0f;
 	float PlayerIsRight = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_L;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_R;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_B;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	float HitMotionTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UMaterialInterface* HitMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Death")
+	float DeathTime = 3.0f;
+
 };

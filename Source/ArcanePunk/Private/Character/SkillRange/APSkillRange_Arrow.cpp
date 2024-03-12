@@ -26,8 +26,8 @@ void AAPSkillRange_Arrow::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbili
     
     MaxDistance = MaxDistance * (GetActorScale3D().Z / DefaultSize);
 
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
-    OwnerPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerPC) return;
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+    OwnerPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerPC.IsValid()) return;
 
     Targeting = true;
     SetActorTickEnabled(true);
@@ -35,7 +35,7 @@ void AAPSkillRange_Arrow::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbili
 
 void AAPSkillRange_Arrow::ObstacleCheck()
 {
-    if(!OwnerCharacter) return; if(!OwnerPC) return;
+    if(!OwnerCharacter.IsValid()) return; if(!OwnerPC.IsValid()) return;
 	FHitResult HitResult;
 	OwnerPC->GetHitResultUnderCursor(ECC_GameTraceChannel3, false, HitResult);
     FVector HitPoint;

@@ -3,21 +3,27 @@
 
 #include "Portal/Portal_Base.h"
 
-#include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Components/Common/APInteractionBoxComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "GameInstance/APGameInstance.h"
 
 // Sets default values
 APortal_Base::APortal_Base()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	PortalTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("PortalTrigger"));
-	SetRootComponent(PortalTrigger);
-
 	PortalMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PortalMesh"));
-	PortalMesh->SetupAttachment(PortalTrigger);
+	SetRootComponent(PortalMesh);
+
+	PortalInteractionTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("PortalInteractionTrigger"));
+	PortalInteractionTrigger->SetupAttachment(PortalMesh); 
 
 }
 
@@ -25,18 +31,21 @@ APortal_Base::APortal_Base()
 void APortal_Base::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	PortalTrigger->OnComponentBeginOverlap.AddDynamic(this, &APortal_Base::OnTeleport_A);
+
 	InitHide(DefaultHidden);
+	FLatentActionInfo LatentActionInfo;
+	// UKismetSystemLibrary::RetriggerableDelay(GetWorld(), Delay_Time + 0.5f, LatentActionInfo);
 }
 
-void APortal_Base::OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	OverlapCharacter = Cast<AArcanePunkCharacter>(OtherActor);
-	if(!OverlapCharacter) return;
-	OverlapCharacter->SetCanMove(false);
-	GetWorldTimerManager().SetTimer(Delay_TimerHandle, this, &APortal_Base::StartTeleport, Delay_Time, false);	
-}
+// void APortal_Base::OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+// {
+// 	OverlapCharacter = Cast<AArcanePunkCharacter>(OtherActor);
+// 	if(!OverlapCharacter) return;
+// 	OverlapCharacter->SetCanMove(false);
+// 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), PortalEffect, OverlapCharacter->GetActorLocation(), OverlapCharacter->GetActorRotation());
+// 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PortalSound, OverlapCharacter->GetActorLocation());
+// 	GetWorldTimerManager().SetTimer(Delay_TimerHandle, this, &APortal_Base::StartTeleport, Delay_Time, false);	
+// }
 
 void APortal_Base::InitHide(bool IsHidden)
 {
@@ -52,8 +61,17 @@ void APortal_Base::InitHide(bool IsHidden)
 	}
 }
 
-void APortal_Base::StartTeleport()
+void APortal_Base::StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint)
 {
-	OverlapCharacter->SetCanMove(true);
+	Character->SetActorLocation(TeleportPoint);
+	Character->SetCanMove(true);
 	GetWorldTimerManager().ClearTimer(Delay_TimerHandle);
+}
+
+void APortal_Base::SpawnSound(FVector Location)
+{
+	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+
+	float SoundVolume = GI->GameSoundVolume.MasterVolume * GI->GameSoundVolume.EffectVolume;
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PortalSound, Location, FRotator::ZeroRotator, SoundVolume, 1.0f, SoundStartTime);
 }

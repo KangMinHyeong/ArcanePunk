@@ -15,6 +15,11 @@ void IInteractionInterface::EndFocus()
 
 }
 
+FInteractData IInteractionInterface::GetInteractData()
+{
+    return FInteractData();
+}
+
 void IInteractionInterface::BeginInteract()
 {
 

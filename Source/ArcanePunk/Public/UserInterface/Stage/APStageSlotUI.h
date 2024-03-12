@@ -42,7 +42,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	uint8 SubStageNumber = 0;
 
-	UPROPERTY()
 	bool IsOpen = false;
 
 	UPROPERTY(EditAnywhere)

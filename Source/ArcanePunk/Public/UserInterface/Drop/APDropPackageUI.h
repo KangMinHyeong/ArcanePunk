@@ -46,6 +46,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;
 
+	UPROPERTY()
 	TArray<UAPSlotSwitcher*> DropSlots; 
 
 	UPROPERTY(EditAnywhere)

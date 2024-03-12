@@ -10,6 +10,13 @@ AEnemy_DropEquipMent::AEnemy_DropEquipMent()
 
 }
 
+void AEnemy_DropEquipMent::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	OnDropEquip();
+}
+
 void AEnemy_DropEquipMent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -17,10 +24,10 @@ void AEnemy_DropEquipMent::BeginPlay()
 	InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
 }
 
-void AEnemy_DropEquipMent::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AEnemy_DropEquipMent::OnDropEquip()
 {
-    auto Character = Cast<AArcanePunkCharacter>(OtherActor);
-	if(!Character) return;
+	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+
     if(IsPendingKillPending() || !ItemReference) return;
 
     if (UAPInventoryComponent* PlayerInventory = Character->GetInventory())
@@ -32,7 +39,7 @@ void AEnemy_DropEquipMent::DropOverlap(UPrimitiveComponent *OverlappedComp, AAct
 			UE_LOG(LogTemp, Warning, TEXT("No add item"));
 			break;
 		case EItemAddResult::IAR_PartialAmountAdded:
-			Character->UpdateInteractionWidget();
+			// Character->UpdateInteractionWidget();
 			UE_LOG(LogTemp, Warning, TEXT("Yes Paritial"));
 			break;
 		case EItemAddResult::IAR_AllItemAdded:

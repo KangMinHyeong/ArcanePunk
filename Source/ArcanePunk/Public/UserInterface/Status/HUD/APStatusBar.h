@@ -30,16 +30,12 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UProgressBar* MPBar;
 
-	UPROPERTY()
 	float OriginHP = 0.0f;
 
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 
-	UPROPERTY()
-	AAPHUD* HUD;
+	TWeakObjectPtr<AAPHUD>  HUD;
 
-	UPROPERTY()
 	bool bChange = false;
 
 	UPROPERTY(EditAnywhere)

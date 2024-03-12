@@ -18,11 +18,11 @@ protected:
 public:
 	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
 
-	void MarkingOn(AActor* OtherActor, float Time);
+	virtual void MarkingOn(AActor* OtherActor, float Time) override;
 
-	void Activate_Skill2();
+	virtual void Activate_Skill() override;
 	
-	void MarkErase();
+	virtual void MarkErase() override;
 
 	virtual void OnSkill() override;
 
@@ -34,7 +34,7 @@ private:
 private:
 	FTimerHandle MarkTimerHandle;
 
-	AActor* MarkedActor;
+	TWeakObjectPtr<AActor> MarkedActor;
 	FVector MarkingLocation;
 
 };

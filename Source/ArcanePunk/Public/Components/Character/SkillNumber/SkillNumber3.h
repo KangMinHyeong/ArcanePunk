@@ -6,9 +6,8 @@
 #include "Components/Character/SkillNumber/SkillNumberBase.h"
 #include "SkillNumber3.generated.h"
 
-/**
- * 
- */
+class AAPSpawnPointBase;
+
 UCLASS()
 class ARCANEPUNK_API USkillNumber3 : public USkillNumberBase
 {
@@ -30,14 +29,7 @@ private:
 	virtual void AddAbilityList() override;
 
 private:
-	UPROPERTY()
-	class AAPSpawnPointBase* Skill3_SpawnPoint;
-
-	UPROPERTY()
-	class AAPSpawnPointBase* Skill3Range_SpawnPoint;
-
 	FVector MaxDist = FVector(0,0,0);
 
-	UPROPERTY()
 	float Skill3_TargetRange = 150.0f;
 };

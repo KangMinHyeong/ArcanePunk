@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "Items/APItemBase.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "Components/Common/APInteractionBoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "Enemy_DropBase.generated.h"
+
+class UProjectileMovementComponent;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_DropBase : public AActor
@@ -28,9 +31,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION()
-	virtual void DropOverlap(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 	FORCEINLINE void SetDropOverlap(bool NewBool) {IsInit = NewBool;};
 
 protected:
@@ -38,13 +39,13 @@ protected:
 	UStaticMeshComponent* DropMesh;
 
 	UPROPERTY(EditAnywhere)
-	class USphereComponent* DropTrigger;
+	UAPInteractionBoxComponent* InteractTrigger;
 
 	UPROPERTY(EditAnywhere)
 	FVector SpawnImpulse = FVector(200.0f,200.0f,500.0f);
 
 	UPROPERTY(EditAnywhere)
-	class UProjectileMovementComponent* DropMovement;
+	UProjectileMovementComponent* DropMovement;
 
 	UPROPERTY(EditAnywhere)
 	float DropSpeed = 0.0f;
@@ -67,8 +68,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Pickup | Item Initialization")
 	int32 ItemQuantity;
-	//
 
-	UPROPERTY()
 	bool IsInit = true;
 };

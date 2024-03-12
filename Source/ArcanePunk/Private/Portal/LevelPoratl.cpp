@@ -10,6 +10,10 @@
 #include "UserInterface/LoadingFade.h"
 #include "TimerManager.h"
 #include "GameInstance/APGameInstance.h"
+#include "Components/Common/APInteractionBoxComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 ALevelPoratl::ALevelPoratl()
 {
@@ -20,16 +24,51 @@ void ALevelPoratl::BeginPlay()
     Super::BeginPlay();
 }
 
-void ALevelPoratl::OnTeleport_A(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void ALevelPoratl::BeginFocus()
 {
-    auto Character = Cast<AArcanePunkCharacter>(OtherActor);
-    if(!Character) return;
+    TWeakObjectPtr<AArcanePunkCharacter> Character = PortalInteractionTrigger->Character; if(!Character.IsValid()) return;
+	Character->ActivateInteractionSweep();
 
-    CharacterPC = Cast<AArcanePunkPlayerController>(Character->GetController());
-    if(!CharacterPC) return;
+    GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &ALevelPoratl::BeginFocus, InteractFrequency, true);
+}
+
+void ALevelPoratl::EndFocus()
+{
+    GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
+}
+
+FInteractData ALevelPoratl::GetInteractData()
+{
+    return PortalInteractionTrigger->GetInteractionData();
+}
+
+void ALevelPoratl::Interact(AArcanePunkCharacter *PlayerCharacter)
+{
+	FVector PlayerLocation = PlayerCharacter->GetMesh()->GetComponentLocation();
+	PlayerCharacter->SetCanMove(false);
+	UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+	SpawnSound(PlayerLocation);
+
+	PlayerCharacter->GetPlayerPanel()->SetHiddenInGame(true);
+
+    GetWorldTimerManager().SetTimer(Delay_TimerHandle, this, &ALevelPoratl::StartLoading, Delay_Time, false);
+
+    CharacterPC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!CharacterPC.IsValid()) return;
+    PlayerCharacter->DisableInput(CharacterPC.Get());
+
+}
+
+void ALevelPoratl::SpawnSound(FVector Location)
+{
+	Super::SpawnSound(Location);
+}
+
+void ALevelPoratl::StartLoading()
+{
+    if(!CharacterPC.IsValid()) return;
     CharacterPC->StartFadeOut();
 
-    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(CharacterPC, FadeLoadingWidgetClass));
+    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(CharacterPC.Get(), FadeLoadingWidgetClass));
     if(!FadeLoadingWidget) return;
 
     GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &ALevelPoratl::Loading, FadeLoadingWidget->FadeTime - 0.1f, false);
@@ -39,10 +78,10 @@ void ALevelPoratl::OnTeleport_A(UPrimitiveComponent *OverlappedComp, AActor *Oth
 
 void ALevelPoratl::Loading()
 {
-    if(!CharacterPC) return;
+    if(!CharacterPC.IsValid()) return;
     CharacterPC->StartLoading();
 
-    UGameplayStatics::OpenLevel(CharacterPC, NextLevel);
+    UGameplayStatics::OpenLevel(CharacterPC.Get(), NextLevel);
 
     GetWorldTimerManager().ClearTimer(LoadTimerHandle);
 }

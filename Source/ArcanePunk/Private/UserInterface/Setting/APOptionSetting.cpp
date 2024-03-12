@@ -54,7 +54,7 @@ void UAPOptionSetting::OnClickButton_Back()
 
 void UAPOptionSetting::InitGraphicsSetting()
 {
-    GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI) return;
+    GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI.IsValid()) return;
 
     GraphicsSettingUI->InitGraphicsSetting();
     GraphicsSettingUI->InitWindowSetting();
@@ -63,20 +63,20 @@ void UAPOptionSetting::InitGraphicsSetting()
 
 void UAPOptionSetting::InitAudioSetting()
 {
-    AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
+    AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI.IsValid()) return;
 }
 
 void UAPOptionSetting::GraphicsSetting()
 {
-    if(!GraphicsSettingUI) GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); 
-    if(!GraphicsSettingUI) return;
+    if(!GraphicsSettingUI.IsValid()) GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); 
+    if(!GraphicsSettingUI.IsValid()) return;
     
     GraphicsSettingUI->AddToViewport();
 }
 
 void UAPOptionSetting::AudioSetting()
 {
-    if(!AudioSettingUI) return; AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI) return;
+    if(!AudioSettingUI.IsValid()) return; AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI.IsValid()) return;
     
     AudioSettingUI->AddToViewport();
 }

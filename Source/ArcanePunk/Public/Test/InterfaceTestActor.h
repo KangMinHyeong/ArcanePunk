@@ -23,8 +23,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Test Actor")
 	UStaticMeshComponent* Mesh;
 
-	UPROPERTY(EditInstanceOnly, Category="Test Actor")
-	FInteractableData InstanceInteractableData;
+	// UPROPERTY(EditInstanceOnly, Category="Test Actor")
+	// FInteractableData InstanceInteractableData;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

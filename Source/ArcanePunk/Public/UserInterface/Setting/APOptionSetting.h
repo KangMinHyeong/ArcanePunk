@@ -38,14 +38,6 @@ public:
 	void GraphicsSetting();
 	void AudioSetting();
 
-	FORCEINLINE float GetMasterVolume() const { return MasterVolume;};
-	FORCEINLINE float GetBGMVolume() const { return BGMVolume;};
-	FORCEINLINE float GetEffectVolume() const { return EffectVolume;};
-
-	FORCEINLINE void SetMasterVolume(float NewValue) { MasterVolume = NewValue;};
-	FORCEINLINE void SetBGMVolume(float NewValue) { BGMVolume = NewValue;};
-	FORCEINLINE void SetEffectVolume(float NewValue) { EffectVolume = NewValue;};
-
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Button_Graphics;
@@ -70,16 +62,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SmartKeySettingClass;
 
-	UPROPERTY()
-	UAPGraphicsSetting* GraphicsSettingUI;
+	TWeakObjectPtr<UAPGraphicsSetting> GraphicsSettingUI;
 
-	UPROPERTY()
-	UAPAudioSetting* AudioSettingUI;
-	UPROPERTY(EditAnywhere)
-	float MasterVolume = 1.0f;
-	UPROPERTY(EditAnywhere)
-	float BGMVolume = 1.0f;
-	UPROPERTY(EditAnywhere)
-	float EffectVolume = 1.0f;
+	TWeakObjectPtr<UAPAudioSetting> AudioSettingUI;
+
 
 };

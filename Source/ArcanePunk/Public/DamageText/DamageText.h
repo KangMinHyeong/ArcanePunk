@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "DamageText.generated.h"
 
+class UTextRenderComponent;
 
 UCLASS()
 class ARCANEPUNK_API ADamageText : public AActor
@@ -25,7 +26,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetDamageText(float Damage);
+	void SetDamageText(float Damage, bool bCriticalAttack);
 
 private:
 	UFUNCTION()
@@ -57,10 +58,10 @@ private:
 	FOnTimelineEvent TimeLineFinishDelegate;
 
 	UPROPERTY(EditAnywhere)
-	class USceneComponent* Root;
+	USceneComponent* Root;
 
 	UPROPERTY(EditAnywhere)
-	class UTextRenderComponent* MyTextRender;
+	UTextRenderComponent* MyTextRender;
 
 	UPROPERTY(EditAnywhere)
 	float MaxLength = 2.0f;
@@ -69,4 +70,17 @@ private:
 
 	FColor InitColor;
 
+	float InitScale;
+
+	UPROPERTY(EditAnywhere)
+	FColor NormalAttackColor;
+
+	UPROPERTY(EditAnywhere)
+	FColor CriticalAttackColor;
+
+	UPROPERTY(EditAnywhere)
+	float NormalAttackScale = 6.0f;
+
+	UPROPERTY(EditAnywhere)
+	float CriticalAttackScale = 9.0f;
 };

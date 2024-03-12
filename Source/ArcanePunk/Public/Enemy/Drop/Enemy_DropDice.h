@@ -14,9 +14,11 @@ class ARCANEPUNK_API AEnemy_DropDice : public AEnemy_DropBase
 {
 	GENERATED_BODY()
 public:
-	virtual void DropOverlap(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
+
+	void OnDropDice();
 	
 };

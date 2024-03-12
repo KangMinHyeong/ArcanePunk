@@ -147,7 +147,7 @@ void UAPSkillAbility::SetTraceActor(AActor* OverlapActor)
 
 void UAPSkillAbility::SetProjectileValue()
 {
-	if(TraceActor)
+	if(TraceActor.IsValid())
 	{		
 		OwnerProjectileMove->bInterpMovement = true;
 		OwnerProjectileMove->bInterpRotation = true;
@@ -177,7 +177,7 @@ void UAPSkillAbility::ProjectileHoming(float DeltaTime)
 {
 	if(OriginProjectileMoveComp) 
 	{
-		if(!TraceActor)
+		if(!TraceActor.IsValid())
 		{
 			OriginProjectileMoveComp->MaxSpeed = FMath::FInterpTo(OriginProjectileMoveComp->MaxSpeed, 2250.0f, DeltaTime, TraceSpeed*5);
 			OwnerProjectileMove->HomingAccelerationMagnitude = FMath::FInterpTo(OwnerProjectileMove->HomingAccelerationMagnitude, 0.1f, DeltaTime, TraceSpeed);
@@ -193,7 +193,7 @@ void UAPSkillAbility::ProjectileHoming(float DeltaTime)
 
 void UAPSkillAbility::AddImpulse()
 {
-	if(!TraceActor) return;;
+	if(!TraceActor.IsValid()) return;;
 	
 	FVector HomingVector = (TraceActor->GetActorLocation() - GetOwner()->GetActorLocation());
 	HomingVector = (HomingVector /HomingVector.Size() )* TraceSpeed;

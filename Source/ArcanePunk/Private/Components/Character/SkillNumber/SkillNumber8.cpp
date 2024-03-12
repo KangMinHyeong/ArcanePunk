@@ -38,7 +38,7 @@ void USkillNumber8::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	{
         if(bActivate)
         {
-            if(ArcaneBall) ArcaneBall->Explosion();
+            if(ArcaneBall.IsValid()) ArcaneBall->Explosion();
             bActivate = false;
         }
         else
@@ -72,8 +72,8 @@ void USkillNumber8::Spawn_Skill8()
 
 	
 	ActivateSkillRange_Target(Skill8_Wide, Skill8_LimitDistance, ESkillRangeType::Arrow);
-	if(SkillRange_Target) SkillRange_Target->SetMaxDist(Skill8_LimitDistance);
-	if(SkillRange_Target) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill8_LimitDistance);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
 
 	if(CheckSmartKey(SkillKey, OwnerCharacter))
 	{
@@ -82,7 +82,7 @@ void USkillNumber8::Spawn_Skill8()
 		SkillRange_Target->SetActorHiddenInGame(true);
 	}
 
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
 }
@@ -98,7 +98,7 @@ void USkillNumber8::OnSkill()
 
 	OwnerAnim->PlaySkill_8_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-    if(SkillRange_Target) SkillRange_Target->SetActorHiddenInGame(true);
+    if(SkillRange_Target.IsValid()) SkillRange_Target->SetActorHiddenInGame(true);
     CharacterRotation();
 }
 
@@ -107,7 +107,7 @@ void USkillNumber8::Remove_Skill()
 	Super::Remove_Skill();
 }
 
-void USkillNumber8::Activate_Skill8()
+void USkillNumber8::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; 
@@ -120,7 +120,7 @@ void USkillNumber8::Activate_Skill8()
     SpawnAddLocation = Skill8_Wide;
 
 	ArcaneBall = GetWorld()->SpawnActor<AArcaneBall>(OwnerCharacter->GetArcaneBallClass(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation());
-	if(!ArcaneBall) return; 
+	if(!ArcaneBall.IsValid()) return; 
     ArcaneBall->SetOwner(OwnerCharacter);
     ArcaneBall->SetBallRadius(Skill8_Wide);
 	ArcaneBall->SetSkill(CurrentSkillType, CurrentSkillAbility);	
@@ -135,7 +135,7 @@ void USkillNumber8::Activate_Skill8()
     OwnerCharacter->SetDoing(false);
 }
 
-void USkillNumber8::Skill8_End()
+void USkillNumber8::SkillEnd()
 {
     bActivate = false;
 }

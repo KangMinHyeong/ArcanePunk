@@ -39,7 +39,7 @@ void USkillNumber12::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
-void USkillNumber12::Activate_Skill12()
+void USkillNumber12::Activate_Skill()
 {
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; 

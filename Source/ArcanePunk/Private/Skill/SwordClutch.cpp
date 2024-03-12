@@ -28,7 +28,7 @@ void ASwordClutch::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if(OwnerCharacter)
+    if(OwnerCharacter.IsValid())
     {
         SetActorLocation(OwnerCharacter->GetActorLocation());
         SetActorRotation(FMath::RInterpTo(GetActorRotation(),FRotator(0, GetActorRotation().Yaw + 90.0f, 0), DeltaTime, ClutchSpeed));
@@ -47,14 +47,14 @@ void ASwordClutch::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> Ski
 
 void ASwordClutch::DestroySKill()
 {
+    DeActivate(ESkillNumber::Skill_14);
     Super::DestroySKill();
 
-    if(OwnerCharacter) OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber14()->bActivate = false;
 }
 
 void ASwordClutch::SpawnClutchTrigger()
 {
-    if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
     FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = GetOwner();
 	SpawnParams.bNoFail = true;
@@ -71,7 +71,7 @@ void ASwordClutch::SpawnClutchTrigger()
         auto ClutchTrigger = GetWorld()->SpawnActor<AClutchTrigger>(ClutchTriggerClass, GetActorLocation() + AddLocation, GetActorRotation(), SpawnParams);
         if(ClutchTrigger) 
         {
-            ClutchTrigger->SetOwner(OwnerCharacter); 
+            ClutchTrigger->SetOwner(OwnerCharacter.Get()); 
             ClutchTrigger->AttachToComponent( ClutchRoot, FAttachmentTransformRules ::KeepWorldTransform);
             ClutchTrigger->SetClutchSphere(Wide/2.0f);
             ClutchTrigger->SetDestroy(DestroyTime);

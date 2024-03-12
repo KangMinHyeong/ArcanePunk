@@ -42,8 +42,8 @@ void UReActiveInventoryPanel::RefreshInventory()
 		}
 	}
 
-	// playerÀÇ HUD->UpdateWidgetPosition(int32 ItemNumbers) È£Ãâ
-	PlayerCharacter->UpdateInventoryWidgetPosition(InventoryReference->GetInventoryContents().Num());
+	// playerï¿½ï¿½ HUD->UpdateWidgetPosition(int32 ItemNumbers) È£ï¿½ï¿½
+	// PlayerCharacter->UpdateInventoryWidgetPosition(InventoryReference->GetInventoryContents().Num());
 }
 
 bool UReActiveInventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,

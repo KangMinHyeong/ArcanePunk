@@ -3,53 +3,84 @@
 
 #include "Portal/Portal_Normal.h"
 
-#include "Components/BoxComponent.h"
+#include "Components/Common/APInteractionBoxComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameInstance/APGameInstance.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
 
 APortal_Normal::APortal_Normal()
 {
-    DestinationTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("DestinationTrigger"));
-	DestinationTrigger->SetupAttachment(PortalTrigger);
-
 	Destination = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Destination"));
-	Destination->SetupAttachment(DestinationTrigger);
+	Destination->SetupAttachment(PortalMesh);
+
+	DestinationTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("DestinationTrigger"));
+	DestinationTrigger->SetupAttachment(Destination);
+}
+
+void APortal_Normal::BeginFocus()
+{
+    TWeakObjectPtr<AArcanePunkCharacter> Character = PortalInteractionTrigger->Character; if(!Character.IsValid()) Character = DestinationTrigger->Character;
+	if(!Character.IsValid()) return;
+	Character->ActivateInteractionSweep();
+
+    GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &APortal_Normal::BeginFocus, InteractFrequency, true);
+}
+
+void APortal_Normal::EndFocus()
+{
+	GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
+}
+
+FInteractData APortal_Normal::GetInteractData()
+{
+    return PortalInteractionTrigger->GetInteractionData();
+}
+
+void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
+{
+	FVector PlayerLocation = PlayerCharacter->GetMesh()->GetComponentLocation();
+	PlayerCharacter->SetCanMove(false);
+	UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+	SpawnSound(PlayerLocation);
+	PlayerCharacter->GetPlayerPanel()->SetHiddenInGame(true);
+
+	if((PlayerLocation - PortalInteractionTrigger->GetComponentLocation()).Size() < (PlayerLocation - DestinationTrigger->GetComponentLocation()).Size())
+	{
+		FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &APortal_Normal::StartTeleport, PlayerCharacter, DestinationTrigger->GetComponentLocation());
+		GetWorld()->GetTimerManager().SetTimer(Delay_TimerHandle, TimerDelegate, Delay_Time, false);
+	}
+	else
+	{
+		FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &APortal_Normal::StartTeleport, PlayerCharacter, PortalInteractionTrigger->GetComponentLocation());
+		GetWorld()->GetTimerManager().SetTimer(Delay_TimerHandle, TimerDelegate, Delay_Time, false);
+	}
+
+	auto CharacterPC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!CharacterPC) return;
+    PlayerCharacter->DisableInput(CharacterPC);
 }
 
 void APortal_Normal::BeginPlay()
 {
     Super::BeginPlay();
 
-    if(BothSides) DestinationTrigger->OnComponentBeginOverlap.AddDynamic(this, &APortal_Normal::OnTeleport_B);
-
 }
 
-void APortal_Normal::OnTeleport_A(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void APortal_Normal::StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint)
 {
-    Start = true;
-    Super::OnTeleport_A(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	Super::StartTeleport(Character, TeleportPoint);
+	Character->GetPlayerPanel()->SetHiddenInGame(false);
 
+	auto CharacterPC = Cast<AArcanePunkPlayerController>(Character->GetController()); if(!CharacterPC) return;
+    Character->EnableInput(CharacterPC);
 }
 
-void APortal_Normal::OnTeleport_B(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void APortal_Normal::SpawnSound(FVector Location)
 {
-	Start = false;
-
-	OverlapCharacter = Cast<AArcanePunkCharacter>(OtherActor);
-	if(!OverlapCharacter) return;
-	OverlapCharacter->SetCanMove(false);
-	GetWorldTimerManager().SetTimer(Delay_TimerHandle, this, &APortal_Normal::StartTeleport, Delay_Time, false);
-}
-
-void APortal_Normal::StartTeleport()
-{
-    if(OverlapCharacter->ActorHasTag(PlayerTag))
-	{
-		if(Start) OverlapCharacter->SetActorLocation(DestinationTrigger->GetComponentLocation());
-		else OverlapCharacter->SetActorLocation(PortalTrigger->GetComponentLocation());
-		
-		OverlapCharacter->SetCanMove(true);
-		GetWorldTimerManager().ClearTimer(Delay_TimerHandle);
-	}
-}
+	Super::SpawnSound(Location);
+} 

@@ -65,7 +65,7 @@ void USkillNumber1::Remove_Skill()
 {
 }
 
-void USkillNumber1::Activate_Skill1()
+void USkillNumber1::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -78,5 +78,5 @@ void USkillNumber1::Activate_Skill1()
 	auto SwordSkill = GetWorld()->SpawnActor<ASwordImpact>(OwnerCharacter->GetSwordImpactClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
 	if(!SwordSkill) return;
 	SwordSkill->SetSkill(CurrentSkillType, CurrentSkillAbility);
-	SwordSkill->SetSkill(CurrentSkillType, CurrentSkillAbility);
+
 }

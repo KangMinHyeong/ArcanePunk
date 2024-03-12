@@ -17,11 +17,11 @@ public:
 
 	virtual void OnSkill() override;
 
-	void Activate_Skill9();
+	virtual void Activate_Skill() override;
 
 private:
 	virtual void AddAbilityList() override;
 	
-	UPROPERTY()
-	AArcaneMine* ArcaneMine;
+private:
+	TWeakObjectPtr<AArcaneMine> ArcaneMine;
 };

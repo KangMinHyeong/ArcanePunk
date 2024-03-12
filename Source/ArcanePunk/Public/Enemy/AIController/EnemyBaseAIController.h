@@ -6,9 +6,8 @@
 #include "AIController.h"
 #include "EnemyBaseAIController.generated.h"
 
-/**
- * 
- */
+class UBehaviorTree;
+
 UCLASS()
 class ARCANEPUNK_API AEnemyBaseAIController : public AAIController
 {
@@ -25,7 +24,7 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere)
-	class UBehaviorTree* AIBehavior;
+	UBehaviorTree* AIBehavior;
 
 	UPROPERTY(EditAnywhere)
 	bool EyeSightTrace = true;

@@ -68,12 +68,12 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 	auto DamageTypeClass = UDamageType::StaticClass();
 	if(IsPlayerSkill)
 	{
-		auto Character = Cast<AArcanePunkCharacter>(MyOwner);
-		if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
+		OwnerCharacter = Cast<AArcanePunkCharacter>(MyOwner);
+		if (OtherActor && OtherActor != this && OtherActor != MyOwner && OwnerCharacter.IsValid())
 		{
 			if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 			HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
-			UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+			UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 			if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
 			{
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
@@ -99,8 +99,8 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 
 void ASwordImpact::SlowPlayer(AActor *OtherActor)
 {
-	auto Character = Cast<AArcanePunkCharacter>(OtherActor);
-	if(Character) Character->GetCrowdControlComponent()->SlowState(SlowCoefficient, StateTime);
+	OwnerCharacter = Cast<AArcanePunkCharacter>(OtherActor);
+	if(OwnerCharacter.IsValid()) OwnerCharacter->GetCrowdControlComponent()->SlowState(SlowCoefficient, StateTime);
 }
 
 void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
@@ -119,4 +119,5 @@ void ASwordImpact::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> Ski
 	Super::SetSkill(SkillType, SkillAbility);
 
 	BaseEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+	BintHit();
 }

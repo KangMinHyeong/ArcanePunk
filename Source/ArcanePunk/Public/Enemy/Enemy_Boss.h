@@ -143,8 +143,7 @@ protected:
 	TArray<UMaterial*> PatternMaterial;
 
 	// Boss Animation 관련 변수
-	UPROPERTY()
-	UAP_EnemyBossAnimInstance* OwnerAnim;
+	TWeakObjectPtr<UAP_EnemyBossAnimInstance> OwnerAnim;
 
 	// Rush Attack 관련 변수
 	UPROPERTY(EditAnywhere, Category = "RushAttack")
@@ -153,7 +152,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "RushAttack")
 	float RushAttackTime = 10.0f;
 	
-	UPROPERTY()
 	bool bRushAttack = false;
 
 	UPROPERTY(EditAnywhere, Category = "RushAttack")
@@ -226,11 +224,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "RangeAttack_2")
 	bool DiagonalDirection = false;
 
-	UPROPERTY()
 	int32 RA_Num = 0;
 	
 	//Attack Move 관련 변수
-	UPROPERTY()
 	bool bAttackMove = false;
 
 	UPROPERTY(EditAnywhere, Category = "AttackMove")
@@ -259,11 +255,9 @@ protected:
 	FRotator FastSlashRotator = FRotator(0,0,0);
 
 	//AAPHUD
-	UPROPERTY()
-	AAPHUD* PlayerHUD;
+	TWeakObjectPtr<AAPHUD> PlayerHUD;
 
 	// Pattern Num
-	UPROPERTY()
 	TArray<int32> PatternNums;
 
 	UPROPERTY(EditAnywhere)

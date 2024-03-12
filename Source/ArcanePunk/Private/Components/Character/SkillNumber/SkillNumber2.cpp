@@ -86,7 +86,7 @@ void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
 	GetWorld()->GetTimerManager().SetTimer(MarkTimerHandle, this, &USkillNumber2::MarkErase, Time, false);
 }
 
-void USkillNumber2::Activate_Skill2()
+void USkillNumber2::Activate_Skill()
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;

@@ -58,38 +58,38 @@ public:
 	FORCEINLINE UUltSkillNumber_1* GetUltSkillNumber1() const {return UltSkillNum_1;};
 
 private:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumberBase* SkillNumBase;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber1* SkillNum_1;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber2* SkillNum_2; 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber3* SkillNum_3;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber4* SkillNum_4;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber5* SkillNum_5;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber6* SkillNum_6;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber7* SkillNum_7;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber8* SkillNum_8;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber9* SkillNum_9;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber10* SkillNum_10;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber11* SkillNum_11;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber12* SkillNum_12;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber13* SkillNum_13;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	USkillNumber14* SkillNum_14;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	UUltSkillNumber_1* UltSkillNum_1;
 
 };

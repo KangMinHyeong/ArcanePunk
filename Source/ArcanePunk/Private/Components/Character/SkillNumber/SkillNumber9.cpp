@@ -41,7 +41,7 @@ void USkillNumber9::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
-void USkillNumber9::Activate_Skill9()
+void USkillNumber9::Activate_Skill()
 {
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; 
@@ -52,7 +52,7 @@ void USkillNumber9::Activate_Skill9()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ArcaneMine = GetWorld()->SpawnActor<AArcaneMine>(OwnerCharacter->GetArcaneMineClass(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation() + FRotator(-45,0,0));
-	if(!ArcaneMine) return; 
+	if(!ArcaneMine.IsValid()) return; 
     ArcaneMine->SetOwner(OwnerCharacter);
 	ArcaneMine->SetSkill(CurrentSkillType, CurrentSkillAbility);	
  

@@ -73,8 +73,8 @@ void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterr
 
 void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!OwnerCharacter.IsValid()) return;
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -86,8 +86,8 @@ void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 
 void UAPAnimHubComponent::OnAttack_B_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	if(!OwnerCharacter.IsValid()) return;
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -102,7 +102,7 @@ void UAPAnimHubComponent::OnSkill_1_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -112,7 +112,7 @@ void UAPAnimHubComponent::OnSkill_2_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -130,7 +130,7 @@ void UAPAnimHubComponent::OnSkill_4_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -142,9 +142,16 @@ void UAPAnimHubComponent::OnSkill_5_MontageEnded()
 	if(!OwnerAnim) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	GetWorld()->GetTimerManager().ClearTimer(OwnerAnim->Skill5_FireTimerHandle);
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->Remove_Skill();
+	TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Remove_Skill();
+		SkillNum->RemoveEffect();
+	} 
+	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->Remove_Skill();
+	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->DeActiaveChargeEffect();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
 }
 
@@ -154,8 +161,14 @@ void UAPAnimHubComponent::OnSkill_6_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber6()->Skill6_End();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber6()->Skill6_End();
+	TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_6);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->SkillEnd();
+	} 
+
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
 }
 
@@ -165,7 +178,7 @@ void UAPAnimHubComponent::OnSkill_7_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -185,7 +198,7 @@ void UAPAnimHubComponent::OnSkill_9_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -195,7 +208,7 @@ void UAPAnimHubComponent::OnSkill_10_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -205,7 +218,7 @@ void UAPAnimHubComponent::OnSkill_11_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -215,7 +228,7 @@ void UAPAnimHubComponent::OnSkill_12_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -235,7 +248,7 @@ void UAPAnimHubComponent::OnSkill_14_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -245,8 +258,8 @@ void UAPAnimHubComponent::OnUltSkill_1_MontageEnded()
 	if(!OwnerCharacter) return;
 
 	OwnerCharacter->SetDoing(false);
-	OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
-	OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetUltSkillNumber1()->UltSkill1_End();
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	OwnerCharacter->GetRSkillNumber()->SkillEnd();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
 }
 

@@ -13,7 +13,7 @@ void UAP_EnemyBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     Super::NativeUpdateAnimation(DeltaSeconds);
 
 	Enemy = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
-	if (!Enemy) return;
+	if (!Enemy.IsValid()) return;
 
 	IsDead = Enemy->IsDead();
 	if (!IsDead)
@@ -46,13 +46,14 @@ bool UAP_EnemyBaseAnimInstance::IsRun()
 
 void UAP_EnemyBaseAnimInstance::PlayNormalAttack_Montage()
 {
+	if(IsDead || !Enemy.IsValid()) return;
     if(Enemy->IsHardCC()) return;
     Montage_Play(NormalAttack_Montage);
 }
 
 void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()
 {
-	if(IsDead || !Enemy) return;
+	if(IsDead || !Enemy.IsValid()) return;
 	if(Enemy->IsHardCC()) return;
 	Enemy->NormalAttack();
 }

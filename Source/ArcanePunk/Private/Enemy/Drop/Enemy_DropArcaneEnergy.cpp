@@ -11,10 +11,11 @@ AEnemy_DropArcaneEnergy::AEnemy_DropArcaneEnergy()
 
 }
 
-void AEnemy_DropArcaneEnergy::DropOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AEnemy_DropArcaneEnergy::Tick(float DeltaTime)
 {
-    auto PlayerCharacter = Cast<AArcanePunkCharacter>(OtherActor);
-	if(!PlayerCharacter) return;
+    Super::Tick(DeltaTime);
+
+    TWeakObjectPtr<AArcanePunkCharacter> PlayerCharacter = InteractTrigger->Character; if(!PlayerCharacter.IsValid()) return;
 
     FPlayerTotalData PD = PlayerCharacter->GetPlayerStatus();
     PD.PlayerDynamicData.MP = FMath::Min( PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MP + MyArcaneEnergy, PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MaxMP);

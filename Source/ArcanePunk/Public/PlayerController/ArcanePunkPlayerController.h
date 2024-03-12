@@ -13,6 +13,10 @@ class UHomingTargetUI;
 class UAPOptionSetting;
 class UAPMouseClickBase;
 class UAPSaveSlotUI;
+class UInteractionWidget;
+struct FInteractData;
+struct FConversationData;
+class UAPConversationUI;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
 
@@ -44,25 +48,37 @@ public:
 	void StartSaveUI();
 
 	// Stage Selecting UI
-	void OpenStageSelectingUI();
+	void OpenStageSelectingUI(AActor* CameraActor);
 	void CloseStageSelectingUI();
+	
+	// Conversation UI
+	void OpenConversationUI(AActor* CameraActor, FName Name, uint8 State);
+	void CloseConversationUI();
 	
 	// Hit UI
 	void HitUI();
 
-	FORCEINLINE UAPStatusUI* GetStatusUI() { return StatusWidget; };
+	FORCEINLINE UAPStatusUI* GetStatusUI() { return StatusWidget.Get(); };
 
 	void DisplayHomingUI(ESkillNumber SkillNumber);
 	void ReturnToDefault();
 	void PreventOtherClick(ESkillNumber SkillNumber);
 
+	// Arcane Tent
 	void SetHideUI(bool NewBool);
 
 	// Option Menu
 	void OptionSetting();
 
-	UAPOptionSetting* GetOptionSettingUI() {return OptionSettingUI;};
+	UAPOptionSetting* GetOptionSettingUI() {return OptionSettingUI.Get();};
 
+	// Interaction UI
+	void OpenInteraction(AActor* NewActor, FInteractData InteractData);
+	void CloseInteraction(AActor* NewActor);
+
+	// Dead UI
+	void DisplayDeadUI();
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -73,6 +89,10 @@ private:
 	void FreeCameraMode();
 
 	void EndSaveUI();
+
+	//Interaction
+	void OnStageSelectingUI();
+	void OnConversationUI(FName Name, uint8 State);
 
 private:
 	FTimerHandle SaveTimerHandle;
@@ -106,19 +126,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> HideUIClass;
 
-	UPROPERTY()
-	UAPStatusUI* StatusWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> DeadUIClass;
+
+	TWeakObjectPtr<UAPStatusUI> StatusWidget;
 	
-	UPROPERTY()
-	UUserWidget* SaveUI;
+	TWeakObjectPtr<UUserWidget> SaveUI;
 
-	UPROPERTY()
-	UHomingTargetUI* HomingUI;
-	UPROPERTY()
-	UAPMouseClickBase* MouseClickUI;
+	TWeakObjectPtr<UHomingTargetUI> HomingUI;
+	TWeakObjectPtr<UAPMouseClickBase> MouseClickUI;
 
-	UPROPERTY()
-	UUserWidget* HideUI;
+	TWeakObjectPtr<UUserWidget> HideUI;
 
 	FInputModeGameOnly GameInputMode;
 	FInputModeGameAndUI GameAndUIInputMode;
@@ -129,17 +147,14 @@ private:
 
 	bool bFreeCameraMode = false;
 
-	UPROPERTY()
-	APawn* FreeCamera;
-	UPROPERTY()
-	AArcanePunkCharacter* MyCharacter;
+	TWeakObjectPtr<APawn> FreeCamera;
+	TWeakObjectPtr<AArcanePunkCharacter> MyCharacter;
 
 	// Loading
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> LoadingWidgetClass;
 
-	UPROPERTY()
-	UUserWidget* LoadingWidget;
+	TWeakObjectPtr<UUserWidget> LoadingWidget;
 
 	FTimerHandle LoadTimerHandle;
 
@@ -150,23 +165,41 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SelectSaveSlotClass;
 
-	UPROPERTY()
-	UAPSaveSlotUI* SelectSlotUI;
+	TWeakObjectPtr<UAPSaveSlotUI> SelectSlotUI;
 
 	// Option Setting 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OptionSettingClass;
 
-	UPROPERTY()
-	UAPOptionSetting* OptionSettingUI;
+	TWeakObjectPtr<UAPOptionSetting> OptionSettingUI;
 
 	// Stage Select 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StageSelectingUIClasss;
+
+	// Interaction UI
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> InteractionUIClass;
+
+	TWeakObjectPtr<UInteractionWidget> InteractionWidget;
+
+	TWeakObjectPtr<AActor> InteractionActor;
+
+	FTimerHandle InteractionTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float BlendTime = 3.0f;
+
+	// Conversation UI
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> ConversationUIClass;
+	
+	TWeakObjectPtr<UAPConversationUI> ConversationUI;
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;
 
 	UPROPERTY()
 	TArray<bool> SmartKeyArr; // QER 스마트키
+
 };

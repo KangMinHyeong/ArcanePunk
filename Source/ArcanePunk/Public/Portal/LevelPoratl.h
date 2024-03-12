@@ -6,9 +6,8 @@
 #include "Portal/Portal_Base.h"
 #include "LevelPoratl.generated.h"
 
-/**
- * 
- */
+class AArcanePunkPlayerController;
+
 UCLASS()
 class ARCANEPUNK_API ALevelPoratl : public APortal_Base
 {
@@ -16,10 +15,15 @@ class ARCANEPUNK_API ALevelPoratl : public APortal_Base
 public:	
 	ALevelPoratl();
 
+	virtual void BeginFocus() override;
+	virtual void EndFocus() override;
+	virtual FInteractData GetInteractData() override;
+	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
+
 protected:
 	virtual void BeginPlay() override;
-
-	virtual void OnTeleport_A(UPrimitiveComponent*OverlappedComp, AActor*OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void SpawnSound(FVector Location) override;
+	void StartLoading();
 
 private:
 	void Loading();
@@ -36,7 +40,7 @@ private:
 
 	FTimerHandle LoadTimerHandle;
 	
-	class AArcanePunkPlayerController* CharacterPC;
+	TWeakObjectPtr<AArcanePunkPlayerController> CharacterPC;
 
 	UPROPERTY(EditAnywhere)
 	FName UnlockedStageName = "";

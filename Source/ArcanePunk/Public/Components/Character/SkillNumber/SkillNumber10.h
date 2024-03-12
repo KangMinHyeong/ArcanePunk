@@ -20,19 +20,17 @@ public:
 
 	virtual void Remove_Skill() override;	
 
-	void Activate_Skill10();
+	virtual void Activate_Skill() override;
 
 private:
 	virtual void AddAbilityList() override;
 	void Spawn_Skill10();
 
-	UPROPERTY()
+private:
 	float Skill10_TargetRange = 60.0f;
 
-	UPROPERTY()
 	float Skill10_LimitDistance = 300.0f;
 
-	UPROPERTY()
 	FVector SkillRange_TargetLocation = FVector(0,0,0);
 
 };

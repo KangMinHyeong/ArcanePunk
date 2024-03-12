@@ -45,27 +45,23 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UDecalComponent* RangeDecal;
 
-	UPROPERTY()
 	float DefaultSize;
 
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;
-	UPROPERTY()
-	AArcanePunkPlayerController* OwnerPC;
-	UPROPERTY()
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+
+	TWeakObjectPtr<AArcanePunkPlayerController> OwnerPC;
+
 	bool Targeting = false;
-	UPROPERTY()
+
 	float MaxDistance = 550.0f;
-	UPROPERTY()
+
 	bool bStun = false;
-	UPROPERTY()
+
 	float TargetDistance = 0.0f;
 
-	UPROPERTY()
 	float Wide = 0.0f;	
 
 public:
-	UPROPERTY()
-	UMaterialInterface* DefaultDecal;
+	TWeakObjectPtr<UMaterialInterface> DefaultDecal;
 
 };

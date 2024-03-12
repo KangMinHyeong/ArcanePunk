@@ -19,6 +19,7 @@ class AEnemy_DropBase;
 class UWidgetComponent;
 class AEnemyBaseAIController;
 class AEnemy_DropPackage;
+class UNiagaraSystem;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
@@ -70,9 +71,12 @@ public:
 	bool AttackPushBack(FVector NewLocation);
 
 	FORCEINLINE float GetMonsterATK() const { return Monster_ATK;}; //Monster_ATK 반환
+	FORCEINLINE bool IsCriticalAttack() const {return bCriticalAttack;};
 
 	// HitPoint 관련 함수
 	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
+
+	void SetHitEffect(FVector HitLocation);
 
 	// 몬스터 Anim 관련 함수
 	UFUNCTION()
@@ -98,13 +102,14 @@ protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
 	void ResetHitStiffness();
-	void SpawnDamageText(float Damage, FVector AddLocation);
+	void SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation);
 
 	// Critical Damage Calculate
 	float CriticalCalculate(float Multiple = 2);
 
-	//HP 세팅 초기화
-	void InitHP();
+	//Monster 세팅 초기화
+	void InitMonster();
+	void StopClear();
 
 	//드롭 관련 함수
 	void DropItemActor();
@@ -113,8 +118,6 @@ protected:
 	virtual void EnemyDestroyed();
 	void CheckAllEnemyKilled();
 	
-	// HitPoint 관련 함수
-	void TestHit();
 
 	// 몬스터 Anim Ended 관련 함수
 	void BindMontageEnded();
@@ -135,7 +138,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float MaxHP = 100.0f;
 
-	UPROPERTY()
 	float HP = 100.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
@@ -168,7 +170,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 NormalAttack_CriticalMultiple = 2;
 
-	UPROPERTY()
+	bool bCriticalAttack = false;
+
 	bool bKnockBackAttack = false;
 
 	// TimerHandle
@@ -176,18 +179,9 @@ protected:
 	FTimerHandle TeleportTimerHandle;
 	FTimerHandle HitTimerHandle;
 	FTimerHandle DeathTimerHandle;
-
+	FTimerHandle StopTimerHandle;
 	// 머터리얼
 	UMaterialInterface* DefaultMaterial;
-
-	UPROPERTY(EditAnywhere, Category = "Skin")
-	UMaterialInterface* HitMaterial; // 피격 점멸 머터리얼
-
-	UPROPERTY(EditAnywhere, Category = "Skin")
-	UMaterialInterface* HitMaterial_Test1; // 피격 점멸 머터리얼
-
-	UPROPERTY(EditAnywhere, Category = "Skin")
-	UMaterialInterface* HitMaterial_Test2; // 피격 점멸 머터리얼
 
 	float DefaultSlip;
 
@@ -201,8 +195,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AEnemy_DropPackage> DropPackageClass;
 
-	UPROPERTY()
-	AEnemy_DropPackage* DropPackage;
+	TWeakObjectPtr<AEnemy_DropPackage> DropPackage;
 
 	bool OnDrop = false;
 
@@ -212,10 +205,9 @@ protected:
 
 	bool bIsDead = false;
 
-	AActor* MarkActor;
+	TWeakObjectPtr<AActor> MarkActor;
 
 	// 몬스터 Hit 관련 변수
-	UPROPERTY()
 	bool bHitting = false;
 
 	UPROPERTY(EditAnywhere, Category = "Hit")
@@ -230,9 +222,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	FVector DamageTextAddLocation = FVector(0,0,0);
 
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_L;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_R;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_B;
+
 	// 몬스터 Anim 관련 변수
-	UPROPERTY()
-	UAP_EnemyBaseAnimInstance* EnemyAnim;
+	TWeakObjectPtr<UAP_EnemyBaseAnimInstance> EnemyAnim;
 
 	// 몬스터 CC기 관련 변수
 	UPROPERTY(EditAnywhere, Category = "CC")
@@ -260,6 +260,5 @@ public:
 
 	FOnCrowdControlCheck OnCrowdControlCheck;
 
-	UPROPERTY()
 	TArray<bool> StopState;
 };

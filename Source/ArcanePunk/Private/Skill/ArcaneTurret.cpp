@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Skill/Sub/TurretAmmo.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "Enemy/Enemy_CharacterBase.h"
 
 AArcaneTurret::AArcaneTurret()
 {   
@@ -45,9 +46,7 @@ float AArcaneTurret::TakeDamage(float DamageAmount, FDamageEvent const &DamageEv
 	HP = HP - DamageApplied;
 	UE_LOG(LogTemp, Display, TEXT("Turret HP : %f"), HP);
 
-    ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation(), FRotator(0.0f, 180.0f, 0.0f)); if(!DamageText) return DamageApplied;
-	DamageText->SetOwner(this);
-	DamageText->SetDamageText(DamageApplied);
+    SpawnDamageText(EventInstigator, DamageAmount);
 
     if(HP <= 0.001f)
 	{
@@ -110,3 +109,18 @@ void AArcaneTurret::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> Sk
 {
     Super::SetSkill(SkillType, SkillAbility);
 }
+
+
+void AArcaneTurret::SpawnDamageText(AController *EventInstigator, float Damage)
+{
+    ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation(), FRotator(0.0f, 180.0f, 0.0f)); if(!DamageText) return;
+    DamageText->SetOwner(this);
+
+    OwnerCharacter = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); 
+    auto InstigatorEnemy =  Cast<AEnemy_CharacterBase>(Enemy);
+
+    if(OwnerCharacter.IsValid()) DamageText->SetDamageText(Damage, OwnerCharacter->IsCriticalAttack());
+    else if(InstigatorEnemy) DamageText->SetDamageText(Damage, InstigatorEnemy->IsCriticalAttack());
+	
+}
+

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BattleSection/DataTable/APBattleStageDataTable.h"
 #include "GameFramework/Actor.h"
 #include "APBattleSectionBase.generated.h"
 
@@ -25,8 +26,10 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	FORCEINLINE uint8 GetTotalSpawnNumber() const {return TotalSpawnNumber;};
-	FORCEINLINE uint8 GetStageNumber() const {return StageNumber;};
+	FORCEINLINE uint8 GetTotalSpawnNumber() const {return TotalSpawnNum;};
+	FORCEINLINE FName GetBattleSectionID() const {return BattleSectionID;};
+
+	bool CheckSpawnEnd();
 
 private:
 	void ClearChecking();
@@ -48,22 +51,7 @@ private:
 	USceneComponent* SpawnRoot2;
 
 	UPROPERTY(EditAnywhere)
-	uint8 SpawnNumber = 5;
-
-	UPROPERTY(EditAnywhere)
-	uint8 TotalSpawnNumber = 1;
-
-	UPROPERTY()
-	TArray<AActor*> SpawnLocation;
-
-	UPROPERTY()
-	TArray<AEnemy_CharacterBase*> MonsterArr;
-
-	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<AAPSpawnPointBase>> SpawnPointClasses;
-
-	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<AEnemy_CharacterBase>> SpawnMonsterClasses;
+	uint8 TotalSpawnNum = 0;
 
 	FTimerHandle SpawnMonsterTimerHandle;
 
@@ -71,6 +59,22 @@ private:
 	float SpawnMonsterTime = 2.5f;
 
 	UPROPERTY(EditAnywhere)
-	uint8 StageNumber = 1;
+	FName BattleSectionID;
+
+
+	// UPROPERTY(EditAnywhere)
+	// uint8 SpawnNumber = 5;
+
+	// UPROPERTY()
+	// TArray<AActor*> SpawnLocation;
+
+	// UPROPERTY()
+	// TArray<AEnemy_CharacterBase*> MonsterArr;
+
+	// UPROPERTY(EditAnywhere)
+	// TArray<TSubclassOf<AAPSpawnPointBase>> SpawnPointClasses;
+
+	// UPROPERTY(EditAnywhere)
+	// TArray<TSubclassOf<AEnemy_CharacterBase>> SpawnMonsterClasses;
 	
 };

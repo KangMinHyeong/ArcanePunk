@@ -23,7 +23,9 @@
 #include "Components/Character/APSpawnFootPrintComponent.h"
 #include "NiagaraComponent.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
-
+#include "ArcanePunk/APGameModeBase.h"
+#include "Components/Character/APHitPointComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -46,19 +48,21 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
-	HitMaterial = CreateDefaultSubobject<UMaterialInterface>(TEXT("HitMaterial"));
 	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
 	LeftBeamPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftBeamPoint"));
+	PlayerPanel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerPanel"));
 
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
 	APSkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("APSkillHubComp"));
 	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
-	TakeDMComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDMComp"));
-	SpawnFootPrintComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnFootPrintComp"));
+	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
+	SpawnStepComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnStepComp"));
+	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
+	PlayerPanel->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
@@ -77,7 +81,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	bUseControllerRotationYaw = false;
 
 	// prodo
-
 	InteractionCheckFrequency = 0.1f;
 	InteractionCheckDistance = 225.0f;
 	PlayerInventory = CreateDefaultSubobject<UAPInventoryComponent>(TEXT("PlayerInventory"));
@@ -106,6 +109,8 @@ void AArcanePunkCharacter::BeginPlay()
 	InitEquipData(WeaponReference, DesiredWeaponID);
 
 	SetHavingSkills();
+	APSkillHubComp->UpdateSkill_Q();
+	APSkillHubComp->UpdateSkill_E();
 	SetRSkill();
 
 	// prodo
@@ -150,6 +155,8 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Save);
 
+	PlayerInputComponent->BindAction(TEXT("WorldMap"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::WorldMap);
+	
 	// prodo
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
 	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AArcanePunkCharacter::EndInteract);
@@ -283,7 +290,7 @@ void AArcanePunkCharacter::ChangeEquipData(TArray<UAPItemBase *> & EquipArr, UAP
 	}
 	
 	UpdateStatus();
-	if(PC) PC->OnUpdateStatusText.Broadcast();
+	if(PC.IsValid()) PC->OnUpdateStatusText.Broadcast();
 }
 
 void AArcanePunkCharacter::SkillBase_Q()
@@ -349,21 +356,7 @@ void AArcanePunkCharacter::SetSkillAbility(EEnhanceCategory EnhanceCategory, EEn
 	if(!HUD) return;
 
 	HUD->DisplayEnhanceChoice(EnhanceCategory, EnHanceType);
-
-	// switch (UpdateSkillAbility)
-	// {
-	// 	case ESkillAbility::
-	// 	HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
-	// 	break;
-	
-	// 	case ESkillTypeState::Type_E:
-	// 	HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
-	// 	break;
-
-	// 	case ESkillTypeState::Type_R:
-	// 	HUD->DisplayEnhanceChoice(UpdateSkillTypeState, EnHanceType);
-	// 	break;
-	// }
+	bInteract = false;
 }
 
 float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
@@ -377,7 +370,7 @@ float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
 
 void AArcanePunkCharacter::Save()
 {
-	if(!PC) return;
+	if(!PC.IsValid()) return;
 	PC->OpenSaveSlot();
 }
 
@@ -398,8 +391,23 @@ void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName, FString GameSlotNa
 
 	MyGameState->UpdateGameData(MyGameStatus);	
 
-	if(!PC) return;
+	if(!PC.IsValid()) return;
 	PC->StartSaveUI();
+}
+
+void AArcanePunkCharacter::SetRSkill()
+{
+	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
+	else {RSkill = EUltSkillNumber::None;}
+
+	APSkillHubComp->UpdateSkill_R();
+}
+
+void AArcanePunkCharacter::WorldMap()
+{
+	auto GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return; 
+	if(!GM->IsBattleStage()) return;
+	if(HUD) HUD->OpenWorldMap();
 }
 
 void AArcanePunkCharacter::CurrentPlayerLocation() // 후에 사용할지 말지 결정, 현재는 필요없는듯?
@@ -421,12 +429,6 @@ void AArcanePunkCharacter::SetHavingSkills()
 	HavingSkill.Add(QSkill); HavingSkill.Add(ESkill);
 }
 
-void AArcanePunkCharacter::SetRSkill()
-{
-	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
-	else {RSkill = EUltSkillNumber::None;}
-}
-
 void AArcanePunkCharacter::SetInArcaneTent(bool NewBool)
 {
 	InArcaneTent = NewBool;
@@ -439,13 +441,13 @@ void AArcanePunkCharacter::SetHideMode(bool NewBool)
 	bHideMode = NewBool;
 	if(bHideMode)
 	{
-		if(PC) PC->SetHideUI(true);
+		if(PC.IsValid()) PC->SetHideUI(true);
 		GetMesh()->SetMaterial(0,HideMaterial);
 		// HideUI 생성 및 캐릭터 머터리얼 변경
 	}
 	else
 	{
-		if(PC) PC->SetHideUI(false);
+		if(PC.IsValid()) PC->SetHideUI(false);
 		GetMesh()->SetMaterial(0,GetDefaultMaterial());
 		// HideUI 삭제 및 캐릭터 머터리얼 원상태
 	}
@@ -458,12 +460,10 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 	float OriginHP = MyPlayerTotalStatus.PlayerDynamicData.HP;
 	if(!bBlockMode)
 	{
-		TakeDMComp->DamageCalculation(DamageApplied);
-		if(PC) PC->OnUpdateStatusText.Broadcast();
+		TakeDamageComp->DamageCalculation(DamageApplied);
+		if(PC.IsValid()) PC->OnUpdateStatusText.Broadcast();
 		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
 	}
-	
-
     return DamageApplied;
 }
 
@@ -474,15 +474,13 @@ bool AArcanePunkCharacter::IsDead()
     return MyPlayerTotalStatus.PlayerDynamicData.HP<=0;
 }
 
-void AArcanePunkCharacter::DeadPenalty()
+void AArcanePunkCharacter::DeadPenalty(float DeathTime)
 {
-	if(MyPlayerState) MyPlayerState->DeathPenalty();
-}
-
-TSubclassOf<AActor> AArcanePunkCharacter::GetFootClass(bool Left) 
-{	
-	if(Left) return LeftFootClass;
-    return RightFootClass;
+	if(!PC.IsValid()) return;
+	DisableInput(PC.Get());
+	// if(MyPlayerState) MyPlayerState->DeathPenalty();
+	FTimerHandle DeathTimerHandle;
+	GetWorldTimerManager().SetTimer(DeathTimerHandle, PC.Get(), &AArcanePunkPlayerController::DisplayDeadUI, DeathTime, false);
 }
 
 FTransform AArcanePunkCharacter::GetFootTransform(bool Left)
@@ -528,8 +526,8 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.bReturnPhysicalMaterial = true;
-	
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(AttackRadius * 0.75f);
+	 
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(GetCapsuleComponent()->GetScaledCapsuleRadius());
 	 
 	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Pawn, Sphere, Params);
 }
@@ -545,9 +543,11 @@ float AArcanePunkCharacter::GetFinalATK(float Multiple)
 	float Percent = FMath::RandRange(0.0f, 100.0f);
 	if(Percent <= MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent)
 	{
+		bCriticalAttack = true;
 		return FinalATK * CriticalCalculate(Multiple);
 	}
-	
+	else {bCriticalAttack= false;}
+
 	return FinalATK;
 }
 
@@ -560,231 +560,69 @@ void AArcanePunkCharacter::InitPlayerStatus()
 	CurrentPlayerLocation();
 }
 
-// prodo
-
-void AArcanePunkCharacter::PerformInteractionCheck()
-{
-	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
-
-	if (!TextRenderActor)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.bNoFail = true;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		const FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);// { GetActorLocation() + (GetActorForwardVector() * 50.0f) };
-		const FTransform SpawnTransform = FTransform(FRotator(0.0f, 0.0f, 0.0f), SpawnLocation);// (GetActorRotation(), SpawnLocation);
-
-		TextRenderActor = GetWorld()->SpawnActor<ATextRenderActor>(ATextRenderActor::StaticClass(), SpawnTransform, SpawnParams);
-		FRotator Rotator = TextRenderActor->GetActorRotation();
-		TextRenderActor->SetActorRotation(FRotator(Rotator.Pitch, Rotator.Yaw + 180.0f, Rotator.Roll));
-		TextRenderActor->SetActorScale3D(FVector3d(5.0f, 5.0f, 5.0f));
-		TextRenderActor->SetActorHiddenInGame(true);
-	}
-
-	// add circle collision to player
-	// if anyone detect in collision then, the first detected enroll interactable
-
-	TArray<TEnumAsByte<EObjectTypeQuery>> types;
-	types.Reserve(1);
-	types.Emplace(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Visibility));
-
-	TArray<AActor*> Ignores;
-	TEnumAsByte<EDrawDebugTrace::Type> DrawDebug;
-	FHitResult HitResult;
-	float DrawTime = 5.0f;
-
-	bool b = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), GetActorLocation(), GetActorLocation(), 500, types, false, Ignores, DrawDebug, HitResult, true, FLinearColor::Red, FLinearColor::Green, DrawTime);
-
-	//DrawDebugSphere(GetWorld(), GetActorLocation(), 500, 26, FColor::Red, false, 0.2f, 0, 2.0f);
-
-	if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
-	{
-		if (HitResult.GetActor() != InteractionData.CurrentInteractable)
-		{
-			FoundInteractable(HitResult.GetActor());
-			return;
-		}
-
-		if (HitResult.GetActor() == InteractionData.CurrentInteractable)
-		{
-			return;
-		}
-
-	}
-
-	// linetrace
-	/* 
-	FVector TraceStart{ GetPawnViewLocation() };
-	FVector TraceEnd{ TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance) };
-
-	float LookDirection = FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector());
-
-	LookDirection = -1;
-
-	if (LookDirection > 0)
-	{
-
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
-
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-		FHitResult TraceHit;
-
-		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
-		{
-			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
-			{
-				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
-				{
-					FoundInteractable(TraceHit.GetActor());
-					return;
-				}
-
-				if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
-				{
-					return;
-				}
-
-			}
-		}
-	}
-	*/
-	NoInteractableFound();
-}
-
-void AArcanePunkCharacter::FoundInteractable(AActor* NewInteractable)
-{
-	if (IsInteracting())
-	{
-		EndInteract();
-	}
-
-	if (InteractionData.CurrentInteractable)
-	{
-		TargetInteractable = InteractionData.CurrentInteractable;
-		TargetInteractable->EndFocus();
-	}
-
-	InteractionData.CurrentInteractable = NewInteractable;
-	TargetInteractable = NewInteractable;
-
-	// hud 위치 설정 viewport 상에서 이루어져야함
-	//FVector Position = NewInteractable->GetActorLocation();
-	//UE_LOG(LogTemp, Warning, TEXT("%f %f"), Position.X, Position.Y);
-	//FVector WPosition = HUD->GetActorLocation();
-	//UE_LOG(LogTemp, Warning, TEXT("%f %f"), WPosition.X, WPosition.Y);
-	//HUD->SetInteractableText(FText::FromString("IS IT WORK?"));
-	//HUD->SetInteractableTextPosition(Position);
-	//HUD->SetActorLocation(Position);
-	//WPosition = HUD->GetActorLocation();
-	//UE_LOG(LogTemp, Warning, TEXT("%f %f"), WPosition.X, WPosition.Y);
-
-	if (TextRenderActor)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("실행중"));
-		TextRenderActor->SetActorHiddenInGame(false);
-		FVector Position = NewInteractable->GetActorLocation();
-		TextRenderActor->SetActorLocation(FVector(Position.X, Position.Y - 250.0f , Position.Z + 250.0f));
-		TextRenderActor->GetTextRender()->SetText(FText::FromString("Press K"));
-		//TextRenderActor->GetTextRender()->SetText(FText::FromString(("{0} {1} To Press K.", TargetInteractable->InteractableData.Action, TargetInteractable->InteractableData.Name);  //TargetInteractable->InteractableData.Action + TargetInteractable->InteractableData.Name); // + FText::FromString("To Press K"));
-	}
-
-	
-	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
-
-	TargetInteractable->BeginFocus();
-}
-
-void AArcanePunkCharacter::NoInteractableFound()
-{
-	if (IsInteracting())
-	{
-		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-	}
-
-	if (InteractionData.CurrentInteractable)
-	{
-		if (IsValid(TargetInteractable.GetObject()))
-		{
-			TargetInteractable->EndFocus();
-		}
-
-		if (TextRenderActor)
-		{
-			TextRenderActor->SetActorHiddenInGame(true);
-		}
-
-		HUD->HideInteractionWidget();
-
-		// when display UI whole monitor, then cant use interact
-		InteractionData.CurrentInteractable = nullptr;
-		TargetInteractable = nullptr;
-	}
-}
-
 void AArcanePunkCharacter::BeginInteract()
 {
-	if (!HUD->TutorialDone) {
-		HUD->UpdateTutorialWidget("PressF");
-		return;
-	}
+	bInteract = true;
 
-	PerformInteractionCheck();
-
-	if (InteractionData.CurrentInteractable)
+	if(!InteractionActors.IsEmpty())
 	{
-		if (IsValid(TargetInteractable.GetObject()))
+		auto Interface = Cast<IInteractionInterface>(InteractionActors.Top());
+		if(Interface)
 		{
-			TargetInteractable->BeginInteract();
-
-			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
-			{
-				Interact();
-			}
-			else
-			{
-				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
-					this,
-					&AArcanePunkCharacter::Interact,
-					TargetInteractable->InteractableData.InteractionDuration,
-					false);
-			}
+			Interface->Interact(this);
 		}
 	}
 }
 
 void AArcanePunkCharacter::EndInteract()
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
-	{
-		TargetInteractable->EndInteract();
-	}
-
+	bInteract = false;
 }
 
-void AArcanePunkCharacter::Interact()
+void AArcanePunkCharacter::ActivateInteractionSweep()
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
+	TArray<FHitResult> HitResults;
+	FCollisionShape Sphere =  FCollisionShape::MakeSphere(InteractionRadius);
+	FCollisionObjectQueryParams ObjectQueryParam(FCollisionObjectQueryParams::InitType::AllDynamicObjects); 
+	if(GetWorld()->SweepMultiByObjectType(HitResults, GetActorLocation(), GetActorLocation()+GetActorUpVector()*15.0f, FQuat::Identity, ObjectQueryParam, Sphere))// 타격 판정 인자 Params 인자 추가
 	{
-		TargetInteractable->Interact(this);
-	}
+		InteractionActors.Empty();
+		for(auto HitResult : HitResults)
+		{
+			auto Interface = Cast<IInteractionInterface>(HitResult.GetActor());
+			if(Interface)
+			{
+				InteractionActors.Add(HitResult.GetActor());
+			}
+		}
+		if(InteractionActors.IsEmpty()) return;
 
+		if(InteractionActors.Num() >= 2)
+		{
+			InteractionActors.Sort([this](AActor& A, AActor& B) 
+			{
+				return (A.GetActorLocation() - GetActorLocation()).Size() > (B.GetActorLocation() - GetActorLocation()).Size();
+			});
+		}
+		if(PC.IsValid())
+		{
+			auto Interface = Cast<IInteractionInterface>(InteractionActors.Top());
+			if(Interface)
+			{
+				PC->OpenInteraction(InteractionActors.Top(), Interface->GetInteractData());
+			}
+		} 
+	}
 }
 
-void AArcanePunkCharacter::UpdateInteractionWidget() const
+void AArcanePunkCharacter::InteractionActorRemove(AActor* InteractionActor)
 {
-	if (IsValid(TargetInteractable.GetObject()))
-	{
-		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
-	}
+	if(InteractionActors.IsEmpty()) return;
+
+	InteractionActors.Remove(InteractionActor);
 }
 
+// prodo
 void AArcanePunkCharacter::DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)
 {
 	if (PlayerInventory->FindMatchingItem(ItemToDrop))
@@ -811,7 +649,7 @@ void AArcanePunkCharacter::ToggleMenu()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressTab");
 
-	//HUD->ToggleMenu();
+	// HUD->ToggleMenu();
 	
 	if (HUD)
 	{
@@ -869,8 +707,6 @@ void AArcanePunkCharacter::UpdateInventoryWidgetPosition(int32 Numbers)
 		Inventory->SetPositionInViewport(NewPosition);
 	}
 }
-
-
 
 void AArcanePunkCharacter::InventorySort()
 {

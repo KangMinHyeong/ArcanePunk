@@ -7,6 +7,9 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "Components/CapsuleComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 UAPTakeDamageComponent::UAPTakeDamageComponent()
 {
@@ -30,8 +33,8 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 	auto PD = OwnerCharacter->GetPlayerStatus();
 
 	DamageApplied = FMath::Min(PD.PlayerDynamicData.HP, DamageApplied);
-	TestHit(); // 나중에 삭제
-	GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, OwnerCharacter->GetHitMotionTime(), false);
+
+	GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, HitMotionTime, false);
 
 	if(DamageApplied == PD.PlayerDynamicData.HP && OwnerCharacter->GetRageMode()) { PD.PlayerDynamicData.HP = 1.0f;}
 	else
@@ -48,7 +51,7 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 		OwnerCharacter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		OwnerCharacter->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// OwnerCharacter->DetachFromControllerPendingDestroy();
-		OwnerCharacter->DeadPenalty();
+		OwnerCharacter->DeadPenalty(DeathTime);
 	// 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABossMonster_Stage1::Destoryed, DeathLoadingTime, false);
 
 	}
@@ -90,25 +93,27 @@ void UAPTakeDamageComponent::OnHitting()
 	GetWorld()->GetTimerManager().ClearTimer(HittingTimerHandle);
 }
 
-void UAPTakeDamageComponent::TestHit()
+void UAPTakeDamageComponent::SetHitEffect(FVector HitLocation)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
+
+	if(HitMaterial) OwnerCharacter->GetMesh()->SetMaterial(0, HitMaterial);
 
 	if(PlayerIsForward > 0)
 	{
 		if(PlayerIsRight > 0)
 		{
-			if(OwnerCharacter->HitMaterial_Test1) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->HitMaterial_Test1); 
+			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_R, OwnerCharacter->GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 		}
 		else
 		{
-			if(OwnerCharacter->HitMaterial_Test2) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->HitMaterial_Test2); 
+			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_L, OwnerCharacter->GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 		}
 	}
 	else
 	{
-		if(OwnerCharacter->GetHitMaterial()) OwnerCharacter->GetMesh()->SetMaterial(0, OwnerCharacter->GetHitMaterial());
+		UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_B, OwnerCharacter->GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 	}
 }
 

@@ -21,12 +21,12 @@ public:
 
 	virtual void Remove_Skill() override;
 
-	void Activate_UltSkill1();
-	void UltSkill1_End();
+	virtual void Activate_Skill() override;
+	virtual void SkillEnd() override;
 
 private:
 	void AddAbilityList();	
 
-	UPROPERTY()
-	AArcaneRain* ArcaneRain;
+private:
+	TWeakObjectPtr<AArcaneRain> ArcaneRain;
 };

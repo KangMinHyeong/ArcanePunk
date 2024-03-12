@@ -39,13 +39,15 @@ public:
 	UFUNCTION()
 	void AnimNotify_AttackTrigger();
 	UFUNCTION()
-	void AnimNotify_Active_Q(); // Skill_1
+	void AnimNotify_Skill_1_Trigger(); // Skill_1
 	UFUNCTION()
-	void AnimNotify_Skill_E_Trigger(); // Skill_2
+	void AnimNotify_Skill_2_Trigger(); // Skill_2
 	UFUNCTION()
 	void AnimNotify_Skill_4_Trigger();
 	UFUNCTION()
 	void AnimNotify_Skill_5_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_5_Enhance();
 	UFUNCTION()
 	void AnimNotify_Skill_5_FireStart();
 	UFUNCTION()
@@ -72,7 +74,7 @@ public:
 	void AnimNotify_Skill_14_Trigger();
 
 	UFUNCTION()
-	void AnimNotify_UltSkill_1_Trigger();
+	void AnimNotify_UltSkill_Trigger();
 
 	UFUNCTION()
 	void AnimNotify_NextCombo();

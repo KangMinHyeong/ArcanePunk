@@ -43,6 +43,5 @@ private:
 	UPROPERTY(EditAnywhere)	
 	TSubclassOf<UAPSaveDataSlot> NoDataSlotClass;
 
-	UPROPERTY()
 	bool IsTitle = false;
 };

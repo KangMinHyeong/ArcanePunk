@@ -6,9 +6,9 @@
 #include "ArcanePunk/APGameModeBase.h"
 #include "APGameModeBattleStage.generated.h"
 
-/**
- * 
- */
+class UDataTable;
+class UNiagaraSystem;
+
 UCLASS()
 class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
 {
@@ -16,10 +16,12 @@ class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
 
 public:
 	void MonsterKilled();
+	FORCEINLINE UDataTable* GetBattleStageDataTable() const {return BattleStageDataTable;};
+	FORCEINLINE UNiagaraSystem* GetSpawnEffect() const {return SpawnEffect;}; 
 
 protected:
 	virtual void StartPlay() override;
-	
+
 private:
 	void EndBattleSection();
 	void PortalSpawn();
@@ -28,6 +30,12 @@ private:
 	FTimerHandle PortalSpawnTimerHandle;
 
 	UPROPERTY()
-	uint8 CurrentClearStage = 0;
+	FName CurrentClearStage;
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* BattleStageDataTable;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* SpawnEffect;
 
 };

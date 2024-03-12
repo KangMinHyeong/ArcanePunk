@@ -49,44 +49,32 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* RerollDice_Text;
 
-	UPROPERTY()
-	AArcanePunkCharacter* OwnerCharacter;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 
-	UPROPERTY()
 	EEnhanceCategory EnhanceCategory = EEnhanceCategory::None;
 
-	UPROPERTY()
 	ESkillNumber SkillNumber = ESkillNumber::None;
 
-	UPROPERTY()
 	ESkillNumber NewSkillNumber = ESkillNumber::None;
 
-	UPROPERTY()
 	EEnHanceType EnHanceType = EEnHanceType::Silver;
 
-	UPROPERTY()
 	TArray<uint8> SkillAbilities;
 
-	UPROPERTY()
 	TArray<uint8> NewSkills;
 
 	ESkillAbility SkillAbility = ESkillAbility::Ability_None;
 
-	UPROPERTY()
 	TArray<ESkillAbility> EnableSkillAbilityList;
 
-	UPROPERTY()
 	TArray<ESkillAbility> OriginSkillAbilityList;
 	
 	uint8 Choice1;
 	uint8 Choice2;
 	uint8 Choice3;
 
-	UPROPERTY()
 	FName TEXT_Silver = TEXT("Silver");
-	UPROPERTY()
 	FName TEXT_Gold = TEXT("Gold");
-	UPROPERTY()
 	FName TEXT_Platinum = TEXT("Platinum");
 
 	UPROPERTY(EditAnywhere, meta=(BindWidget))

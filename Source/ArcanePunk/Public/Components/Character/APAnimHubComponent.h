@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "APAnimHubComponent.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPAnimHubComponent : public UActorComponent
 {

@@ -20,16 +20,15 @@ public:
 
 	virtual void Remove_Skill() override;	
 
-	void Activate_Skill14();
+	virtual void Activate_Skill() override;
 
 private:
 	virtual void AddAbilityList() override;
 	void Spawn_Skill14();
 
-	UPROPERTY()
+private:
 	float Skill14_Wide = 150.0f;
 
-	UPROPERTY()
 	float Skill14_LimitDistance = 600.0f;
 
 

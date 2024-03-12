@@ -12,6 +12,9 @@
 #include "UserInterface/Save/APSaveSlotUI.h"
 #include "UserInterface/Stage/APStageSelectingUI.h"
 #include "UserInterface/Stage/APEntranceUI.h"
+#include "UserInterface/Interaction/InteractionWidget.h"
+#include "Interfaces/InteractionInterface.h"
+#include "UserInterface/Conversation/APConversationUI.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -69,10 +72,10 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
 {  
     if(!bFreeCameraMode)
     {
-        MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter) return;
-        FreeCamera = GetWorld()->SpawnActor<APawn>(FreeCameraClass, MyCharacter->ReturnCameraTransform()); if(!FreeCamera) return;
+        MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
+        FreeCamera = GetWorld()->SpawnActor<APawn>(FreeCameraClass, MyCharacter->ReturnCameraTransform()); if(!FreeCamera.IsValid()) return;
         
-        Possess(FreeCamera);
+        Possess(FreeCamera.Get());
         bFreeCameraMode = true;
     }
     else
@@ -84,21 +87,21 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
         {
             MyCharacter = Cast<AArcanePunkCharacter>(Actor);
         }
-        if(!MyCharacter) return;
+        if(!MyCharacter.IsValid()) return;
         bFreeCameraMode = false;
-        Possess(MyCharacter);
-        if(!FreeCamera) return;
+        Possess(MyCharacter.Get());
+        if(!FreeCamera.IsValid()) return;
         FreeCamera->Destroy();
     }
 }
 
 void AArcanePunkPlayerController::OptionSetting()
 {
-    if(OptionSettingUI) {OptionSettingUI->AddToViewport(); return;}
+    if(OptionSettingUI.IsValid()) {OptionSettingUI->AddToViewport(); return;}
     else
     {
         OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); 
-        if(!OptionSettingUI) return;
+        if(!OptionSettingUI.IsValid()) return;
 
         OptionSettingUI->InitGraphicsSetting();
         OptionSettingUI->InitAudioSetting();
@@ -114,7 +117,7 @@ void AArcanePunkPlayerController::StartFadeIn()
     FadeLoadingWidget->AddToViewport();
     FadeLoadingWidget->FadeIn();
 
-    if(!LoadingWidget) return;
+    if(!LoadingWidget.IsValid()) return;
     LoadingWidget->RemoveFromParent();
     GetWorldTimerManager().ClearTimer(LoadTimerHandle);
     
@@ -131,7 +134,7 @@ void AArcanePunkPlayerController::StartFadeOut()
 
 void AArcanePunkPlayerController::StartLoading()
 {
-    LoadingWidget = CreateWidget(this, LoadingWidgetClass); if(!LoadingWidget) return;
+    LoadingWidget = CreateWidget(this, LoadingWidgetClass); if(!LoadingWidget.IsValid()) return;
     
     LoadingWidget->AddToViewport();
 
@@ -147,10 +150,10 @@ void AArcanePunkPlayerController::CreateEntranceUI()
 
 void AArcanePunkPlayerController::OpenSaveSlot()
 {
-    if(SelectSlotUI) {SelectSlotUI->BindSlot(); SelectSlotUI->AddToViewport();}
+    if(SelectSlotUI.IsValid()) {SelectSlotUI->BindSlot(); SelectSlotUI->AddToViewport();}
     else
     {
-        SelectSlotUI =  Cast<UAPSaveSlotUI>(CreateWidget(this, SelectSaveSlotClass)); if(!SelectSlotUI) return;
+        SelectSlotUI =  Cast<UAPSaveSlotUI>(CreateWidget(this, SelectSaveSlotClass)); if(!SelectSlotUI.IsValid()) return;
         SelectSlotUI->BindButton();
         SelectSlotUI->BindSlot();
         SelectSlotUI->AddToViewport();
@@ -159,34 +162,73 @@ void AArcanePunkPlayerController::OpenSaveSlot()
 
 void AArcanePunkPlayerController::CloseSaveSlot()
 {
-    if(SelectSlotUI) SelectSlotUI->RemoveFromParent();
+    if(SelectSlotUI.IsValid()) SelectSlotUI->RemoveFromParent();
 }
 
 void AArcanePunkPlayerController::StartSaveUI()
 {
-    SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass)); if(!SaveUI) return;
+    SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass)); if(!SaveUI.IsValid()) return;
 
     SaveUI->AddToViewport();
 
     GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AArcanePunkPlayerController::EndSaveUI, LoadingTime, false);
 }
 
-void AArcanePunkPlayerController::OpenStageSelectingUI()
+void AArcanePunkPlayerController::OpenStageSelectingUI(AActor* CameraActor)
 {
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+    MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
+    MyCharacter->SetActorHiddenInGame(true); MyCharacter->DisableInput(this); 
+    SetViewTargetWithBlend(CameraActor, BlendTime);
+    
+	GetWorldTimerManager().SetTimer(InteractionTimerHandle, this, &AArcanePunkPlayerController::OnStageSelectingUI, BlendTime+0.75f, false);    
+}
+
+void AArcanePunkPlayerController::OnStageSelectingUI()
+{
+    GetWorldTimerManager().ClearTimer(InteractionTimerHandle);
     auto StageSelectingUI = Cast<UAPStageSelectingUI>(CreateWidget<UUserWidget>(this, StageSelectingUIClasss));
 
     if(StageSelectingUI)
     {
         StageSelectingUI->BindButton();
         StageSelectingUI->AddToViewport();
-
         SetPause(true);
     }
 }
 
 void AArcanePunkPlayerController::CloseStageSelectingUI()
 {
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Visible);
     SetPause(false);
+    if(MyCharacter.IsValid()) {MyCharacter->SetActorHiddenInGame(false); SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); MyCharacter->EnableInput(this);} 
+}
+
+void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName Name, uint8 State)
+{
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+    MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
+    MyCharacter->SetActorHiddenInGame(true); MyCharacter->DisableInput(this); 
+    SetViewTargetWithBlend(CameraActor, BlendTime);
+
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, Name, State);
+	GetWorld()->GetTimerManager().SetTimer(InteractionTimerHandle, TimerDelegate, BlendTime, false);
+}
+
+void AArcanePunkPlayerController::OnConversationUI(FName Name, uint8 State)
+{
+    GetWorld()->GetTimerManager().ClearTimer(InteractionTimerHandle);
+    ConversationUI = CreateWidget<UAPConversationUI>(GetWorld(), ConversationUIClass); if(!ConversationUI.IsValid()) return;
+    ConversationUI->AddToViewport();
+    ConversationUI->InitOrder(Name, State);
+}
+
+void AArcanePunkPlayerController::CloseConversationUI()
+{
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+    if(ConversationUI.IsValid()) ConversationUI->RemoveFromParent();
+    if(MyCharacter.IsValid()) {MyCharacter->SetActorHiddenInGame(false); SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); MyCharacter->EnableInput(this);} 
 }
 
 void AArcanePunkPlayerController::EndSaveUI()
@@ -200,13 +242,13 @@ void AArcanePunkPlayerController::HitUI()
     
     HitUI->AddToViewport();
     HitUI->FadeOut();
-
+    
     if(HitCS) ClientStartCameraShake(HitCS, 1.0f);
 }
 
 void AArcanePunkPlayerController::DisplayHomingUI(ESkillNumber SkillNumber)
 {
-    HomingUI = Cast<UHomingTargetUI>(CreateWidget(this, HomingUIClass)); if(!HomingUI) return;
+    HomingUI = Cast<UHomingTargetUI>(CreateWidget(this, HomingUIClass)); if(!HomingUI.IsValid()) return;
     
     HomingUI->InputSkillInfo(SkillNumber);
     HomingUI->AddToViewport(); 
@@ -222,7 +264,7 @@ void AArcanePunkPlayerController::ReturnToDefault()
 
 void AArcanePunkPlayerController::PreventOtherClick(ESkillNumber SkillNumber)
 {
-    MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass)); if(!MouseClickUI) return;
+    MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass)); if(!MouseClickUI.IsValid()) return;
     
     MouseClickUI->InputSkillInfo(SkillNumber);
     MouseClickUI->AddToViewport(); 
@@ -232,11 +274,37 @@ void AArcanePunkPlayerController::SetHideUI(bool NewBool)
 {
     if(NewBool)
     {
-        if(!HideUI) HideUI = CreateWidget(this, HideUIClass); 
-        if(HideUI) HideUI->AddToViewport(); 
+        if(!HideUI.IsValid()) HideUI = CreateWidget(this, HideUIClass); 
+        if(HideUI.IsValid()) HideUI->AddToViewport(); 
     }
     else
     {
-        if(HideUI) HideUI->RemoveFromParent();
+        if(HideUI.IsValid()) HideUI->RemoveFromParent();
     }
+}
+
+void AArcanePunkPlayerController::OpenInteraction(AActor* NewActor, FInteractData InteractData)
+{
+    if(InteractionActor == NewActor) return;
+
+    if(InteractionWidget.IsValid()) InteractionWidget->RemoveFromParent();
+    InteractionWidget = CreateWidget<UInteractionWidget>(GetWorld(), InteractionUIClass); if(!InteractionWidget.IsValid()) return;
+    InteractionWidget->AddToViewport();
+    InteractionWidget->UpdateWidget(InteractData);
+    InteractionActor = NewActor;
+}
+
+void AArcanePunkPlayerController::CloseInteraction(AActor* NewActor)
+{
+    if(InteractionActor == NewActor)
+    {
+        if(InteractionWidget.IsValid()) InteractionWidget->RemoveFromParent();
+        InteractionActor = nullptr;
+    }
+}
+
+void AArcanePunkPlayerController::DisplayDeadUI()
+{
+    auto DeadUI = CreateWidget<UUserWidget>(GetWorld(), DeadUIClass); if(!DeadUI) return;
+    DeadUI->AddToViewport();
 }

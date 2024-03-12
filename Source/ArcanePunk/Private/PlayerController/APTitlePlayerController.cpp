@@ -67,11 +67,11 @@ void AAPTitlePlayerController::RemoveIntroUI(UUserWidget* IntroWidget)
 
 void AAPTitlePlayerController::OptionSetting()
 {
-    if(OptionSettingUI) {OptionSettingUI->AddToViewport(); return;}
+    if(OptionSettingUI.IsValid()) {OptionSettingUI->AddToViewport(); return;}
     else
     {
         OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); 
-        if(!OptionSettingUI) return;
+        if(!OptionSettingUI.IsValid()) return;
 
         OptionSettingUI->InitGraphicsSetting();
         OptionSettingUI->InitAudioSetting();
