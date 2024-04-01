@@ -26,6 +26,7 @@
 #include "ArcanePunk/APGameModeBase.h"
 #include "Components/Character/APHitPointComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/Common/APGhostTrailSpawnComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -54,17 +55,18 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 
 	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
 	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
-	APSkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("APSkillHubComp"));
+	SkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComp"));
 	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
 	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
-	SpawnStepComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("SpawnStepComp"));
+	APSpawnStepComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("APSpawnStepComp"));
 	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
+	GhostTrailSpawnComp = CreateDefaultSubobject<UAPGhostTrailSpawnComponent>(TEXT("GhostTrailSpawnComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
 	PlayerPanel->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
-	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
+	Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
 	StunEffect->SetupAttachment(GetRootComponent());
@@ -93,8 +95,13 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 void AArcanePunkCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	// prodo
+	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	HUD->UpdateTutorialWidget("NONE");
 
+	// Minhyeong
 	PC = Cast<AArcanePunkPlayerController>(GetController());
+	GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
@@ -109,13 +116,13 @@ void AArcanePunkCharacter::BeginPlay()
 	InitEquipData(WeaponReference, DesiredWeaponID);
 
 	SetHavingSkills();
-	APSkillHubComp->UpdateSkill_Q();
-	APSkillHubComp->UpdateSkill_E();
+	SkillHubComp->UpdateSkill_Q();
+	SkillHubComp->UpdateSkill_E();
 	SetRSkill();
 
-	// prodo
-	HUD = Cast<AAPHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	HUD->UpdateTutorialWidget("NONE");
+	SetWeaponPosition();
+
+
 }
 
 void AArcanePunkCharacter::Tick(float DeltaTime)
@@ -213,10 +220,21 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 	MySpringArm->TargetArmLength = CurrentArmLength;
 }
 
+void AArcanePunkCharacter::SetAttackRotation()
+{
+	if(PC.IsValid()) 
+	{
+		if(!GM.IsValid()) return; 
+		// if(GM->IsBattleStage())PC->SetControlRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
+		if(GM->IsBattleStage()) MoveComp->SetAttackRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
+	}
+}
+
 void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
 	if(bDoing || !StopState.IsEmpty()) return;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
+	
 	AttackComp->StartAttack_A(bCanMove);	
 }
 
@@ -293,36 +311,57 @@ void AArcanePunkCharacter::ChangeEquipData(TArray<UAPItemBase *> & EquipArr, UAP
 	if(PC.IsValid()) PC->OnUpdateStatusText.Broadcast();
 }
 
+void AArcanePunkCharacter::SetWeaponPosition()
+{
+	if(!GM.IsValid()) return;
+
+	if(GM->IsBattleStage())
+	{
+		Weapon->SetHiddenInGame(false);
+	}
+	else
+	{
+		Weapon->SetHiddenInGame(true);
+	}
+}
+
 void AArcanePunkCharacter::SkillBase_Q()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	if(bCanSkill && bCanMove && StopState.IsEmpty()) APSkillHubComp->PressQ();	
+	if(MyPlayerTotalStatus.PlayerDynamicData.MP <= 0) {PC->DisplayNotEnoughMPUI(); return;}
+	if( bCanMove && StopState.IsEmpty() ) SkillHubComp->PressQ();	
 	OnQSkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_E()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
-	if(bCanSkill && bCanMove && StopState.IsEmpty()) APSkillHubComp->PressE();
+	if(MyPlayerTotalStatus.PlayerDynamicData.MP <= 0) {PC->DisplayNotEnoughMPUI(); return;}
+	if( bCanMove && StopState.IsEmpty() ) SkillHubComp->PressE();
 	OnESkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_R()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
-	if(bCanSkill && bCanMove && StopState.IsEmpty()) APSkillHubComp->PressSpace();
+	if(!bUltCanSkill) {PC->DisplayNotEnoughMPUI(); return;}
+	if( bCanMove && StopState.IsEmpty()) SkillHubComp->PressSpace();
 	OnRSkill = true;
 }
 
 void AArcanePunkCharacter::StartJog()
 {
 	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
+
+	GhostTrailSpawnComp->SetRunTrail(true);
+
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
 }
 
 void AArcanePunkCharacter::EndJog()
 {
 	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+	GhostTrailSpawnComp->SetRunTrail(false);
 }
 
 void AArcanePunkCharacter::Jump()
@@ -400,12 +439,12 @@ void AArcanePunkCharacter::SetRSkill()
 	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
 	else {RSkill = EUltSkillNumber::None;}
 
-	APSkillHubComp->UpdateSkill_R();
+	SkillHubComp->UpdateSkill_R();
 }
 
 void AArcanePunkCharacter::WorldMap()
 {
-	auto GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return; 
+	if(!GM.IsValid()) return; 
 	if(!GM->IsBattleStage()) return;
 	if(HUD) HUD->OpenWorldMap();
 }

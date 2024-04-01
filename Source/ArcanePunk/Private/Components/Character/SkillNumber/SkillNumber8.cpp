@@ -15,14 +15,14 @@
 void USkillNumber8::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_8");
 }
 
 void USkillNumber8::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// // EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber8::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -73,7 +73,7 @@ void USkillNumber8::Spawn_Skill8()
 	
 	ActivateSkillRange_Target(Skill8_Wide, Skill8_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill8_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
 
 	if(CheckSmartKey(SkillKey, OwnerCharacter))
 	{
@@ -89,6 +89,7 @@ void USkillNumber8::Spawn_Skill8()
 
 void USkillNumber8::OnSkill()
 {
+	Super::OnSkill();
     SetComponentTickEnabled(false);
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
@@ -123,10 +124,10 @@ void USkillNumber8::Activate_Skill()
 	if(!ArcaneBall.IsValid()) return; 
     ArcaneBall->SetOwner(OwnerCharacter);
     ArcaneBall->SetBallRadius(Skill8_Wide);
-	ArcaneBall->SetSkill(CurrentSkillType, CurrentSkillAbility);	
+	ArcaneBall->SetSkill(SkillAbilityNestingData);	
     float Size = ArcaneBall->GetActorScale3D().Y/ ArcaneBall->DefaultSize;
     // ArcaneBall->SetActorLocation( ArcaneBall->GetActorLocation() + (OwnerCharacter->GetActorUpVector()*150.0f*Size));
-    ArcaneBall->SetDeadTime((SkillRange_Target->GetTargetDistance() * 2.0f - SpawnAddLocation) / ArcaneBall->GetCutterSpeed()); // 거리 = 속력 * 시간 으로 DeadTime 수정
+    ArcaneBall->SetDeadTime((SkillRange_Target->GetTargetDistance() * 2.0f - SpawnAddLocation) / ArcaneBall->GetBallSpeed()); // 거리 = 속력 * 시간 으로 DeadTime 수정
 	// if(SkillRange_Target) ArcaneBeam->SetDistance(SkillRange_Target->GetTargetDistance() * 2.0f);
 	// if(SkillRange_Target) ArcaneBeam->SetWide(SkillRange_Target->GetTargetWide());
 	Remove_Skill();

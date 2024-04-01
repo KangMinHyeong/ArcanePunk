@@ -92,8 +92,12 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithoutLocationActor(TSubclassO
 void UAPSpawnMonsterComponent::PlaySpawnEffect(FVector Location)
 {
     auto GM = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return;
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GM->GetSpawnEffect(),  Location);
+
+    float SpawnSoundVolume = GI->GameSoundVolume.MasterVolume * GI->GameSoundVolume.EffectVolume * GM->GetSpawnSoundVolume();
+    UGameplayStatics::SpawnSoundAtLocation(GetWorld(), GM->GetSpawnSound(), Location, FRotator::ZeroRotator, SpawnSoundVolume, 1.0f, Sink);
 }
 
 // TArray 없이 스폰

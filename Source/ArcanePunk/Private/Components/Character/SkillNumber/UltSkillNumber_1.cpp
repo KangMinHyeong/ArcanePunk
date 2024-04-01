@@ -25,6 +25,7 @@ void UUltSkillNumber_1::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	OwnerCharacter->SetDoing(true);
     SetAbility(WhichKey);
 
+	SkillKey = WhichKey;
 	CurrentSkillType = SkillType;
 
 	OnSkill();
@@ -39,6 +40,7 @@ void UUltSkillNumber_1::OnSkill()
 	if(!OwnerAnim) return;
 
 	OwnerAnim->PlayUltSkill_1_Montage();
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
@@ -58,7 +60,7 @@ void UUltSkillNumber_1::Activate_Skill()
 
     ArcaneRain = GetWorld()->SpawnActor<AArcaneRain>(OwnerCharacter->GetArcaneRainClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 	if(!ArcaneRain.IsValid()) return;
-	ArcaneRain->SetSkill(CurrentSkillType, CurrentSkillAbility);	
+	// ArcaneRain->SetSkill(CurrentSkillType, CurrentSkillAbility);	
 	ArcaneRain->SetOwner(OwnerCharacter);
 	ArcaneRain->SetRainEffect();
 }

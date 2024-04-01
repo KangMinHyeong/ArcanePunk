@@ -78,6 +78,9 @@ public:
 
 	// Dead UI
 	void DisplayDeadUI();
+
+	// Not Enough MP
+	void DisplayNotEnoughMPUI();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -85,6 +88,7 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 
 private:
+	void SetMouseCursor();
 	void LookStatus();
 	void FreeCameraMode();
 
@@ -196,10 +200,15 @@ private:
 	
 	TWeakObjectPtr<UAPConversationUI> ConversationUI;
 
+	// Not Enough MP
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> NotEnoughMPUIClass;
+
 public:
 	FOnUpdateStatusText OnUpdateStatusText;
 
 	UPROPERTY()
 	TArray<bool> SmartKeyArr; // QER 스마트키
-
+	
+	float MousePositionAngle = 0.0f;
 };

@@ -7,6 +7,12 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneRage.h"
 
+void USkillNumber12::BeginPlay()
+{
+	Super::BeginPlay();
+	SkillAbilityNestingData.SkillName = TEXT("Skill_12");
+}
+
 void USkillNumber12::AddAbilityList()
 {
 }
@@ -29,6 +35,7 @@ void USkillNumber12::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber12::OnSkill()
 {
+	Super::OnSkill();
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
@@ -53,6 +60,6 @@ void USkillNumber12::Activate_Skill()
 	
     if(!ArcaneRage) return;
 	ArcaneRage->SetOwner(OwnerCharacter);
-	ArcaneRage->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	ArcaneRage->SetSkill(SkillAbilityNestingData);	
     ArcaneRage->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules ::KeepWorldTransform);
 }

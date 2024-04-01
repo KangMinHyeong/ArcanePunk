@@ -21,13 +21,15 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/Character/APMovementComponent.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidgetComp"));
 	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
+	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
 	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
 
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
@@ -48,6 +50,7 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetActorTickEnabled(false);
 	InitMonster();	
 	BindMontageEnded();
 	OnDrop = true;
@@ -151,6 +154,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		TeleportMarkDeactivate();
 		CheckAllEnemyKilled();
+		StunEffect->DeactivateImmediate();
+		TeleportMark->DeactivateImmediate();
 	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
 	}
 	else
@@ -266,11 +271,6 @@ float AEnemy_CharacterBase::CriticalCalculate(float Multiple)
     return  1.0f;
 }
 
-float AEnemy_CharacterBase::GetDistanceLimit()
-{
-    return Distance_Limit;
-}
-
 void AEnemy_CharacterBase::PossessedBy(AController *NewController)
 {
 	Super::PossessedBy(NewController);
@@ -322,7 +322,7 @@ void AEnemy_CharacterBase::DropItemActor()
 		{
 			if(DropPercent <= DropClass.Value)
 			{
-				uint8 EnhanceCategoryNum = FMath::RandRange(1, 7);
+				uint8 EnhanceCategoryNum = FMath::RandRange(1, 2);
 				if(DropPackage.IsValid())
 				{
 					DropPackage->AddEnhance(EnhanceCategoryNum);
@@ -432,4 +432,14 @@ void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor, float Time)
 {
 	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
 	if(!Character->IsBlockMode())  Character->GetCrowdControlComponent()->StunState(Time);
+}
+
+void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
+{
+	FVector Loc = TargetActor->GetActorLocation() - GetMesh()->GetComponentLocation();
+	Loc.Z = 0.0f; FRotator Rotation = FRotationMatrix::MakeFromX(Loc).Rotator();
+
+	if(Speed < 0.0f) {MoveComp->SetAttackRotation(Rotation);}
+	else {MoveComp->SetAttackRotation(Rotation, Speed);}
+   	
 }

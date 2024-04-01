@@ -10,14 +10,14 @@
 void USkillNumber1::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_1");
 }
 
 void USkillNumber1::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber1::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -28,29 +28,32 @@ void USkillNumber1::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	
 	SetAbility(WhichKey);
 
+	SkillKey = WhichKey;
 	CurrentSkillType = SkillType;
 
-	if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
-	{
-		if(CheckSmartKey(WhichKey, OwnerCharacter))
-		{
-			OnSkill();
-		}
-		else
-		{
-			auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-			SetMouseCursor(PC, ESkillCursor::Crosshairs);
-			PC->DisplayHomingUI(ESkillNumber::Skill_1);
-		}
-	}
-	else
-	{
-		OnSkill();
-	}
+	// if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
+	// {
+	// 	if(CheckSmartKey(WhichKey, OwnerCharacter))
+	// 	{
+	// 		OnSkill();
+	// 	}
+	// 	else
+	// 	{
+	// 		auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
+	// 		SetMouseCursor(PC, ESkillCursor::Crosshairs);
+	// 		PC->DisplayHomingUI(ESkillNumber::Skill_1);
+	// 	}
+	// }
+	// else
+	// {
+	// 	OnSkill();
+	// }
+	OnSkill();
 }
 
 void USkillNumber1::OnSkill()
 {
+	Super::OnSkill();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
     
@@ -77,6 +80,6 @@ void USkillNumber1::Activate_Skill()
 
 	auto SwordSkill = GetWorld()->SpawnActor<ASwordImpact>(OwnerCharacter->GetSwordImpactClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
 	if(!SwordSkill) return;
-	SwordSkill->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	SwordSkill->SetSkill(SkillAbilityNestingData);
 
 }

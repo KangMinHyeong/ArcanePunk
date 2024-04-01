@@ -12,9 +12,15 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Skill/SwordClutch.h"
 
+void USkillNumber14::BeginPlay()
+{
+	Super::BeginPlay();
+	SkillAbilityNestingData.SkillName = TEXT("Skill_14");
+}
+
 void USkillNumber14::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
 }
 
 void USkillNumber14::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -65,10 +71,10 @@ void USkillNumber14::Spawn_Skill14()
 	ActivateSkillRange_Target(Skill14_LimitDistance, Skill14_LimitDistance, ESkillRangeType::Around_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill14_LimitDistance+Skill14_Wide/2);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetWide(Skill14_Wide);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
 
 	ActivateSkillRange_Round(Skill14_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
 
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
@@ -77,6 +83,7 @@ void USkillNumber14::Spawn_Skill14()
 
 void USkillNumber14::OnSkill()
 {
+	Super::OnSkill();
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
@@ -115,7 +122,7 @@ void USkillNumber14::Activate_Skill()
 	if(SkillRange_Target.IsValid()) SwordClutch->SetDistance(SkillRange_Target->GetTargetDistance() - Skill14_Wide/2);
 	if(SkillRange_Target.IsValid()) SwordClutch->SetClutchSpeed(SkillRange_Target->GetMaxDist() / SkillRange_Target->GetTargetDistance());
 	SwordClutch->SetWide(Skill14_Wide);
-	SwordClutch->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	SwordClutch->SetSkill(SkillAbilityNestingData);	
 	Remove_Skill();
 	bActivate = true;
 }

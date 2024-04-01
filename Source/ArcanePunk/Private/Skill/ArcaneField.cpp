@@ -75,9 +75,9 @@ void AArcaneField::FollowCharacter(float DeltaTime)
     SetActorLocation(FMath::VInterpTo(GetActorLocation(), FVector(OwnerCharacter->GetActorLocation().X, OwnerCharacter->GetActorLocation().Y, GetActorLocation().Z) , DeltaTime, FollowSpeed));
 }
 
-void AArcaneField::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneField::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 
     // FieldTrigger->OnComponentBeginOverlap.AddDynamic(this, &AArcaneField::SetFieldDebuff);
 }

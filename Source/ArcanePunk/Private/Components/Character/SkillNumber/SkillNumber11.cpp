@@ -7,10 +7,16 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneField.h"
 
+void USkillNumber11::BeginPlay()
+{
+	Super::BeginPlay();
+	SkillAbilityNestingData.SkillName = TEXT("Skill_11");
+}
+
 void USkillNumber11::AddAbilityList()
 {
-    EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+    // EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber11::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -31,6 +37,7 @@ void USkillNumber11::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber11::OnSkill()
 {
+	Super::OnSkill();
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
@@ -55,6 +62,6 @@ void USkillNumber11::Activate_Skill()
 	
     if(!ArcaneField) return;
 	ArcaneField->SetOwner(OwnerCharacter);
-	ArcaneField->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	ArcaneField->SetSkill(SkillAbilityNestingData);	
     
 }

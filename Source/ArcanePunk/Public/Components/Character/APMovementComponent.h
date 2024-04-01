@@ -30,9 +30,17 @@ public:
 	void AnimMovement(); // 콤보어택 Move 시작
 	void AnimMoveStop(); // 콤보어택 Move 끝
 
+	void SetAttackRotation(FRotator NewTargetRot, float Speed = 0.0f);
 private:
 
 private:
 	// 이동 관련 변수
 	FVector PlayerVec = FVector::ZeroVector;
+
+	FRotator TargetRot;
+
+	UPROPERTY(EditAnywhere)
+	float RotSpeed = 3.0f;
+
+	float InitRotSpeed;
 };

@@ -19,10 +19,10 @@ void AAPSkillRange_Arrow::Tick(float DeltaTime)
 	}
 }
 
-void AAPSkillRange_Arrow::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AAPSkillRange_Arrow::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
-    if(SkillAbility.Contains(ESkillAbility::Stun)) bStun = true;
+    Super::SetSkill(SkillAbilityNestingData);
+    // if(SkillAbility.Contains(ESkillAbility::Stun)) bStun = true;
     
     MaxDistance = MaxDistance * (GetActorScale3D().Z / DefaultSize);
 

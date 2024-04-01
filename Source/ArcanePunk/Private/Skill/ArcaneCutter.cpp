@@ -56,9 +56,9 @@ void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, 
     Destroy();
 }
 
-void AArcaneCutter::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-	Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 
 	CutterEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
 	BintHit();

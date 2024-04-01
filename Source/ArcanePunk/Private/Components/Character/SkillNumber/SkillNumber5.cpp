@@ -16,7 +16,7 @@
 void USkillNumber5::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_5");
 	InitIncreasingSpeed = IncreasingSpeed;
 }
 
@@ -31,9 +31,9 @@ void USkillNumber5::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void USkillNumber5::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// // EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber5::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -89,7 +89,7 @@ void USkillNumber5::Spawn_Skill5()
 
 	ActivateSkillRange_Target(Skill5_Wide, Skill5_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill5_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
 
 	if(CheckSmartKey(SkillKey, OwnerCharacter))
 	{
@@ -114,16 +114,21 @@ void USkillNumber5::OnSkill5()
 	if(!OwnerAnim) return;
 
 	OwnerAnim->PlaySkill_5_Montage();
+	OnSkill();
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
 void USkillNumber5::OnSkill()
 {
+	Super::OnSkill();
 }
 
 void USkillNumber5::Remove_Skill()
 {
 	Super::Remove_Skill();
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
 }
 
 void USkillNumber5::Activate_Skill()
@@ -139,7 +144,7 @@ void USkillNumber5::Activate_Skill()
 	ArcaneBeam = GetWorld()->SpawnActor<AArcaneBeam>(OwnerCharacter->GetArcaneBeamClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
 	if(!ArcaneBeam.IsValid()) return; 
 	ArcaneBeam->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("BeamPoint"));
-	ArcaneBeam->SetSkill(CurrentSkillType, CurrentSkillAbility);	
+	ArcaneBeam->SetSkill(SkillAbilityNestingData);	
 	ArcaneBeam->SetOwner(OwnerCharacter);
 	if(SkillRange_Target.IsValid()) ArcaneBeam->SetDistance(SkillRange_Target->GetTargetDistance() * 2.0f);
 	if(SkillRange_Target.IsValid()) ArcaneBeam->SetWide(SkillRange_Target->GetTargetWide());
@@ -156,15 +161,19 @@ void USkillNumber5::SkillEnd()
 void USkillNumber5::SpawnChargeEffect()
 {
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
-	ChargeEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(OwnerCharacter->GetChargeEffect(), OwnerCharacter->GetMesh(), TEXT("BeamPoint"), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+	ChargeEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), OwnerCharacter->GetChargeEffect(), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation());
+	// ChargeEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(OwnerCharacter->GetChargeEffect(), OwnerCharacter->GetMesh(), TEXT("BeamPoint"), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
 }
 
 void USkillNumber5::RemoveEffect()
 {
 	if(ChargeEffectComp.IsValid()) ChargeEffectComp->DeactivateImmediate();
+	if(ChargeEnhanceEffectComp.IsValid()) ChargeEnhanceEffectComp->DeactivateImmediate();
 }
 
 void USkillNumber5::Enhance()
 {
 	IncreasingSpeed = InitIncreasingSpeed * 3.0;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	ChargeEnhanceEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(OwnerCharacter->GetChargeEnhanceEffect(), OwnerCharacter->GetMesh(), TEXT("BeamPoint"), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
 }

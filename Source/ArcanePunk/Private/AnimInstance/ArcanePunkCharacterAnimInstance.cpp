@@ -7,6 +7,8 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
 #include "Character/SkillRange/APSkillRange.h"
+#include "ArcanePunk/APGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
 {
@@ -24,6 +26,7 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     if (!IsDead)
 	{
 		CurrentPawnSpeed = OwnerCharacter->GetVelocity().Size();
+        
 		// auto Character = Cast<ACharacter>(Pawn);
 		// if (Character)
 		// {
@@ -32,9 +35,25 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 }
 
+void UArcanePunkCharacterAnimInstance::NativeBeginPlay()
+{
+    auto GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return;
+
+    if(GM->IsBattleStage())
+    {
+        bBattleMode = 1.0f;
+    }
+    else
+    {
+        bBattleMode = 0.0f;
+    }
+}
+
 void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
 {
     if(IsDead) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner()); if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->SetAttackRotation();
     Montage_Play(Attack_A_Montage, 1.0f);
 }
 
@@ -411,6 +430,14 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
     OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(true);
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_FootRightOnlySound()
+{
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(true, false);
+}
+
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
 {
     TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
@@ -419,11 +446,21 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
     OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(false);
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeftOnlySound()
+{
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(false, false);
+}
+
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
 {
     if(IsDead) return;
     AttackSection = NewSection;
 	if(!Montage_IsPlaying(Attack_A_Montage)) return;
+    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner()); if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->SetAttackRotation();
 	Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
 }
 

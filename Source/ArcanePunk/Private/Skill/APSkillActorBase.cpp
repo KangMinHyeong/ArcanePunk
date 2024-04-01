@@ -8,8 +8,8 @@ AAPSkillActorBase::AAPSkillActorBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SkillTypeComp = CreateDefaultSubobject<UAPSkillType>(TEXT("SkillTypeComp"));
-	SkillAbilityComp = CreateDefaultSubobject<UAPSkillAbility>(TEXT("SkillAbilityComp"));
+	// SkillTypeComp = CreateDefaultSubobject<UAPSkillType>(TEXT("SkillTypeComp"));
+	// SkillAbilityComp = CreateDefaultSubobject<UAPSkillAbility>(TEXT("SkillAbilityComp"));
 	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 }
 
@@ -34,11 +34,13 @@ void AAPSkillActorBase::DestroySKill()
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
-void AAPSkillActorBase::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AAPSkillActorBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-	SkillAbilityComp->SetSkillAbility(SkillAbility, SkillCategory);
+	// SkillAbilityComp->SetSkillAbility(SkillAbility, SkillCategory);
 
-    SkillTypeComp->SetSkillType(SkillType, SkillCategory);
+    // SkillTypeComp->SetSkillType(SkillType, SkillCategory);
+
+	SkillAbilityData = SkillAbilityNestingData;
 }
 
 void AAPSkillActorBase::DeActivate(ESkillNumber SkillNumber)

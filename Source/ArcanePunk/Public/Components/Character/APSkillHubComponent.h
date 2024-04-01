@@ -58,9 +58,13 @@ public:
 
 	USkillNumberBase* GetSKillNumberComponent(ESkillNumber SkillNumber);
 
+	void AutoRecoveryMP();
+
 private:
 	// void SkillDetermine(ESkillKey First, ESkillKey Second);
 	void PlayBasicSkill();
+
+	void RecoveryMP();
 	// void CastSkillNumber(ESkillNumber SkillNumber, ESkillKey WhichKey);
 	// void CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey);
 	// bool ActivationCheck(ESkillNumber SkillNumber);
@@ -81,10 +85,15 @@ private:
 
 	//TimerHandle
 	FTimerHandle SkillCancleTimerHandle;
+	FTimerHandle RecoveryMPTimerHandle;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	// UPROPERTY(EditAnywhere, Category = "Component")
 	// UAPSkillNumber* SkillNumComp;
+	bool Proceeding = false;
+
+	UPROPERTY()
+	float RecoveryTime_MP = 10.0f;
 
 public:	
 	ESkillKey LastSkill = ESkillKey::None;

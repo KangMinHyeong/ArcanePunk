@@ -21,9 +21,11 @@ public:
 
 	void InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType);
 
-	void ApplyEnhance(ESkillAbility UpdateSkillAbility);
+	void ApplyEnhance(uint8 UpdateSkillAbility, uint16 UpdateNestingNumb );
 	void ApplyNewSkill(ESkillNumber UpdateSkillNumber);
-
+	FORCEINLINE UDataTable* GetSkillAbilityDataTable() const {return SkillAbilityDataTable;};
+	FORCEINLINE EEnHanceType GetEnHanceType() const {return EnHanceType;};
+	FORCEINLINE FSkillAbilityNestingData GetSkillAbilityNestingData() const {return SkillAbilityNestingData;};
 private:	
 	void EnhanceSuffle();
 	bool SkillSuffle();
@@ -63,11 +65,11 @@ private:
 
 	TArray<uint8> NewSkills;
 
-	ESkillAbility SkillAbility = ESkillAbility::Ability_None;
+	// ESkillAbility SkillAbility = ESkillAbility::Ability_None;
 
-	TArray<ESkillAbility> EnableSkillAbilityList;
+	// TArray<ESkillAbility> EnableSkillAbilityList;
 
-	TArray<ESkillAbility> OriginSkillAbilityList;
+	// TArray<ESkillAbility> OriginSkillAbilityList;
 	
 	uint8 Choice1;
 	uint8 Choice2;
@@ -88,4 +90,11 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float SkillAppearPercent = 0.0f; // 스킬 등장 확률, 100 - 스킬 등장 확률 = 증강 등장 확률
+
+	UPROPERTY(EditAnywhere)
+	UDataTable* SkillAbilityDataTable;
+
+	FSkillAbilityNestingData SkillAbilityNestingData;
+
+	uint16 PlusAbilityNum = 1;
 };

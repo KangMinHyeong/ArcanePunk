@@ -31,9 +31,9 @@ void AArcaneTent::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 }
 
-void AArcaneTent::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneTent::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); OwnerCharacter->SetReturnToHideTime(ReturnToHideTime); OwnerCharacter->SetInArcaneTent(true);
     TentTrigger->OnComponentBeginOverlap.AddDynamic(this, &AArcaneTent::OnBeginHiding);

@@ -16,18 +16,32 @@ public:
 	UAP_EnemyBaseAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	FORCEINLINE void SetbBattleMode(float NewValue) {bBattleMode = NewValue;};
+
 	UFUNCTION(BlueprintPure)
 	bool IsRun();
 
 	// Play Skill Anim
 	void PlayNormalAttack_Montage();
 
+	/* Notify */ 
 	UFUNCTION()
 	void AnimNotify_NormalAttack();
 
+	// ScoutDog
+	UFUNCTION()
+	void AnimNotify_JumpEffect();
+	UFUNCTION()
+	void AnimNotify_LeapFoward();
+	UFUNCTION()
+	void AnimNotify_LeapEnd();
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
+	float bBattleMode = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	bool IsDead;
@@ -35,7 +49,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	class UAnimSequence* RunPose;
 
-private:
 	TWeakObjectPtr<AEnemy_CharacterBase> Enemy;
 	
 public:

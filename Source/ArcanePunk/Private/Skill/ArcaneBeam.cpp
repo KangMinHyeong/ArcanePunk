@@ -37,12 +37,12 @@ void AArcaneBeam::SetBeamEffect(float Coefficient)
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
     float Size =  GetActorScale3D().Y / DefaultSize * ( 1.0f / OwnerCharacter->GetMesh()->GetComponentScale().Y);
     
-    BeamComp = UNiagaraFunctionLibrary::SpawnSystemAttached(BeamEffect, OwnerCharacter->GetLeftBeamPoint(), TEXT("ArcaneBeam"), FVector(0,0,0), FRotator::ZeroRotator, Size * BeamScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
+    BeamComp = UNiagaraFunctionLibrary::SpawnSystemAttached(BeamEasdaffect, OwnerCharacter->GetLeftBeamPoint(), TEXT("ArcaneBeam"), FVector(0,0,0), FRotator::ZeroRotator, Size * BeamScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
     if(!BeamComp.IsValid()) return; 
     BeamStart = OwnerCharacter->GetLeftBeamPoint()->GetComponentLocation();
     BeamEnd = FVector(OwnerCharacter->GetCapsuleComponent()->GetComponentLocation().X,OwnerCharacter->GetCapsuleComponent()->GetComponentLocation().Y,BeamStart.Z) + OwnerCharacter->GetActorForwardVector() * Distance * Size;
     BeamComp->SetNiagaraVariableVec3(TEXT("Beam End"),  BeamEnd);
-    BeamComp->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+    // BeamComp->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
 
     DamageCoefficient = Coefficient;
     SetBeamAttack();
@@ -55,8 +55,8 @@ void AArcaneBeam::SetBeamAttack()
     GetWorldTimerManager().SetTimer(BeamHitLoopTimerHandle, this, &AArcaneBeam::SetBeamAttack, BeamHitLoopTime, false);
 }
 
-void AArcaneBeam::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneBeam::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
     
 }

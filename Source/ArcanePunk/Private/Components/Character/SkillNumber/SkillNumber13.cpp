@@ -10,9 +10,15 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Skill/ArcaneTent.h"
 
+void USkillNumber13::BeginPlay()
+{
+	Super::BeginPlay();
+	SkillAbilityNestingData.SkillName = TEXT("Skill_13");
+}
+
 void USkillNumber13::AddAbilityList()
 {
-    EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+    // EnableSkillAbilityList.Add(ESkillAbility::Gigant);
 }
 
 void USkillNumber13::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -33,6 +39,7 @@ void USkillNumber13::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber13::OnSkill()
 {
+	Super::OnSkill();
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
@@ -60,6 +67,6 @@ void USkillNumber13::Activate_Skill()
 	
     if(!ArcaneTent) return;
 	ArcaneTent->SetOwner(OwnerCharacter);
-	ArcaneTent->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	ArcaneTent->SetSkill(SkillAbilityNestingData);	
     
 }

@@ -28,7 +28,7 @@ public:
 
 	UDecalComponent* GetDecalComponent() {return RangeDecal;};
 	
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
 
 	FORCEINLINE float GetMaxDist() const {return MaxDistance;};
@@ -37,6 +37,8 @@ public:
 	FORCEINLINE float GetTargetWide() {return RangeDecal->DecalSize.Y * (GetActorScale3D().Z / DefaultSize);};
 	FORCEINLINE bool GetbStun() const {return bStun;};
 	FORCEINLINE void SetWide(float NewValue) {Wide = NewValue;};
+
+	// FORCEINLINE void SetHideAndTargeting(bool NewBool) {Targeting = !NewBool; }; // SetHideAndTargeting
 
 protected:
 	UPROPERTY(EditAnywhere)

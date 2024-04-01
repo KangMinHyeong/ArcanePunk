@@ -79,10 +79,10 @@ struct FPlayerDynamicData
 	float MaxHP = 100.0f;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	int32 MP = 100;
+	int32 MP = 3;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	int32 MaxMP = 100;
+	int32 MaxMP = 3;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float ATK = 25.0f;

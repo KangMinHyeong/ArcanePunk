@@ -23,7 +23,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 	

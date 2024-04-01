@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UserInterface/APHUD.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Components/ActorComponent.h"
 #include "SkillNumberBase.generated.h"
@@ -52,10 +53,12 @@ public:
 
 	void CharacterRotation();
 
+	// Only Ult
+	FORCEINLINE float GetUltCoolTime() const {return UltCoolTime;};
 protected:
 	ESkillTypeState CurrentSkillType = ESkillTypeState::Type_None;
 
-	TArray<ESkillAbility> CurrentSkillAbility;
+	// TArray<ESkillAbility> CurrentSkillAbility;
 
 	FHitResult HitResult;
 
@@ -63,8 +66,17 @@ protected:
 
 	float SpawnAddLocation = 35.0f;
 
+	uint8 MPConsumption = 1;
+
+	float RotSpeed = 640.0f;
+
+	float UltCoolTime = 15.0f;
+
 public:
-	TArray<ESkillAbility> EnableSkillAbilityList;
+	// TArray<ESkillAbility> EnableSkillAbilityList;
+
+	UPROPERTY() // 스킬 증강 정보 (종류 및 중첩 상태)
+	FSkillAbilityNestingData SkillAbilityNestingData;
 
 	ESkillKey SkillKey = ESkillKey::None;
 

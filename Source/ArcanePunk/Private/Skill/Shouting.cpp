@@ -51,8 +51,8 @@ void AShouting::SetShoutingAttack()
     DrawDebugSphere(GetWorld(), OwnerCharacter->GetMesh()->GetComponentLocation(), ShoutRadius* Size, 18, FColor::Green,false, 2.5f);
 }
 
-void AShouting::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 }
 

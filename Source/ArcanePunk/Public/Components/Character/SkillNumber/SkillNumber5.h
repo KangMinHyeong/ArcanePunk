@@ -46,6 +46,7 @@ private:
 	float Skill5_Wide = 100.0f / 2.0f;
 
 	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
+	TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;
 
 	float DamageCoefficient = 1.0f;
 

@@ -8,6 +8,7 @@
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 
 UBTService_EnemyEyeSight::UBTService_EnemyEyeSight()
 {
@@ -27,8 +28,9 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
     AEnemy_CharacterBase* Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
     if(!Monster) return;
+     auto Anim = Cast<UAP_EnemyBaseAnimInstance>(Monster->GetMesh()->GetAnimInstance()); if(!Anim) return; 
 
-    AActor* TargetActor = Monster->IsAggro();
+    TWeakObjectPtr<AActor> TargetActor = Monster->IsAggro();
     if(!Monster->IsAggro())
     {
         AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));  if(!TargetPlayer) return;
@@ -36,14 +38,26 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
         else {TargetActor = nullptr;}
     }   
 
-    if(TargetActor)
+    if(TargetActor.IsValid())
     {
             FVector TargetLocation = TargetActor->GetActorLocation();
         float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
 
-        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
+        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && Distance < Monster->GetDetectLimit())
         {
-            OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor);
+            Current = FMath::FInterpConstantTo(Current, 1.0f, DeltaSeconds, Speed);
+            if(first) {Monster->RotateTowardsTarget(TargetActor.Get(), RotateSpeed); first = false;}
+        }
+        else 
+        { 
+            Current = FMath::FInterpConstantTo(Current, 0.0f, DeltaSeconds, Speed);
+            first = true;
+        }
+        Anim->SetbBattleMode(Current);
+
+        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
+        {
+            OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
         }
         else
         {

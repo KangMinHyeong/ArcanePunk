@@ -5,6 +5,7 @@
 // #include "Components/Character/APSkillBaseShift.h"
 // #include "Components/Character/APSkillBaseSpace.h"
 #include "Character/ArcanePunkCharacter.h"
+#include "UserInterface/APHUD.h"
 
 UAPSkillHubComponent::UAPSkillHubComponent()
 {
@@ -20,7 +21,8 @@ void UAPSkillHubComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->OnAutoRecoveryMPDelegate.AddUObject(this, &UAPSkillHubComponent::AutoRecoveryMP);
 }
 
 void UAPSkillHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -391,6 +393,7 @@ void UAPSkillHubComponent::UpdateSkill_Q()
 	if(!OwnerCharacter->GetQSkillNumber()) return;
 	OwnerCharacter->GetQSkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetQSkillNumber()->RegisterComponent();
+	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::Q, (uint8)OwnerCharacter->GetQSkill());
 }
 
 void UAPSkillHubComponent::UpdateSkill_E()
@@ -459,6 +462,7 @@ void UAPSkillHubComponent::UpdateSkill_E()
 	if(!OwnerCharacter->GetESkillNumber()) return;
 	OwnerCharacter->GetESkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetESkillNumber()->RegisterComponent();
+	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::E, (uint8)OwnerCharacter->GetESkill());
 }
 
 void UAPSkillHubComponent::UpdateSkill_R()
@@ -477,6 +481,7 @@ void UAPSkillHubComponent::UpdateSkill_R()
 	if(!OwnerCharacter->GetRSkillNumber()) return;
 	OwnerCharacter->GetRSkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetRSkillNumber()->RegisterComponent();
+	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::R, (uint8)OwnerCharacter->GetRSkill());
 }
 
 
@@ -494,4 +499,31 @@ USkillNumberBase* UAPSkillHubComponent::GetSKillNumberComponent(ESkillNumber Ski
 		return OwnerCharacter->GetESkillNumber();
 	}
 	return nullptr;
+}
+
+void UAPSkillHubComponent::AutoRecoveryMP()
+{
+	if(Proceeding) {UE_LOG(LogTemp, Display, TEXT("Your a")); return;}
+	else {Proceeding = true; UE_LOG(LogTemp, Display, TEXT("Your b"));}
+	GetWorld()->GetTimerManager().SetTimer(RecoveryMPTimerHandle, this, &UAPSkillHubComponent::RecoveryMP, RecoveryTime_MP, true);	
+}
+
+void UAPSkillHubComponent::RecoveryMP()
+{
+	if(!OwnerCharacter.IsValid()) return; auto PD = OwnerCharacter->GetPlayerStatus();
+	
+	if(PD.PlayerDynamicData.MaxMP == PD.PlayerDynamicData.MP)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RecoveryMPTimerHandle);
+		Proceeding = false;
+	}
+	else
+	{
+		OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(1, false);
+		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MaxMP == OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(RecoveryMPTimerHandle);
+			Proceeding = false;
+		}
+	}
 }

@@ -6,28 +6,42 @@
 #include "GameFramework/Actor.h"
 #include "APFootPrint.generated.h"
 
+class UDecalComponent;
+
 UCLASS()
 class ARCANEPUNK_API AAPFootPrint : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AAPFootPrint();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void FadeOut();
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
 	UPROPERTY(EditAnywhere)
-	class USceneComponent* RootComp;
+	USceneComponent* RootComp;
 
 	UPROPERTY(EditAnywhere)
-	class UDecalComponent* FootDecal;
+	UDecalComponent* FootDecal;
+
+	UPROPERTY(EditAnywhere, Category = Decal)
+	float Opacity = 5.0f;
+
+	UPROPERTY(EditAnywhere, Category = Decal)
+	float FadeStartDelay = 1.5f;
+
+	UPROPERTY(EditAnywhere, Category = Decal)
+	float FadeOutTime = 3.5f;
+
+	UPROPERTY(EditAnywhere, Category = Decal)
+	float FadeOutSpeed = 2.0f;
+
+	FTimerHandle FadeTimerHandle;
 
 };

@@ -15,6 +15,7 @@ class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
 public:
 	UArcanePunkCharacterAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	virtual void NativeBeginPlay() override;
 
 	void SetDeadAnim() { IsDead = true; }
 
@@ -85,7 +86,11 @@ public:
 	UFUNCTION()
 	void AnimNotify_FootRight();
 	UFUNCTION()
+	void AnimNotify_FootRightOnlySound();
+	UFUNCTION()
 	void AnimNotify_FootLeft();
+	UFUNCTION()
+	void AnimNotify_FootLeftOnlySound();
 
 	UFUNCTION()
 	void AnimNotify_HideClear();
@@ -101,6 +106,9 @@ public:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
+	float bBattleMode = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	bool IsDead;

@@ -10,6 +10,8 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GameMode/APGameModeBattleStage.h"
+#include "Kismet/GameplayStatics.h"
 
 UAPTakeDamageComponent::UAPTakeDamageComponent()
 {
@@ -52,6 +54,8 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 		OwnerCharacter->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// OwnerCharacter->DetachFromControllerPendingDestroy();
 		OwnerCharacter->DeadPenalty(DeathTime);
+		auto GM = Cast<AAPGameModeBattleStage>((UGameplayStatics::GetGameMode(GetWorld()))); if(!GM) return;
+		GM->PlayerKilled();
 	// 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &ABossMonster_Stage1::Destoryed, DeathLoadingTime, false);
 
 	}

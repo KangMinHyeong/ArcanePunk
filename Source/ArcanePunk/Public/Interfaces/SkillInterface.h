@@ -20,5 +20,5 @@ class ARCANEPUNK_API ISkillInterface
 	GENERATED_BODY()
 
 public:
-	virtual void SetSkill( ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility);
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData);
 };

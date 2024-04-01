@@ -23,8 +23,8 @@ protected:
 	virtual void BeginPlay() override;	
 
 public:
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;	
-
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	
 	void SetShoutingEffect();
 	void SetShoutingAttack();
 

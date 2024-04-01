@@ -14,7 +14,7 @@ class ARCANEPUNK_API AAPSkillRange_Target : public AAPSkillRange
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
 
 };
