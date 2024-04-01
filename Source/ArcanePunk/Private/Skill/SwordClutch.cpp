@@ -35,9 +35,9 @@ void ASwordClutch::Tick(float DeltaTime)
     }
 }
 
-void ASwordClutch::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void ASwordClutch::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility); // Wide 곱해주기 추가
+    Super::SetSkill(SkillAbilityNestingData); // Wide 곱해주기 추가
 
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
     SpawnClutchTrigger();

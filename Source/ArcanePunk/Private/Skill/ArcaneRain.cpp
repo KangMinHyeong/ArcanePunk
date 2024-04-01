@@ -55,11 +55,11 @@ void AArcaneRain::DestroySKill()
 
 void AArcaneRain::ReceiveParticleData(const TArray<FBasicParticleData> &Data, UNiagaraSystem *NiagaraSystem, const FVector &SimulationPositionOffset)
 {
-    UE_LOG(LogTemp, Display, TEXT("Your message"));
+
 }
 
-void AArcaneRain::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneRain::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 }
 

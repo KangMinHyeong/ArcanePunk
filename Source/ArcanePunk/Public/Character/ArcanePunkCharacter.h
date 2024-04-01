@@ -7,9 +7,10 @@
 #include "PlayerState/APPlayerData.h"
 #include "Components/Common/APCrowdControlComponent.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
-#include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FOnAutoRecoveryMPDelegate);
 
 //Minhyeong
 class UDataTable;
@@ -49,9 +50,10 @@ class ASwordClutch;
 class UNiagaraSystem;
 class USkillNumberBase;
 class UAPHitPointComponent;
+class AAPGameModeBase;
+class UAPGhostTrailSpawnComponent;
 
 // prodo
-
 class UAPItemBase;
 class UAPInventoryComponent;
 class AAPHUD;
@@ -126,6 +128,7 @@ public:
 
 	// Attack 관련 함수
 	FORCEINLINE UAPAttackComponent* GetAttackComponent() const {return AttackComp;};  // AttackComp 반환
+	void SetAttackRotation(); // 마우스 커서 방향으로 플레이어 회전
 	// FORCEINLINE float GetAttackRadius() const {return AttackRadius;}; // 공격 반경 반환
 	// FORCEINLINE UParticleSystem* GetComboHitEffect() const {return ComboHitEffect;}; // 콤보어택 히트 파티클 반환;
 	// FORCEINLINE FVector GetComboHitEffectScale() const {return HitEffectScale;}; // 콤보어택 히트 스케일 반환;
@@ -141,7 +144,7 @@ public:
 	
 	// Skill 관련 함수
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return APSkillHubComp;}; // SkillComp 반환
+	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return SkillHubComp;}; // SkillComp 반환
 	FORCEINLINE TSubclassOf<ASwordImpact> GetSwordImpactClass() const {return SwordImpactClass;}; //SwordImpactClass 반환
 	FORCEINLINE TSubclassOf<ASwordThrowBase> GetSwordThrowClass() const {return SwordThrowClass;}; // SwordThrowClass 반환
 	FORCEINLINE TSubclassOf<AArcaneBomb> GetArcaneBombClass() const {return ArcaneBombClass;}; // ArcaneBombClass 반환
@@ -165,12 +168,12 @@ public:
 	FORCEINLINE EUltSkillNumber GetRSkill() const {return RSkill;}; // RSkill 반환
 	void SetRSkill(); // RSkill 설정
 
-	FORCEINLINE TArray<ESkillAbility> GetAbilitySkillQ() const {return SkillAbilityQ;}; // SkillAbilityQ 반환
-	FORCEINLINE void SetAbilitySkillQ(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityQ = NewSkillAbility;}; // SkillAbilityQ 설정
-	FORCEINLINE TArray<ESkillAbility> GetAbilitySkillE() const {return SkillAbilityE;}; // SkillAbilityE 반환
-	FORCEINLINE void SetAbilitySkillE(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityE = NewSkillAbility;}; // SkillAbilityE 설정
-	FORCEINLINE TArray<ESkillAbility> GetAbilitySkillR() const {return SkillAbilityR;}; // SkillAbilityR 반환
-	FORCEINLINE void SetAbilitySkillR(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityR = NewSkillAbility;}; // SkillAbilityR 설정
+	// FORCEINLINE TArray<ESkillAbility> GetAbilitySkillQ() const {return SkillAbilityQ;}; // SkillAbilityQ 반환
+	// FORCEINLINE void SetAbilitySkillQ(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityQ = NewSkillAbility;}; // SkillAbilityQ 설정
+	// FORCEINLINE TArray<ESkillAbility> GetAbilitySkillE() const {return SkillAbilityE;}; // SkillAbilityE 반환
+	// FORCEINLINE void SetAbilitySkillE(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityE = NewSkillAbility;}; // SkillAbilityE 설정
+	// FORCEINLINE TArray<ESkillAbility> GetAbilitySkillR() const {return SkillAbilityR;}; // SkillAbilityR 반환
+	// FORCEINLINE void SetAbilitySkillR(TArray<ESkillAbility> NewSkillAbility) {SkillAbilityR = NewSkillAbility;}; // SkillAbilityR 설정
 
 	FORCEINLINE bool GetOnQSkill() const {return OnQSkill;};
 	FORCEINLINE bool GetOnESkill() const {return OnESkill;};
@@ -190,6 +193,7 @@ public:
 	FORCEINLINE TSubclassOf<AAPSkillRange_Circle> GetAPSkillRange_Circle() const {return SkillRange_Circle;};
 
 	FORCEINLINE UNiagaraSystem* GetChargeEffect() const {return ChargeEffect;};
+	FORCEINLINE UNiagaraSystem* GetChargeEnhanceEffect() const {return ChargeEnhanceEffect;};
 
 	void SetSkillAbility(EEnhanceCategory EnhanceCategory, EEnHanceType EnHanceType);
 	
@@ -213,6 +217,8 @@ public:
 	FORCEINLINE UMaterialInterface* GetHideMaterial() const {return HideMaterial;};
 	void HideClear();
 
+	FORCEINLINE void SetbCanSkill(bool NewBool) {bUltCanSkill = NewBool;}
+
 	// 무적 관련 함수
 	FORCEINLINE bool IsBlockMode() const {return bBlockMode;};
 
@@ -233,7 +239,7 @@ public:
 	FORCEINLINE void DeadPenalty(float DeathTime); // DeadPenalty 발동
 
 	//FootPrint 관련 함수
-	FORCEINLINE UAPSpawnFootPrintComponent* GetSpawnFootPrintComponent() const {return SpawnStepComp;}; // HitMotionTime 반환	
+	FORCEINLINE UAPSpawnFootPrintComponent* GetSpawnFootPrintComponent() const {return APSpawnStepComp;}; // HitMotionTime 반환	
 	FORCEINLINE UStaticMeshComponent* GetPlayerPanel() {return PlayerPanel;}; // PlayerPanel 반환
 	FTransform GetFootTransform(bool Left);	
 	
@@ -304,6 +310,9 @@ private:
 	void InitEquipData(TArray<UAPItemBase*> & EquipArr, FName EquipID);
 	void ChangeEquipData(TArray<UAPItemBase*> & EquipArr, UAPItemBase* NewData);
 
+	// 무기 위치 설정
+	void SetWeaponPosition();
+	
 private:
 	// 부착 컴포넌트
 	UPROPERTY(EditAnywhere, Category = "Component")
@@ -313,7 +322,7 @@ private:
 	UAPMovementComponent* MoveComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPSkillHubComponent* APSkillHubComp;
+	UAPSkillHubComponent* SkillHubComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPAnimHubComponent* AnimHubComp;
@@ -322,7 +331,7 @@ private:
 	UAPTakeDamageComponent* TakeDamageComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPSpawnFootPrintComponent* SpawnStepComp;
+	UAPSpawnFootPrintComponent* APSpawnStepComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPCrowdControlComponent* CrowdControlComp;
@@ -333,8 +342,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Component")
 	USceneComponent* LeftBeamPoint;
 
+	UPROPERTY(EditAnywhere, Category = "Component")
+	UAPGhostTrailSpawnComponent* GhostTrailSpawnComp;
+
 	//PlayerController 변수
 	TWeakObjectPtr<AArcanePunkPlayerController> PC;
+	//GameMode 변수
+	TWeakObjectPtr<AAPGameModeBase> GM;
 
 	// 장비, 무기 변수
 	UPROPERTY(EditAnywhere, Category = "Equipment")
@@ -459,6 +473,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	UNiagaraSystem* ChargeEffect;
 
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	UNiagaraSystem* ChargeEnhanceEffect;
+
 	UPROPERTY()
 	USkillNumberBase* Skill_Q;
 
@@ -474,17 +491,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	ESkillNumber QSkill = ESkillNumber::Skill_1;
 
-	TArray<ESkillAbility> SkillAbilityQ;
-
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	ESkillNumber ESkill = ESkillNumber::Skill_2;
-
-	TArray<ESkillAbility> SkillAbilityE;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	EUltSkillNumber RSkill = EUltSkillNumber::UltSkill_1;
 
-	TArray<ESkillAbility> SkillAbilityR;
+	// TArray<ESkillAbility> SkillAbilityQ;
+	// TArray<ESkillAbility> SkillAbilityE;
+	// TArray<ESkillAbility> SkillAbilityR;
 
 	FVector HomingPoint = FVector(0,0,0);
 
@@ -507,7 +522,7 @@ private:
 
 	bool OnRSkill = false;
 
-	bool bCanSkill = true;
+	bool bUltCanSkill = true;
 
 	UPROPERTY(EditAnywhere, Category = "Skill Range")
 	TSubclassOf<AAPSkillRange> SkillRange;
@@ -575,6 +590,8 @@ public:
 
 	TArray<ESkillNumber> HavingSkill;
 
+	FOnAutoRecoveryMPDelegate OnAutoRecoveryMPDelegate;
+
 	// UPROPERTY()
 	// TArray<ESkillTypeState> SkillTypeState; // 나중에 쓸수도?
 
@@ -583,6 +600,7 @@ public:
 
 	void UpdateInventoryWidgetPosition(int32 Numbers);
 
+	FORCEINLINE AAPHUD* GetAPHUD() const {return HUD;};
 // prodo
 
 protected:

@@ -3,6 +3,7 @@
 
 #include "Animation/AnimSequence.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "Enemy/Enemy_ScoutDog.h"
 
 UAP_EnemyBaseAnimInstance::UAP_EnemyBaseAnimInstance()
 {
@@ -56,4 +57,32 @@ void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()
 	if(IsDead || !Enemy.IsValid()) return;
 	if(Enemy->IsHardCC()) return;
 	Enemy->NormalAttack();
+}
+
+// ScoutDog
+void UAP_EnemyBaseAnimInstance::AnimNotify_JumpEffect()
+{
+    if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+	auto ScoutDog = Cast<AEnemy_ScoutDog>(Enemy); if(!ScoutDog) return;
+	ScoutDog->SpawnJumpEffect();
+}
+
+void UAP_EnemyBaseAnimInstance::AnimNotify_LeapFoward()
+{
+    if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+    auto ScoutDog = Cast<AEnemy_ScoutDog>(Enemy); if(!ScoutDog) return;
+	ScoutDog->LeapFoward();
+}
+
+void UAP_EnemyBaseAnimInstance::AnimNotify_LeapEnd()
+{
+    if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+    auto ScoutDog = Cast<AEnemy_ScoutDog>(Enemy); if(!ScoutDog) return;
+	ScoutDog->AttackCondition(false);
 }

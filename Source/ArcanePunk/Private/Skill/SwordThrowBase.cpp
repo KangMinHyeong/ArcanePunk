@@ -71,7 +71,7 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	}
 }
 
-void ASwordThrowBase::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void ASwordThrowBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-	Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 }

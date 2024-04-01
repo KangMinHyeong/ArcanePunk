@@ -10,12 +10,12 @@
 void USkillNumber6::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_6");
 }
 
 void USkillNumber6::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
 	
 }
 
@@ -25,8 +25,8 @@ void USkillNumber6::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	if(!OwnerCharacter) return;
 	OwnerCharacter->SetDoing(true);
     SetAbility(WhichKey);
-
 	CurrentSkillType = SkillType;
+	SkillKey = WhichKey;
 	
 	OnSkill();
 
@@ -51,6 +51,7 @@ void USkillNumber6::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber6::OnSkill()
 {
+	Super::OnSkill();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
     
@@ -77,7 +78,7 @@ void USkillNumber6::Activate_Skill()
 
     Shouting = GetWorld()->SpawnActor<AShouting>(OwnerCharacter->GetShoutingClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
 	if(!Shouting.IsValid()) return;
-	Shouting->SetSkill(CurrentSkillType, CurrentSkillAbility);	
+	Shouting->SetSkill(SkillAbilityNestingData);	
 	Shouting->SetOwner(OwnerCharacter);
 	Shouting->SetShoutingEffect();
 }

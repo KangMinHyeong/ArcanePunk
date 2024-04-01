@@ -105,9 +105,9 @@ AActor* AArcaneTurret::FindEnemy()
     return nullptr;
 }
 
-void AArcaneTurret::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneTurret::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 }
 
 

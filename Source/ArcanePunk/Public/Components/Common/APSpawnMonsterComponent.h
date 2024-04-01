@@ -32,4 +32,8 @@ public:
 	void SpawnMonsterRandomWithoutLocationActor(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector MinimumRange, FVector MaximumRange);
 	
 	FActorSpawnParameters SpawnParams;
+
+private:
+	UPROPERTY(EditAnywhere)
+	float Sink = 0.4f;
 };

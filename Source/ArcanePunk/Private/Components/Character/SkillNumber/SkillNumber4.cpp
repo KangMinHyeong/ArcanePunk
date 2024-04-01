@@ -13,7 +13,7 @@
 void USkillNumber4::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_4");
 }
 
 void USkillNumber4::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
@@ -23,9 +23,9 @@ void USkillNumber4::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void USkillNumber4::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber4::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -57,22 +57,43 @@ void USkillNumber4::Spawn_Skill4()
 	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
 	if(!OwnerCharacterPC) return;
 
-	if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
-	{
-		if(CheckSmartKey(SkillKey, OwnerCharacter))
-		{
-			OnSkill();
-		}
-		else
-		{
-			auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-			SetMouseCursor(PC, ESkillCursor::Crosshairs);
-			PC->DisplayHomingUI(ESkillNumber::Skill_4);
-		}
-	}
-	else
-	{
-		OwnerCharacterPC->bShowMouseCursor = false;
+	// if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
+	// {
+	// 	if(CheckSmartKey(SkillKey, OwnerCharacter))
+	// 	{
+	// 		OnSkill();
+	// 	}
+	// 	else
+	// 	{
+	// 		auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
+	// 		SetMouseCursor(PC, ESkillCursor::Crosshairs);
+	// 		PC->DisplayHomingUI(ESkillNumber::Skill_4);
+	// 	}
+	// }
+	// else
+	// {
+	// 	OwnerCharacterPC->bShowMouseCursor = false;
+	// 	CursorImmediately();
+
+	// 	if(!CheckSmartKey(SkillKey, OwnerCharacter)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_4);}
+
+	// 	FActorSpawnParameters SpawnParams;
+	// 	SpawnParams.Owner = OwnerCharacter;
+	// 	SpawnParams.bNoFail = true;
+	// 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	// 	ActivateSkillRange_Target(Skill4_TargetRange, Skill4_TargetRange, ESkillRangeType::Control_Circle);
+	// 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill4_LimitDistance);
+	// 	// if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+
+	// 	ActivateSkillRange_Round(Skill4_LimitDistance);
+	// 	// if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+
+	// 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// 	OwnerCharacter->SetDoing(false);
+	// 	SetComponentTickEnabled(true);
+	// }
+	OwnerCharacterPC->bShowMouseCursor = false;
 		CursorImmediately();
 
 		if(!CheckSmartKey(SkillKey, OwnerCharacter)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_4);}
@@ -84,19 +105,19 @@ void USkillNumber4::Spawn_Skill4()
 
 		ActivateSkillRange_Target(Skill4_TargetRange, Skill4_TargetRange, ESkillRangeType::Control_Circle);
 		if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill4_LimitDistance);
-		if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+		if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
 
 		ActivateSkillRange_Round(Skill4_LimitDistance);
-		if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+		if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
 
 		// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 		OwnerCharacter->SetDoing(false);
 		SetComponentTickEnabled(true);
-	}
 }
 
 void USkillNumber4::OnSkill()
 {
+	Super::OnSkill();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
 	
@@ -129,7 +150,7 @@ void USkillNumber4::Activate_Skill()
 	auto ArcaneBomb = GetWorld()->SpawnActor<AArcaneBomb>(OwnerCharacter->GetArcaneBombClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, FRotator::ZeroRotator, SpawnParams);
 	if(!ArcaneBomb) return;	
 	ArcaneBomb->SetOwner(OwnerCharacter);
-	ArcaneBomb->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	ArcaneBomb->SetSkill(SkillAbilityNestingData);	
 	if(SkillRange_Target.IsValid()) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
 	
 	Remove_Skill();

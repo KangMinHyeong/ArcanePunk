@@ -26,7 +26,7 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
 	FORCEINLINE void SetbStun(bool NewBool) {bStun = NewBool;};
 	FORCEINLINE bool IsSkillTypeMaterial(ESkillTypeState SkillType) const {return SkillTypeMaterial.Contains(SkillType);};
@@ -41,11 +41,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 5.0f;
 
-	UPROPERTY()
-	UAPSkillType* SkillTypeComp;
+	// UPROPERTY()
+	// UAPSkillType* SkillTypeComp;
 
-	UPROPERTY()
-	UAPSkillAbility* SkillAbilityComp;
+	// UPROPERTY()
+	// UAPSkillAbility* SkillAbilityComp;
 
 	UPROPERTY()
 	UAPHitPointComponent* HitPointComp;
@@ -70,6 +70,8 @@ protected:
 	TMap<ESkillTypeState, FLinearColor> SkillTypeColor;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+
+	FSkillAbilityNestingData SkillAbilityData;
 
 public:
 	float DefaultSize = 1.0f;

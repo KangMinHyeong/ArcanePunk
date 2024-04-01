@@ -47,14 +47,14 @@ void UAPSkillAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	
 }
 
-void UAPSkillAbility::SetSkillAbility(TArray<ESkillAbility> SkillAbility, ESkillCategory UpdateSkillCategory)
-{
-	SkillCategory = UpdateSkillCategory;
+// void UAPSkillAbility::SetSkillAbility(TArray<ESkillAbility> SkillAbility, ESkillCategory UpdateSkillCategory)
+// {
+// 	SkillCategory = UpdateSkillCategory;
 
-	if(SkillAbility.Contains(ESkillAbility::Gigant)) SetOwnerScale();
-	if(SkillAbility.Contains(ESkillAbility::Homing)) SetHoming();
-	if(SkillAbility.Contains(ESkillAbility::Stun)) SetStun();
-}
+// 	// if(SkillAbility.Contains(ESkillAbility::Gigant)) SetOwnerScale();
+// 	// if(SkillAbility.Contains(ESkillAbility::Homing)) SetHoming();
+// 	// if(SkillAbility.Contains(ESkillAbility::Stun)) SetStun();
+// }
 
 void UAPSkillAbility::SetOwnerScale()
 {

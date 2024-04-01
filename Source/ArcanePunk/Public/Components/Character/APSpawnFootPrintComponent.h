@@ -25,7 +25,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SpawnFootPrint(bool LeftFoot); // 풋프린트 생성
+	void SpawnFootPrint(bool LeftFoot, bool Step = true); // 풋프린트 생성
 
 private:
 	TSubclassOf<AActor> GetFootClass(bool Left);

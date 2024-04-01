@@ -42,9 +42,9 @@ void AArcaneRage::DestroySKill()
     Super::DestroySKill();
 }
 
-void AArcaneRage::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneRage::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 
     SetRageMode();
 }

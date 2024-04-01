@@ -10,10 +10,16 @@
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Components/Character/APSkillHubComponent.h"
 
+void USkillNumber10::BeginPlay()
+{
+	Super::BeginPlay();
+	SkillAbilityNestingData.SkillName = TEXT("Skill_10");
+}
+
 void USkillNumber10::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber10::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -55,10 +61,10 @@ void USkillNumber10::Spawn_Skill10()
 
 	ActivateSkillRange_Target(Skill10_TargetRange, Skill10_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill10_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
 
 	ActivateSkillRange_Round(Skill10_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
 
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
@@ -67,6 +73,7 @@ void USkillNumber10::Spawn_Skill10()
 
 void USkillNumber10::OnSkill()
 {
+	Super::OnSkill();
     SetComponentTickEnabled(false);
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
@@ -101,7 +108,7 @@ void USkillNumber10::Activate_Skill()
 	
     if(!ArcaneTurret) return;
 	ArcaneTurret->SetOwner(OwnerCharacter);
-	ArcaneTurret->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	ArcaneTurret->SetSkill(SkillAbilityNestingData);	
 
     
 }

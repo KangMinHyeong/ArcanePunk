@@ -22,7 +22,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SetSkillAbility(TArray<ESkillAbility> SkillAbility, ESkillCategory UpdateSkillCategory);
+	// void SetSkillAbility(TArray<ESkillAbility> SkillAbility, ESkillCategory UpdateSkillCategory);
 
 private:
 	// Gigant

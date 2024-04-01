@@ -15,6 +15,11 @@ class UAPTuTorialUserWidget;
 class UAPStageInformationUI;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateMPBar, uint8, bool);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateSkillSlot, ESkillKey, uint8);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnOperateSkill, ESkillKey);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHightLightSkill, ESkillKey);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUsingSkill, ESkillKey, bool);
 
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
@@ -104,4 +109,14 @@ private:
 
 public:
 	FOnUpdateHPBar OnUpdateHPBar;
+
+	FOnUpdateMPBar OnUpdateMPBar;
+
+	FOnUpdateSkillSlot OnUpdateSkillSlot;
+
+	FOnOperateSkill OnOperateSkill;
+
+	FOnHightLightSkill OnHightLightSkill;
+
+	FOnUsingSkill OnUsingSkill;
 };

@@ -60,9 +60,9 @@ void AArcaneMine::Explosion(AActor* OtherActor)
     Destroy();
 }
 
-void AArcaneMine::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneMine::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-	Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 }
 
 

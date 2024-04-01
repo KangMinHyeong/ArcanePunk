@@ -8,6 +8,7 @@
 
 class UDataTable;
 class UNiagaraSystem;
+class USoundBase;
 
 UCLASS()
 class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
@@ -16,8 +17,11 @@ class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
 
 public:
 	void MonsterKilled();
+	void PlayerKilled();
 	FORCEINLINE UDataTable* GetBattleStageDataTable() const {return BattleStageDataTable;};
 	FORCEINLINE UNiagaraSystem* GetSpawnEffect() const {return SpawnEffect;}; 
+	FORCEINLINE USoundBase* GetSpawnSound() const {return SpawnSound;}; 
+	FORCEINLINE float GetSpawnSoundVolume() const {return SpawnSoundVolume;}; 
 
 protected:
 	virtual void StartPlay() override;
@@ -37,5 +41,11 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* SpawnEffect;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* SpawnSound;
+
+	UPROPERTY(EditAnywhere)
+	float SpawnSoundVolume = 2.5f;
 
 };

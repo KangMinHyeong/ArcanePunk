@@ -20,6 +20,7 @@ class UWidgetComponent;
 class AEnemyBaseAIController;
 class AEnemy_DropPackage;
 class UNiagaraSystem;
+class UAPMovementComponent;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
@@ -42,6 +43,8 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
+	FORCEINLINE UAPMovementComponent* GetMoveComp() const {return MoveComp;};
+
 	// 몬스터 Dead , Hit 관련 함수
 	UFUNCTION(BlueprintPure)
 	virtual bool IsDead();
@@ -63,7 +66,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	void NormalAttack();
 
-	float GetDistanceLimit();
+	FORCEINLINE float GetDistanceLimit()const {return Distance_Limit;}; 
+	FORCEINLINE float GetDetectLimit()const {return DetectLimit;}; 
 
 	void TeleportMarkActivate(float Time, AActor * MarkOwner);
 	void TeleportMarkDeactivate();
@@ -72,6 +76,8 @@ public:
 
 	FORCEINLINE float GetMonsterATK() const { return Monster_ATK;}; //Monster_ATK 반환
 	FORCEINLINE bool IsCriticalAttack() const {return bCriticalAttack;};
+
+	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
 	// HitPoint 관련 함수
 	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
@@ -134,6 +140,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPCrowdControlComponent* CrowdControlComp;
 
+	UPROPERTY(EditAnywhere, Category = "Component")
+	UAPMovementComponent* MoveComp;
+
 	// 몬스터 Status 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float MaxHP = 100.0f;
@@ -157,6 +166,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Distance_Limit = 800.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Status")
+	float DetectLimit = 2500.0f;
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* TeleportMark;

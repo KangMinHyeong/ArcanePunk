@@ -28,9 +28,9 @@ void AAPSkillRange::Tick(float DeltaTime)
 
 }
 
-void AAPSkillRange::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AAPSkillRange::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-	if(SkillAbility.Contains(ESkillAbility::Gigant)) SetActorScale3D(GetActorScale3D() * 2.0f);
+	// if(SkillAbility.Contains(ESkillAbility::Gigant)) SetActorScale3D(GetActorScale3D() * 2.0f);
 	// if(SkillAbility.Contains(ESkillAbility::Homing)) SetHoming();
 	// if(SkillAbility.Contains(ESkillAbility::Stun)) SetStun();
 }

@@ -114,9 +114,9 @@ void ASwordImpact::OnPenetrating(UPrimitiveComponent *OverlappedComp, AActor *Ot
 	DamageAction(OtherActor, SweepResult);
 }
 
-void ASwordImpact::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void ASwordImpact::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-	Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 
 	BaseEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
 	BintHit();

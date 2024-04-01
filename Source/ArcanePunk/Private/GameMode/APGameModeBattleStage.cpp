@@ -6,6 +6,8 @@
 #include "ArcanePunk/Public/Enemy/Enemy_CharacterBase.h"
 #include "GameState/APGameState.h"
 #include "Portal/Portal_Base.h"
+#include "GameFramework/Controller.h"
+#include "AIController.h"
 
 void AAPGameModeBattleStage::MonsterKilled()
 {
@@ -16,6 +18,16 @@ void AAPGameModeBattleStage::MonsterKilled()
     }   
 
     EndBattleSection();	
+}
+
+void AAPGameModeBattleStage::PlayerKilled()
+{
+    for(AController* Controller : TActorRange<AController>(GetWorld()))
+    {
+        auto AIC = Cast<AAIController>(Controller); if(!AIC) continue;
+        AIC->GameHasEnded(Controller->GetPawn(), false);
+        AIC->UnPossess();
+    } 
 }
 
 void AAPGameModeBattleStage::EndBattleSection()

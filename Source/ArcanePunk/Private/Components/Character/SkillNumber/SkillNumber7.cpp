@@ -13,14 +13,14 @@
 void USkillNumber7::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_7");
 }
 
 void USkillNumber7::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// // EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber7::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -63,7 +63,7 @@ void USkillNumber7::Spawn_Skill7()
 	
 	ActivateSkillRange_Target(Skill7_Wide, Skill7_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill7_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
 
 	if(CheckSmartKey(SkillKey, OwnerCharacter))
 	{
@@ -79,6 +79,7 @@ void USkillNumber7::Spawn_Skill7()
 
 void USkillNumber7::OnSkill()
 {
+	Super::OnSkill();
     SetComponentTickEnabled(false);
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
@@ -109,7 +110,7 @@ void USkillNumber7::Activate_Skill()
 
 	ArcaneCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation());
 	if(!ArcaneCutter.IsValid()) return; 
-	ArcaneCutter->SetSkill(CurrentSkillType, CurrentSkillAbility);	
+	ArcaneCutter->SetSkill(SkillAbilityNestingData);	
     float Size = ArcaneCutter->GetActorScale3D().Y/ ArcaneCutter->DefaultSize;
     ArcaneCutter->SetActorLocation( ArcaneCutter->GetActorLocation() + (OwnerCharacter->GetActorUpVector()*150.0f*Size));
 	ArcaneCutter->SetOwner(OwnerCharacter);

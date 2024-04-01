@@ -15,6 +15,7 @@
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "Interfaces/InteractionInterface.h"
 #include "UserInterface/Conversation/APConversationUI.h"
+#include "ArcanePunk/APGameModeBase.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -25,10 +26,9 @@ void AArcanePunkPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    SetInputMode(GameAndUIInputMode);
-    // CurrentMouseCursor = EMouseCursor::Default;
-    bShowMouseCursor = true;
-
+    SetMouseCursor();
+    
+   
     StartLoading();
     LookStatus(); LookStatus(); // 오류 때문에 삽입
     
@@ -46,6 +46,24 @@ void AArcanePunkPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
 
+}
+
+void AArcanePunkPlayerController::SetMouseCursor()
+{
+    SetInputMode(GameAndUIInputMode);
+     
+    bShowMouseCursor = true;
+
+    auto GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return;
+    if(GM->IsBattleStage())
+    {
+        CurrentMouseCursor = EMouseCursor::CardinalCross;
+    }
+    else
+    {
+        CurrentMouseCursor = EMouseCursor::Default;
+    }
+    // 
 }
 
 void AArcanePunkPlayerController::LookStatus()
@@ -307,4 +325,10 @@ void AArcanePunkPlayerController::DisplayDeadUI()
 {
     auto DeadUI = CreateWidget<UUserWidget>(GetWorld(), DeadUIClass); if(!DeadUI) return;
     DeadUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::DisplayNotEnoughMPUI()
+{
+    auto NotEnoughMPUI = CreateWidget<UUserWidget>(GetWorld(), NotEnoughMPUIClass); if(!NotEnoughMPUI) return;
+    NotEnoughMPUI->AddToViewport();
 }

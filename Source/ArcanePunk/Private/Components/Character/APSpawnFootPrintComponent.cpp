@@ -22,7 +22,7 @@ void UAPSpawnFootPrintComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot)
+void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot, bool Step)
 {
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
@@ -32,38 +32,59 @@ void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot)
 	{
 		if(OwnerCharacter->PMCheck(HitResult, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() - OwnerCharacter->GetActorUpVector()*100.0f))
 		{
-			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
+			if(Step && EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
 			{
 				auto FootPrint = GetWorld()->SpawnActor<AActor>(GetFootClass(true), OwnerCharacter->GetFootTransform(true));
-			}
-
-			if(OwnerCharacter->GetVelocity().Size() >= 0.1f)
+			} 
+			else if(!Step)
 			{
-				if(Num != (uint8)UGameplayStatics::GetSurfaceType(HitResult))
+				if(OwnerCharacter->GetVelocity().Size() >= 0.1f)
 				{
-					Num = (uint8)UGameplayStatics::GetSurfaceType(HitResult);
-					if(StepEffect.Num() <= Num) return; if(StepSound.Num() <= Num) return;
+					if(Num != (uint8)UGameplayStatics::GetSurfaceType(HitResult))
+					{
+						Num = (uint8)UGameplayStatics::GetSurfaceType(HitResult);
+						if(StepEffect.Num() <= Num) return; if(StepSound.Num() <= Num) return;
 
-					if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
-					if(StepSound[Num]) RunEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(StepEffect[Num], OwnerCharacter->GetMesh(), TEXT("StepEffect"), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*UpCoeff - OwnerCharacter->GetActorForwardVector()*BackCoeff, OwnerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+						if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
+						if(StepSound[Num]) RunEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(StepEffect[Num], OwnerCharacter->GetMesh(), TEXT("StepEffect"), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*UpCoeff - OwnerCharacter->GetActorForwardVector()*BackCoeff, OwnerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+					}
+					if(StepSound[Num]) SpawnSound(StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
 				}
-				if(StepSound[Num]) SpawnSound(StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
+				else
+				{
+					if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
+					Num = -1;
+				}
 			}
-			else
-			{
-				if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
-				Num = -1;
-			}
-			// 
 		}
 	}
 	else
 	{
 		if(OwnerCharacter->PMCheck(HitResult, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() - OwnerCharacter->GetActorUpVector()*100.0f))
 		{
-			if(EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
+			if(Step && EPhysicalSurface::SurfaceType2 == UGameplayStatics::GetSurfaceType(HitResult))
 			{
 				auto FootPrint = GetWorld()->SpawnActor<AActor>(GetFootClass(false), OwnerCharacter->GetFootTransform(false));
+			}
+			else if(!Step)
+			{
+				if(OwnerCharacter->GetVelocity().Size() >= 0.1f)
+				{
+					if(Num != (uint8)UGameplayStatics::GetSurfaceType(HitResult))
+					{
+						Num = (uint8)UGameplayStatics::GetSurfaceType(HitResult);
+						if(StepEffect.Num() <= Num) return; if(StepSound.Num() <= Num) return;
+
+						if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
+						if(StepSound[Num]) RunEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(StepEffect[Num], OwnerCharacter->GetMesh(), TEXT("StepEffect"), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*UpCoeff - OwnerCharacter->GetActorForwardVector()*BackCoeff, OwnerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+					}
+					if(StepSound[Num]) SpawnSound(StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
+				}
+				else
+				{
+					if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
+					Num = -1;
+				}
 			}
 		}
 	}

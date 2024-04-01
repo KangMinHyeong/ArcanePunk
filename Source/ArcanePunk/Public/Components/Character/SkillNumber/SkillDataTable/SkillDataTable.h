@@ -6,6 +6,8 @@
 #include "Engine/DataTable.h"
 #include "SkillDataTable.generated.h"
 
+class UTexture2D;
+
 UENUM(BlueprintType)
 enum class ESkillNumber : uint8 // 스킬 넘버
 {
@@ -42,14 +44,14 @@ enum class ESkillTypeState : uint8 // 스킬 타입
     Type_R	 	= 3, // 전기
 };
 
-UENUM(BlueprintType)
-enum class ESkillAbility : uint8 // 스킬 추가 능력
-{
-	Ability_None	= 0,
-    Gigant			= 1 UMETA(DisplayName = "거대화"), // 스킬 범위 증가
-    Homing			= 2 UMETA(DisplayName = "유도"), // 유도
-    Stun		 	= 3 UMETA(DisplayName = "스턴"), // CC기(스턴)
-};
+// UENUM(BlueprintType)
+// enum class ESkillAbility : uint8 // 스킬 추가 능력
+// {
+// 	Ability_None	= 0,
+//     Gigant			= 1 UMETA(DisplayName = "거대화"), // 스킬 범위 증가
+//     Homing			= 2 UMETA(DisplayName = "유도"), // 유도
+//     Stun		 	= 3 UMETA(DisplayName = "스턴"), // CC기(스턴)
+// };
 
 UENUM(BlueprintType)
 enum class ESkillKey : uint8
@@ -100,6 +102,81 @@ enum class EEnhanceCategory : uint8 // 증강 타입 넘버
 	Enhance_Dash		= 5 UMETA(DisplayName = "이동기 강화"),
 	Enhance_LeftMouse	= 6 UMETA(DisplayName = "LeftMouse 공격 강화"),
 	Enhance_RightMouse	= 7 UMETA(DisplayName = "RightMouse 공격 강화"),
+};
+
+USTRUCT()
+struct FSkillAbilityList
+{
+	GENERATED_USTRUCT_BODY()
+
+	FSkillAbilityList() {}
+	
+	UPROPERTY(EditAnywhere)
+	FString AbilityName;
+
+	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
+	FString AbilityInformation;
+	
+	UPROPERTY(EditAnywhere)
+	bool Nestable = false;
+
+	UPROPERTY(EditAnywhere)
+	float Coefficient_X = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Coefficient_Y = -1.0f;
+};
+
+
+USTRUCT()
+struct FSkillAbilityDataTable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	FSkillAbilityDataTable() {}
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8, FSkillAbilityList> SilverAbilityInformation;
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8, FSkillAbilityList> GoldAbilityInformation;
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8, FSkillAbilityList> PlatinumAbilityInformation;
+};
+
+USTRUCT()
+struct FSkillAbilityNestingData
+{
+	GENERATED_USTRUCT_BODY()
+
+	FSkillAbilityNestingData() {}
+
+	UPROPERTY(EditAnywhere)
+	FName SkillName;
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8, uint16> SilverAbilityNestingNum;
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8, uint16> GoldAbilityNestingNum;
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8, uint16> PlatinumAbilityNestingNum;
+
+};
+
+
+
+USTRUCT()
+struct FSkillSlotDataTable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	FSkillSlotDataTable() {}
+
+	UPROPERTY(EditAnywhere)
+	TMap<uint8 , UTexture2D*> SkillSlotImage;
 };
 
 

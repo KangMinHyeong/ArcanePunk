@@ -29,4 +29,5 @@ private:
 
 private:
 	TWeakObjectPtr<AArcaneRain> ArcaneRain;
+
 };

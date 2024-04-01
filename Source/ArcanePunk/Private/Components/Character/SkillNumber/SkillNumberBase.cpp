@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Character/SkillRange/APSkillRange_Arrow.h"
 #include "Character/SkillRange/APSkillRange_Circle.h"
+#include "Components/Character/APMovementComponent.h"
 
 USkillNumberBase::USkillNumberBase()
 {
@@ -58,10 +59,14 @@ void USkillNumberBase::CheckingOtherSkill()
 
 void USkillNumberBase::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 {
+
 }
 
 void USkillNumberBase::OnSkill()
 {
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
+	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 }
 
 void USkillNumberBase::Remove_Skill()
@@ -159,13 +164,13 @@ void USkillNumberBase::SetAbility(ESkillKey WhichKey)
 	switch (WhichKey)
 	{
 		case ESkillKey::Q:
-		CurrentSkillAbility = OwnerCharacter->GetAbilitySkillQ();
+		// CurrentSkillAbility = OwnerCharacter->GetAbilitySkillQ();
 		break;
 		case ESkillKey::E:
-		CurrentSkillAbility = OwnerCharacter->GetAbilitySkillE();
+		// CurrentSkillAbility = OwnerCharacter->GetAbilitySkillE();
 		break;
 		case ESkillKey::R:
-		CurrentSkillAbility = OwnerCharacter->GetAbilitySkillR();
+		// CurrentSkillAbility = OwnerCharacter->GetAbilitySkillR();
 		break;
 	}
 	
@@ -221,5 +226,5 @@ void USkillNumberBase::CharacterRotation()
 
 	Loc.Z = 0.0f; FRotator Rotation = FRotationMatrix::MakeFromX(Loc).Rotator();
 	
-	OwnerCharacter->SetActorRotation(Rotation);
+	OwnerCharacter->GetAPMoveComponent()->SetAttackRotation(Rotation, RotSpeed);
 }

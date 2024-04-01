@@ -9,20 +9,29 @@
 
 UAPMovementComponent::UAPMovementComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UAPMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	AnimMoveStop();
+	InitRotSpeed = RotSpeed;
 }
 
 void UAPMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	AttackMoving(DeltaTime);
+	FRotator Current = GetOwner()->GetActorRotation();
+	Current = FMath::RInterpConstantTo(Current, TargetRot, DeltaTime, RotSpeed);
+	GetOwner()->SetActorRotation(Current);
+
+	if(abs(Current.Yaw - TargetRot.Yaw) < 0.01f) 
+	{
+		RotSpeed = InitRotSpeed;
+		AnimMoveStop();
+	}
 }
 
 void UAPMovementComponent::PlayerMoveForward(float AxisValue)
@@ -94,4 +103,12 @@ void UAPMovementComponent::AnimMovement()
 void UAPMovementComponent::AnimMoveStop()
 {
 	SetComponentTickEnabled(false);
+}
+
+void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float Speed)
+{
+	SetComponentTickEnabled(true);
+	TargetRot = NewTargetRot;
+	if(Speed < 1.0f) return;
+	if(abs(Speed - RotSpeed)  >= 1.0f) RotSpeed = Speed;
 }

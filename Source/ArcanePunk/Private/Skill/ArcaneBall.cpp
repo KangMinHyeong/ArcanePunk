@@ -63,7 +63,7 @@ void AArcaneBall::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherAc
 	}
 }
 
-float AArcaneBall::GetCutterSpeed() const
+float AArcaneBall::GetBallSpeed() const
 {
     return BallMoveComp->InitialSpeed;
 }
@@ -96,9 +96,9 @@ void AArcaneBall::Explosion()
     GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
-void AArcaneBall::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AArcaneBall::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
+    Super::SetSkill(SkillAbilityNestingData);
 
 	BallEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
 }

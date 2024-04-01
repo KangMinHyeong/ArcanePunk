@@ -34,11 +34,10 @@ void AAPSkillRange_Target::Tick(float DeltaTime)
 	}
 }
 
-void AAPSkillRange_Target::SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility)
+void AAPSkillRange_Target::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
-    Super::SetSkill(SkillType, SkillAbility);
-    if(SkillAbility.Contains(ESkillAbility::Stun)) bStun = true;
-    
+    Super::SetSkill(SkillAbilityNestingData);
+
     MaxDistance = MaxDistance * (GetActorScale3D().Z / DefaultSize);
 
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;

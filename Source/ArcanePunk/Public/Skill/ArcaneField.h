@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;	
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;	
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 	
 	virtual void DestroySKill() override;	
 

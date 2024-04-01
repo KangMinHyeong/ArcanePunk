@@ -8,11 +8,17 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneMine.h"
 
+void USkillNumber9::BeginPlay()
+{
+	Super::BeginPlay();
+	SkillAbilityNestingData.SkillName = TEXT("Skill_9");
+}
+
 void USkillNumber9::AddAbilityList()
 {
-    EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+    // EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// // EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber9::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -31,6 +37,7 @@ void USkillNumber9::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber9::OnSkill()
 {
+	Super::OnSkill();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
     
@@ -54,6 +61,6 @@ void USkillNumber9::Activate_Skill()
 	ArcaneMine = GetWorld()->SpawnActor<AArcaneMine>(OwnerCharacter->GetArcaneMineClass(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation() + FRotator(-45,0,0));
 	if(!ArcaneMine.IsValid()) return; 
     ArcaneMine->SetOwner(OwnerCharacter);
-	ArcaneMine->SetSkill(CurrentSkillType, CurrentSkillAbility);	
+	ArcaneMine->SetSkill(SkillAbilityNestingData);	
  
 }

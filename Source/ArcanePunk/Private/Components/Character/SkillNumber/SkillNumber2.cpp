@@ -15,14 +15,14 @@
 void USkillNumber2::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SkillAbilityNestingData.SkillName = TEXT("Skill_2");
 }
 
 void USkillNumber2::AddAbilityList()
 {
-	EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	EnableSkillAbilityList.Add(ESkillAbility::Stun);
+	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
+	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
+	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
 void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
@@ -40,31 +40,34 @@ void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	}
 	else
 	{
+		SkillKey = WhichKey;
 		CurrentSkillType = SkillType;
 		SetAbility(WhichKey);
 		OwnerCharacter->SetDoing(true);
-		if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
-		{
-			if(CheckSmartKey(WhichKey, OwnerCharacter))
-			{
-				OnSkill();
-			}
-			else
-			{
-				auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-				SetMouseCursor(PC, ESkillCursor::Crosshairs);
-				PC->DisplayHomingUI(ESkillNumber::Skill_2);
-			}
-		}
-		else
-		{
-			OnSkill();
-		}
+		// if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
+		// {
+		// 	if(CheckSmartKey(WhichKey, OwnerCharacter))
+		// 	{
+		// 		OnSkill();
+		// 	}
+		// 	else
+		// 	{
+		// 		auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
+		// 		SetMouseCursor(PC, ESkillCursor::Crosshairs);
+		// 		PC->DisplayHomingUI(ESkillNumber::Skill_2);
+		// 	}
+		// }
+		// else
+		// {
+		// 	OnSkill();
+		// }
+		OnSkill();
 	}
 }
 
 void USkillNumber2::OnSkill()
 {
+	Super::OnSkill();
 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter) return;
 
@@ -97,7 +100,7 @@ void USkillNumber2::Activate_Skill()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(OwnerCharacter->GetSwordThrowClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
-	if(SwordThrow) SwordThrow->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	// if(SwordThrow) SwordThrow->SetSkill(CurrentSkillType, CurrentSkillAbility);
 }
 
 void USkillNumber2::MarkErase()

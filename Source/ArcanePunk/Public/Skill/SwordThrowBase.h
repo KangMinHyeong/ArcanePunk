@@ -23,7 +23,7 @@ public:
 	UFUNCTION()
 	virtual void OnHitting(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	virtual void SetSkill(ESkillTypeState SkillType, TArray<ESkillAbility> SkillAbility) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
 protected:
 	void ScaleSet();
