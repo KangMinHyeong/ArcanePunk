@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "APAnimHubComponent.generated.h"
 
+class AArcanePunkCharacter;
+class UArcanePunkCharacterAnimInstance;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPAnimHubComponent : public UActorComponent
 {
@@ -32,7 +35,9 @@ public:
 	void PlayerMontageEnded(UAnimMontage *Montage, bool bInterrupted);
 
 private:
-	// 스킬 몽타주 엔드 함수
+	// 스킬 몽타주 엔드 함수	
+	void ComboCheck();
+
 	void OnAttack_A_MontageEnded();
 	void OnAttack_B_MontageEnded();
 	void OnSkill_1_MontageEnded();
@@ -49,7 +54,27 @@ private:
 	void OnSkill_12_MontageEnded();
 	void OnSkill_13_MontageEnded();
 	void OnSkill_14_MontageEnded();
+	void OnSkill_15_MontageEnded();
+	void OnSkill_18_MontageEnded();
+	
+	void OnSkill_5_Fire_MontageEnded();
 
 	void OnUltSkill_1_MontageEnded();
+	void OnUltSkill_4_MontageEnded();
+	void OnUltSkill_5_MontageEnded();
+	void OnUltSkill_6_MontageEnded();
+	void OnUltSkill_8_MontageEnded();
+	void OnUltSkill_9_MontageEnded();
+	void OnUltSkill_10_MontageEnded();
+	void OnUltSkill_11_MontageEnded();
+	void OnUltSkill_12_MontageEnded();
+	void OnUltSkill_13_MontageEnded();
+	void OnUltSkill_14_MontageEnded();
+	void OnUltSkill_15_MontageEnded();
 	
+	void OnUltSkill_Fire_MontageEnded();
+
+private:
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<UArcanePunkCharacterAnimInstance> OwnerAnim;
 };

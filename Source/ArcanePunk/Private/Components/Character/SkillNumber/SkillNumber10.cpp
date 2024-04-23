@@ -10,10 +10,16 @@
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Components/Character/APSkillHubComponent.h"
 
+USkillNumber10::USkillNumber10()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_10");
+
+	MaxChargeNum_Origin = 3;
+}
+
 void USkillNumber10::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_10");
 }
 
 void USkillNumber10::AddAbilityList()
@@ -22,42 +28,32 @@ void USkillNumber10::AddAbilityList()
 	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
-void USkillNumber10::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber10::PlaySkill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
 	if(Skilling)
 	{
 		Remove_Skill();
 	}
 	else
 	{
+		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey) || CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
 		OwnerCharacter->SetDoing(true);
-		SetAbility(WhichKey);
-        SkillKey = WhichKey;
 		Skilling = true;
-		CurrentSkillType = SkillType;
 		Spawn_Skill10();
 	}
 }
 
 void USkillNumber10::Spawn_Skill10()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
-	if(!OwnerCharacterPC) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey, OwnerCharacter)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_10);}
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
-	SpawnParams.bNoFail = true;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_10);}
 
 	ActivateSkillRange_Target(Skill10_TargetRange, Skill10_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill10_LimitDistance);
@@ -73,11 +69,11 @@ void USkillNumber10::Spawn_Skill10()
 
 void USkillNumber10::OnSkill()
 {
-	Super::OnSkill();
     SetComponentTickEnabled(false);
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
-    
+	if(!OwnerCharacter.IsValid()) return; OwnerCharacter->SetDoing(true);
+    OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
+
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -85,31 +81,45 @@ void USkillNumber10::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
     CharacterRotation();
 
-    if(SkillRange_Target.IsValid()) SkillRange_TargetLocation = SkillRange_Target->GetActorLocation();
-    Remove_Skill();
-}
-
-void USkillNumber10::Remove_Skill()
-{
-	Super::Remove_Skill();
+    SpawnLocation = SkillRange_Target->GetActorLocation();
 }
 
 void USkillNumber10::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; 
+	if(!OwnerCharacter.IsValid()) return;
+	CurrentChargeNum--;
+	OwnerCharacter->GetAPHUD()->OnChargeTime.Broadcast(SkillKey);
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	auto ArcaneTurret = GetWorld()->SpawnActor<AArcaneTurret>(OwnerCharacter->GetArcaneTurretClass(), SkillRange_TargetLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
+	auto ArcaneTurret = GetWorld()->SpawnActor<AArcaneTurret>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneTurretClass(), SpawnLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
 	
     if(!ArcaneTurret) return;
-	ArcaneTurret->SetOwner(OwnerCharacter);
+	ArcaneTurret->SetOwner(OwnerCharacter.Get());
 	ArcaneTurret->SetSkill(SkillAbilityNestingData);	
+	OwnerCharacter->SetDoing(false);
 
-    
+	Remove_Skill();
+}
+
+void USkillNumber10::UpdateSkillData()
+{
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+	
+	int32 Charge = MaxChargeNum_Origin;
+	for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+		if(It.Key == 1)
+		{
+			UpdatAbilityData(EEnHanceType::Platinum, It.Key);
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_Add(Charge, AbilityData->Coefficient_X, It.Value); 
+			MaxChargeNum = Charge;
+			OwnerCharacter->GetAPHUD()->OnChargeTime.Broadcast(SkillKey);
+		}// 충전횟수 증가
+	}
 }
 

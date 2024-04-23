@@ -35,8 +35,8 @@ void UAPStatusText::UpdatePlayerStatus()
     MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.MaxHP))));
     MP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.MP)));
     MaxMP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.MaxMP)));
-    ATK->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetFinalATK()))));
-    ATKSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.ATKSpeed))));
+    ATK->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetCurrentATK()))));
+    ATKSpeed->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), Character->GetPlayerStatus().PlayerDynamicData.ATKSpeed)));
     DEF->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.DEF))));
     MoveSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.MoveSpeed))));
     SP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.SP)));

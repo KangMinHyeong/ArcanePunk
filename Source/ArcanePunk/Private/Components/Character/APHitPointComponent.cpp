@@ -41,7 +41,7 @@ void UAPHitPointComponent::SetCrowdControl(AActor *HitActor, ECharacterState Upd
 		break;
 
 		case ECharacterState::Slow:
-		Enemy->GetCrowdControlComp()->SlowState(SlowCoefficient, StateTime);
+		Enemy->GetCrowdControlComp()->SlowState(SlowPercent, StateTime);
 		break;
 	}
 }

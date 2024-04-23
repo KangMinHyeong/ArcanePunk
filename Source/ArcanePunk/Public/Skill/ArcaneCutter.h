@@ -39,10 +39,10 @@ private:
 
 private:
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* CutterTrigger;
+	UBoxComponent* CutterTrigger;
 	
 	UPROPERTY(EditAnywhere)
-	class UNiagaraComponent* CutterEffect;
+	UNiagaraComponent* CutterEffect;
 
 	UPROPERTY(EditAnywhere)
 	float CutterSpeed = 1500.0f;

@@ -6,6 +6,12 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneRain.h"
+#include "Components/Character/APSkillHubComponent.h"
+
+UUltSkillNumber_1::UUltSkillNumber_1()
+{
+	OriginCoolTime = 15.0f;
+}
 
 void UUltSkillNumber_1::BeginPlay()
 {
@@ -13,59 +19,50 @@ void UUltSkillNumber_1::BeginPlay()
 
 }
 
-void UUltSkillNumber_1::AddAbilityList()
+void UUltSkillNumber_1::PlaySkill()
 {
-	// EnableSkillAbilityList.Add(ESkillAbility::Gigant); Ult는 강화 X(후에는 바뀔수도)
-}
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
 
-void UUltSkillNumber_1::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
-{
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
 	OwnerCharacter->SetDoing(true);
-    SetAbility(WhichKey);
-
-	SkillKey = WhichKey;
-	CurrentSkillType = SkillType;
 
 	OnSkill();
 }
 
 void UUltSkillNumber_1::OnSkill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	Super::OnSkill();
+	if(!OwnerCharacter.IsValid()) return;
     
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
 	OwnerAnim->PlayUltSkill_1_Montage();
-	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-}
-
-void UUltSkillNumber_1::Remove_Skill()
-{
 }
 
 void UUltSkillNumber_1::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    ArcaneRain = GetWorld()->SpawnActor<AArcaneRain>(OwnerCharacter->GetArcaneRainClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
+    ArcaneRain = GetWorld()->SpawnActor<AArcaneRain>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneRainClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 	if(!ArcaneRain.IsValid()) return;
 	// ArcaneRain->SetSkill(CurrentSkillType, CurrentSkillAbility);	
-	ArcaneRain->SetOwner(OwnerCharacter);
+	ArcaneRain->SetOwner(OwnerCharacter.Get());
 	ArcaneRain->SetRainEffect();
 }
 
 void UUltSkillNumber_1::SkillEnd()
 {
 	if(ArcaneRain.IsValid()) ArcaneRain->DestroySKill();
+}
+
+void UUltSkillNumber_1::UpdateSkillData()
+{
 }

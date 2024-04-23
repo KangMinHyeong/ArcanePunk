@@ -10,10 +10,14 @@
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Components/Character/APSkillHubComponent.h"
 
+USkillNumber4::USkillNumber4()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_4");
+}
+
 void USkillNumber4::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_4");
 }
 
 void USkillNumber4::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
@@ -28,22 +32,20 @@ void USkillNumber4::AddAbilityList()
 	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
-void USkillNumber4::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber4::PlaySkill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
 	if(Skilling)
 	{
 		Remove_Skill();
 	}
 	else
 	{
+		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
 		OwnerCharacter->SetDoing(true);
-		SetAbility(WhichKey);
-		SkillKey = WhichKey;
 		Skilling = true;
-		CurrentSkillType = SkillType;
 		Spawn_Skill4();
 	}
 
@@ -52,10 +54,7 @@ void USkillNumber4::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber4::Spawn_Skill4()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
-	if(!OwnerCharacterPC) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	// if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
 	// {
@@ -96,12 +95,7 @@ void USkillNumber4::Spawn_Skill4()
 	OwnerCharacterPC->bShowMouseCursor = false;
 		CursorImmediately();
 
-		if(!CheckSmartKey(SkillKey, OwnerCharacter)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_4);}
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = OwnerCharacter;
-		SpawnParams.bNoFail = true;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_4);}
 
 		ActivateSkillRange_Target(Skill4_TargetRange, Skill4_TargetRange, ESkillRangeType::Control_Circle);
 		if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill4_LimitDistance);
@@ -118,8 +112,7 @@ void USkillNumber4::Spawn_Skill4()
 void USkillNumber4::OnSkill()
 {
 	Super::OnSkill();
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
+	if(!OwnerCharacter.IsValid()) return; OwnerCharacter->SetDoing(true);
 	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -139,19 +132,22 @@ void USkillNumber4::Remove_Skill()
 
 void USkillNumber4::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	auto ArcaneBomb = GetWorld()->SpawnActor<AArcaneBomb>(OwnerCharacter->GetArcaneBombClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, FRotator::ZeroRotator, SpawnParams);
+	auto ArcaneBomb = GetWorld()->SpawnActor<AArcaneBomb>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneBombClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, FRotator::ZeroRotator, SpawnParams);
 	if(!ArcaneBomb) return;	
-	ArcaneBomb->SetOwner(OwnerCharacter);
+	ArcaneBomb->SetOwner(OwnerCharacter.Get());
 	ArcaneBomb->SetSkill(SkillAbilityNestingData);	
 	if(SkillRange_Target.IsValid()) ArcaneBomb->SetTargetPoint(Skill4_TargetRange, SkillRange_Target->GetActorLocation());
 	
 	Remove_Skill();
+}
+
+void USkillNumber4::UpdateSkillData()
+{
 }

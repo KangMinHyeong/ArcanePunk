@@ -63,7 +63,10 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	{
 		if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 		HitPointComp->DistinctHitPoint(Hit.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		
+		float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, Hit, true);
+		OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
+		// UGameplayStatics::ApplyDamage(OtherActor, , MyOwnerInstigator, this, DamageTypeClass);
 		if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
@@ -74,4 +77,5 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 void ASwordThrowBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 {
     Super::SetSkill(SkillAbilityNestingData);
+	HitTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 }

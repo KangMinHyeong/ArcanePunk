@@ -22,6 +22,8 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APMovementComponent.h"
+#include "Components/Character/APAttackComponent.h"
+#include "UserInterface/APHUD.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -39,6 +41,8 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 	TeleportMark->SetupAttachment(GetMesh());
 	TeleportMark->Deactivate();
 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
@@ -56,7 +60,8 @@ void AEnemy_CharacterBase::BeginPlay()
 	OnDrop = true;
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 	DefaultMaterial = GetMesh()->GetMaterial(0);
-
+	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+	
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
 }
 
@@ -137,7 +142,9 @@ bool AEnemy_CharacterBase::AttackPushBack(FVector NewLocation)
 float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
+
+	if(IsDead()) return 0.0f;
+	DamageApplied = DamageApplied * DamageMultiple;
 	DamageApplied = FMath::Min(HP, DamageApplied);
 	
 	HP = HP - DamageMath(DamageApplied);
@@ -163,7 +170,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		bHitting = true;
 		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AEnemy_CharacterBase::ResetHitStiffness, HitStiffnessTime, false);
 	}
-	
+
     return DamageApplied;
 }
 
@@ -386,6 +393,20 @@ void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
 	MonsterIsRight = Right;
 }
 
+void AEnemy_CharacterBase::SetDamageMultiple(float Multiple, float Time)
+{
+	DamageMultiple = DamageMultiple * Multiple;
+	FTimerHandle Timer;
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemy_CharacterBase::MultipleEnd, &Timer, Multiple);
+	GetWorld()->GetTimerManager().SetTimer(Timer, TimerDelegate, Time, false);
+}
+
+void AEnemy_CharacterBase::MultipleEnd(FTimerHandle* TimerHandle, float Multiple)
+{
+	DamageMultiple = DamageMultiple / Multiple;
+	GetWorld()->GetTimerManager().ClearTimer(*TimerHandle);
+}
+
 void AEnemy_CharacterBase::SetHitEffect(FVector HitLocation)
 {
 	if(MonsterIsForward > 0)
@@ -393,14 +414,17 @@ void AEnemy_CharacterBase::SetHitEffect(FVector HitLocation)
 		if(MonsterIsRight > 0)
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_R, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
+			// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect_R, HitLocation, FRotator::ZeroRotator);
 		}
 		else
 		{
+			// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect_L, HitLocation, FRotator::ZeroRotator);
 			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_L, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 		}
 	}
 	else
 	{
+		// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect_B, HitLocation, FRotator::ZeroRotator);
 		UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_B, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 	}
 }

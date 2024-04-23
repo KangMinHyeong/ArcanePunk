@@ -9,8 +9,9 @@
 
 class UButton;
 class UTextBlock;
-class UWrapBox;
+class UHorizontalBox;
 class UChoiceButton;
+class USizeBox;
 
 UCLASS()
 class ARCANEPUNK_API UAPEnhanceChoice : public UUserWidget
@@ -21,12 +22,19 @@ public:
 
 	void InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType);
 
-	void ApplyEnhance(uint8 UpdateSkillAbility, uint16 UpdateNestingNumb );
+	void ApplyEnhance(uint8 UpdateSkillAbility, uint16 UpdateNestingNumb, uint16 MaxNestingNumb);
 	void ApplyNewSkill(ESkillNumber UpdateSkillNumber);
-	FORCEINLINE UDataTable* GetSkillAbilityDataTable() const {return SkillAbilityDataTable;};
+	FORCEINLINE UDataTable* GetSkillAbilityRowNameData() const {return SkillAbilityRowNameData;};
 	FORCEINLINE EEnHanceType GetEnHanceType() const {return EnHanceType;};
 	FORCEINLINE FSkillAbilityNestingData GetSkillAbilityNestingData() const {return SkillAbilityNestingData;};
+	FORCEINLINE void SetSkillAppearPercent(float NewValue) {SkillAppearPercent = NewValue;};
+	
+	void OnReroll(uint8 ChoiceIndexNum);
+
 private:	
+	void ActiveSuffle(uint8 Index);
+	void InitPassiveSuffle();
+	
 	void EnhanceSuffle();
 	bool SkillSuffle();
 	void SetPauseGame();
@@ -36,7 +44,7 @@ private:
 	void SetChoiceButton();
 
 	UFUNCTION()
-	void OnReroll();
+	void OnCancel();
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -46,7 +54,7 @@ private:
 	UTextBlock* EnHanceCategory_Text;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UButton* Reroll_Button;
+	UButton* Cancel_Button;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* RerollDice_Text;
@@ -80,10 +88,13 @@ private:
 	FName TEXT_Platinum = TEXT("Platinum");
 
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
-	UWrapBox* ChoiceWrapBox;
-
+	UHorizontalBox* ChoiceHorizontalBox;
+	
 	UPROPERTY()
 	TArray<UChoiceButton*> ChoiceSlots;
+
+	UPROPERTY()
+	TArray<USizeBox*> ChoiceSizeBoxes;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UChoiceButton> ChoiceSlotClass;
@@ -92,7 +103,7 @@ private:
 	float SkillAppearPercent = 0.0f; // 스킬 등장 확률, 100 - 스킬 등장 확률 = 증강 등장 확률
 
 	UPROPERTY(EditAnywhere)
-	UDataTable* SkillAbilityDataTable;
+	UDataTable* SkillAbilityRowNameData;
 
 	FSkillAbilityNestingData SkillAbilityNestingData;
 

@@ -12,10 +12,14 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Skill/SwordClutch.h"
 
+USkillNumber14::USkillNumber14()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_14");
+}
+
 void USkillNumber14::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_14");
 }
 
 void USkillNumber14::AddAbilityList()
@@ -23,11 +27,11 @@ void USkillNumber14::AddAbilityList()
 	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
 }
 
-void USkillNumber14::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber14::PlaySkill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
 	if(Skilling)
 	{
 		Remove_Skill();
@@ -41,11 +45,9 @@ void USkillNumber14::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
         }
         else
         {
+			if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
             OwnerCharacter->SetDoing(true);
-            SetAbility(WhichKey);
-            SkillKey = WhichKey;
             Skilling = true;
-            CurrentSkillType = SkillType;
             Spawn_Skill14();
         }
 	}
@@ -53,20 +55,12 @@ void USkillNumber14::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 
 void USkillNumber14::Spawn_Skill14()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
-	if(!OwnerCharacterPC) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = true;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey, OwnerCharacter)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_14);}
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
-	SpawnParams.bNoFail = true;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_14);}
 
 	ActivateSkillRange_Target(Skill14_LimitDistance, Skill14_LimitDistance, ESkillRangeType::Around_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill14_LimitDistance+Skill14_Wide/2);
@@ -83,10 +77,10 @@ void USkillNumber14::Spawn_Skill14()
 
 void USkillNumber14::OnSkill()
 {
-	Super::OnSkill();
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+    if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
     
@@ -97,32 +91,40 @@ void USkillNumber14::OnSkill()
 	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetActorHiddenInGame(true);
 }
 
-void USkillNumber14::Remove_Skill()
-{
-	Super::Remove_Skill();
-}
-
 void USkillNumber14::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; 
-
+	if(!OwnerCharacter.IsValid()) return;
+	
     OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	auto SwordClutch = GetWorld()->SpawnActor<ASwordClutch>(OwnerCharacter->GetSwordClutchClass(), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
+	auto SwordClutch = GetWorld()->SpawnActor<ASwordClutch>(OwnerCharacter->GetAPSkillHubComponent()->GetSwordClutchClass(), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
 	
     if(!SwordClutch) return;
-	SwordClutch->SetOwner(OwnerCharacter);
+	SwordClutch->SetOwner(OwnerCharacter.Get());
 	if(SkillRange_Target.IsValid()) SwordClutch->SetDistance(SkillRange_Target->GetTargetDistance() - Skill14_Wide/2);
 	if(SkillRange_Target.IsValid()) SwordClutch->SetClutchSpeed(SkillRange_Target->GetMaxDist() / SkillRange_Target->GetTargetDistance());
 	SwordClutch->SetWide(Skill14_Wide);
+	SwordClutch->AddDestroyTime(AddDuration);
 	SwordClutch->SetSkill(SkillAbilityNestingData);	
-	Remove_Skill();
+	
 	bActivate = true;
+	Remove_Skill();
+}
+
+void USkillNumber14::SkillEnd()
+{
+	bActivate = false; 	
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+}
+
+void USkillNumber14::UpdateSkillData()
+{
 }

@@ -11,19 +11,32 @@ UCLASS()
 class ARCANEPUNK_API USkillNumber9 : public USkillNumberBase
 {
 	GENERATED_BODY()
+public:	
+	USkillNumber9();
 protected:
 	virtual void BeginPlay() override;
 	
 public:
-	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
-
+	virtual void PlaySkill() override;
+	
 	virtual void OnSkill() override;
 
 	virtual void Activate_Skill() override;
 
+	virtual void SkillEnd() override;	
+
+	virtual void UpdateSkillData() override;
+
 private:
 	virtual void AddAbilityList() override;
-	
+	void Spawn_Skill9();	
+
 private:
 	TWeakObjectPtr<AArcaneMine> ArcaneMine;
+
+	float Skill9_TargetRange = 120.0f;
+	float Skill9_TargetRange_Origin = 120.0f;
+
+	float Skill9_LimitDistance = 350.0f;
+	float Skill9_LimitDistance_Origin = 350.0f;
 };

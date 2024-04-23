@@ -7,6 +7,9 @@
 #include "ArcanePunkCharacterAnimInstance.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnComboCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnUltChargeEnd);
+
+class AArcanePunkCharacter;
 
 UCLASS()
 class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
@@ -35,10 +38,47 @@ public:
 	void PlaySkill_12_Montage();
 	void PlaySkill_13_Montage();
 	void PlaySkill_14_Montage();
+	void PlaySkill_15_Montage();
+	void PlaySkill_18_Montage();
+
+	void StopSkill_5_Montage();
+	void StopSkill_18_Montage();
+	
+	void PlaySkill_5_Fire_Montage();
+
 	void PlayUltSkill_1_Montage();
+	void PlayUltSkill_2_Montage();
+	void PlayUltSkill_3_Montage();
+	void PlayUltSkill_4_Montage(); 
+	void PlayUltSkill_5_Montage();
+	void PlayUltSkill_6_Montage();
+	void PlayUltSkill_8_Montage();
+	void PlayUltSkill_9_Montage();
+	void PlayUltSkill_10_Montage();
+	void PlayUltSkill_11_Montage();
+	void PlayUltSkill_12_Montage();
+	void PlayUltSkill_13_Montage();
+	void PlayUltSkill_14_Montage();
+	void PlayUltSkill_15_Montage();
+
+	void StopUltSkill_3_Montage();
+	void StopUltSkill_6_Montage();
+	void StopUltSkill_11_Montage();
+	void StopUltSkill_12_Montage();
+
+	void JumpToFireMontage_Ult();
 
 	UFUNCTION()
 	void AnimNotify_AttackTrigger();
+	UFUNCTION()
+	void AnimNotify_MultiAttackTrigger();
+	UFUNCTION()
+	void AnimNotify_SwordTrail_1();
+	UFUNCTION()
+	void AnimNotify_SwordTrail_2();
+	UFUNCTION()
+	void AnimNotify_SwordTrail_3();
+
 	UFUNCTION()
 	void AnimNotify_Skill_1_Trigger(); // Skill_1
 	UFUNCTION()
@@ -47,10 +87,7 @@ public:
 	void AnimNotify_Skill_4_Trigger();
 	UFUNCTION()
 	void AnimNotify_Skill_5_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_5_Enhance();
-	UFUNCTION()
-	void AnimNotify_Skill_5_FireStart();
+
 	UFUNCTION()
 	void AnimNotify_Skill_5_Fire();
 	UFUNCTION()
@@ -73,9 +110,16 @@ public:
 	void AnimNotify_Skill_13_Trigger();
 	UFUNCTION()
 	void AnimNotify_Skill_14_Trigger();
+	UFUNCTION()
+	void AnimNotify_Skill_15_Trigger();
+
+	UFUNCTION()
+	void AnimNotify_Skill_5_Enhance();
 
 	UFUNCTION()
 	void AnimNotify_UltSkill_Trigger();
+	UFUNCTION()
+	void AnimNotify_UltSkill_Charge_Trigger();
 
 	UFUNCTION()
 	void AnimNotify_NextCombo();
@@ -96,12 +140,14 @@ public:
 	void AnimNotify_HideClear();
 
 	void JumpToComboSection(int32 NewSection);
+	bool CheckComboEnd();
 
 	FName GetAttackMontageSectionName(int32 Section);
 
 	int32 GetAttackSection();
 
 	void FireCheck();
+	
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
@@ -118,12 +164,20 @@ private:
 
 	int32 AttackSection = 0;
 
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+
 public:
 	FOnComboCheckDelegate OnComboCheck;
 	FOnMontageEnded OnAttack_A_Montage_End;
+	FOnUltChargeEnd OnUltChargeEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Attack_A_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Combo_2_Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Combo_3_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Attack_B_Montage;
@@ -171,7 +225,58 @@ public:
 	UAnimMontage* Skill_14_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_15_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_18_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_5_Fire_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* UltSkill_1_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_2_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_3_Montage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_4_Montage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_5_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_6_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_8_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_9_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_10_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_11_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_12_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_13_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_14_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_15_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_Fire_Montage;
 
 	FTimerHandle Skill5_FireTimerHandle;
 };

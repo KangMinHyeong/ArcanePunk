@@ -11,21 +11,21 @@ UCLASS()
 class ARCANEPUNK_API UUltSkillNumber_1 : public USkillNumberBase
 {
 	GENERATED_BODY()
+public:
+	UUltSkillNumber_1();
+
 protected:
 	virtual void BeginPlay() override;
 	
 public:
-	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
+	virtual void PlaySkill() override;
 
 	virtual void OnSkill() override;
-
-	virtual void Remove_Skill() override;
 
 	virtual void Activate_Skill() override;
 	virtual void SkillEnd() override;
 
-private:
-	void AddAbilityList();	
+	virtual void UpdateSkillData() override;
 
 private:
 	TWeakObjectPtr<AArcaneRain> ArcaneRain;

@@ -7,11 +7,20 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneMine.h"
+#include "Character/SkillRange/APSkillRange.h"
+#include "Character/SkillRange/APSkillRange_Target.h"
+#include "Components/Character/APSkillHubComponent.h"
+
+USkillNumber9::USkillNumber9()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_9");
+
+	MaxChargeNum_Origin = 3;
+}
 
 void USkillNumber9::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_9");
 }
 
 void USkillNumber9::AddAbilityList()
@@ -21,46 +30,138 @@ void USkillNumber9::AddAbilityList()
 	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
-void USkillNumber9::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber9::PlaySkill()
 {
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
-    OwnerCharacter->SetDoing(true);
-    SetAbility(WhichKey);
-    SkillKey = WhichKey;
-    Skilling = true;
-    CurrentSkillType = SkillType;
-    OnSkill();
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
+	if(Skilling)
+	{
+		Remove_Skill();
+	}
+	else
+	{
+        if(bActivate)
+        {
+            if(!ArcaneMine.IsValid()) return;
+			if(ArcaneMine->IsExploaionEnable())
+			{
+				ArcaneMine->Explosion();
+			} 
+        }
+        else
+        {
+			if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey) || CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+            OwnerCharacter->SetDoing(true);
+			Skilling = true;
+			Spawn_Skill9();
+        }
+		
+		// OnSkill();
+	}
     
+}
+
+void USkillNumber9::Spawn_Skill9()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+
+	OwnerCharacterPC->bShowMouseCursor = false;
+	CursorImmediately();
+
+	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_9);}
+
+	ActivateSkillRange_Target(Skill9_TargetRange, Skill9_TargetRange, ESkillRangeType::Control_Circle);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill9_LimitDistance);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+
+	ActivateSkillRange_Round(Skill9_LimitDistance);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	OwnerCharacter->SetDoing(false);
+	SetComponentTickEnabled(true);
+
 }
 
 void USkillNumber9::OnSkill()
 {
-	Super::OnSkill();
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; OwnerCharacter->SetDoing(true);
+	SetComponentTickEnabled(false);
+	if(!OwnerCharacter.IsValid()) return; OwnerCharacter->SetDoing(true);
+	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
     
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
 	OwnerAnim->PlaySkill_9_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+    if(SkillRange_Target.IsValid()) SkillRange_Target->SetActorHiddenInGame(true);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetActorHiddenInGame(true);
+
+	SpawnLocation = SkillRange_Target->GetActorLocation();
+    CharacterRotation();
+
 }
 
 void USkillNumber9::Activate_Skill()
 {
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; 
+    if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	CurrentChargeNum--;
+	OwnerCharacter->GetAPHUD()->OnChargeTime.Broadcast(SkillKey);
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ArcaneMine = GetWorld()->SpawnActor<AArcaneMine>(OwnerCharacter->GetArcaneMineClass(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation() + FRotator(-45,0,0));
+	ArcaneMine = GetWorld()->SpawnActor<AArcaneMine>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneMineClass(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation());
 	if(!ArcaneMine.IsValid()) return; 
-    ArcaneMine->SetOwner(OwnerCharacter);
+    ArcaneMine->SetOwner(OwnerCharacter.Get());
+	ArcaneMine->SetExplosionRadius(Skill9_TargetRange);
+	ArcaneMine->SetTarget(SpawnLocation);
 	ArcaneMine->SetSkill(SkillAbilityNestingData);	
- 
+
+	bActivate = true;
+	Remove_Skill();
+}
+
+void USkillNumber9::SkillEnd()
+{
+	bActivate = false; 
+	
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
+}
+
+void USkillNumber9::UpdateSkillData()
+{
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+	
+	float Dist = Skill9_LimitDistance_Origin;
+	float Wide = Skill9_TargetRange_Origin;
+	float Cool = OriginCoolTime;
+	int32 Charge = MaxChargeNum_Origin;
+	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+        if(It.Key == 1){UpdatAbilityData(EEnHanceType::Silver, It.Key); Dist = OwnerCharacter->GetAPSkillAbility()->Coefficient_Multiple_Return(Dist, AbilityData->Coefficient_X, It.Value); }// 사거리 강화}
+		if(It.Key == 2) {UpdatAbilityData(EEnHanceType::Silver, It.Key); Wide = OwnerCharacter->GetAPSkillAbility()->Coefficient_Multiple_Return(Wide, AbilityData->Coefficient_X, It.Value); }// 사이즈 강화}
+    }
+    // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    // {
+    // }
+    for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+		if(It.Key == 2)
+		{
+			UpdatAbilityData(EEnHanceType::Platinum, It.Key);
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_Add(Charge, AbilityData->Coefficient_X, It.Value); 
+			MaxChargeNum = Charge;
+			OwnerCharacter->GetAPHUD()->OnChargeTime.Broadcast(SkillKey);
+		}// 충전횟수 증가
+	}
+	Skill9_LimitDistance = Dist;
+	Skill9_TargetRange = Wide;
+	CurrentCoolTime = Cool;
 }

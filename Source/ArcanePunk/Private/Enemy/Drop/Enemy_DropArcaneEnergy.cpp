@@ -17,9 +17,11 @@ void AEnemy_DropArcaneEnergy::Tick(float DeltaTime)
 
     TWeakObjectPtr<AArcanePunkCharacter> PlayerCharacter = InteractTrigger->Character; if(!PlayerCharacter.IsValid()) return;
 
-    FPlayerTotalData PD = PlayerCharacter->GetPlayerStatus();
-    PD.PlayerDynamicData.MP = FMath::Min( PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MP + MyArcaneEnergy, PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MaxMP);
-    PlayerCharacter->SetPlayerStatus(PD);
+    // 후에 수정 델리게이트로
+
+    // FPlayerTotalData PD = PlayerCharacter->GetPlayerStatus();
+    // PD.PlayerDynamicData.MP = FMath::Min( PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MP + MyArcaneEnergy, PlayerCharacter->GetPlayerStatus().PlayerDynamicData.MaxMP);
+    // PlayerCharacter->SetPlayerStatus(PD);
 
     Destroy();
 }

@@ -10,6 +10,8 @@ class UDataTable;
 class UNiagaraSystem;
 class USoundBase;
 
+DECLARE_MULTICAST_DELEGATE(FOnMonsterKilled);
+
 UCLASS()
 class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
 {
@@ -48,4 +50,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float SpawnSoundVolume = 2.5f;
 
+public:
+	FOnMonsterKilled OnMonsterKilled;
 };

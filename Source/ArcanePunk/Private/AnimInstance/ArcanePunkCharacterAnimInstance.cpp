@@ -20,7 +20,7 @@ void UArcanePunkCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+   
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     if (!IsDead)
@@ -47,20 +47,67 @@ void UArcanePunkCharacterAnimInstance::NativeBeginPlay()
     {
         bBattleMode = 0.0f;
     }
+
+    OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner()); 
+
+    OnUltChargeEnd.AddUObject(this, &UArcanePunkCharacterAnimInstance::JumpToFireMontage_Ult);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
 {
     if(IsDead) return;
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner()); if(!OwnerCharacter.IsValid()) return;
+    if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetAttackRotation();
-    Montage_Play(Attack_A_Montage, 1.0f);
+    Montage_Play(Attack_A_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Attack_B_Montage);
+    Montage_Play(Attack_B_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+}
+
+void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
+{
+    if(IsDead) return;
+    AttackSection = NewSection;
+	// if(!Montage_IsPlaying(Attack_A_Montage)) return;
+    if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->SetAttackRotation();
+
+    switch (NewSection)
+    {
+        case 2:
+        Montage_Play(Combo_2_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+        break;
+
+        case 3:
+        Montage_Play(Combo_3_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+        break;
+    }
+	// Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
+}
+
+bool UArcanePunkCharacterAnimInstance::CheckComboEnd()
+{
+    if(Montage_IsPlaying(Attack_A_Montage)) return false;
+    if(Montage_IsPlaying(Combo_2_Montage)) return false;
+    if(Montage_IsPlaying(Combo_3_Montage)) return false;
+    return true;
+}
+
+FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Section)
+{
+    if(Section >= 1 && Section <= 3)
+    {
+        return FName(*FString::Printf(TEXT("Attack%d"), Section));
+    }
+	return FName(TEXT(""));
+}
+
+int32 UArcanePunkCharacterAnimInstance::GetAttackSection()
+{
+    return AttackSection;
 }
 
 void UArcanePunkCharacterAnimInstance::PlaySkill_1_Montage()
@@ -147,23 +194,192 @@ void UArcanePunkCharacterAnimInstance::PlaySkill_14_Montage()
     Montage_Play(Skill_14_Montage);
 }
 
+void UArcanePunkCharacterAnimInstance::PlaySkill_15_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_15_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_18_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(Skill_18_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopSkill_5_Montage()
+{
+    if(IsDead) return;
+    Montage_Stop(0.0f, Skill_5_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopSkill_18_Montage()
+{
+    if(IsDead) return;
+    Montage_Stop(0.5f, Skill_18_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySkill_5_Fire_Montage()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+    Montage_Play(Skill_5_Fire_Montage);
+
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
+	if(SkillNum.IsValid())
+	{
+        if(SkillNum->SkillRange_Target.IsValid()) SkillNum->SkillRange_Target->SetActorHiddenInGame(true);
+        SkillNum->CharacterRotation();
+	} 
+}
+
 void UArcanePunkCharacterAnimInstance::PlayUltSkill_1_Montage()
 {
     if(IsDead) return;
     Montage_Play(UltSkill_1_Montage);
 }
 
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_2_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_2_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_3_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_3_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopUltSkill_3_Montage()
+{
+    if(IsDead) return;
+    Montage_Stop(0.0f, UltSkill_3_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_4_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_4_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_5_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_5_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_6_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_6_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopUltSkill_6_Montage()
+{
+    if(IsDead) return;
+    Montage_Stop(0.0f, UltSkill_6_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_8_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_8_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_9_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_9_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_10_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_10_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_11_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_11_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopUltSkill_11_Montage()
+{
+    if(IsDead) return;
+    Montage_Stop(0.0f, UltSkill_11_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_12_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_12_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopUltSkill_12_Montage()
+{
+    if(IsDead) return;
+    Montage_Stop(0.0f, UltSkill_12_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_13_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_13_Montage, 0.7f);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_14_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_14_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::PlayUltSkill_15_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_15_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::JumpToFireMontage_Ult()
+{
+    if(IsDead) return;
+    Montage_Play(UltSkill_Fire_Montage);
+}
+
 void UArcanePunkCharacterAnimInstance::AnimNotify_AttackTrigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetAttackComponent()->NormalAttack(OwnerCharacter->GetActorLocation(), true);
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_MultiAttackTrigger()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetAttackComponent()->MultiAttack();
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_1()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(1);
+}
+void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_2()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(2);
+}
+void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
+}
+
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_1_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_1);
@@ -175,7 +391,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_1_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_2_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
@@ -187,7 +402,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_2_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_4_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_4);
@@ -199,13 +413,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_4_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Trigger()
 {
-    GetWorld()->GetTimerManager().SetTimer(Skill5_FireTimerHandle, this, &UArcanePunkCharacterAnimInstance::FireCheck, 0.05f, true);
-
-}
-
-void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Enhance()
-{
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
+    // GetWorld()->GetTimerManager().SetTimer(Skill5_FireTimerHandle, this, &UArcanePunkCharacterAnimInstance::FireCheck, 0.05f, true);
     if(!OwnerCharacter.IsValid() || IsDead) return;
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
 	if(SkillNum.IsValid())
@@ -214,57 +422,18 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Enhance()
 	} 
 }
 
-void UArcanePunkCharacterAnimInstance::FireCheck()
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Enhance()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
-
-    bool Check = false;
-
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
 	if(SkillNum.IsValid())
 	{
-        switch (SkillNum->SkillKey)
-        {
-            case ESkillKey::Q:
-            if(!OwnerCharacter->GetOnQSkill()) Check = true;
-            break;
-
-            case ESkillKey::E:
-            if(!OwnerCharacter->GetOnESkill()) Check = true;
-            break;
-
-            case ESkillKey::R:
-            if(!OwnerCharacter->GetOnRSkill()) Check = true;
-            break;
-        }
+		SkillNum->DoubleEnhance();
 	} 
-
-    if(Check)
-    {
-        Montage_JumpToSection(TEXT("Fire"), Skill_5_Montage);
-        GetWorld()->GetTimerManager().ClearTimer(Skill5_FireTimerHandle);
-    } 
-    // 후에 CC 맞으면 취소 되는것도 추가
-}
-
-void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_FireStart()
-{
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
-    if(!OwnerCharacter.IsValid() || IsDead) return;
-
-    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
-	if(SkillNum.IsValid())
-	{
-        if(SkillNum->SkillRange_Target.IsValid()) SkillNum->SkillRange_Target->SetActorHiddenInGame(true);
-        SkillNum->CharacterRotation();
-	} 
-
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Fire()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
@@ -275,7 +444,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_Fire()
 }
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_FireEnd()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
@@ -287,7 +455,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_5_FireEnd()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_6_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_6);
@@ -299,7 +466,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_6_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_7_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_7);
@@ -311,7 +477,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_7_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_8_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_8);
@@ -323,7 +488,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_8_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_9_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_9);
@@ -335,7 +499,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_9_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_10_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_10);
@@ -347,7 +510,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_10_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_11_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_11);
@@ -359,7 +521,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_11_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_12_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_12);
@@ -371,7 +532,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_12_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_13_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_13);
@@ -383,7 +543,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_13_Trigger()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_14_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_14);
@@ -393,12 +552,29 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_14_Trigger()
 	} 
 }
 
+void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_15_Trigger()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_15);
+	if(SkillNum.IsValid())
+	{
+		SkillNum->Activate_Skill();
+	} 
+}
+
 void UArcanePunkCharacterAnimInstance::AnimNotify_UltSkill_Trigger()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetRSkillNumber()->Activate_Skill();
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_UltSkill_Charge_Trigger()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetRSkillNumber()->Enhance();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
@@ -408,23 +584,20 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_NextCombo()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AnimMove()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->GetAPMoveComponent()->AnimMovement();
+    OwnerCharacter->GetAPMoveComponent()->ComboMovement();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AnimStop()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->GetAPMoveComponent()->AnimMoveStop();
+    OwnerCharacter->GetAPMoveComponent()->ComboMoveStop();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(true);
@@ -432,7 +605,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootRightOnlySound()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(true, false);
@@ -440,7 +612,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootRightOnlySound()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(false);
@@ -448,40 +619,14 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeft()
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootLeftOnlySound()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetSpawnFootPrintComponent()->SpawnFootPrint(false, false);
 }
 
-void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
-{
-    if(IsDead) return;
-    AttackSection = NewSection;
-	if(!Montage_IsPlaying(Attack_A_Montage)) return;
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner()); if(!OwnerCharacter.IsValid()) return;
-    OwnerCharacter->SetAttackRotation();
-	Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
-}
-
-FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Section)
-{
-    if(Section >= 1 && Section <= 3)
-    {
-        return FName(*FString::Printf(TEXT("Attack%d"), Section));
-    }
-	return FName(TEXT(""));
-}
-
-int32 UArcanePunkCharacterAnimInstance::GetAttackSection()
-{
-    return AttackSection;
-}
-
 void UArcanePunkCharacterAnimInstance::AnimNotify_HideClear()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(TryGetPawnOwner());
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->HideClear();
+    if(!OwnerCharacter->IsEnhanceTent()) OwnerCharacter->HideClear();
 }

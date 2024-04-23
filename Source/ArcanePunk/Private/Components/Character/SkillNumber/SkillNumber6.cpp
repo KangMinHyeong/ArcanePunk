@@ -6,11 +6,16 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/Shouting.h"
+#include "Components/Character/APSkillHubComponent.h"
+
+USkillNumber6::USkillNumber6()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_6");
+}
 
 void USkillNumber6::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_6");
 }
 
 void USkillNumber6::AddAbilityList()
@@ -19,14 +24,13 @@ void USkillNumber6::AddAbilityList()
 	
 }
 
-void USkillNumber6::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber6::PlaySkill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+
 	OwnerCharacter->SetDoing(true);
-    SetAbility(WhichKey);
-	CurrentSkillType = SkillType;
-	SkillKey = WhichKey;
 	
 	OnSkill();
 
@@ -52,8 +56,7 @@ void USkillNumber6::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 void USkillNumber6::OnSkill()
 {
 	Super::OnSkill();
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
     
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -68,22 +71,25 @@ void USkillNumber6::Remove_Skill()
 
 void USkillNumber6::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    Shouting = GetWorld()->SpawnActor<AShouting>(OwnerCharacter->GetShoutingClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
+    Shouting = GetWorld()->SpawnActor<AShouting>(OwnerCharacter->GetAPSkillHubComponent()->GetShoutingClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
 	if(!Shouting.IsValid()) return;
 	Shouting->SetSkill(SkillAbilityNestingData);	
-	Shouting->SetOwner(OwnerCharacter);
+	Shouting->SetOwner(OwnerCharacter.Get());
 	Shouting->SetShoutingEffect();
 }
 
 void USkillNumber6::SkillEnd()
 {
 	if(Shouting.IsValid()) Shouting->DestroySKill();
+}
+
+void USkillNumber6::UpdateSkillData()
+{
 }

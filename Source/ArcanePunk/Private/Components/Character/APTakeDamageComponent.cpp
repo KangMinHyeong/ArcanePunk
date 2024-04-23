@@ -38,12 +38,12 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 
 	GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, HitMotionTime, false);
 
-	if(DamageApplied == PD.PlayerDynamicData.HP && OwnerCharacter->GetRageMode()) { PD.PlayerDynamicData.HP = 1.0f;}
+	if(DamageApplied >= PD.PlayerDynamicData.HP && OwnerCharacter->GetRageMode()) { PD.PlayerDynamicData.HP = 1.0f;}
 	else
 	{
 		PD.PlayerDynamicData.HP = PD.PlayerDynamicData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.PlayerDynamicData.DEF)));
 	}
-	OwnerCharacter->SetPlayerStatus(PD);
+	OwnerCharacter->SetDefaultHP(PD.PlayerDynamicData.HP); 
 	
 	if(OwnerCharacter->IsDead())
 	{
@@ -67,6 +67,12 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 		if(MyController) MyController->HitUI();
 		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.HP);
 	}
+}
+
+void UAPTakeDamageComponent::ReflectDamage(float & DamageApplied, AActor* DamageCauser)
+{
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
+	UGameplayStatics::ApplyDamage(DamageCauser, DamageApplied, OwnerCharacter->GetInstigatorController(), OwnerCharacter, UDamageType::StaticClass());
 }
 
 void UAPTakeDamageComponent::SetHitPoint(float Forward, float Right)

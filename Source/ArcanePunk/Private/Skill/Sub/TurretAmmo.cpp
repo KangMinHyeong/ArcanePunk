@@ -3,10 +3,11 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Character/ArcanePunkCharacter.h"
+#include "Skill/ArcaneTurret.h"
 #include "Particles/ParticleSystem.h"
 #include "Components/Character/APHitPointComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Character/ArcanePunkCharacter.h"
 
 ATurretAmmo::ATurretAmmo()
 {
@@ -43,6 +44,7 @@ void ATurretAmmo::Tick(float DeltaTime)
 void ATurretAmmo::BindHit()
 {
 	AmmoMesh->OnComponentHit.AddDynamic(this, &ATurretAmmo::OnHitting);
+	AmmoMesh->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ATurretAmmo::DestroyAmmo, DeadTime, false);
 }
 
@@ -60,14 +62,17 @@ void ATurretAmmo::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UP
 		Destroy();
 		return;
 	} 
-	auto MyOwnerInstigator = MyOwner->GetInstigatorController();
+	auto MyOwnerInstigator = MyOwner->GetOwner()->GetInstigatorController();
 	auto DamageTypeClass = UDamageType::StaticClass();
 
-	auto Character = Cast<AArcanePunkCharacter>(MyOwner);
-	if (OtherActor && OtherActor != this && OtherActor != MyOwner && Character)
+	auto ArcaneTurret = Cast<AArcaneTurret>(MyOwner);
+	auto OwnerCharacter = Cast<AArcanePunkCharacter>(MyOwner->GetOwner()); if(!OwnerCharacter) return;
+	if (OtherActor && OtherActor != this && OtherActor != MyOwner && ArcaneTurret)
 	{
 		HitPointComp->DistinctHitPoint(Hit.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, Character->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, ArcaneTurret->GetDamage(), Hit, true);
+		OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
+		// UGameplayStatics::ApplyDamage(OtherActor, ArcaneTurret->GetDamage() * OwnerCharacter->CriticalCalculate(), MyOwnerInstigator, MyOwner->GetOwner(), DamageTypeClass);
         if(HitEffet) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffet, GetActorLocation(), GetActorRotation(), FVector(0.5f, 0.5f, 0.5f));
 	}
     Destroy();

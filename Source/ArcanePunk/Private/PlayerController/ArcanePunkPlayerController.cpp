@@ -280,12 +280,31 @@ void AArcanePunkPlayerController::ReturnToDefault()
 	App.QueryCursor();
 }
 
-void AArcanePunkPlayerController::PreventOtherClick(ESkillNumber SkillNumber)
+void AArcanePunkPlayerController::PreventOtherClick(ESkillNumber SkillNumber, bool Loop)
 {
-    MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass)); if(!MouseClickUI.IsValid()) return;
+    if(!MouseClickUI.IsValid())
+    {
+        MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass)); if(!MouseClickUI.IsValid()) return;    
+    }
     
-    MouseClickUI->InputSkillInfo(SkillNumber);
+    MouseClickUI->InputSkillInfo(SkillNumber, Loop);
     MouseClickUI->AddToViewport(); 
+}
+
+void AArcanePunkPlayerController::PreventOtherClick_Ult(bool Loop)
+{
+    if(!MouseClickUI.IsValid())
+    {
+        MouseClickUI = Cast<UAPMouseClickBase>(CreateWidget(this, MouseClickUIClass)); if(!MouseClickUI.IsValid()) return;   
+    }
+    
+    MouseClickUI->InputSkillInfo_Ult(Loop);
+    MouseClickUI->AddToViewport(); 
+}
+
+void AArcanePunkPlayerController::RemoveOtherClick()
+{
+    if(MouseClickUI.IsValid()) MouseClickUI->RemoveFromParent(); 
 }
 
 void AArcanePunkPlayerController::SetHideUI(bool NewBool)

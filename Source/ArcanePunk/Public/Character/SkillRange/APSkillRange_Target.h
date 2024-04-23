@@ -16,5 +16,4 @@ public:
 
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
-
 };

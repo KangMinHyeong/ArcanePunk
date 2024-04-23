@@ -15,7 +15,7 @@ UAPMovementComponent::UAPMovementComponent()
 void UAPMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	AnimMoveStop();
+	SetComponentTickEnabled(false);
 	InitRotSpeed = RotSpeed;
 }
 
@@ -23,21 +23,19 @@ void UAPMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FRotator Current = GetOwner()->GetActorRotation();
-	Current = FMath::RInterpConstantTo(Current, TargetRot, DeltaTime, RotSpeed);
-	GetOwner()->SetActorRotation(Current);
+	if(bMove) TickMove(DeltaTime);
+	if(bRotation) TickRotate(DeltaTime);
+	TickCheck();
+}
 
-	if(abs(Current.Yaw - TargetRot.Yaw) < 0.01f) 
-	{
-		RotSpeed = InitRotSpeed;
-		AnimMoveStop();
-	}
+void UAPMovementComponent::SetBind()
+{
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 }
 
 void UAPMovementComponent::PlayerMoveForward(float AxisValue)
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter || !OwnerCharacter->GetCanMove()) return;
+	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
 
 	PlayerVec.X = AxisValue;
 	if(PlayerVec.SizeSquared() != 0)
@@ -49,8 +47,7 @@ void UAPMovementComponent::PlayerMoveForward(float AxisValue)
 
 void UAPMovementComponent::PlayerMoveRight(float AxisValue)
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter || !OwnerCharacter->GetCanMove()) return;
+	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
 
 	PlayerVec.Y = AxisValue;
 	if(PlayerVec.SizeSquared() != 0)
@@ -60,55 +57,83 @@ void UAPMovementComponent::PlayerMoveRight(float AxisValue)
 	}
 }
 
-void UAPMovementComponent::AttackMoving(float DeltaTime)
+void UAPMovementComponent::TickCheck()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	if(!bMove && !bRotation) SetComponentTickEnabled(false);
+}
 
-	int32 Section = OwnerAnim->GetAttackSection();
-	float Speed = OwnerCharacter->GetAttackMoveSpeed(Section);
+void UAPMovementComponent::TickRotate(float DeltaTime)
+{
+	if(!OwnerCharacter.IsValid()) return;
+	Current = FMath::RInterpConstantTo(Current, TargetRot, DeltaTime, RotSpeed  * OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed );
+	GetOwner()->SetActorRotation(Current);
 
-	FHitResult HitResult;
-	FVector DashVector = OwnerCharacter->GetActorForwardVector()*Speed * DeltaTime;
-	FVector OverlapStart = OwnerCharacter->GetActorLocation();
-	FVector OverlapEnd = OverlapStart + OwnerCharacter->GetActorForwardVector() * OwnerCharacter->GetAttackComponent()->GetMaxDistance();
-
-	if(OwnerCharacter->PMCheck(HitResult, OverlapStart, OverlapEnd))
+	if(abs(Current.Yaw - TargetRot.Yaw) < 0.01f) 
 	{
-		auto Enemy = Cast<AEnemy_CharacterBase>(HitResult.GetActor());
-		if(!Enemy) return;
-
-		if(Enemy->IsHitting())
-		{
-			if(Enemy->AttackPushBack(DashVector * OwnerCharacter->GetPushCoefficient())) OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + DashVector);
-		} 
-		else
-		{
-			OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + DashVector);
-		}
-	}
-	else
-	{
-		OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + DashVector);
+		RotSpeed = InitRotSpeed;
+		RotateMoveStop();
 	}
 }
 
-void UAPMovementComponent::AnimMovement()
+void UAPMovementComponent::TickMove(float DeltaTime)
 {
+	if(!OwnerCharacter.IsValid()) return;
+	FVector Location = GetOwner()->GetActorLocation();
+	Location = FMath::VInterpConstantTo(Location, TargetLocation, DeltaTime, LocSpeed * OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed );
+	GetOwner()->SetActorLocation(Location);
+	if(abs(Location.X - TargetLocation.X) < 0.01f && abs(Location.Y - TargetLocation.Y) < 0.01f) 
+	{
+		ComboMoveStop();
+	}
+}
+
+void UAPMovementComponent::ComboMovement()
+{
+	if(!OwnerCharacter.IsValid()) return;
+	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
+	int32 Section = OwnerAnim->GetAttackSection();
+
+	switch (Section)
+	{
+		case 2:
+		TargetLocation = OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector() * Combo_2_Distance;
+		LocSpeed = Combo_2_Speed;
+		break;
+	
+		case 3:
+		TargetLocation = OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector() * Combo_3_Distance;
+		LocSpeed = Combo_3_Speed;
+		break;
+	}
+	
+	bMove = true;
 	SetComponentTickEnabled(true);
 }
 
-void UAPMovementComponent::AnimMoveStop()
+void UAPMovementComponent::ComboMoveStop()
 {
-	SetComponentTickEnabled(false);
+	bMove = false;
+}
+
+void UAPMovementComponent::RotateMovement()
+{
+	bRotation = true;
+	SetComponentTickEnabled(true);
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+}
+
+void UAPMovementComponent::RotateMoveStop()
+{
+	bRotation = false;
 }
 
 void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float Speed)
 {
-	SetComponentTickEnabled(true);
+	Current = GetOwner()->GetActorRotation();
 	TargetRot = NewTargetRot;
-	if(Speed < 1.0f) return;
-	if(abs(Speed - RotSpeed)  >= 1.0f) RotSpeed = Speed;
+	if(Speed < 1.0f) {RotSpeed = InitRotSpeed;}
+	else if(abs(Speed - RotSpeed)  >= 1.0f) RotSpeed = Speed;
+	// SetComponentTickEnabled(true);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UAPMovementComponent::RotateMovement, 0.0001f, false);
 }
+

@@ -22,53 +22,73 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// void SetSkillAbility(TArray<ESkillAbility> SkillAbility, ESkillCategory UpdateSkillCategory);
+	// Coefficient Calculate
+	void Coefficient_Add(float &Current, float Add, uint16 NestingNum);
+	void Coefficient_Add(int32 & Current, float Add, uint16 NestingNum);
+	float Coefficient_Add_Return(float Current, float Add, uint16 NestingNum);
+	int32 Coefficient_Add_Return(int32 Current, float Add, uint16 NestingNum);
 
-private:
+	void Coefficient_Multiple(float &Current, float Coefficient, uint16 NestingNum);
+	float Coefficient_Multiple_Return(float Current, float Coefficient, uint16 NestingNum);
+	
+	void Coefficient_AddMultiple(float &Current, float Coefficient, uint16 NestingNum);
+	void Coefficient_AddMultiple(int32 &Current, float Coefficient, uint16 NestingNum);
+	void Coefficient_SubtractMultiple(float &Current, float Coefficient, uint16 NestingNum);
+
 	// Gigant
-	void SetOwnerScale();
+	void GigantGradually(float Coefficient, uint16 NestingNum);
+	float SizeUp_Multiple(float Coefficient, uint16 NestingNum);
+	// void SetOwnerScale();
 
-	// Homing
-	void SetHoming();
+	// // Homing
+	// void SetHoming();
 
-	void Accelrating();
+	// void Accelrating();
 
-	void SetProjectileMove();
-	void SetTraceActor(AActor* OverlapActor = nullptr);
-	void SetProjectileValue();
-	UFUNCTION()
-	void HomingEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
-	void ProjectileHoming(float DeltaTime);
+	// void SetProjectileMove();
+	// void SetTraceActor(AActor* OverlapActor = nullptr);
+	// void SetProjectileValue();
+	// UFUNCTION()
+	// void HomingEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+	// void ProjectileHoming(float DeltaTime);
 
-	void AddImpulse(); //  Physics 활성화므로 Impulse 추가로 유도 활성화
+	// void AddImpulse(); //  Physics 활성화므로 Impulse 추가로 유도 활성화
 
-	// Stun
-	void SetStun();
+	// // Stun
+	// void SetStun();
 
 public:
-	UPROPERTY(EditAnywhere)
-	UProjectileMovementComponent* OwnerProjectileMove;
+	// UPROPERTY(EditAnywhere)
+	// UProjectileMovementComponent* OwnerProjectileMove;
 	
-	UPROPERTY(EditAnywhere)
-	UProjectileMovementComponent* OriginProjectileMoveComp;
+	// UPROPERTY(EditAnywhere)
+	// UProjectileMovementComponent* OriginProjectileMoveComp;
 
-	float OriginProjectileSpeed = 0.0f;
+	// float OriginProjectileSpeed = 0.0f;
 
-	bool bTriggerOn = false;
+	// bool bTriggerOn = false;
 
-	bool Init = true;
+	// bool Init = true;
 
-	UPROPERTY()
-	TArray<AActor*> Actors;
+	// UPROPERTY()
+	// TArray<AActor*> Actors;
 
-	TWeakObjectPtr<AActor> TraceActor;
+	// TWeakObjectPtr<AActor> TraceActor;
 
-	FTimerHandle AccelerateTimerHandle;
+	// FTimerHandle AccelerateTimerHandle;
 
-	float TraceSpeed = 1000.0f;
+	// float TraceSpeed = 1000.0f;
 
-	float HomingTime = 0.15f;
+	// float HomingTime = 0.15f;
 
-	ESkillCategory SkillCategory = ESkillCategory::None;
+	// ESkillCategory SkillCategory = ESkillCategory::None;
 
+	/* version 04.03 */
+	
+	// Gigant
+	float GigantCoefficient = 1.0f;
+	FVector CurrentScale;
+	FVector TargetScale;
+
+	// 
 };

@@ -18,13 +18,20 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void DestroySKill() override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
-
-	void Explosion(AActor* OtherActor);
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	
+	void SetTarget(FVector TargetComponent);
+	FORCEINLINE void SetExplosionRadius(float NewRadius) {ExplosionRadius = NewRadius;};
+	FORCEINLINE bool IsExploaionEnable() const {return bExploaionEnable;};
+	void Explosion();
 
 private:
 	UFUNCTION()
@@ -49,12 +56,21 @@ private:
 	UPROPERTY(EditAnywhere)
 	float MineSpeed = 750.0f;
 
-	UPROPERTY(EditAnywhere)
 	float ExplosionRadius = 250.0f;
 
 	UPROPERTY(EditAnywhere)
-	uint8 HitNumbers = 3;
+	FVector ExplosionScale = FVector(1.0f, 1.0f, 1.0f);
 
 	UPROPERTY(EditAnywhere)
-	FVector ExplosionScale = FVector(1.0f, 1.0f, 1.0f);
+	float DOT = 2.0f;
+	UPROPERTY(EditAnywhere)
+	float DOT_Time = 10.1f;
+	UPROPERTY(EditAnywhere)
+	float DOT_InRate = 2.0f;
+
+	bool bExploaionEnable = false;
+
+	FVector CurrentLocation;
+	FVector TargetLocation;
+
 };

@@ -21,7 +21,7 @@ public:
 
 	FORCEINLINE void SetKnockBackVec(FVector NewValue) {KnockBackVec =  NewValue;};
 	FORCEINLINE void SetKnockBackDist(float NewValue) {KnockBackDist =  NewValue;};
-	FORCEINLINE void SetSlowCoefficient(float NewValue) {SlowCoefficient =  NewValue;};
+	FORCEINLINE void SetSlowPercent(uint8 NewValue) {SlowPercent =  NewValue;};
 
 private:
 
@@ -29,6 +29,6 @@ private:
 
 	float KnockBackDist = 0.0f;
 
-	float SlowCoefficient = 0.0f;
+	uint8 SlowPercent = 0;
 
 };

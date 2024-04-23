@@ -22,7 +22,10 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
-	
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+
 	virtual void DestroySKill() override;	
 
 private:
@@ -30,6 +33,12 @@ private:
 
 	void SetFieldDebuff();
 	void SetFieldDamage();
+
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+	UFUNCTION()
+	void OnEndOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex);
+	void BindOverlap();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -43,7 +52,7 @@ private:
 
 	FTimerHandle FieldTimerHandle;
 	FTimerHandle DamageTimerHandle;
-
+	
 	UPROPERTY(EditAnywhere)
 	float DebuffRateTime = 1.25f;
 
@@ -52,6 +61,5 @@ private:
 
 	TWeakObjectPtr<AArcanePunkCharacter> Character;
 
-	UPROPERTY(EditAnywhere)
-	float SlowCoefficient = 0.5f;
+	float FieldDamage;
 };

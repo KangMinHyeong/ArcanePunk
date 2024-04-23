@@ -118,10 +118,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Possess")
 	AEnemyBaseAIController* MonsterAIController;
 	
-	// Boss Status 관련 변수
-	UPROPERTY(EditAnywhere, Category = "Status")
-	float DefaultSpeed = 0.0f;
-
 	// Boss Effect 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	UParticleSystemComponent* RushEffect;

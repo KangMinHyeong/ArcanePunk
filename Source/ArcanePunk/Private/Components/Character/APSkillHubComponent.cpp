@@ -1,20 +1,13 @@
 #include "Components/Character/APSkillHubComponent.h"
 
-// #include "Components/Character/APSkillBaseQ.h"
-// #include "Components/Character/APSkillBaseE.h"
-// #include "Components/Character/APSkillBaseShift.h"
-// #include "Components/Character/APSkillBaseSpace.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "UserInterface/APHUD.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
 
 UAPSkillHubComponent::UAPSkillHubComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// SkillNumComp = CreateDefaultSubobject<UAPSkillNumber>(TEXT("SkillNumComp"));
-	// QComp = CreateDefaultSubobject<UAPSkillBaseQ>(TEXT("QComp"));
-	// EComp = CreateDefaultSubobject<UAPSkillBaseE>(TEXT("EComp"));
-	// SpaceComp = CreateDefaultSubobject<UAPSkillBaseSpace>(TEXT("SpaceComp"));
 }
 
 void UAPSkillHubComponent::BeginPlay()
@@ -23,6 +16,7 @@ void UAPSkillHubComponent::BeginPlay()
 
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->OnAutoRecoveryMPDelegate.AddUObject(this, &UAPSkillHubComponent::AutoRecoveryMP);
+	OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerCharacterPC.IsValid()) return;
 }
 
 void UAPSkillHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -32,7 +26,6 @@ void UAPSkillHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UAPSkillHubComponent::PressQ()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->GetDoing()) return;
 
@@ -55,7 +48,6 @@ void UAPSkillHubComponent::PressQ()
 
 void UAPSkillHubComponent::PressE()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->GetDoing()) return;
 
@@ -78,7 +70,6 @@ void UAPSkillHubComponent::PressE()
 
 void UAPSkillHubComponent::PressSpace() // R
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->GetDoing()) return;
 
@@ -160,25 +151,22 @@ ESkillKey UAPSkillHubComponent::GetSkillState()
 
 void UAPSkillHubComponent::PlayBasicSkill()
 {
-	// GetWorld()->GetTimerManager().ClearTimer(SkillCancleTimerHandle);
-
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter.IsValid()) return;
-
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	OwnerCharacterPC->RemoveOtherClick();
 	switch(SkillState)
 	{
 		case ESkillKey::Q:
-		if(OwnerCharacter->GetQSkillNumber()) OwnerCharacter->GetQSkillNumber()->PlaySkill(SkillState);
+		if(OwnerCharacter->GetQSkillNumber()) OwnerCharacter->GetQSkillNumber()->PlaySkill();
 		// CastSkillNumber(OwnerCharacter->GetQSkill(), ESkillKey::Q);
 		break;
 
 		case ESkillKey::E:
-		if(OwnerCharacter->GetESkillNumber()) OwnerCharacter->GetESkillNumber()->PlaySkill(SkillState);
+		if(OwnerCharacter->GetESkillNumber()) OwnerCharacter->GetESkillNumber()->PlaySkill();
 		// CastSkillNumber(OwnerCharacter->GetESkill(), ESkillKey::E);
 		break;
 
 		case ESkillKey::R:
-		if(OwnerCharacter->GetRSkillNumber()) OwnerCharacter->GetRSkillNumber()->PlaySkill(SkillState);
+		if(OwnerCharacter->GetRSkillNumber()) OwnerCharacter->GetRSkillNumber()->PlaySkill();
 		// CastUltSkillNumber(OwnerCharacter->GetRSkill(), ESkillKey::R);
 		break;
 
@@ -389,10 +377,27 @@ void UAPSkillHubComponent::UpdateSkill_Q()
 		case ESkillNumber::Skill_14:
 		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber14>(GetOwner()));
 		break;
+
+		case ESkillNumber::Skill_15:
+		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber15>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_16:
+		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber16>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_17:
+		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber17>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_18:
+		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber18>(GetOwner()));
+		break;
 	}
 	if(!OwnerCharacter->GetQSkillNumber()) return;
 	OwnerCharacter->GetQSkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetQSkillNumber()->RegisterComponent();
+	OwnerCharacter->GetQSkillNumber()->SkillKey = ESkillKey::Q;
 	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::Q, (uint8)OwnerCharacter->GetQSkill());
 }
 
@@ -458,10 +463,27 @@ void UAPSkillHubComponent::UpdateSkill_E()
 		case ESkillNumber::Skill_14:
 		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber14>(GetOwner()));
 		break;
+
+		case ESkillNumber::Skill_15:
+		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber15>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_16:
+		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber16>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_17:
+		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber17>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_18:
+		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber18>(GetOwner()));
+		break;
 	}
 	if(!OwnerCharacter->GetESkillNumber()) return;
 	OwnerCharacter->GetESkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetESkillNumber()->RegisterComponent();
+	OwnerCharacter->GetESkillNumber()->SkillKey = ESkillKey::E;
 	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::E, (uint8)OwnerCharacter->GetESkill());
 }
 
@@ -476,11 +498,70 @@ void UAPSkillHubComponent::UpdateSkill_R()
 		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_1>(GetOwner()));
 		break;
 
+		case EUltSkillNumber::UltSkill_2:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_2>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_3:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_3>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_4:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_4>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_5:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_5>(GetOwner()));
+		break;
 		
+		case EUltSkillNumber::UltSkill_6:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_6>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_7:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_7>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_8:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_8>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_9:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_9>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_10:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_10>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_11:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_11>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_12:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_12>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_13:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_13>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_14:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_14>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_15:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_15>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_16:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_16>(GetOwner()));
+		break;
 	}
 	if(!OwnerCharacter->GetRSkillNumber()) return;
 	OwnerCharacter->GetRSkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetRSkillNumber()->RegisterComponent();
+	OwnerCharacter->GetRSkillNumber()->SkillKey = ESkillKey::R;
 	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::R, (uint8)OwnerCharacter->GetRSkill());
 }
 
@@ -503,14 +584,14 @@ USkillNumberBase* UAPSkillHubComponent::GetSKillNumberComponent(ESkillNumber Ski
 
 void UAPSkillHubComponent::AutoRecoveryMP()
 {
-	if(Proceeding) {UE_LOG(LogTemp, Display, TEXT("Your a")); return;}
-	else {Proceeding = true; UE_LOG(LogTemp, Display, TEXT("Your b"));}
+	if(Proceeding) {return;}
+	else {Proceeding = true; }
 	GetWorld()->GetTimerManager().SetTimer(RecoveryMPTimerHandle, this, &UAPSkillHubComponent::RecoveryMP, RecoveryTime_MP, true);	
 }
 
 void UAPSkillHubComponent::RecoveryMP()
 {
-	if(!OwnerCharacter.IsValid()) return; auto PD = OwnerCharacter->GetPlayerStatus();
+	if(!OwnerCharacter.IsValid()) return; const auto PD = OwnerCharacter->GetPlayerStatus();
 	
 	if(PD.PlayerDynamicData.MaxMP == PD.PlayerDynamicData.MP)
 	{
