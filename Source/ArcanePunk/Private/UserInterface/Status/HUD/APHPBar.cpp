@@ -1,0 +1,48 @@
+
+#include "UserInterface/Status/HUD/APHPBar.h"
+
+#include "Character/ArcanePunkCharacter.h"
+#include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
+
+void UAPHPBar::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
+    const auto PD = OwnerCharacter->GetPlayerStatus();
+
+    HPBar->SetPercent(PD.PlayerDynamicData.HP / PD.PlayerDynamicData.MaxHP); OriginHP = PD.PlayerDynamicData.HP;
+    TEXT_CurrentMaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(PD.PlayerDynamicData.MaxHP))));
+    TEXT_CurrentHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
+
+}
+
+void UAPHPBar::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry, InDeltaTime);
+
+    if(bChange) UpdatePercentBar(InDeltaTime);
+}
+
+
+void UAPHPBar::SetHPPercent(float Origin)
+{
+    if(!OwnerCharacter.IsValid()) return; const auto PD = OwnerCharacter->GetPlayerStatus();
+
+    OriginHP = Origin;
+
+    if(OriginHP != PD.PlayerDynamicData.HP) bChange = true;
+}
+
+void UAPHPBar::UpdatePercentBar(float InDeltaTime)
+{
+    if(!OwnerCharacter.IsValid()) return; const auto PD = OwnerCharacter->GetPlayerStatus();
+    // if(OriginHP == PD.PlayerDynamicData.HP) {bChange = false; return;}
+
+    OriginHP = FMath::FInterpConstantTo(OriginHP, PD.PlayerDynamicData.HP, InDeltaTime, BarSpeed);
+    HPBar->SetPercent(OriginHP / PD.PlayerDynamicData.MaxHP);
+    TEXT_CurrentMaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(PD.PlayerDynamicData.MaxHP))));
+    TEXT_CurrentHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
+    // MPBar->SetPercent(PD.PlayerDynamicData.MP / PD.PlayerDynamicData.MaxMP);
+}

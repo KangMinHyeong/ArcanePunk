@@ -16,7 +16,8 @@ class ARCANEPUNK_API UAPMouseClickBase : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void InputSkillInfo(ESkillNumber UpdateSkillNumber);
+	void InputSkillInfo(ESkillNumber UpdateSkillNumber, bool Loop = false);
+	void InputSkillInfo_Ult(bool Loop = false);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -37,4 +38,7 @@ private:
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 
 	TWeakObjectPtr<AArcanePunkPlayerController> OwnerCharacterPC;
+
+	bool UltMode = false;
+	bool bLoop = false;
 };

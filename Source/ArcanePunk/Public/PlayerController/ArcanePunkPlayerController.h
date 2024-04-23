@@ -38,6 +38,8 @@ public:
 	void StartFadeOut();
 	void StartLoading();	
 
+	void SetMouseCursor();
+	
 	// Stage Enter UI
 	void CreateEntranceUI();
 
@@ -62,8 +64,10 @@ public:
 
 	void DisplayHomingUI(ESkillNumber SkillNumber);
 	void ReturnToDefault();
-	void PreventOtherClick(ESkillNumber SkillNumber);
-
+	void PreventOtherClick(ESkillNumber SkillNumber, bool Loop = false);
+	void PreventOtherClick_Ult( bool Loop = false);
+	void RemoveOtherClick();
+	
 	// Arcane Tent
 	void SetHideUI(bool NewBool);
 
@@ -88,7 +92,6 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 
 private:
-	void SetMouseCursor();
 	void LookStatus();
 	void FreeCameraMode();
 

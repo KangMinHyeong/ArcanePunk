@@ -62,6 +62,9 @@ public:
 
 	void SetHitPoint(float Forward, float Right);
 
+	FORCEINLINE float GetDamageMultiple() const {return DamageMultiple;};
+	void SetDamageMultiple(float Multiple, float Time);
+
 	// 몬스터 Attack 관련 함수
 	virtual void PossessedBy(AController* NewController) override;
 	void NormalAttack();
@@ -75,6 +78,7 @@ public:
 	bool AttackPushBack(FVector NewLocation);
 
 	FORCEINLINE float GetMonsterATK() const { return Monster_ATK;}; //Monster_ATK 반환
+	FORCEINLINE void SetMonsterATK(float NewValue) { Monster_ATK = NewValue;}; //Monster_ATK 설정
 	FORCEINLINE bool IsCriticalAttack() const {return bCriticalAttack;};
 
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
@@ -101,8 +105,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsHardCC();
 
+	FORCEINLINE float GetDefaultSpeed() const {return DefaultSpeed;}; // DefaultSpeed 반환;
+
 	// 몬스터 어그로
 	AActor* IsAggro();
+
+	// 흡혈 영역
+	FORCEINLINE bool IsInDrainField() const {return InDrainField;}; // InDrainField 반환;
+	FORCEINLINE void AddInDrainField(bool NewBool) { InDrainField = NewBool;};
 
 protected:
 	float DamageMath(float Damage);
@@ -135,6 +145,9 @@ protected:
 	void OnPlayerStun(AActor *Actor, float Time);
 	void CrowdControlCheck();
 
+	// 데미지 배수 관련 함수
+	void MultipleEnd(FTimerHandle* TimerHandle, float Multiple);
+
 protected:
 	//Component
 	UPROPERTY(EditAnywhere, Category = "Component")
@@ -148,6 +161,9 @@ protected:
 	float MaxHP = 100.0f;
 
 	float HP = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Status")
+	float DefaultSpeed = 400.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	UWidgetComponent* HealthWidgetComp;
@@ -266,6 +282,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> DamageTextClass;
+
+	float DamageMultiple = 1.0f;
+
+	bool InDrainField = false;
 
 public:
 	FOnHPChanged OnEnemyHPChanged;

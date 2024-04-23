@@ -50,18 +50,13 @@ void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, 
 	{
 		if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 		HitPointComp->DistinctHitPoint(Hit.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		
+		float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, Hit, true);
+		OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
+		// UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetCurrentATK()* OwnerCharacter->CriticalCalculate() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
         // HitImpact & DestroyEffect
 	}
     Destroy();
-}
-
-void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
-{
-    Super::SetSkill(SkillAbilityNestingData);
-
-	CutterEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
-	BintHit();
 }
 
 float AArcaneCutter::GetCutterSpeed() const
@@ -88,4 +83,13 @@ void AArcaneCutter::BintHit()
 {
     // CutterTrigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
     CutterTrigger->OnComponentHit.AddDynamic(this, &AArcaneCutter::OnHitting);
+}
+
+void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+{
+    Super::SetSkill(SkillAbilityNestingData);
+
+	CutterEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+	BintHit();
+	CutterTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 }

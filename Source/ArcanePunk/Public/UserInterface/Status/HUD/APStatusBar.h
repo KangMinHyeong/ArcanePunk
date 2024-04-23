@@ -7,7 +7,6 @@
 #include "Blueprint/UserWidget.h"
 #include "APStatusBar.generated.h"
 
-class UProgressBar;
 class AAPHUD;
 class AArcanePunkCharacter;
 class UHorizontalBox;
@@ -16,7 +15,8 @@ class UWidgetAnimation;
 class UAPMPBar;
 class UAPSkillSlot;
 class UAPUltSkillSlot;
-class UTextBlock;
+class UAPHPBar;
+class UAPSkillChargingGauge;
 
 UCLASS()
 class ARCANEPUNK_API UAPStatusBar : public UUserWidget
@@ -25,33 +25,30 @@ class ARCANEPUNK_API UAPStatusBar : public UUserWidget
 public:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	void InitStatusBar();
+	
 	void SetHPPercent(float Origin);
-	void UpdatePercentBar(float InDeltaTime);
+
 	void UpdateMPBar(uint8 Number, bool bUse = true);
 	void RecoveryMP(uint8 Number);
-
 	void IncreaseMaxMP(uint8 Number);
 
 	void UpdateSkillSlot(ESkillKey SkillKey, uint8 SkillNumber);
 	void OperateSkillSlot(ESkillKey SkillKey);
 	void HightLightSkillSlot(ESkillKey SkillKey);
 	void UsingSkillSlot(ESkillKey SkillKey, bool NewBool);
-
+	void StartCoolTimeSlot(ESkillKey SkillKey);
+	void CheckChargeTime(ESkillKey SkillKey);
+	void ChargeGauge(float Currnet, float Max);
+	void ChargeEnd(bool Start);
+	
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UProgressBar* HPBar;
+	UAPHPBar* APHPBar;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UHorizontalBox* MPBar;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* TEXT_CurrentHP;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* TEXT_CurrentMaxHP;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPSkillSlot* QSkillSlot;
@@ -62,18 +59,15 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPUltSkillSlot* RSkillSlot;
 
-	float OriginHP = 0.0f;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UAPSkillChargingGauge* SkillChargingGauge;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 
 	TWeakObjectPtr<AAPHUD>  HUD;
 
-	bool bChange = false;
-
-	UPROPERTY(EditAnywhere)
-	float BarSpeed = 3.0f;
-
 	TArray<UAPMPBar*> MPSpaces;
+	TArray<UAPMPBar*> Remain_MPBars;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAPMPBar> MPBarClass;

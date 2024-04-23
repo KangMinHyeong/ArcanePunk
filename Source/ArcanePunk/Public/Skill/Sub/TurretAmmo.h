@@ -55,7 +55,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AmmoSpeed = 1200.0f;
 
-	UPROPERTY(EditAnywhere)
-	float DamageCoefficient = 1.0f;
-
 };

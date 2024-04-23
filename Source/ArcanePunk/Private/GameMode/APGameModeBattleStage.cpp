@@ -12,12 +12,15 @@
 void AAPGameModeBattleStage::MonsterKilled()
 {
     if(RemainMonsterNumber > 0) RemainMonsterNumber--;
+
+    uint16 MonsterRemain = 0;
     for(AEnemy_CharacterBase* Enemy : TActorRange<AEnemy_CharacterBase>(GetWorld()))
     {
-       if(!Enemy->IsDead()) return;
+       if(!Enemy->IsDead()) {MonsterRemain++; continue;}
+       else {OnMonsterKilled.Broadcast();}
     }   
 
-    EndBattleSection();	
+    if(MonsterRemain == 0) EndBattleSection();	
 }
 
 void AAPGameModeBattleStage::PlayerKilled()

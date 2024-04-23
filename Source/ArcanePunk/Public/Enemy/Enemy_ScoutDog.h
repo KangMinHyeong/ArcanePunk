@@ -27,7 +27,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+	void Test();
 private:
 	UPROPERTY(EditAnywhere)
 	UCapsuleComponent* RushTrigger;

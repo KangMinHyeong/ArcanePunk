@@ -8,6 +8,7 @@
 
 class UPoseableMeshComponent;
 class UMaterialInstance;
+class AArcanePunkCharacter;
 
 UCLASS()
 class ARCANEPUNK_API AAPGhostTrail : public AActor
@@ -24,8 +25,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void InitPose(USkeletalMeshComponent* OwnerCharacterMesh);
+	void InitSkillPose(USkeletalMeshComponent* OwnerCharacterMesh, float TraceTime);
+	void InitSkillPoseFirst(USkeletalMeshComponent* OwnerCharacterMesh, float TraceTime);
 private:
-
+	void OnDestory();
+	void SetVisibility();
+	
 private:
 	UPROPERTY(EditAnywhere)
 	UPoseableMeshComponent* PoseableMesh;	//메쉬의 포즈정보만 복사해오는 컴포넌트
@@ -39,5 +44,16 @@ private:
 	float Opacity = 5.0f;
 
 	UPROPERTY(EditAnywhere)
+	float DefaultOpacity = 0.75f;
+
+	UPROPERTY(EditAnywhere)
 	float FadeOutSpeed = 2.0f;
+
+	FTimerHandle TimerHandle;
+
+	bool bSkillTrail = false;
+
+	bool bRunTrail = false;
+
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 };

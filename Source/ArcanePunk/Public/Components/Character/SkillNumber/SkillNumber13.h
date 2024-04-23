@@ -13,15 +13,21 @@ UCLASS()
 class ARCANEPUNK_API USkillNumber13 : public USkillNumberBase
 {
 	GENERATED_BODY()
+public:	
+	USkillNumber13();
 protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
+	virtual void PlaySkill() override;
 
 	virtual void OnSkill() override;
 
 	virtual void Activate_Skill() override;
+
+	virtual void SkillEnd() override;
+
+	virtual void UpdateSkillData() override;
 
 private:
 	virtual void AddAbilityList() override;	

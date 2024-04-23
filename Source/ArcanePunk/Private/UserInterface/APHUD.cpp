@@ -7,6 +7,7 @@
 #include "UserInterface/APTuTorialUserWidget.h"
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 #include "UserInterface/Inform/APStageInformationUI.h"
+#include "UserInterface/EnhanceUI/EnhanceGauge.h"
 
 AAPHUD::AAPHUD()
 {
@@ -165,14 +166,22 @@ void AAPHUD::SetBossHPUI()
 	BossHPWidget->AddToViewport(-1);
 }
 
-void AAPHUD::DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType)
+void AAPHUD::DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance)
 {
 	if(!EnhanceChoiceClasses[(uint8)UpdateEnHanceType]) return;
 
-	auto EnhanceUI = CreateWidget<UAPEnhanceChoice>(GetWorld(), EnhanceChoiceClasses[(uint8)UpdateEnHanceType]);
+	auto EnhanceUI = CreateWidget<UAPEnhanceChoice>(GetWorld(), EnhanceChoiceClasses[(uint8)UpdateEnHanceType]); if(!EnhanceUI) return;
+	if(bOnlyEnhance) EnhanceUI->SetSkillAppearPercent(0.0f);
 	EnhanceUI->InitType(EnhanceCategory, UpdateEnHanceType);
 	// ESkillTypeState, EnHanceType 의 정보를 EnhanceUI에게 넘겨주기
-	EnhanceUI->AddToViewport(-1);
+	EnhanceUI->AddToViewport(20);
+}
+
+void AAPHUD::DisplayEnhanceGauge(int32 TargetNum, int32 MaxNum)
+{
+	auto EnhanceGaugeUI = CreateWidget<UEnhanceGauge>(GetWorld(), EnhanceGaugeUIClass); if(!EnhanceGaugeUI) return;
+	EnhanceGaugeUI->DisplayEnhanceGauge(TargetNum, MaxNum);
+	EnhanceGaugeUI->AddToViewport(20);
 }
 
 void AAPHUD::OpenWorldMap()

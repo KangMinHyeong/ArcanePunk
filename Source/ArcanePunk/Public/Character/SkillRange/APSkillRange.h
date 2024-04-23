@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Interfaces/SkillInterface.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/Actor.h"
@@ -11,6 +12,7 @@
 class UMaterialInterface;
 class AArcanePunkPlayerController;
 class AArcanePunkCharacter;
+class UDecalComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPSkillRange : public AActor, public ISkillInterface
@@ -27,9 +29,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UDecalComponent* GetDecalComponent() {return RangeDecal;};
-	
+	USceneComponent* GetRootComponent() const {return RootComp;};
+
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
+	void SetAngle(float AngleSize);
 
 	FORCEINLINE float GetMaxDist() const {return MaxDistance;};
 	FORCEINLINE void SetMaxDist(float MaxDist) {MaxDistance = MaxDist;};
@@ -37,15 +41,17 @@ public:
 	FORCEINLINE float GetTargetWide() {return RangeDecal->DecalSize.Y * (GetActorScale3D().Z / DefaultSize);};
 	FORCEINLINE bool GetbStun() const {return bStun;};
 	FORCEINLINE void SetWide(float NewValue) {Wide = NewValue;};
-
+	FORCEINLINE void SetSkillRangeType(ESkillRangeType NewValue) {SkillRangeType = NewValue;};
+	FORCEINLINE void SetMouseControll(bool NewBool) {Targeting = NewBool;};
+	
 	// FORCEINLINE void SetHideAndTargeting(bool NewBool) {Targeting = !NewBool; }; // SetHideAndTargeting
 
 protected:
 	UPROPERTY(EditAnywhere)
-	class USceneComponent* RootComp;
+	USceneComponent* RootComp;
 
 	UPROPERTY(EditAnywhere)
-	class UDecalComponent* RangeDecal;
+	UDecalComponent* RangeDecal;
 
 	float DefaultSize;
 
@@ -62,6 +68,8 @@ protected:
 	float TargetDistance = 0.0f;
 
 	float Wide = 0.0f;	
+
+	ESkillRangeType SkillRangeType = ESkillRangeType::None;
 
 public:
 	TWeakObjectPtr<UMaterialInterface> DefaultDecal;

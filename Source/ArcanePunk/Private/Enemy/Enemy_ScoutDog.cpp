@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AEnemy_ScoutDog::AEnemy_ScoutDog()
 {
@@ -21,12 +22,20 @@ void AEnemy_ScoutDog::BeginPlay()
 
     RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     RushTrigger->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_ScoutDog::OnOverlapping);
+    FTimerHandle DamageTimerHandle;
+    // GetWorld()->GetTimerManager().SetTimer(DamageTimerHandle, this, &AEnemy_ScoutDog::Test, 0.3f, true);
+}
+
+void AEnemy_ScoutDog::Test()
+{
+    UE_LOG(LogTemp, Display, TEXT("Monster_ATK %f"), DamageMultiple);
+    UE_LOG(LogTemp, Display, TEXT("Monster_Speed %f"), GetCharacterMovement()->MaxWalkSpeed);
 }
 
 void AEnemy_ScoutDog::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+    
     CurrentLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, DeltaTime, InterpSpeed);
     SetActorLocation(CurrentLocation);
     if(abs(CurrentLocation.X - TargetLocation.X )< 1.0f && abs(CurrentLocation.Y - TargetLocation.Y) < 1.0f) 

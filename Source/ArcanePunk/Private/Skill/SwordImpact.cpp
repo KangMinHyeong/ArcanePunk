@@ -31,6 +31,7 @@ ASwordImpact::ASwordImpact()
 void ASwordImpact::BeginPlay()
 {
 	Super::BeginPlay();
+	SlowPercent = 50;
 }
 
 void ASwordImpact::Tick(float DeltaTime)
@@ -73,7 +74,10 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 		{
 			if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
 			HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
-			UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetFinalATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+			
+			float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, HitResult, true);
+		    OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
+			// UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetCurrentATK()* OwnerCharacter->CriticalCalculate() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 			if(HitEffect && OtherActor->ActorHasTag(TEXT("Enemy")))
 			{
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
@@ -100,7 +104,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 void ASwordImpact::SlowPlayer(AActor *OtherActor)
 {
 	OwnerCharacter = Cast<AArcanePunkCharacter>(OtherActor);
-	if(OwnerCharacter.IsValid()) OwnerCharacter->GetCrowdControlComponent()->SlowState(SlowCoefficient, StateTime);
+	if(OwnerCharacter.IsValid()) OwnerCharacter->GetCrowdControlComponent()->SlowState(SlowPercent, StateTime);
 }
 
 void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
@@ -120,4 +124,5 @@ void ASwordImpact::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
 
 	BaseEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
 	BintHit();
+	ImpactComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }

@@ -49,6 +49,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RainRadius = 550.0f;
 
-	UPROPERTY(EditAnywhere)
-	uint8 HitNumbers = 3;
 };

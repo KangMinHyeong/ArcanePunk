@@ -42,7 +42,7 @@ void AEnemy_Boss::BeginPlay()
     RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     BindMontageEnd();
     BindRushAttack();
-    DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
     // SetHPUI();
 }
 

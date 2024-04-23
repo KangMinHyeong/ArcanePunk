@@ -20,9 +20,14 @@ public:
 protected:
 	virtual void BeginPlay() override;	
 	
+	void ApplyRecovery();
+
 public:
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
-
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	
 	virtual void DestroySKill() override;
 	
 	void SetRageMode();
@@ -34,4 +39,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	UParticleSystemComponent* RageEffect;	
 
+	bool bPluslusInstantDeath = false;
+	float PlusInstantDeathPercent = 0.0f;
+
+	uint8 ReflectingModeGauge = 0;
+
+	bool bHPRecovery = false;
+	float HPRecoveryPercent = 0.0f;
 };

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameInstance/APGameInstance.h"
 #include "Components/SkillActor/APSkillType.h"
 #include "Components/SkillActor/APSkillAbility.h"
 #include "Interfaces/SkillInterface.h"
@@ -10,6 +11,18 @@
 #include "Components/Character/APHitPointComponent.h"
 #include "GameFramework/Actor.h"
 #include "APSkillActorBase.generated.h"
+
+UENUM(BlueprintType)
+enum class EBuffType : uint8
+{
+	None		 = 0,
+    Speed		 = 1,
+    ATKSpeed     = 2,
+	ATK			 = 3,
+	Damage		 = 4,
+};
+
+class AEnemy_CharacterBase;
 
 UCLASS()
 class ARCANEPUNK_API AAPSkillActorBase : public AActor, public ISkillInterface
@@ -22,11 +35,26 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void DestroySKill();
+		
 	void DeActivate(ESkillNumber SkillNumber);
+	void DeActivate_Ult();
 
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum);
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum);
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum);
+	
+	void HitDelay(AActor* DamagedActor, float Damage, uint8 HitNums, float DelayTime, bool bCriticalApply);
+
+	void HomingOrderSet();
+
+	void CheckBuff(bool NewBool);
+	bool CheckSkillKey(USkillNumberBase* SkillNum);
+	void SetPlayerCollisionEnable(bool NewBool);
+	
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void OnCharging();
 
 	FORCEINLINE void SetbStun(bool NewBool) {bStun = NewBool;};
 	FORCEINLINE bool IsSkillTypeMaterial(ESkillTypeState SkillType) const {return SkillTypeMaterial.Contains(SkillType);};
@@ -34,6 +62,10 @@ public:
 	FORCEINLINE bool IsEffectColor(ESkillTypeState SkillType) const {return SkillTypeColor.Contains(SkillType);};
 	FORCEINLINE FLinearColor GetEffectColor(ESkillTypeState SkillType) const {return SkillTypeColor[SkillType];};
 	FORCEINLINE void SetEffectColor(FLinearColor NewColor) {EffectColor = NewColor;};
+	FORCEINLINE float GetStateTime() const {return StateTime;};
+	FORCEINLINE float GetDamage() const {return CurrentDamage;};
+	FORCEINLINE bool IsSlow() const {return bSlow;};
+	virtual void SetDeadTime(float DeadTime);
 
 protected:
 	FTimerHandle DestroyTimerHandle;
@@ -44,13 +76,26 @@ protected:
 	// UPROPERTY()
 	// UAPSkillType* SkillTypeComp;
 
-	// UPROPERTY()
-	// UAPSkillAbility* SkillAbilityComp;
+	UPROPERTY(EditAnywhere)
+	UAPSkillAbility* SkillAbilityComponent;
 
 	UPROPERTY()
 	UAPHitPointComponent* HitPointComp;
+
+	// UPROPERTY()
+	// UAPGameInstance* APGI;
+	UPROPERTY(EditAnywhere)
+	int32 SlowPercent = 0;
 	
+	bool bSlow = false;
 	bool bStun = false;
+	bool bWeak = false;
+	bool bHoming = false;
+	bool bCharging = false;
+
+	EBuffType BuffType = EBuffType::None;
+
+	float WeakCoefficient = 0.0f;
 
 	UPROPERTY(EditAnywhere)
 	float StateTime = 3.0f;
@@ -73,6 +118,38 @@ protected:
 
 	FSkillAbilityNestingData SkillAbilityData;
 
+	FSkillAbilityRowNameData* RowDataTable;
+
+	FSkillAbilityDataSheet* AbilityData;
+
+	FTimerHandle BuffTimerHandle;
+	float DamageBuff = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float FastCoefficient = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float ATKCoefficient = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float ATKSpeedCoefficient = 0.0f;
+
+	UPROPERTY()
+	TArray<AActor*> HomingActors;
+
+	UPROPERTY(EditAnywhere)
+	float HomingSpeed = 1000.0f;
+
+	float InstantDeathPercent = 0.0f;
+
+	float CurrentDamage = 0.0f;
+
+	float ChargeCurrent = 0.0f;
+	float ChargeMax = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	uint8 HitNumbers = 2;
+	
+	UPROPERTY(EditAnywhere)
+	float HitDelayTime = 0.25f;
+	
 public:
 	float DefaultSize = 1.0f;
 };

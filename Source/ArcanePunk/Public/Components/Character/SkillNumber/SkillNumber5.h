@@ -14,29 +14,25 @@ UCLASS()
 class ARCANEPUNK_API USkillNumber5 : public USkillNumberBase
 {
 	GENERATED_BODY()
+public:	
+	USkillNumber5();
 protected:
 	virtual void BeginPlay() override;
 	
 public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType = ESkillTypeState::Type_None) override;	
-
+	virtual void PlaySkill() override;
 	virtual void OnSkill() override;
-
 	virtual void Remove_Skill() override;
-
 	virtual void Activate_Skill() override;
 	virtual void SkillEnd() override;
+
+	virtual void UpdateSkillData() override;
 	
 	virtual void Enhance() override;
-
-	virtual void RemoveEffect() override;
-
+	virtual void DoubleEnhance() override;
 private:
-	virtual void AddAbilityList() override;
 	void Spawn_Skill5();
-	void OnSkill5();
-	void SpawnChargeEffect();
+	void Activate_Skill_5();
 
 private:
 	TWeakObjectPtr<AArcaneBeam> ArcaneBeam;
@@ -45,15 +41,15 @@ private:
 
 	float Skill5_Wide = 100.0f / 2.0f;
 
-	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
-	TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;
+	// TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
+	// TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;
 
-	float DamageCoefficient = 1.0f;
+	// float DamageCoefficient = 1.0f;
 
-	float MaxDamageCoefficient = 5.0f; 
+	// float MaxDamageCoefficient = 5.0f; 
 
-	float IncreasingSpeed = 0.25f; 
+	// float IncreasingSpeed = 0.25f; 
 
-	float InitIncreasingSpeed = 0.0f;
+	// float InitIncreasingSpeed = 0.0f;
 
 };

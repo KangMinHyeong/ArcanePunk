@@ -6,11 +6,16 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneField.h"
+#include "Components/Character/APSkillHubComponent.h"
+
+USkillNumber11::USkillNumber11()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_11");
+}
 
 void USkillNumber11::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_11");
 }
 
 void USkillNumber11::AddAbilityList()
@@ -19,27 +24,25 @@ void USkillNumber11::AddAbilityList()
 	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
-void USkillNumber11::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber11::PlaySkill()
 {
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
 	if(bActivate) return;
 
+	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
-	SetAbility(WhichKey);
-    SkillKey = WhichKey;
 	Skilling = true;
-	CurrentSkillType = SkillType;
 	OnSkill();
 }
 
 void USkillNumber11::OnSkill()
 {
-	Super::OnSkill();
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+    if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
 
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -50,18 +53,30 @@ void USkillNumber11::OnSkill()
 
 void USkillNumber11::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; 
-
+	if(!OwnerCharacter.IsValid()) return;
+		
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	auto ArcaneField = GetWorld()->SpawnActor<AArcaneField>(OwnerCharacter->GetArcaneFieldClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
+	auto ArcaneField = GetWorld()->SpawnActor<AArcaneField>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneFieldClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
 	
     if(!ArcaneField) return;
-	ArcaneField->SetOwner(OwnerCharacter);
+	ArcaneField->SetOwner(OwnerCharacter.Get());
 	ArcaneField->SetSkill(SkillAbilityNestingData);	
-    
+    Skilling = false;
+}
+
+void USkillNumber11::SkillEnd()
+{
+	bActivate = false; 
+	
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+}
+
+void USkillNumber11::UpdateSkillData()
+{
 }

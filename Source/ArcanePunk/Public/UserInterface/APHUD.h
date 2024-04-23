@@ -18,8 +18,12 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateMPBar, uint8, bool);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateSkillSlot, ESkillKey, uint8);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnOperateSkill, ESkillKey);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartCoolTime, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHightLightSkill, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUsingSkill, ESkillKey, bool);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCheckChargeNum, ESkillKey);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChargingGauge, float, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChargingEnd, bool);
 
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
@@ -67,7 +71,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UUserWidget* GetStatusWidget() const {return StatusBarWidget.Get();};
 
-	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType);
+	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance = false);
+	void DisplayEnhanceGauge(int32 TargetNum, int32 MaxNum);
 
 	void OpenWorldMap();
 
@@ -99,6 +104,9 @@ private:
 	TArray<TSubclassOf<UUserWidget>> EnhanceChoiceClasses;
 
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> EnhanceGaugeUIClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> StageInformationUIClass;
 
 	TWeakObjectPtr<UUserWidget> StatusBarWidget;
@@ -119,4 +127,12 @@ public:
 	FOnHightLightSkill OnHightLightSkill;
 
 	FOnUsingSkill OnUsingSkill;
+
+	FOnStartCoolTime OnStartCoolTime;
+
+	FOnCheckChargeNum OnChargeTime;
+
+	FOnChargingGauge OnChargingGauge;
+
+	FOnChargingEnd OnChargingEnd;
 };

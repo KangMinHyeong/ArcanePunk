@@ -88,7 +88,7 @@ struct FPlayerDynamicData
 	float ATK = 25.0f;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	int32 ATKSpeed = 1;
+	float ATKSpeed = 1.0f;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
 	float DEF = 0.0f;

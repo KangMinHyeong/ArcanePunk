@@ -23,10 +23,8 @@ void UAPAnimHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UAPAnimHubComponent::BindAttackCheck()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 
 	// MontageEnd
 	OwnerAnim->OnMontageEnded.AddDynamic(this, &UAPAnimHubComponent::PlayerMontageEnded);
@@ -34,31 +32,35 @@ void UAPAnimHubComponent::BindAttackCheck()
 
 void UAPAnimHubComponent::BindComboCheck()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	//ComboAttack
-	OwnerAnim->OnComboCheck.AddLambda([OwnerCharacter]()->void {
-		OwnerCharacter->GetAttackComponent()->ComboCheck();
+	OwnerAnim->OnComboCheck.AddLambda([this]()->void {
+		ComboCheck();
 	});
+}
+
+void UAPAnimHubComponent::ComboCheck()
+{
+	if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->GetAttackComponent()->ComboCheck();
 }
 
 void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterrupted)
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 	
 	if(Montage == OwnerAnim->Attack_A_Montage) OnAttack_A_MontageEnded();
+	else if(Montage == OwnerAnim->Combo_2_Montage) OnAttack_A_MontageEnded();
+	else if(Montage == OwnerAnim->Combo_3_Montage) OnAttack_A_MontageEnded();
 	else if(Montage == OwnerAnim->Attack_B_Montage) OnAttack_B_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_1_Montage) OnSkill_1_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_2_Montage) OnSkill_2_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_3_Montage) OnSkill_3_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_4_Montage) OnSkill_4_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_5_Montage) OnSkill_5_MontageEnded();
+	else if(Montage == OwnerAnim->Skill_5_Fire_Montage) OnSkill_5_Fire_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_6_Montage) OnSkill_6_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_7_Montage) OnSkill_7_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_8_Montage) OnSkill_8_MontageEnded();
@@ -68,16 +70,28 @@ void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterr
 	else if(Montage == OwnerAnim->Skill_12_Montage) OnSkill_12_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_13_Montage) OnSkill_13_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_14_Montage) OnSkill_14_MontageEnded();
+	else if(Montage == OwnerAnim->Skill_15_Montage) OnSkill_15_MontageEnded();
+	else if(Montage == OwnerAnim->Skill_18_Montage) OnSkill_18_MontageEnded();
 	else if(Montage == OwnerAnim->UltSkill_1_Montage) OnUltSkill_1_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_4_Montage) OnUltSkill_4_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_5_Montage) OnUltSkill_5_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_6_Montage) OnUltSkill_6_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_8_Montage) OnUltSkill_8_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_9_Montage) OnUltSkill_9_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_10_Montage) OnUltSkill_10_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_11_Montage) OnUltSkill_11_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_12_Montage) OnUltSkill_12_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_13_Montage) OnUltSkill_13_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_14_Montage) OnUltSkill_14_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_15_Montage) OnUltSkill_15_MontageEnded();
+	else if(Montage == OwnerAnim->UltSkill_Fire_Montage) OnUltSkill_Fire_MontageEnded();
 }
 
 void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 {
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter.IsValid()) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
+	if(!OwnerAnim->CheckComboEnd()) return;
 	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
 	OwnerCharacter->GetAttackComponent()->ComboAttackEnd();
 	OwnerCharacter->SetCanMove(true);
@@ -86,10 +100,7 @@ void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 
 void UAPAnimHubComponent::OnAttack_B_MontageEnded()
 {
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter.IsValid()) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	OwnerCharacter->GetAttackComponent()->SetAttack_B(false);
@@ -98,8 +109,7 @@ void UAPAnimHubComponent::OnAttack_B_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_1_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -108,8 +118,7 @@ void UAPAnimHubComponent::OnSkill_1_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_2_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -118,16 +127,14 @@ void UAPAnimHubComponent::OnSkill_2_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_3_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void UAPAnimHubComponent::OnSkill_4_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -136,29 +143,22 @@ void UAPAnimHubComponent::OnSkill_4_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_5_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
+	OwnerAnim->PlaySkill_5_Fire_Montage();
+}
+
+void UAPAnimHubComponent::OnSkill_5_Fire_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+	
 	OwnerCharacter->SetDoing(false);
-	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
-	GetWorld()->GetTimerManager().ClearTimer(OwnerAnim->Skill5_FireTimerHandle);
-	TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_5);
-	if(SkillNum.IsValid())
-	{
-		SkillNum->Remove_Skill();
-		SkillNum->RemoveEffect();
-	} 
-	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->Remove_Skill();
-	// OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumber5()->DeActiaveChargeEffect();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
 }
 
 void UAPAnimHubComponent::OnSkill_6_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -174,8 +174,7 @@ void UAPAnimHubComponent::OnSkill_6_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_7_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -184,8 +183,7 @@ void UAPAnimHubComponent::OnSkill_7_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_8_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	// OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -194,8 +192,7 @@ void UAPAnimHubComponent::OnSkill_8_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_9_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -204,8 +201,7 @@ void UAPAnimHubComponent::OnSkill_9_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_10_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -214,8 +210,7 @@ void UAPAnimHubComponent::OnSkill_10_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_11_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -224,8 +219,7 @@ void UAPAnimHubComponent::OnSkill_11_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_12_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -234,8 +228,7 @@ void UAPAnimHubComponent::OnSkill_12_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_13_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	// OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
@@ -244,22 +237,135 @@ void UAPAnimHubComponent::OnSkill_13_MontageEnded()
 
 void UAPAnimHubComponent::OnSkill_14_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
+void UAPAnimHubComponent::OnSkill_15_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UAPAnimHubComponent::OnSkill_18_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
 void UAPAnimHubComponent::OnUltSkill_1_MontageEnded()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->GetRSkillNumber()->SkillEnd();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
+}
+
+void UAPAnimHubComponent::OnUltSkill_4_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	// OwnerCharacter->GetRSkillNumber()->SkillEnd();
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
+}
+
+void UAPAnimHubComponent::OnUltSkill_5_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
+}
+
+void UAPAnimHubComponent::OnUltSkill_6_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	// OwnerCharacter->SetDoing(false);
+	// OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
+}
+
+void UAPAnimHubComponent::OnUltSkill_8_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
+}
+
+void UAPAnimHubComponent::OnUltSkill_9_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);	
+}
+
+void UAPAnimHubComponent::OnUltSkill_10_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UAPAnimHubComponent::OnUltSkill_11_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerAnim->OnUltChargeEnd.Broadcast();
+}
+
+void UAPAnimHubComponent::OnUltSkill_12_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UAPAnimHubComponent::OnUltSkill_13_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	OwnerCharacter->GetRSkillNumber()->SkillEnd();
+}
+
+void UAPAnimHubComponent::OnUltSkill_14_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UAPAnimHubComponent::OnUltSkill_15_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+
+void UAPAnimHubComponent::OnUltSkill_Fire_MontageEnded()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
+
+	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 

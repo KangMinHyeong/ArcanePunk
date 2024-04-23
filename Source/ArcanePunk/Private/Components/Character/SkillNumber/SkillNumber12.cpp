@@ -6,39 +6,42 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Skill/ArcaneRage.h"
+#include "Components/Character/APSkillHubComponent.h"
+
+USkillNumber12::USkillNumber12()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_12");
+}
 
 void USkillNumber12::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_12");
 }
 
 void USkillNumber12::AddAbilityList()
 {
 }
 
-void USkillNumber12::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber12::PlaySkill()
 {
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
 	if(bActivate) return;
 
+	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
-	SetAbility(WhichKey);
-    SkillKey = WhichKey;
 	Skilling = true;
-	CurrentSkillType = SkillType;
 	OnSkill();
 }
 
 void USkillNumber12::OnSkill()
 {
-	Super::OnSkill();
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
+    if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -48,18 +51,51 @@ void USkillNumber12::OnSkill()
 
 void USkillNumber12::Activate_Skill()
 {
-    auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return; 
-
+    if(!OwnerCharacter.IsValid()) return;
+		
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	auto ArcaneRage = GetWorld()->SpawnActor<AArcaneRage>(OwnerCharacter->GetArcaneRageClass(), OwnerCharacter->GetActorLocation() + FVector(0,0,SpawnAddLocation), OwnerCharacter->GetActorRotation(), SpawnParams);
+	auto ArcaneRage = GetWorld()->SpawnActor<AArcaneRage>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneRageClass(), OwnerCharacter->GetActorLocation() + FVector(0,0,SpawnAddLocation), OwnerCharacter->GetActorRotation(), SpawnParams);
 	
     if(!ArcaneRage) return;
-	ArcaneRage->SetOwner(OwnerCharacter);
+	ArcaneRage->SetOwner(OwnerCharacter.Get());
 	ArcaneRage->SetSkill(SkillAbilityNestingData);	
     ArcaneRage->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules ::KeepWorldTransform);
+	Skilling = false;
+}
+
+void USkillNumber12::SkillEnd()
+{
+	bActivate = false; 
+	
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
+	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+}
+
+void USkillNumber12::UpdateSkillData()
+{
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+
+	float Cool = OriginCoolTime;
+	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+        if(It.Key == 2)
+		{
+			UpdatAbilityData(EEnHanceType::Silver, It.Key);
+			Cool = OwnerCharacter->GetAPSkillAbility()->Coefficient_Multiple_Return(Cool, AbilityData->Coefficient_X, It.Value); // 쿨타임 강화
+		} 
+	}
+    // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    // {
+    // }
+    // for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    // {
+    // }
+	Cool = FMath::Max(OriginCoolTime * 0.4f, Cool);
+	CurrentCoolTime = Cool;
 }

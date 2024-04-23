@@ -12,10 +12,14 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/CapsuleComponent.h"
 
+USkillNumber2::USkillNumber2()
+{
+	SkillAbilityNestingData.SkillName = TEXT("Skill_2");
+}
+
 void USkillNumber2::BeginPlay()
 {
 	Super::BeginPlay();
-	SkillAbilityNestingData.SkillName = TEXT("Skill_2");
 }
 
 void USkillNumber2::AddAbilityList()
@@ -25,10 +29,10 @@ void USkillNumber2::AddAbilityList()
 	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
 }
 
-void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
+void USkillNumber2::PlaySkill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	Super::PlaySkill();
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 	
 	if(bActivate)
 	{
@@ -40,27 +44,9 @@ void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 	}
 	else
 	{
-		SkillKey = WhichKey;
-		CurrentSkillType = SkillType;
-		SetAbility(WhichKey);
+		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
 		OwnerCharacter->SetDoing(true);
-		// if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
-		// {
-		// 	if(CheckSmartKey(WhichKey, OwnerCharacter))
-		// 	{
-		// 		OnSkill();
-		// 	}
-		// 	else
-		// 	{
-		// 		auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-		// 		SetMouseCursor(PC, ESkillCursor::Crosshairs);
-		// 		PC->DisplayHomingUI(ESkillNumber::Skill_2);
-		// 	}
-		// }
-		// else
-		// {
-		// 	OnSkill();
-		// }
+
 		OnSkill();
 	}
 }
@@ -68,11 +54,8 @@ void USkillNumber2::PlaySkill(ESkillKey WhichKey, ESkillTypeState SkillType)
 void USkillNumber2::OnSkill()
 {
 	Super::OnSkill();
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
-
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-	if(!OwnerAnim) return;
+	if(!OwnerCharacter.IsValid()) return;
+	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
 
 	OwnerAnim->PlaySkill_2_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -91,15 +74,14 @@ void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
 
 void USkillNumber2::Activate_Skill()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 	
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(OwnerCharacter->GetSwordThrowClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
+	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(OwnerCharacter->GetAPSkillHubComponent()->GetSwordThrowClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
 	// if(SwordThrow) SwordThrow->SetSkill(CurrentSkillType, CurrentSkillAbility);
 }
 
@@ -109,3 +91,6 @@ void USkillNumber2::MarkErase()
 	GetWorld()->GetTimerManager().ClearTimer(MarkTimerHandle);
 }
 
+void USkillNumber2::UpdateSkillData()
+{
+}

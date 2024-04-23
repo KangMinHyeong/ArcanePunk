@@ -29,11 +29,13 @@ public:
 
 	FORCEINLINE USphereComponent* GetClutchSphere() {return ClutchSphere;}; 
 	void SetClutchSphere(float NewValue);
-
+	void SetSlowPercent(uint8 SlowPercent);
 	void SetDestroy(float Time);
 
 private:
 	void OnDestroy();
+	void CheckEnemyDeath(AActor* OtherActor);
+	void DrainCheck(AActor* OtherActor, float DamageApplied);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -44,7 +46,4 @@ private:
 
 	UPROPERTY()
 	UAPHitPointComponent* HitPointComp;
-
-	UPROPERTY(EditAnywhere)
-	float DamageCoefficient = 1.0f;
 };

@@ -89,6 +89,7 @@ void AArcaneBomb::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
     // SkillAbilityComp->TraceSpeed = SkillAbilityComp->TraceSpeed * 0.55f;
     // SkillAbilityComp->HomingTime = 0.01f;
     // SkillAbilityComp->OwnerProjectileMove->Friction = 0.05f;
+    BombTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
 }
 

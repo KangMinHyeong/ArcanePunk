@@ -9,6 +9,7 @@
 class UNiagaraSystem;
 class UBoxComponent;
 class UNiagaraComponent;
+class USkillNumberBase;
 
 UCLASS()
 class ARCANEPUNK_API AArcaneBeam : public AAPSkillActorBase
@@ -23,12 +24,19 @@ protected:
 	virtual void BeginPlay() override;	
 
 public:
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
 
-	void SetBeamEffect(float Coefficient);
+	void SetBeamEffect();
 	void SetBeamAttack();
 	void SetDistance(float Dist) {Distance = Dist;};
 	void SetWide(float Radius) {BeamRadius = Radius;};
+
+	virtual void OnCharging() override;
+	void OnChargingEnhance();
+private:
+	void OnChargindCheck(float DeltaTime);
+
 protected:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BeamBox;
@@ -37,7 +45,10 @@ protected:
 	UNiagaraSystem* BeamEffect;
 
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* BeamEasdaffect;
+	UNiagaraSystem* ChargeEffect;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ChargeEnhanceEffect;
 
 	TWeakObjectPtr<UNiagaraComponent> BeamComp;
 	
@@ -58,5 +69,17 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float BeamHitLoopTime = 0.3f;
+	
+	TWeakObjectPtr<USkillNumberBase> Skill_5;
 
+	UPROPERTY(EditAnywhere)
+	float MaxDamageCoefficient = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	float InitIncreasingSpeed = 1.0f;
+
+	float IncreasingSpeed = 1.0f;
+
+	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
+	TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;
 };

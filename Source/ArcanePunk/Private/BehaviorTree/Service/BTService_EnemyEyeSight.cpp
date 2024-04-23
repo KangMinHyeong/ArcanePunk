@@ -45,15 +45,15 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
         if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && Distance < Monster->GetDetectLimit())
         {
-            Current = FMath::FInterpConstantTo(Current, 1.0f, DeltaSeconds, Speed);
-            if(first) {Monster->RotateTowardsTarget(TargetActor.Get(), RotateSpeed); first = false;}
+            Anim->SetbBattleMode(1.0f);
         }
         else 
         { 
-            Current = FMath::FInterpConstantTo(Current, 0.0f, DeltaSeconds, Speed);
-            first = true;
+            OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+            Anim->SetbBattleMode(0.0f);
+            return;
         }
-        Anim->SetbBattleMode(Current);
+        // Anim->SetbBattleMode(Current);
 
         if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
         {
@@ -67,6 +67,7 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
     else
     {
         OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+        Anim->SetbBattleMode(0.0f);
     }
 
 }

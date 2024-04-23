@@ -53,9 +53,6 @@ private:
 	UNiagaraSystem* HitEffect;
 
 	UPROPERTY(EditAnywhere)
-	float SlowCoefficient = 0.75f;
-
-	UPROPERTY(EditAnywhere)
 	float ImpactSpeed = 1500.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))

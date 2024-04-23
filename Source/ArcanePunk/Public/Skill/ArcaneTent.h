@@ -23,7 +23,10 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
-	
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+
 	virtual void DestroySKill() override;	
 
 private:
@@ -32,6 +35,9 @@ private:
 
 	UFUNCTION()
 	void OnEndHiding(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void SetDotDamage();
+	void CheckOverlap(bool NewBool);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -42,4 +48,19 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float ReturnToHideTime = 0.5f;
+
+	FTimerHandle DotRateTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float DotRateTime = 3.5f;
+
+	float DotPercent = 0.0f;
+
+	bool bFollowing = false;
+
+	float FollowingSpeed = 0.0f;
+
+	bool bDrainField = false;
+
+	float TentFieldDrainCoefficient = 0.0f;
 };

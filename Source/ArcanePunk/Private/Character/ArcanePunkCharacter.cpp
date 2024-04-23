@@ -27,6 +27,7 @@
 #include "Components/Character/APHitPointComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Common/APGhostTrailSpawnComponent.h"
+#include "Components/SkillActor/APSkillAbility.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -61,6 +62,8 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	APSpawnStepComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("APSpawnStepComp"));
 	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
 	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
+	BuffComp = CreateDefaultSubobject<UAPBuffComponent>(TEXT("BuffComp"));
+	SkillAbility = CreateDefaultSubobject<UAPSkillAbility>(TEXT("SkillAbility"));
 	GhostTrailSpawnComp = CreateDefaultSubobject<UAPGhostTrailSpawnComponent>(TEXT("GhostTrailSpawnComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
@@ -100,6 +103,8 @@ void AArcanePunkCharacter::BeginPlay()
 	HUD->UpdateTutorialWidget("NONE");
 
 	// Minhyeong
+	InitComponent();
+
 	PC = Cast<AArcanePunkPlayerController>(GetController());
 	GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
@@ -108,21 +113,20 @@ void AArcanePunkCharacter::BeginPlay()
 
 	DefaultMaterial = GetMesh()->GetMaterial(0);
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
-	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
-	DefaultSpeed = GetCharacterMovement()->MaxWalkSpeed;
-
-	UpdateStatus();
+	MoveComp->SetBind();
+	
 	InitPlayerStatus();
 	InitEquipData(WeaponReference, DesiredWeaponID);
+	UpdateStatus();
 
 	SetHavingSkills();
 	SkillHubComp->UpdateSkill_Q();
 	SkillHubComp->UpdateSkill_E();
 	SetRSkill();
 
+	
+
 	SetWeaponPosition();
-
-
 }
 
 void AArcanePunkCharacter::Tick(float DeltaTime)
@@ -175,6 +179,12 @@ void AArcanePunkCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	AnimHubComp->BindAttackCheck();
 	AnimHubComp->BindComboCheck();
+}
+
+void AArcanePunkCharacter::InitComponent()
+{
+	// 컴포넌트 초기화
+	AttackComp->InitAttackComp();
 }
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
@@ -265,8 +275,15 @@ void AArcanePunkCharacter::HideCheck()
 
 float AArcanePunkCharacter::CriticalCalculate(float Multiple)
 {
-	float CriticalMultiple = MyPlayerTotalStatus.PlayerDynamicData.CriticalStep * (Multiple - 1.0f) + 1;
-    return CriticalMultiple;
+	float Percent = FMath::RandRange(0.0f, 100.0f);
+	if(Percent <= MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent)
+	{
+		bCriticalAttack = true;
+		return MyPlayerTotalStatus.PlayerDynamicData.CriticalStep * (Multiple - 1.0f) + 1;
+	}
+	else {bCriticalAttack= false;}
+
+    return 1.0f;
 }
 
 void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
@@ -328,7 +345,6 @@ void AArcanePunkCharacter::SetWeaponPosition()
 void AArcanePunkCharacter::SkillBase_Q()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	if(MyPlayerTotalStatus.PlayerDynamicData.MP <= 0) {PC->DisplayNotEnoughMPUI(); return;}
 	if( bCanMove && StopState.IsEmpty() ) SkillHubComp->PressQ();	
 	OnQSkill = true;
 }
@@ -336,7 +352,6 @@ void AArcanePunkCharacter::SkillBase_Q()
 void AArcanePunkCharacter::SkillBase_E()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
-	if(MyPlayerTotalStatus.PlayerDynamicData.MP <= 0) {PC->DisplayNotEnoughMPUI(); return;}
 	if( bCanMove && StopState.IsEmpty() ) SkillHubComp->PressE();
 	OnESkill = true;
 }
@@ -344,14 +359,14 @@ void AArcanePunkCharacter::SkillBase_E()
 void AArcanePunkCharacter::SkillBase_R()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
-	if(!bUltCanSkill) {PC->DisplayNotEnoughMPUI(); return;}
 	if( bCanMove && StopState.IsEmpty()) SkillHubComp->PressSpace();
 	OnRSkill = true;
 }
 
 void AArcanePunkCharacter::StartJog()
 {
-	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * 2.0f;
+	if(bCanJog)  CrowdControlComp->FastState(1.0f, true);
+	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2.0f;
 
 	GhostTrailSpawnComp->SetRunTrail(true);
 
@@ -360,7 +375,8 @@ void AArcanePunkCharacter::StartJog()
 
 void AArcanePunkCharacter::EndJog()
 {
-	if(bCanJog) GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+	if(bCanJog) CrowdControlComp->FastState(1.0f, false);
+	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 0.5f;
 	GhostTrailSpawnComp->SetRunTrail(false);
 }
 
@@ -398,15 +414,6 @@ void AArcanePunkCharacter::SetSkillAbility(EEnhanceCategory EnhanceCategory, EEn
 	bInteract = false;
 }
 
-float AArcanePunkCharacter::GetAttackMoveSpeed(int32 Section)
-{
-	float Speed = 0.0f;
-	if (Section == 1) Speed = Attack1_MoveSpeed;
-	else if(Section == 2) Speed = Attack2_MoveSpeed;
-	else if(Section == 3) Speed = Attack3_MoveSpeed;
-    return Speed;
-}
-
 void AArcanePunkCharacter::Save()
 {
 	if(!PC.IsValid()) return;
@@ -419,10 +426,10 @@ void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName, FString GameSlotNa
 	// 	HUD->UpdateTutorialWidget("PressCtrl + 9");
 	// 	return;
 	// }
-	MyPlayerTotalStatus.SaveSlotName = PlayerSlotName;
-	MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation = GetActorLocation();
+	MyPlayerTotalStatus_Origin.SaveSlotName = PlayerSlotName;
+	MyPlayerTotalStatus_Origin.PlayerDynamicData.PlayerLocation = GetActorLocation();
 	
-	MyPlayerState->UpdatePlayerData(MyPlayerTotalStatus);
+	MyPlayerState->UpdatePlayerData(MyPlayerTotalStatus_Origin);
 
 	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	MyGameStatus.SaveSlotName = GameSlotName;
@@ -437,6 +444,21 @@ void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName, FString GameSlotNa
 void AArcanePunkCharacter::SetRSkill()
 {
 	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
+	else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_2;}
+	else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_3;}
+	else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_4;}
+	else if( (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_13) ){ RSkill = EUltSkillNumber::UltSkill_5;}
+	else if( (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_12) ){ RSkill = EUltSkillNumber::UltSkill_6;}
+	else if( (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_10) ){ RSkill = EUltSkillNumber::UltSkill_7;}
+	else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_8;}
+	else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_9;}
+	else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_10;}
+	else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_11;}
+	else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_12;}
+	else if( (QSkill == ESkillNumber::Skill_4 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_4) ){ RSkill = EUltSkillNumber::UltSkill_13;}
+	else if( (QSkill == ESkillNumber::Skill_7 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_7) ){ RSkill = EUltSkillNumber::UltSkill_14;}
+	else if( (QSkill == ESkillNumber::Skill_4 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_4) ){ RSkill = EUltSkillNumber::UltSkill_15;}
+	else if( (QSkill == ESkillNumber::Skill_7 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_7) ){ RSkill = EUltSkillNumber::UltSkill_16;}
 	else {RSkill = EUltSkillNumber::None;}
 
 	SkillHubComp->UpdateSkill_R();
@@ -496,11 +518,13 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if(ReflectingModeGauge > 0) {TakeDamageComp->ReflectDamage(DamageApplied, DamageCauser); return DamageApplied;}
+
 	float OriginHP = MyPlayerTotalStatus.PlayerDynamicData.HP;
 	if(!bBlockMode)
 	{
 		TakeDamageComp->DamageCalculation(DamageApplied);
-		if(PC.IsValid()) PC->OnUpdateStatusText.Broadcast();
+		UpdateStatus();
 		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
 	}
     return DamageApplied;
@@ -573,29 +597,20 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 
 void AArcanePunkCharacter::UpdateStatus()
 {
+	FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK;
 	WeaponReference.IsEmpty() ? FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK : FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK + WeaponReference.Top()->ItemStatistics.DamageValue;
-	 
-}
 
-float AArcanePunkCharacter::GetFinalATK(float Multiple)
-{
-	float Percent = FMath::RandRange(0.0f, 100.0f);
-	if(Percent <= MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent)
-	{
-		bCriticalAttack = true;
-		return FinalATK * CriticalCalculate(Multiple);
-	}
-	else {bCriticalAttack= false;}
-
-	return FinalATK;
+	if(PC.IsValid()) PC->OnUpdateStatusText.Broadcast();
 }
 
 void AArcanePunkCharacter::InitPlayerStatus()
 {
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
-	MyPlayerTotalStatus = MyPlayerState->PlayerTotalStatus;
+	MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus;
+	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
 
+	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
 	CurrentPlayerLocation();
 }
 

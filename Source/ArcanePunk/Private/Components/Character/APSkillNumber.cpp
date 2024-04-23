@@ -41,59 +41,59 @@ void UAPSkillNumber::BindSkill(ESkillNumber SkillNumber, ESkillTypeState SkillTy
 	switch(SkillNumber)
 	{
 		case ESkillNumber::Skill_1:
-		SkillNum_1->PlaySkill(WhichKey, SkillType);
+		SkillNum_1->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_2:
-		SkillNum_2->PlaySkill(WhichKey, SkillType);
+		SkillNum_2->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_3:
-		SkillNum_3->PlaySkill(WhichKey, SkillType);
+		SkillNum_3->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_4:
-		SkillNum_4->PlaySkill(WhichKey, SkillType);
+		SkillNum_4->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_5:
-		SkillNum_5->PlaySkill(WhichKey, SkillType);
+		SkillNum_5->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_6:
-		SkillNum_6->PlaySkill(WhichKey, SkillType);
+		SkillNum_6->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_7:
-		SkillNum_7->PlaySkill(WhichKey, SkillType);
+		SkillNum_7->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_8:
-		SkillNum_8->PlaySkill(WhichKey, SkillType);
+		SkillNum_8->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_9:
-		SkillNum_9->PlaySkill(WhichKey, SkillType);
+		SkillNum_9->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_10:
-		SkillNum_10->PlaySkill(WhichKey, SkillType);
+		SkillNum_10->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_11:
-		SkillNum_11->PlaySkill(WhichKey, SkillType);
+		SkillNum_11->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_12:
-		SkillNum_12->PlaySkill(WhichKey, SkillType);
+		SkillNum_12->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_13:
-		SkillNum_13->PlaySkill(WhichKey, SkillType);
+		SkillNum_13->PlaySkill();
 		break;
 
 		case ESkillNumber::Skill_14:
-		SkillNum_14->PlaySkill(WhichKey, SkillType);
+		SkillNum_14->PlaySkill();
 		break;
 
 		// 추가 스킬 생길때마다 추가 
@@ -108,7 +108,7 @@ void UAPSkillNumber::BindUltSkill(EUltSkillNumber UltSkillNumber, ESkillTypeStat
 	switch(UltSkillNumber)
 	{
 		case EUltSkillNumber::UltSkill_1:
-		UltSkillNum_1->PlaySkill(WhichKey, SkillType);
+		UltSkillNum_1->PlaySkill();
 		break;
 
 		// 추가 스킬 생길때마다 추가 

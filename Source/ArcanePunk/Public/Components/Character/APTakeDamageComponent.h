@@ -25,7 +25,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void DamageCalculation(float &DamageApplied);
-
+	void ReflectDamage(float & DamageApplied, AActor* DamageCauser);
+	
 	void SetHitPoint(float Forward, float Right);
 
 	UFUNCTION(BlueprintPure)

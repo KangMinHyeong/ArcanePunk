@@ -22,21 +22,28 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
-	
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+		
 	virtual void DestroySKill() override;	
 
 	FORCEINLINE void SetDistance(float NewValue) {Distance = NewValue;};
 	FORCEINLINE void SetWide(float NewValue) {Wide = NewValue;};
-	FORCEINLINE void SetClutchSpeed(float NewValue) {ClutchSpeed = ClutchSpeed * NewValue; UE_LOG(LogTemp, Display, TEXT("Your %f"), NewValue);};
-
+	FORCEINLINE void SetClutchSpeed(float NewValue) {ClutchSpeed = ClutchSpeed * NewValue;};
+	FORCEINLINE void AddDestroyTime(float Add) {DestroyTime = DestroyTime + Add;};
+	
+	FORCEINLINE bool IsDrain() const {return bDrain;};
+	FORCEINLINE float GetDrainCoefficient() const {return DrainCoefficient;};
+	FORCEINLINE bool IsDurationUpgrade() const {return bDurationUpgrade;};
+	FORCEINLINE float GetDurationUpgradeCoefficient() const {return DurationUpgradeCoefficient;};
+	
 private:
 	void SpawnClutchTrigger();
 
 private:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* ClutchRoot;
-
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;	
 
 	float Distance = 0.0f;
 
@@ -47,4 +54,13 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float ClutchSpeed = 1.0f;
+
+	int32 SwordNumber = 4;
+
+	bool bDrain = false;
+
+	float DrainCoefficient = 0.0f;
+
+	bool bDurationUpgrade = false;
+	float DurationUpgradeCoefficient = 0.0f;
 };

@@ -6,7 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "APMPBar.generated.h"
 
-class UWidgetSwitcher;
+class UBorder;
+class UImage;
 
 UCLASS()
 class ARCANEPUNK_API UAPMPBar : public UUserWidget
@@ -15,9 +16,6 @@ class ARCANEPUNK_API UAPMPBar : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void UseMP();
-	void RecoveryMP();
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void FadeOut();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -25,11 +23,9 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidgetSwitcher* MPSwitcher;
+	UBorder* MP_Border;	
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* MP_Origin;	
+	UImage* MPCharge;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* MP_Use;	
 };

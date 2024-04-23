@@ -28,13 +28,24 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	FORCEINLINE float GetCurrentSlowCoefficient() const {return CurrentSlowCoefficient;}; 
+	FORCEINLINE float GetCurrentFastCoefficient() const {return CurrentFastCoefficient;}; 
+
+public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// 플레이어 상태이상 함수
 	void KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime);//후에 인자 추가 (상태시간)
 	void StunState(float StunTime);//후에 인자 추가 (상태시간)
 	void SleepState();//후에 인자 추가 (상태시간)
-	void SlowState(float SlowCoefficient, float SlowTime);
+	void SlowState(int32 SlowPercent, float SlowTime);
+	void BurnState(APawn* DamageCauser, float DOT, float TotalTime, float InRate);
+	void BleedingState(APawn* DamageCauser, float BleedingDamage, float TotalTime, float InRate);
+	void WeakState(float WeakCoefficient, float WeakTime);
+
+	// 이속 Buff
+	void FastState(float FastCoefficient, bool Start);
+	void FastState(float FastCoefficient, float FastTime);
 
 private:
 	bool CalculateStateTime(ECharacterState UpdateState, FTimerHandle& StateTimerHandle,float StateTime);
@@ -48,12 +59,25 @@ private:
 
 	void NormalState();	
 
+	void OnBurnDamage(APawn* DamageCauser, float DOT);
+	void OnBleedingDamage(APawn* DamageCauser, float BleedingDamage);
+		
 	void KnockBackEnd();
 	void StunEnd();
-	void SlowEnd();
+	void SlowEnd(FTimerHandle* SlowTimerHandle, int32 SlowPercent);
+	void BurnEnd();
+	void BleedingEnd();
+	void WeakEnd(FTimerHandle* WeakTimerHandle, float WeakCoefficient);
 
-	void PlayStateEffect(ECharacterState UpdateState, bool IsPlay);
+	// 이속 버프
+	void FastEnd(FTimerHandle* FastTimerHandle, float FastCoefficient);
 	
+	float GetDefaultSpeed();
+	float GetDefaultATK();
+	void SetDefaultATK(float NewValue);
+	
+	void PlayStateEffect(ECharacterState UpdateState, bool IsPlay);
+
 private:
 	FTimerHandle KnockBackTimerHandle;
 
@@ -61,12 +85,20 @@ private:
 
 	FTimerHandle SleepTimerHandle;
 
-	FTimerHandle SlowTimerHandle;
+	FTimerHandle BurnTimerHandle;
+	FTimerHandle BurnEndTimerHandle;
+
+	FTimerHandle BleedingTimerHandle;
+	FTimerHandle BleedingEndTimerHandle;
 
 	TMap<ECharacterState, float> StateMap;
 	
 	TArray<bool> CC_Priority;
+	TArray<uint8> SlowPriority;
 
 	float DefaultSlip = 0.0f;
 	float DefaultSpeed = 0.0f;
+
+	float CurrentSlowCoefficient = 1.0f;
+	float CurrentFastCoefficient = 1.0f;
 };
