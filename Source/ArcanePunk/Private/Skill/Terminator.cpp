@@ -60,7 +60,7 @@ void ATerminator::FastBuff(float DeltaTime)
 {
     if(!OwnerCharacter.IsValid()) return;
     CurrentFastCoefficient = FMath::FInterpConstantTo(CurrentFastCoefficient, 1.0f, DeltaTime, BuffEndSpeed);
-    OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = OwnerCharacter->GetDefaultSpeed() * OwnerCharacter->GetCrowdControlComponent()->GetCurrentSlowCoefficient() * OwnerCharacter->GetCrowdControlComponent()->GetCurrentFastCoefficient() * CurrentFastCoefficient;
+    OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = OwnerCharacter->GetDefaultSpeed_Origin() * OwnerCharacter->GetCrowdControlComp()->GetCurrentSlowCoefficient() * OwnerCharacter->GetCrowdControlComp()->GetCurrentFastCoefficient() * CurrentFastCoefficient;
     OwnerCharacter->SetDefaultSpeed( OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed );
 
     if(abs(CurrentFastCoefficient - 1.0f) <= KINDA_SMALL_NUMBER) {bComplete = true;}
@@ -99,15 +99,15 @@ void ATerminator::ResettTerminatorMode()
     PD.PlayerDynamicData.ATK = PD.PlayerDynamicData.ATK * OwnerCharacter->GetBuffComp()->GetCurrentATKCoefficient();
     OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK);
 
-    OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = OwnerCharacter->GetDefaultSpeed() * OwnerCharacter->GetCrowdControlComponent()->GetCurrentSlowCoefficient() * OwnerCharacter->GetCrowdControlComponent()->GetCurrentFastCoefficient();
+    OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = OwnerCharacter->GetDefaultSpeed_Origin() * OwnerCharacter->GetCrowdControlComp()->GetCurrentSlowCoefficient() * OwnerCharacter->GetCrowdControlComp()->GetCurrentFastCoefficient();
     OwnerCharacter->SetDefaultSpeed( OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed );
 
     Destroy();
 }
 
-void ATerminator::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ATerminator::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
 
     SetTerminatorMode();

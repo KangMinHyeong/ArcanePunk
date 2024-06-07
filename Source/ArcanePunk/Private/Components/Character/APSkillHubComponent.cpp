@@ -27,67 +27,28 @@ void UAPSkillHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UAPSkillHubComponent::PressQ()
 {
 	if(!OwnerCharacter.IsValid()) return;
-	if(OwnerCharacter->GetDoing()) return;
 
 	SkillState = ESkillKey::Q;
 	PlayBasicSkill();
-	// if(SkillState == ESkillKey::None)
-	// {
-	// 	SkillState = ESkillKey::Q;
-	// 	if(ActivationCheck(OwnerCharacter->GetQSkill())) {PlayBasicSkill();}
-	// 	else {GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);}
-	// }
-	// else
-	// {
-	// 	ESkillKey Second = ESkillKey::Q;
-	// 	GetWorld()->GetTimerManager().ClearTimer(SkillCancleTimerHandle);
-	// 	AddSkillState(SkillState);		
-	// 	SkillDetermine(SkillState, Second);
-	// }
+
 }
 
 void UAPSkillHubComponent::PressE()
 {
 	if(!OwnerCharacter.IsValid()) return;
-	if(OwnerCharacter->GetDoing()) return;
 
 	SkillState = ESkillKey::E;
 	PlayBasicSkill();
-	// if(SkillState == ESkillKey::None)
-	// {
-	// 	SkillState = ESkillKey::E;
-	// 	if(ActivationCheck(OwnerCharacter->GetESkill())) {PlayBasicSkill();}
-	// 	else {GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);}
-	// }
-	// else
-	// {
-	// 	ESkillKey Second = ESkillKey::E;
-	// 	GetWorld()->GetTimerManager().ClearTimer(SkillCancleTimerHandle);
-	// 	AddSkillState(SkillState);		
-	// 	SkillDetermine(SkillState, Second);
-	// }
+
 }
 
 void UAPSkillHubComponent::PressSpace() // R
 {
 	if(!OwnerCharacter.IsValid()) return;
-	if(OwnerCharacter->GetDoing()) return;
 
 	SkillState = ESkillKey::R;
 	PlayBasicSkill();
-	// if(SkillState == ESkillKey::None)
-	// {
-	// 	SkillState = ESkillKey::R;
-	// 	// R도 후에 만들어주기
-	// 	GetWorld()->GetTimerManager().SetTimer(SkillCancleTimerHandle, this, &UAPSkillHubComponent::PlayBasicSkill, OwnerCharacter->GetSkillCancelTime(), false);
-	// }
-	// else
-	// {
-	// 	ESkillKey Second = ESkillKey::R;
-	// 	GetWorld()->GetTimerManager().ClearTimer(SkillCancleTimerHandle);
-	// 	AddSkillState(SkillState);		
-	// 	SkillDetermine(SkillState, Second);
-	// }
+
 }
 
 void UAPSkillHubComponent::PressShift()
@@ -95,59 +56,10 @@ void UAPSkillHubComponent::PressShift()
 
 }
 
-// void UAPSkillHubComponent::SetSkillState(ESkillKey NewValue)
-// {
-// 	if(SkillStateArr.IsEmpty())
-// 	{
-// 		SkillState = NewValue;
-// 	}
-// 	else
-// 	{
-// 		SkillState = SkillStateArr.Top();
-// 	}
-// }
-
-// void UAPSkillHubComponent::AddSkillState(ESkillKey NewValue)
-// {
-// 	SkillStateArr.Add(NewValue);
-// }
-
-// void UAPSkillHubComponent::RemoveSkillState(ESkillKey NewValue)
-// {
-// 	if(!SkillStateArr.IsEmpty())
-// 	{
-// 		SkillStateArr.Pop();
-// 		SetSkillState(NewValue);
-// 	}
-// }
-
 ESkillKey UAPSkillHubComponent::GetSkillState()
 {
     return SkillState;
 }
-
-// void UAPSkillHubComponent::SkillDetermine(ESkillKey First, ESkillKey Second)
-// {
-// 	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-// 	if(!OwnerCharacter) return;
-
-// 	LastSkill = First;
-	
-// 	switch(First)
-// 	{
-// 		case ESkillKey::Q:
-// 		QComp->SkillBase_Q(Second);
-// 		break;
-
-// 		case ESkillKey::E:
-// 		EComp->SkillBase_E(Second);
-// 		break;
-
-// 		case ESkillKey::R: // R
-// 		SpaceComp->SkillBase_Space(Second);
-// 		break;
-// 	}
-// }
 
 void UAPSkillHubComponent::PlayBasicSkill()
 {
@@ -178,144 +90,8 @@ void UAPSkillHubComponent::PlayBasicSkill()
 	SkillState = ESkillKey::None;
 }
 
-// void UAPSkillHubComponent::CastSkillNumber(ESkillNumber SkillNumber, ESkillKey WhichKey)
-// {
-// 	switch (SkillNumber)
-// 	{
-// 		case ESkillNumber::Skill_1:
-// 		SkillNumComp->GetSkillNumber1()->PlaySkill(WhichKey);
-// 		break;
 
-// 		case ESkillNumber::Skill_2:
-// 		SkillNumComp->GetSkillNumber2()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_3:
-// 		SkillNumComp->GetSkillNumber3()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_4:
-// 		SkillNumComp->GetSkillNumber4()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_5:
-// 		SkillNumComp->GetSkillNumber5()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_6:
-// 		SkillNumComp->GetSkillNumber6()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_7:
-// 		SkillNumComp->GetSkillNumber7()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_8:
-// 		SkillNumComp->GetSkillNumber8()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_9:
-// 		SkillNumComp->GetSkillNumber9()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_10:
-// 		SkillNumComp->GetSkillNumber10()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_11:
-// 		SkillNumComp->GetSkillNumber11()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_12:
-// 		SkillNumComp->GetSkillNumber12()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_13:
-// 		SkillNumComp->GetSkillNumber13()->PlaySkill(WhichKey);
-// 		break;
-
-// 		case ESkillNumber::Skill_14:
-// 		SkillNumComp->GetSkillNumber14()->PlaySkill(WhichKey);
-// 		break;
-// 	}
-// }
-
-// void UAPSkillHubComponent::CastUltSkillNumber(EUltSkillNumber UltSkillNumber, ESkillKey WhichKey)
-// {
-// 	switch (UltSkillNumber)
-// 	{
-// 		case EUltSkillNumber::UltSkill_1:
-// 		SkillNumComp->GetUltSkillNumber1()->PlaySkill(WhichKey);
-// 		break;
-
-// 	}	
-// }
-
-// bool UAPSkillHubComponent::ActivationCheck(ESkillNumber SkillNumber)
-// {
-// 	switch (SkillNumber)
-// 	{
-// 		case ESkillNumber::Skill_1:
-// 		return SkillNumComp->GetSkillNumber1()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_2:
-// 		return SkillNumComp->GetSkillNumber2()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_3:
-// 		return SkillNumComp->GetSkillNumber3()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_4:
-// 		return SkillNumComp->GetSkillNumber4()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_5:
-// 		return SkillNumComp->GetSkillNumber5()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_6:
-// 		return SkillNumComp->GetSkillNumber6()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_7:
-// 		return SkillNumComp->GetSkillNumber7()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_8:
-// 		return SkillNumComp->GetSkillNumber8()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_9:
-// 		return SkillNumComp->GetSkillNumber9()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_10:
-// 		return SkillNumComp->GetSkillNumber10()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_11:
-// 		return SkillNumComp->GetSkillNumber11()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_12:
-// 		return SkillNumComp->GetSkillNumber12()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_13:
-// 		return SkillNumComp->GetSkillNumber13()->bActivate;
-// 		break;
-
-// 		case ESkillNumber::Skill_14:
-// 		return SkillNumComp->GetSkillNumber14()->bActivate;
-// 		break;
-// 	}
-// 	return false;
-// }
-
-
-void UAPSkillHubComponent::UpdateSkill_Q()
+void UAPSkillHubComponent::UpdatingSkill_Q()
 {
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return;
@@ -393,15 +169,25 @@ void UAPSkillHubComponent::UpdateSkill_Q()
 		case ESkillNumber::Skill_18:
 		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber18>(GetOwner()));
 		break;
+
+		case ESkillNumber::Skill_19:
+		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber19>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_20:
+		OwnerCharacter->SetQSkillNumber(NewObject<USkillNumber20>(GetOwner()));
+		break;
 	}
 	if(!OwnerCharacter->GetQSkillNumber()) return;
 	OwnerCharacter->GetQSkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetQSkillNumber()->RegisterComponent();
-	OwnerCharacter->GetQSkillNumber()->SkillKey = ESkillKey::Q;
+	OwnerCharacter->GetQSkillNumber()->SetSkillKey(ESkillKey::Q);
+	OwnerCharacter->GetQSkillNumber()->SetCurrentSkillNumber(OwnerCharacter->GetQSkill());
+
 	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::Q, (uint8)OwnerCharacter->GetQSkill());
 }
 
-void UAPSkillHubComponent::UpdateSkill_E()
+void UAPSkillHubComponent::UpdatingSkill_E()
 {
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return;
@@ -479,15 +265,25 @@ void UAPSkillHubComponent::UpdateSkill_E()
 		case ESkillNumber::Skill_18:
 		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber18>(GetOwner()));
 		break;
+
+		case ESkillNumber::Skill_19:
+		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber19>(GetOwner()));
+		break;
+
+		case ESkillNumber::Skill_20:
+		OwnerCharacter->SetESkillNumber(NewObject<USkillNumber20>(GetOwner()));
+		break;
 	}
 	if(!OwnerCharacter->GetESkillNumber()) return;
 	OwnerCharacter->GetESkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetESkillNumber()->RegisterComponent();
-	OwnerCharacter->GetESkillNumber()->SkillKey = ESkillKey::E;
+	OwnerCharacter->GetESkillNumber()->SetSkillKey(ESkillKey::E);
+	OwnerCharacter->GetESkillNumber()->SetCurrentSkillNumber(OwnerCharacter->GetESkill());
+	
 	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::E, (uint8)OwnerCharacter->GetESkill());
 }
 
-void UAPSkillHubComponent::UpdateSkill_R()
+void UAPSkillHubComponent::UpdatingSkill_R()
 {
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return;
@@ -557,16 +353,120 @@ void UAPSkillHubComponent::UpdateSkill_R()
 		case EUltSkillNumber::UltSkill_16:
 		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_16>(GetOwner()));
 		break;
+
+		case EUltSkillNumber::UltSkill_17:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_17>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_18:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_18>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_19:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_19>(GetOwner()));
+		break;
+
+		case EUltSkillNumber::UltSkill_20:
+		OwnerCharacter->SetRSkillNumber(NewObject<UUltSkillNumber_20>(GetOwner()));
+		break;
 	}
 	if(!OwnerCharacter->GetRSkillNumber()) return;
 	OwnerCharacter->GetRSkillNumber()->RegisterAllComponentTickFunctions(true);
 	OwnerCharacter->GetRSkillNumber()->RegisterComponent();
-	OwnerCharacter->GetRSkillNumber()->SkillKey = ESkillKey::R;
+	OwnerCharacter->GetRSkillNumber()->SetSkillKey(ESkillKey::R);
 	OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::R, (uint8)OwnerCharacter->GetRSkill());
 }
 
+USkillNumberBase* UAPSkillHubComponent::CreateSkillNumber(ESkillNumber CreatedNumber)
+{
+	switch (CreatedNumber)
+	{
+		case ESkillNumber::Skill_1:
+		return NewObject<USkillNumber1>(GetOwner());
+		break;
 
-USkillNumberBase* UAPSkillHubComponent::GetSKillNumberComponent(ESkillNumber SkillNumber)
+		case ESkillNumber::Skill_2:
+		return NewObject<USkillNumber2>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_3:
+		return NewObject<USkillNumber3>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_4:
+		return NewObject<USkillNumber4>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_5:
+		return NewObject<USkillNumber5>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_6:
+		return NewObject<USkillNumber6>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_7:
+		return NewObject<USkillNumber7>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_8:
+		return NewObject<USkillNumber8>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_9:
+		return NewObject<USkillNumber9>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_10:
+		return NewObject<USkillNumber10>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_11:
+		return NewObject<USkillNumber11>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_12:
+		return NewObject<USkillNumber12>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_13:
+		return NewObject<USkillNumber13>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_14:
+		return NewObject<USkillNumber14>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_15:
+		return NewObject<USkillNumber15>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_16:
+		return NewObject<USkillNumber16>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_17:
+		return NewObject<USkillNumber17>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_18:
+		return NewObject<USkillNumber18>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_19:
+		return NewObject<USkillNumber19>(GetOwner());
+		break;
+
+		case ESkillNumber::Skill_20:
+		return NewObject<USkillNumber20>(GetOwner());
+		break;
+	}
+	return nullptr;
+	
+	// OwnerCharacter->GetAPHUD()->OnUpdateSkillSlot.Broadcast(ESkillKey::E, (uint8)OwnerCharacter->GetESkill());
+}
+
+USkillNumberBase* UAPSkillHubComponent::GetSKillNumberComp(ESkillNumber SkillNumber)
 {
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
 	if(!OwnerCharacter.IsValid()) return nullptr;
@@ -608,3 +508,4 @@ void UAPSkillHubComponent::RecoveryMP()
 		}
 	}
 }
+

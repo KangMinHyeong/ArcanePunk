@@ -32,6 +32,7 @@ void ASwordImpact::BeginPlay()
 {
 	Super::BeginPlay();
 	SlowPercent = 50;
+	BintHit();
 }
 
 void ASwordImpact::Tick(float DeltaTime)
@@ -73,7 +74,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 		if (OtherActor && OtherActor != this && OtherActor != MyOwner && OwnerCharacter.IsValid())
 		{
 			if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
-			HitPointComp->DistinctHitPoint(HitResult.Location, OtherActor);
+			HitPointComp->DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
 			
 			float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, HitResult, true);
 		    OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
@@ -92,7 +93,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 			if(HitEffect && OtherActor->ActorHasTag(TEXT("Player")))
 			{
 				Enemy->DistinctHitPoint(HitResult.Location, OtherActor);
-				UGameplayStatics::ApplyDamage(OtherActor, Enemy->GetMonsterATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+				UGameplayStatics::ApplyDamage(OtherActor, Enemy->GetDefaultATK() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, OtherActor->GetActorLocation(), OtherActor->GetActorRotation(), FVector(0.2f,0.2f,0.2f));
 				SlowPlayer(OtherActor);
 			}
@@ -104,7 +105,7 @@ void ASwordImpact::DamageAction(AActor *OtherActor, const FHitResult &HitResult)
 void ASwordImpact::SlowPlayer(AActor *OtherActor)
 {
 	OwnerCharacter = Cast<AArcanePunkCharacter>(OtherActor);
-	if(OwnerCharacter.IsValid()) OwnerCharacter->GetCrowdControlComponent()->SlowState(SlowPercent, StateTime);
+	if(OwnerCharacter.IsValid()) OwnerCharacter->GetCrowdControlComp()->SlowState(SlowPercent, StateTime);
 }
 
 void ASwordImpact::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
@@ -118,11 +119,10 @@ void ASwordImpact::OnPenetrating(UPrimitiveComponent *OverlappedComp, AActor *Ot
 	DamageAction(OtherActor, SweepResult);
 }
 
-void ASwordImpact::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ASwordImpact::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 
 	BaseEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
-	BintHit();
 	ImpactComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }

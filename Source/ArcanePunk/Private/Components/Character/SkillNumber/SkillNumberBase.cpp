@@ -38,7 +38,6 @@ void USkillNumberBase::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void USkillNumberBase::CreateInit()
 {
-	CurrentCoolTime = OriginCoolTime;
 	MaxChargeNum = MaxChargeNum_Origin;
 	CurrentChargeNum = MaxChargeNum;
 
@@ -55,18 +54,23 @@ void USkillNumberBase::InitSkillData()
 	switch (SkillKey)
     {
         case ESkillKey::Q:
-        SkillAbilityNestingData = APGI->QSkillAbilityNestingData;
+        SkillAbilityNestingData = APGI->GetQSkillAbilityNestingData();
         break;
 
         case ESkillKey::E:
-        SkillAbilityNestingData = APGI->QSkillAbilityNestingData;
+        SkillAbilityNestingData = APGI->GetESkillAbilityNestingData();
         break;
 
         case ESkillKey::R:
-        SkillAbilityNestingData = APGI->QSkillAbilityNestingData;
+        SkillAbilityNestingData = APGI->GetRSkillAbilityNestingData();
         break;
     }
 	UpdateSkillData();
+
+	auto DataTable = APGI->GetSkillNameList()->FindRow<FSkillNameList>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString()); if(!DataTable) return;
+	SkillNameListData = *DataTable;
+	CurrentCoolTime = SkillNameListData.CoolTime;
+	MPConsumption = SkillNameListData.MPConsumption;
 }
 
 void USkillNumberBase::CheckingOtherSkill()
@@ -88,7 +92,44 @@ void USkillNumberBase::CheckingOtherSkill()
 	}
 	if(SkillKey != OwnerCharacter->GetAPSkillHubComponent()->LastSkill) 
 	{
+		if(SkillKey == ESkillKey::None &&  OwnerCharacter->GetAPSkillHubComponent()->LastSkill == ESkillKey::R) return;
 		Remove_Skill(); return;
+	}
+}
+
+void USkillNumberBase::ClearSkillAbilityNestingData(EEnHanceType ClearEnHanceType)
+{
+	switch (ClearEnHanceType)
+	{
+	case EEnHanceType::Silver:
+	SkillAbilityNestingData.SilverAbilityNestingNum.Empty();
+		break;
+	
+	case EEnHanceType::Gold:
+	SkillAbilityNestingData.GoldAbilityNestingNum.Empty();
+		break;
+
+	case EEnHanceType::Platinum:
+	SkillAbilityNestingData.PlatinumAbilityNestingNum.Empty();
+		break;
+	}
+}
+
+void USkillNumberBase::AddSkillAbilityNestingData(EEnHanceType AddEnHanceType, TPair<uint8, uint16> UpdateAbilityNestingNum)
+{
+	switch (AddEnHanceType)
+	{
+	case EEnHanceType::Silver:
+	SkillAbilityNestingData.SilverAbilityNestingNum.Add(UpdateAbilityNestingNum);
+		break;
+	
+	case EEnHanceType::Gold:
+	SkillAbilityNestingData.GoldAbilityNestingNum.Add(UpdateAbilityNestingNum);
+		break;
+
+	case EEnHanceType::Platinum:
+	SkillAbilityNestingData.PlatinumAbilityNestingNum.Add(UpdateAbilityNestingNum);
+		break;
 	}
 }
 
@@ -98,12 +139,21 @@ void USkillNumberBase::PlaySkill()
 	OwnerCharacterPC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!OwnerCharacterPC.IsValid()) return;
 }
 
+void USkillNumberBase::Spawn_SkillRange()
+{
+	if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->OnLeftMouseClick.AddDynamic(this, &USkillNumberBase::OnSkill);
+}
+
 void USkillNumberBase::OnSkill()
 {
 	if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
 }
 
 void USkillNumberBase::Remove_Skill()
@@ -119,10 +169,19 @@ void USkillNumberBase::Remove_Skill()
 	OwnerCharacterPC->SetMouseCursor();
 	CursorImmediately();
 	Skilling = false;
+
+	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumberBase::Enhance);
+	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumberBase::DoubleEnhance);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
 }
 
 void USkillNumberBase::SkillEnd()
 {
+	if(!OwnerCharacter.IsValid()) return; 
+	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.RemoveDynamic(this, &USkillNumberBase::SkillEnd);
+	OwnerCharacter->OnSkillEndWithSkillKey.Broadcast(SkillKey, CurrentSkillNumber);
 }
 
 void USkillNumberBase::RemoveEffect()
@@ -131,14 +190,20 @@ void USkillNumberBase::RemoveEffect()
 
 void USkillNumberBase::Activate_Skill()
 {
+	if(!OwnerCharacter.IsValid()) return; 
+	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
 }
 
 void USkillNumberBase::Enhance()
 {
+	if(!OwnerCharacter.IsValid()) return; 
+	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumberBase::Enhance);
 }
 
 void USkillNumberBase::DoubleEnhance()
 {
+	if(!OwnerCharacter.IsValid()) return; 
+	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumberBase::DoubleEnhance);
 }
 
 void USkillNumberBase::MarkingOn(AActor *OtherActor, float Time)
@@ -151,32 +216,43 @@ void USkillNumberBase::MarkErase()
 
 void USkillNumberBase::UpdateSkillData()
 {
-	RowDataTable = OwnerCharacter->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString());
+	auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!APGI) return;
+	RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString());
 }
 
 void USkillNumberBase::UpdatAbilityData(EEnHanceType EnHanceType, uint8 AbilityNum)
 {
+	auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!APGI) return;
 	if(AbilityNum == 0) return; 
 	AbilityNum--;
 
 	switch (EnHanceType)
 	{
 		case EEnHanceType::Silver:
-		AbilityData = OwnerCharacter->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->SilverRowName[AbilityNum]), RowDataTable->SilverRowName[AbilityNum]);
+		AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->SilverRowName[AbilityNum]), RowDataTable->SilverRowName[AbilityNum]);
 		break;
 	
 		case EEnHanceType::Gold:
-		AbilityData = OwnerCharacter->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->GoldRowName[AbilityNum]), RowDataTable->GoldRowName[AbilityNum]);
+		AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->GoldRowName[AbilityNum]), RowDataTable->GoldRowName[AbilityNum]);
 		break;
 
 		case EEnHanceType::Platinum:
-		AbilityData = OwnerCharacter->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->PlatinumRowName[AbilityNum]), RowDataTable->PlatinumRowName[AbilityNum]);
+		AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->PlatinumRowName[AbilityNum]), RowDataTable->PlatinumRowName[AbilityNum]);
 		break;
 	}
 }
 
 void USkillNumberBase::OnCoolDown()
 {
+}
+
+bool USkillNumberBase::CheckSkillCondition()
+{
+	if(!OwnerCharacter.IsValid()) return false;
+	if(OwnerCharacter->GetDoing()) return false;
+	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP < MPConsumption || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return false;}
+	
+    return true;
 }
 
 bool USkillNumberBase::CheckSmartKey(ESkillKey WhichKey)
@@ -314,12 +390,14 @@ void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, E
 void USkillNumberBase::CharacterRotation()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!SkillRange_Target.IsValid()) return;
-
+		
 	FVector Loc = SkillRange_Target->GetDecalComponent()->GetComponentLocation() - OwnerCharacter->GetMesh()->GetComponentLocation();
 
 	Loc.Z = 0.0f; FRotator Rotation = FRotationMatrix::MakeFromX(Loc).Rotator();
 	
 	OwnerCharacter->GetAPMoveComponent()->SetAttackRotation(Rotation, RotSpeed);
+
+	OwnerCharacter->OnSkillRotationTrigger.RemoveDynamic(this, &USkillNumberBase::CharacterRotation);
 }
 
 void USkillNumberBase::CharacterRotation_TwoCircle()
@@ -350,3 +428,4 @@ void USkillNumberBase::CharacterRotation_Sector()
 
 	OwnerCharacter->GetAPMoveComponent()->SetAttackRotation(SkillRange_Target->GetActorRotation(), RotSpeed);
 }
+

@@ -12,8 +12,7 @@
 
 UUltSkillNumber_8::UUltSkillNumber_8()
 {
-	OriginCoolTime = 7.0f;
-
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_8");
 }
 
 void UUltSkillNumber_8::BeginPlay()
@@ -32,29 +31,30 @@ void UUltSkillNumber_8::PlaySkill()
 	}
 	else
 	{
-        if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+        if(!CheckSkillCondition()) return;
         OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_UltSkill8();
+		Spawn_SkillRange();
 	}
     
 }
 
-void UUltSkillNumber_8::Spawn_UltSkill8()
+void UUltSkillNumber_8::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
 
 	ActivateSkillRange_Target(UltSkill8_TargetRange, UltSkill8_TargetRange_2, ESkillRangeType::Two_Circle);
 	if(SkillRange_TWoCircle.IsValid()) SkillRange_TWoCircle->SetMaxDist(UltSkill8_LimitDistance);
-	if(SkillRange_TWoCircle.IsValid()) SkillRange_TWoCircle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_TWoCircle.IsValid()) SkillRange_TWoCircle->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(UltSkill8_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
@@ -90,14 +90,15 @@ void UUltSkillNumber_8::Activate_Skill()
 	if(!ArcaneMeteor.IsValid()) return; 
     ArcaneMeteor->SetOwner(OwnerCharacter.Get());
     ArcaneMeteor->SetRadius(UltSkill8_TargetRange, UltSkill8_TargetRange_2);
-	ArcaneMeteor->SetSkill(SkillAbilityNestingData);	
+	ArcaneMeteor->SetSkill(SkillAbilityNestingData, this);	
 
-    Remove_Skill();
+    SkillEnd();
 }
 
 void UUltSkillNumber_8::SkillEnd()
 {
-
+	Super::SkillEnd();
+	Remove_Skill();
 }
 
 void UUltSkillNumber_8::UpdateSkillData()

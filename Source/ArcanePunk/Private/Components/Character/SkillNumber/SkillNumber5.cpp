@@ -17,11 +17,21 @@
 USkillNumber5::USkillNumber5()
 {
 	SkillAbilityNestingData.SkillName = TEXT("Skill_5");
+
+	RotSpeed = 780.0f;
 }
 
 void USkillNumber5::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void USkillNumber5::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// if(SkillRange_Target.IsValid())	GetOwner()->SetActorRotation(FRotationMatrix::MakeFromX( SkillRange_Target->GetRotVector()).Rotator());
+	
 }
 
 void USkillNumber5::PlaySkill()
@@ -35,16 +45,16 @@ void USkillNumber5::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_Skill5();
+		Spawn_SkillRange();
 
 		OnSkill();
 	}
 }
 
-void USkillNumber5::Spawn_Skill5()
+void USkillNumber5::Spawn_SkillRange()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
@@ -53,7 +63,7 @@ void USkillNumber5::Spawn_Skill5()
 
 	ActivateSkillRange_Target(Skill5_Wide, Skill5_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill5_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	if(CheckSmartKey(SkillKey))
 	{
@@ -72,7 +82,13 @@ void USkillNumber5::OnSkill()
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 	OwnerCharacter->SetDoing(true);
-    
+
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
+	OwnerCharacter->OnSkillChargingTrigger.AddDynamic(this, &USkillNumberBase::Enhance);
+	OwnerCharacter->OnSkillEnhanceTrigger.AddDynamic(this, &USkillNumberBase::DoubleEnhance);
+	OwnerCharacter->OnSkillRotationTrigger.AddDynamic(this, &USkillNumberBase::Remove_Skill);
+	    
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -99,12 +115,13 @@ void USkillNumber5::Activate_Skill_5()
 	ArcaneBeam->SetOwner(OwnerCharacter.Get());
 	ArcaneBeam->SetDistance(Skill5_LimitDistance * 2.0f - OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius());
 	ArcaneBeam->SetWide(Skill5_Wide);
-	ArcaneBeam->SetSkill(SkillAbilityNestingData);	
+	ArcaneBeam->SetSkill(SkillAbilityNestingData, this);	
 
 }
 
 void USkillNumber5::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid() || !ArcaneBeam.IsValid()) return;
 	
 	ArcaneBeam->SetBeamEffect();	
@@ -112,31 +129,78 @@ void USkillNumber5::Activate_Skill()
 
 void USkillNumber5::Remove_Skill()
 {
-	Super::Remove_Skill();
-	if(!OwnerCharacter.IsValid()) return;
-	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
-	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	OwnerCharacter->OnSkillRotationTrigger.RemoveDynamic(this, &USkillNumberBase::Remove_Skill);
+	CharacterRotation();
+	
+	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+    if(OwnerAnim) OwnerAnim->StopSkill_5_Montage();
+
+	SetComponentTickEnabled(false);
+	if(SkillRange_Target.IsValid()) SkillRange_Target->Destroy();
+	OwnerCharacterPC->SetMouseCursor();
+	CursorImmediately();
+	Skilling = false;
+
+	if(!ArcaneBeam.IsValid()) return;
+	ArcaneBeam->SetbCharging(false);
 }
 
 void USkillNumber5::SkillEnd()
 {
-	Remove_Skill();
+	Super::SkillEnd();
+	if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+
+	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumberBase::Enhance);
+	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumberBase::DoubleEnhance);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
+
 	if(ArcaneBeam.IsValid()) ArcaneBeam->DestroySKill();
 }
 
 void USkillNumber5::Enhance()
 {
+	Super::Enhance();
 	if(!OwnerCharacter.IsValid() || !ArcaneBeam.IsValid()) return;
-
 	ArcaneBeam->OnCharging();
 }
 
 void USkillNumber5::DoubleEnhance()
 {
+	Super::DoubleEnhance();
 	if(!OwnerCharacter.IsValid() || !ArcaneBeam.IsValid()) return;
 	ArcaneBeam->OnChargingEnhance();
 }
 
 void USkillNumber5::UpdateSkillData()
 {
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+	
+	float Dist = Skill5_LimitDistance_Origin;
+	float Wide = Skill5_Wide_Origin;
+	float Cool = SkillNameListData.CoolTime;
+	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+		if(It.Key == 2) {
+			UpdatAbilityData(EEnHanceType::Silver, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Dist, AbilityData->Coefficient_X, It.Value); // 사거리 강화}
+		} 
+		if(It.Key == 3) {
+			UpdatAbilityData(EEnHanceType::Silver, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Wide, AbilityData->Coefficient_X, It.Value); // 사거리 강화}
+		} 
+	}
+    // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    // {
+    // }
+    // for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    // {
+    // }
+	Skill5_LimitDistance = Dist;
+	Skill5_Wide = Wide;
+	CurrentCoolTime = Cool;
 }

@@ -24,6 +24,8 @@ public:
 
 	UFUNCTION()
 	void OnClickBack();
+	UFUNCTION()
+	void OnClickApply();
 
 	UFUNCTION()
 	void OnSlide_Master(float Value);
@@ -35,6 +37,8 @@ public:
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Back;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_Apply;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	USlider* Slider_Master;
@@ -42,5 +46,9 @@ private:
 	USlider* Slider_BGM;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	USlider* Slider_Effect;
+
+	float Master;
+	float BGM;
+	float Effect;
 
 };

@@ -128,9 +128,9 @@ void AArcaneExecution::SetExecutionType(uint8 NewValue)
     }
 }
 
-void AArcaneExecution::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneExecution::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 
     if(!OwnerCharacter.IsValid()) return;
     

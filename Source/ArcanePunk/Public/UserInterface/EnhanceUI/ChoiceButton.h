@@ -18,18 +18,33 @@ class ARCANEPUNK_API UChoiceButton : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void SetEnhance(UUserWidget* UpdateParentWidget, ESkillNumber UpdateSkillNumber, uint8 UpdateSkillAbility ,uint16 UpdateNestingNumb);
-	void SetNewSkill(UUserWidget* UpdateParentWidget, ESkillNumber UpdateSkillNumber);
+	void SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkillNumber, uint8 UpdateSkillAbility ,uint16 UpdateNestingNumb);
+	void SetNewSkill(UUserWidget* UpdateParentWidget, uint8 UpdateSkillNumber);
 	FORCEINLINE void SetChoiceIndexNum(uint8 NewValue) {ChoiceIndexNum = NewValue;};
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnChoice_FadeIn();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnRerollButton_FadeIn();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnChoiceButton_Hovered();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnChoiceButton_UnHovered();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnEnhanceChoice();
 
 private:
 	void BindButton();
+	void SetSkillName();
 
 	UFUNCTION()
-	void OnEnhanceChoice();
-
+	void OnClickChoice();
 	UFUNCTION()
 	void OnReroll();
+	UFUNCTION(BlueprintCallable)
+	void ApplyChoice();
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -48,19 +63,23 @@ private:
 	UTextBlock* SkillAbility_Nesting;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_New;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* SkillNumber_Image;
 
 	UPROPERTY(EditAnywhere)
-	UDataTable* SkillSlotDataTable;
+	UDataTable* SkillNameDataTable;
 
-	UPROPERTY(EditAnywhere)
 	FName Name = TEXT("NormalSkill");
+	FName SkillNumberName;
 	// ESkillAbility SkillAbility = ESkillAbility::Ability_None;
 
 	uint8 SkillAbility;
 	uint16 NestingNumb;
+	FSkillAbilityNestingData NestingData;
 
-	ESkillNumber SkillNumber = ESkillNumber::None;
+	uint8 SkillNumber = 0;
 
 	TWeakObjectPtr<UAPEnhanceChoice> ParentWidget;
 

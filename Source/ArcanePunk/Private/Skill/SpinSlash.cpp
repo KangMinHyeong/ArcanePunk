@@ -46,7 +46,7 @@ void ASpinSlash::DestroySKill()
 void ASpinSlash::OnKeyDownCheck(float DeltaTime)
 {
     if(!OwnerCharacter.IsValid()) return;
-    if(CheckSkillKey(Skill_18.Get()))
+    if(CheckSkillKey(SkillComp.Get()))
     {
         OwnerCharacter->GetAPHUD()->OnChargingGauge.Broadcast( CurrentTime, DestroyTime );
         CurrentTime = FMath::FInterpConstantTo(CurrentTime, DestroyTime, DeltaTime, ChargeSpeed);
@@ -85,14 +85,11 @@ void ASpinSlash::SetSlashSize()
     SlashEffectComp->SetNiagaraVariableFloat(TEXT("Time"), DestroyTime);
 }
 
-void ASpinSlash::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ASpinSlash::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());  if(!OwnerCharacter.IsValid()) return;
 
-    Skill_18 = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_18);
-
-    
     SetSlashSize();
     OnSlashDamage();
     GetWorldTimerManager().SetTimer(SlashTimerHandle, this, &ASpinSlash::OnSlashDamage, SlashAttackRate, true);

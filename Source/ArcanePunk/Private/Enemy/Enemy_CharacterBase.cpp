@@ -24,18 +24,15 @@
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APAttackComponent.h"
 #include "UserInterface/APHUD.h"
+#include "GameInstance/APGameInstance.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidgetComp"));
-	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
-	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
-	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
 
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
-	StunEffect->SetupAttachment(GetMesh());
 
 	TeleportMark = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TeleportMark"));
 	TeleportMark->SetupAttachment(GetMesh());
@@ -54,13 +51,13 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
 	SetActorTickEnabled(false);
 	InitMonster();	
 	BindMontageEnded();
-	OnDrop = true;
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 	DefaultMaterial = GetMesh()->GetMaterial(0);
-	GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
 	
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
 }
@@ -93,11 +90,13 @@ void AEnemy_CharacterBase::CrowdControlCheck()
 	}
 }
 
-void AEnemy_CharacterBase::TeleportMarkActivate(float Time, AActor* MarkOwner)
+void AEnemy_CharacterBase::TeleportMarkActivate(float Time, AActor* MarkOwner, USkillNumberBase* SkillComp)
 {
 	MarkActor = MarkOwner;
+	SkillComponent = SkillComp;
 	TeleportMark->Activate();
-	GetWorldTimerManager().SetTimer(TeleportTimerHandle, this, &AEnemy_CharacterBase::TeleportMarkDeactivate, Time, false);
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemy_CharacterBase::TeleportMarkDeactivate);
+	GetWorld()->GetTimerManager().SetTimer(TeleportTimerHandle, TimerDelegate, Time, false);
 }
 
 void AEnemy_CharacterBase::TeleportMarkDeactivate()
@@ -105,17 +104,11 @@ void AEnemy_CharacterBase::TeleportMarkDeactivate()
 	TeleportMark->DeactivateImmediate();
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter = Cast<AArcanePunkCharacter>(MarkActor); if(!OwnerCharacter.IsValid()) return;
 
-	TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
-	if(SkillNum.IsValid())
+	if(SkillComponent.IsValid())
 	{
-		SkillNum->MarkErase();
+		SkillComponent->MarkErase();
 	} 
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
-}
-
-bool AEnemy_CharacterBase::IsHitting()
-{
-    return bHitting;
 }
 
 float AEnemy_CharacterBase::GetForward()
@@ -144,10 +137,12 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if(IsDead()) return 0.0f;
+	float HP = MyPlayerTotalStatus.PlayerDynamicData.HP;
 	DamageApplied = DamageApplied * DamageMultiple;
 	DamageApplied = FMath::Min(HP, DamageApplied);
 	
 	HP = HP - DamageMath(DamageApplied);
+	MyPlayerTotalStatus.PlayerDynamicData.HP = HP;
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
@@ -161,7 +156,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		TeleportMarkDeactivate();
 		CheckAllEnemyKilled();
-		StunEffect->DeactivateImmediate();
+		StunEffectComp->DeactivateImmediate();
 		TeleportMark->DeactivateImmediate();
 	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
 	}
@@ -172,15 +167,6 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	}
 
     return DamageApplied;
-}
-
-bool AEnemy_CharacterBase::IsDead()
-{
-	if(HP<=0.0001f)
-	{
-		bIsDead = true;
-	}
-    return bIsDead;
 }
 
 bool AEnemy_CharacterBase::IsHardCC()
@@ -212,7 +198,7 @@ AActor* AEnemy_CharacterBase::IsAggro()
 
 float AEnemy_CharacterBase::DamageMath(float Damage)
 {
-    return Damage * Defense_constant * (1/(Defense_constant + Character_Defense));
+    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerTotalStatus.PlayerDynamicData.DEF));
 }
 
 bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom, float Radius, FVector CustomStart, FVector CustomEnd)
@@ -235,6 +221,11 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
     {
 		Params.AddIgnoredActor(Actor);
     }    
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Ground"), Actors);
+	for (AActor* Actor : Actors)
+    {
+		Params.AddIgnoredActor(Actor);
+    }   
 	
 	HitVector = -Rotation.Vector();
 
@@ -249,7 +240,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 
 void AEnemy_CharacterBase::NormalAttack()
 {
-	float Damage = Monster_ATK * CriticalCalculate(NormalAttack_CriticalMultiple);
+	float Damage = MyPlayerTotalStatus.PlayerDynamicData.ATK * CriticalCalculate();
 	FHitResult HitResult;
 	FVector HitVector;
 	if(AttackTrace(HitResult, HitVector))
@@ -264,18 +255,6 @@ void AEnemy_CharacterBase::NormalAttack()
 			if(bKnockBackAttack) OnPlayerKnockBack(Actor, KnockBackDist, KnockBackTime);
 		}
 	}
-}
-
-float AEnemy_CharacterBase::CriticalCalculate(float Multiple)
-{
-	float Percent = FMath::RandRange(0.0f, 100.0f);
-	if(Percent <= CriticalPercent)
-	{
-		bCriticalAttack = true;
-		return CriticalStep * (Multiple - 1.0f) + 1;
-	}
-	else {bCriticalAttack = false;}
-    return  1.0f;
 }
 
 void AEnemy_CharacterBase::PossessedBy(AController *NewController)
@@ -296,15 +275,17 @@ void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float D
 	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 180.0f, 0.0f));
 	if(!DamageText) return;
 
-	auto Character = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); if(!Character) return;
+	bool Check = false; 
+	auto Character = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); 
+	if(Character) Check = Character->IsCriticalAttack();
 
 	DamageText->SetOwner(this);
-	DamageText->SetDamageText(Damage, Character->IsCriticalAttack());
+	DamageText->SetDamageText(Damage, Check);
 }
 
 void AEnemy_CharacterBase::InitMonster()
 {
-	HP = MaxHP;
+	MyPlayerTotalStatus.PlayerDynamicData.HP = MyPlayerTotalStatus.PlayerDynamicData.MaxHP;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }
@@ -317,27 +298,24 @@ void AEnemy_CharacterBase::StopClear()
 
 void AEnemy_CharacterBase::DropItemActor() 
 {
-	// for(TPair<TSubclassOf<AEnemy_DropBase>, float>& DropClass : DropMap)
-	// {
-	// 	float DropPercent = FMath::RandRange(0.0f,  100.0f);
-	// 	if(DropPercent <= DropClass.Value) auto DropItem = GetWorld()->SpawnActor<AEnemy_DropBase>(DropClass.Key, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-	// }
-	for(TPair<FName, float>& DropClass : PackageDropMap)
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+	auto PackageDrops = GI->GetPackageDropMap();
+
+	for(TPair<FName, float>& DropClass : PackageDrops)
 	{
 		float DropPercent = FMath::RandRange(0.0f,  100.0f);
 		if(DropClass.Key == "Enhance")
 		{
 			if(DropPercent <= DropClass.Value)
 			{
-				uint8 EnhanceCategoryNum = FMath::RandRange(1, 2);
 				if(DropPackage.IsValid())
 				{
-					DropPackage->AddEnhance(EnhanceCategoryNum);
+					DropPackage->AddEnhance();
 				}
 				else
 				{
-					DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(DropPackageClass, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-					DropPackage->AddEnhance(EnhanceCategoryNum);
+					DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(GI->GetDropPackageClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+					DropPackage->AddEnhance();
 				}	
 			}
 			continue;
@@ -351,7 +329,7 @@ void AEnemy_CharacterBase::DropItemActor()
 			}
 			else
 			{
-				DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(DropPackageClass, GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+				DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(GI->GetDropPackageClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
 				DropPackage->AddItem(DropClass.Key);
 			}	
 		}
@@ -432,7 +410,7 @@ void AEnemy_CharacterBase::SetHitEffect(FVector HitLocation)
 void AEnemy_CharacterBase::BindMontageEnded()
 {
 	EnemyAnim = Cast<UAP_EnemyBaseAnimInstance>(GetMesh()->GetAnimInstance());
-	EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy_CharacterBase::EnemyMontageEnded);
+	if(EnemyAnim.IsValid()) EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy_CharacterBase::EnemyMontageEnded);
 }
 
 void AEnemy_CharacterBase::EnemyMontageEnded(UAnimMontage *Montage, bool bInterrupted)
@@ -448,14 +426,14 @@ void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 
 void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor, float Dist, float Time)
 {
-	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
-	if(!Character->IsBlockMode()) Character->GetCrowdControlComponent()->KnockBackState(GetActorLocation(), Dist, Time);
+	auto Character = Cast<AAPCharacterBase>(Actor); if(!Character) return;
+	if(!Character->IsBlockMode()) Character->GetCrowdControlComp()->KnockBackState(GetActorLocation(), Dist, Time);
 }
 
 void AEnemy_CharacterBase::OnPlayerStun(AActor *Actor, float Time)
 {
-	auto Character = Cast<AArcanePunkCharacter>(Actor); if(!Character) return;
-	if(!Character->IsBlockMode())  Character->GetCrowdControlComponent()->StunState(Time);
+	auto Character = Cast<AAPCharacterBase>(Actor); if(!Character) return;
+	if(!Character->IsBlockMode())  Character->GetCrowdControlComp()->StunState(Time);
 }
 
 void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
@@ -463,7 +441,7 @@ void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
 	FVector Loc = TargetActor->GetActorLocation() - GetMesh()->GetComponentLocation();
 	Loc.Z = 0.0f; FRotator Rotation = FRotationMatrix::MakeFromX(Loc).Rotator();
 
-	if(Speed < 0.0f) {MoveComp->SetAttackRotation(Rotation);}
-	else {MoveComp->SetAttackRotation(Rotation, Speed);}
+	if(Speed < 0.0f) {MoveComponent->SetAttackRotation(Rotation);}
+	else {MoveComponent->SetAttackRotation(Rotation, Speed);}
    	
 }

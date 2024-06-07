@@ -47,28 +47,29 @@ void USkillNumber3::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_Skill3();
+		Spawn_SkillRange();
 	}
 	
 }
 
-void USkillNumber3::Spawn_Skill3()
+void USkillNumber3::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_3);
+	// if(!CheckSmartKey(SkillKey)) OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_3);
 
 	ActivateSkillRange_Target(Skill3_TargetRange, Skill3_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill3_LimitDist);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(Skill3_LimitDist);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);

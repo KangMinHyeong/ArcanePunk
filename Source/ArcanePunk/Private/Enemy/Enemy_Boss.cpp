@@ -16,6 +16,8 @@
 #include "UserInterface/Enemy/APEnemyHP.h"
 #include "Enemy/AIController/EnemyBossBaseAIController.h"
 #include "Components/Common/APSpawnMonsterComponent.h"
+#include "Enemy/SkillActor/APPillarAttack.h"
+#include "Components/Character/APMovementComponent.h"
 
 AEnemy_Boss::AEnemy_Boss()
 {
@@ -25,8 +27,8 @@ AEnemy_Boss::AEnemy_Boss()
     SpawnMonsterComp = CreateDefaultSubobject<UAPSpawnMonsterComponent>(TEXT("SpawnMonsterComp"));
     RushEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("RushEffect"));
     RushTrigger = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RushTrigger"));
-    
 
+    Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
     RushEffect->SetupAttachment(GetMesh());
     RushTrigger->SetupAttachment(GetMesh());
 }
@@ -35,11 +37,10 @@ void AEnemy_Boss::BeginPlay()
 {
     Super::BeginPlay();
 
-    MonsterAIController = Cast<AEnemyBaseAIController>(GetController());
-    if(MonsterAIController) MonsterAIController->UnPossessing();
+    // MonsterAIController = Cast<AEnemyBaseAIController>(GetController());
+    // if(MonsterAIController) MonsterAIController->UnPossessing();
 
     InitPatternNums(); 
-    RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     BindMontageEnd();
     BindRushAttack();
 
@@ -88,6 +89,7 @@ void AEnemy_Boss::BossMontageEnded(UAnimMontage *Montage, bool bInterrupted)
     else if(Montage == OwnerAnim->DrainMonster_Montage) OnDrainMonster_MontageEnd();
     else if(Montage == OwnerAnim->RangeAttack1_Montage) OnRangeAttack1_MontageEnd();
     else if(Montage == OwnerAnim->RangeAttack2_Montage) OnRangeAttack2_MontageEnd();
+    else if(Montage == OwnerAnim->PillarAttack_Montage) OnPillarAttackMontageEnd();
 }
 
 void AEnemy_Boss::OnRushAttack_MontageEnd()
@@ -130,21 +132,28 @@ void AEnemy_Boss::OnRangeAttack2_MontageEnd()
 {
     GetMesh()->SetMaterial(0,DefaultMaterial);
 }
+
+void AEnemy_Boss::OnPillarAttackMontageEnd()
+{
+    Monster_AttackRadius /= PillarRangeCoefficient;
+    Monster_AttackRange /= PillarRangeCoefficient;
+    MyPlayerTotalStatus.PlayerDynamicData.ATK /= 1.5f;
+}
 // Montage Bind Func End
 
 //Rush Attack Func Start
 void AEnemy_Boss::RushAttackStart()
 {
     GetWorldTimerManager().SetTimer(RushAttackTimerHandle, this, &AEnemy_Boss::RushAttackEnd, RushAttackTime, false);
-    bRushAttack = true;
-    GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed*2;
+    bRushAttack = true; SetActorTickEnabled(true);
+    GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed*2.0f;
     if(PatternMaterial.Num() >= 5) GetMesh()->SetMaterial(0,PatternMaterial.Last(4));
 }
 
 void AEnemy_Boss::RushAttackEnd()
 {
-    bRushAttack = false;
-    GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+    bRushAttack = false; SetActorTickEnabled(false);
+    GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
     GetMesh()->SetMaterial(0,DefaultMaterial);
 	RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetWorldTimerManager().ClearTimer(RushAttackTimerHandle);
@@ -173,8 +182,8 @@ void AEnemy_Boss::ActiveRushTrigger(UPrimitiveComponent *OverlappedComp, AActor 
 	
 	if (OtherActor && OtherActor != this)
 	{
-        DistinctHitPoint(SweepResult.Location, OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, Monster_ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+        DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
+		UGameplayStatics::ApplyDamage(OtherActor, MyPlayerTotalStatus.PlayerDynamicData.ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
         OnPlayerKnockBack(OtherActor, KnockBackDist, RushKnockBackTime);
 	}
     RushAttackEnd();
@@ -197,7 +206,6 @@ void AEnemy_Boss::KnockBackAttack()
 
 void AEnemy_Boss::KnockBackActivate()
 {
-    bKnockBackAttack = true;
     UNiagaraFunctionLibrary::SpawnSystemAttached(KnockBackSlash, GetMesh(), TEXT("KnockBackSlashEffect"), GetActorLocation(), GetActorRotation() + KnockBackSlashRotator, EAttachLocation::KeepWorldPosition, true);
     NormalAttack();
 }
@@ -236,8 +244,8 @@ void AEnemy_Boss::DrainMonster()
         if(!MonsterArr.Top()->IsDead())
         {
             MonsterArr.Top()->Destroy();
-            HP = FMath::Min(MaxHP, HP+100.0f);
-            UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
+            MyPlayerTotalStatus.PlayerDynamicData.HP = FMath::Min(MyPlayerTotalStatus.PlayerDynamicData.MaxHP, MyPlayerTotalStatus.PlayerDynamicData.HP+100.0f);
+            UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), MyPlayerTotalStatus.PlayerDynamicData.HP);
             OnEnemyHPChanged.Broadcast();
         }
         MonsterArr.Pop();
@@ -293,7 +301,7 @@ void AEnemy_Boss::SpawnRangeAttack_1()
         {
             if(AActor* Actor = HitResult.GetActor())
             {
-                float Damage= Monster_ATK * RangeAttack_1_Coefficient;
+                float Damage= MyPlayerTotalStatus.PlayerDynamicData.ATK * RangeAttack_1_Coefficient;
                 FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
                 AController* MyController = Cast<AController>(GetController());
                 if(MyController == nullptr) return;
@@ -356,6 +364,58 @@ void AEnemy_Boss::OnSwordImpactSpawn(float AddAngle)
 }
 // RangeAttack_2 Func End
 
+// PillarAttack Func Start
+void AEnemy_Boss::OnPillarWeapon()
+{
+    bGetPillar = true;
+    Weapon->SetSkeletalMeshAsset(SecondWeapon);
+    Weapon->SetRelativeLocation(SecondWeaponLocation); 
+    Weapon->SetRelativeScale3D(SecondWeaponScale);
+}
+
+void AEnemy_Boss::OnPillarCombo()
+{
+    MyPlayerTotalStatus.PlayerDynamicData.ATK *= 1.5f;
+    Monster_AttackRadius *= PillarRangeCoefficient;
+    Monster_AttackRange *= PillarRangeCoefficient;
+    if(!OwnerAnim.IsValid()) return;
+    OwnerAnim->PlayPillarAttack_Montage();
+}
+
+void AEnemy_Boss::OnThrowingPillarReady(FVector Target)
+{
+    Target.Z = 0.0f;
+    MoveComponent->SetAttackRotation(FRotationMatrix::MakeFromX(Target).Rotator());
+    PillarTarget = Target;
+
+    if(!OwnerAnim.IsValid()) return;
+    OwnerAnim->PlayPillarThrowing_Montage();
+}
+
+void AEnemy_Boss::OnThrowingPillar()
+{
+    FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.bNoFail = true;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    auto Pillar = GetWorld()->SpawnActor<AAPPillarAttack>(PillarClass, RushTrigger->GetComponentLocation(), ThrowingPillarRot, SpawnParams);
+    if(!Pillar) return;
+    Pillar->SetOwner(this);
+    Pillar->ThrowedPillar(PillarTarget);
+
+    OnPillarAttackEnd();
+}
+
+void AEnemy_Boss::OnPillarAttackEnd()
+{
+    bGetPillar = true;
+    bGetPillar = false;
+    Weapon->SetSkeletalMeshAsset(DefaultWeapon);
+    Weapon->SetRelativeLocation(FVector::ZeroVector); 
+    Weapon->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+}
+
 // HPUI Set Start
 bool AEnemy_Boss::SetHPUI()
 { 
@@ -382,8 +442,10 @@ void AEnemy_Boss::OnAttackMove(float DeltaTime)
 {
     if(bAttackMove)
     {
-        SetActorLocation(GetActorLocation() + GetActorForwardVector() * AttackMoveSpeed * DeltaTime);
-        OnHitPlayerMove(GetActorForwardVector() * AttackMoveSpeed * DeltaTime * 1.1f);
+        FVector Current = GetActorLocation();
+        Current = FMath::VInterpConstantTo(Current, Current + GetActorForwardVector() * 1500.0f, AttackMoveSpeed, DeltaTime);
+        SetActorLocation(Current);
+        // OnHitPlayerMove(GetActorForwardVector() * AttackMoveSpeed * DeltaTime * 1.1f);
     }
 }
 
@@ -391,7 +453,7 @@ void AEnemy_Boss::OnHitPlayerMove(FVector MoveLocation)
 {
     FHitResult HitResult; FVector HitVector;
     if(!AttackTrace(HitResult, HitVector)) return;
-    auto Character = Cast<AArcanePunkCharacter>(HitResult.GetActor());
+    auto Character = Cast<ACharacter>(HitResult.GetActor());
     if(Character) Character->SetActorLocation(Character->GetActorLocation() + MoveLocation);
 }
 // Attack Move Func End

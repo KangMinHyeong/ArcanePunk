@@ -25,7 +25,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	FORCEINLINE void SetMaxWindWitdh(float Width) {MaxWindWitdh =  Width;};
 	void SetMaxLocation(FVector Location);
 	FORCEINLINE void SetMaxRadius(float Radius) {MaxRadius =  Radius;};
@@ -33,6 +33,7 @@ private:
 	UFUNCTION()
 	void OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 	void SetWindTrigger(float DeltaTime);
+	void SetWindSpeed(float DeltaTime);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -41,14 +42,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* WindTrigger;
 	
-	UPROPERTY()
-	UNiagaraComponent* WindEffectComp;
-	UPROPERTY()
-	UNiagaraComponent* WindGroundEffectComp;
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* WindEffect;
-	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* WindGroundEffect;
+	UNiagaraComponent* WindEffect;
+
+	// UPROPERTY(EditAnywhere)
+	// UNiagaraSystem* WindEffect;
+	// UPROPERTY(EditAnywhere)
+	// UNiagaraSystem* WindGroundEffect;
 
 	UPROPERTY(EditAnywhere)
 	float WindSpeed = 2.0f;	
@@ -56,6 +56,7 @@ private:
 	float LocationSpeed;
 	float RadiusSpeed;
 
+	float EffectScale = 0.3f;
 
 	float CurrentWindWitdh;
 	float MaxWindWitdh;
@@ -66,4 +67,6 @@ private:
 	float CurrentRadius;
 	float MaxRadius;
 
+	// UPROPERTY()
+	// TArray<AActor*> HitActors;
 };

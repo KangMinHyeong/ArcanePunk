@@ -72,6 +72,6 @@ void APortal_Base::SpawnSound(FVector Location)
 {
 	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-	float SoundVolume = GI->GameSoundVolume.MasterVolume * GI->GameSoundVolume.EffectVolume;
+	float SoundVolume = GI->GetGameSoundVolume().MasterVolume * GI->GetGameSoundVolume().EffectVolume;
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PortalSound, Location, FRotator::ZeroRotator, SoundVolume, 1.0f, SoundStartTime);
 }

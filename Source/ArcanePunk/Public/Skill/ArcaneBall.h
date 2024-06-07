@@ -11,16 +11,6 @@ class UNiagaraComponent;
 class UNiagaraSystem;
 class UProjectileMovementComponent;
 
-UENUM(BlueprintType)
-enum class EPenetrateType : uint8 // 관통 종류
-{
-	None 	= 0 UMETA(DisplayName = "None"),
-	Enemy 	= 1 UMETA(DisplayName = "Enemy 관통"),
-	Object 	= 2 UMETA(DisplayName = "Object 관통"),
-	Both 	= 3	UMETA(DisplayName = "모두 관통")
-};
-
-
 
 UCLASS()
 class ARCANEPUNK_API AArcaneBall : public AAPSkillActorBase
@@ -39,7 +29,7 @@ public:
 	void OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 	UFUNCTION()
 	void OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit);
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
@@ -59,19 +49,21 @@ private:
 	void BintOverlap();
 
 	void SpawnGravityBall(float Radius);
+
+	virtual void HomingOrderSet() override;
 	
 private:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* BallTrigger;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* BallMesh;
+	UStaticMeshComponent* BallCenter;
 	
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* BallEffect;
 
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* ExplosionEffect;
+	UNiagaraSystem* BallHitEffect;
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* GravityBallTrigger;
@@ -80,18 +72,16 @@ private:
 	UProjectileMovementComponent* BallMoveComp;
 
 	UPROPERTY(EditAnywhere)
+	UProjectileMovementComponent* HomingMoveComp;
+
+	UPROPERTY(EditAnywhere)
 	float BallSpeed = 750.0f;
+	float CurrentBallSpeed;
 
 	UPROPERTY(EditAnywhere)
 	float ExplosionRadius = 250.0f;
-
-	int32 PenetrateCount = 1;
-
-	bool bPenetrate = true;
 	
-	EPenetrateType PenetrateType = EPenetrateType::None;
-	
-	
+	bool bDrag = false;
 
 	float GravitySpeed = 0.0f;
 

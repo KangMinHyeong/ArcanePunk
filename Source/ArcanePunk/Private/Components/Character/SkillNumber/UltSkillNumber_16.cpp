@@ -11,7 +11,7 @@
 
 UUltSkillNumber_16::UUltSkillNumber_16()
 {
-	OriginCoolTime = 5.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_16");
 }
 
 void UUltSkillNumber_16::BeginPlay()
@@ -26,7 +26,7 @@ void UUltSkillNumber_16::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
 	OnSkill();
 }
@@ -52,7 +52,7 @@ void UUltSkillNumber_16::Activate_Skill()
 	SuperiorMode = GetWorld()->SpawnActor<ASuperiorMode>(OwnerCharacter->GetAPSkillHubComponent()->GetSuperiorMode(), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
     if(!SuperiorMode.IsValid()) return;
 	SuperiorMode->SetOwner(OwnerCharacter.Get());
-	SuperiorMode->SetSkill(SkillAbilityNestingData);	
+	SuperiorMode->SetSkill(SkillAbilityNestingData, this);	
     SuperiorMode->AttachToComponent(OwnerCharacter->GetRootComponent(), FAttachmentTransformRules ::KeepWorldTransform);
 
 }

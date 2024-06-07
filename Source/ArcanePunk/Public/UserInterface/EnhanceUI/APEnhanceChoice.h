@@ -12,6 +12,8 @@ class UTextBlock;
 class UHorizontalBox;
 class UChoiceButton;
 class USizeBox;
+class UAPGameInstance;
+class UBorder;
 
 UCLASS()
 class ARCANEPUNK_API UAPEnhanceChoice : public UUserWidget
@@ -20,25 +22,42 @@ class ARCANEPUNK_API UAPEnhanceChoice : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType);
+	void InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType, uint8 UpdateEnhanceSkillNum);
 
-	void ApplyEnhance(uint8 UpdateSkillAbility, uint16 UpdateNestingNumb, uint16 MaxNestingNumb);
-	void ApplyNewSkill(ESkillNumber UpdateSkillNumber);
+	void ApplyEnhance(uint8 UpdateSkillNumber, uint8 UpdateSkillAbility, uint16 UpdateNestingNumb, uint16 MaxNestingNumb);
+	void ApplyNewSkill(uint8 UpdateSkillNumber);
 	FORCEINLINE UDataTable* GetSkillAbilityRowNameData() const {return SkillAbilityRowNameData;};
+	FORCEINLINE EEnhanceCategory GetEnHanceCategory() const {return EnhanceCategory;};
 	FORCEINLINE EEnHanceType GetEnHanceType() const {return EnHanceType;};
 	FORCEINLINE FSkillAbilityNestingData GetSkillAbilityNestingData() const {return SkillAbilityNestingData;};
-	FORCEINLINE void SetSkillAppearPercent(float NewValue) {SkillAppearPercent = NewValue;};
+	FORCEINLINE FSkillAbilityNestingData GetPassiveAbilityNestingData(uint8 Key) const {return PassiveNestingData[Key];};
+	FORCEINLINE void SetSkillAppearPercent(float NewValue) {SkillAppearPercent = NewValue; PassiveSkillAppearPercent = NewValue;};
 	
 	void OnReroll(uint8 ChoiceIndexNum);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBackGround_FadeIn();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBackGround_FadeOut();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnReroll_FadeIn();
+
+	UFUNCTION(BlueprintCallable)
+	void OnDisplayChoiceButton();
+	UFUNCTION(BlueprintCallable)
+	void OnDisplayRerollButton();
+
 private:	
+	void InitTypeSetting();
 	void ActiveSuffle(uint8 Index);
-	void InitPassiveSuffle();
+	void InitPassiveSuffle(uint8 Index);
+	void InitPassiveSkillName();
 	
-	void EnhanceSuffle();
+	void EnhanceSuffle(FName SkillName);
 	bool SkillSuffle();
+	bool PassiveSuffle();
+	
 	void SetPauseGame();
-	void TextSetting();
 	void SetAbility();
 	void EnhanceListing();
 	void SetChoiceButton();
@@ -46,7 +65,12 @@ private:
 	UFUNCTION()
 	void OnCancel();
 
+	void OnPlayingChoiceButton(uint8 CurrentNum);
+
 private:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UBorder* ChoiceBorder;
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* EnHanceType_Text;
 
@@ -60,18 +84,21 @@ private:
 	UTextBlock* RerollDice_Text;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<UAPGameInstance> APGI;
 
 	EEnhanceCategory EnhanceCategory = EEnhanceCategory::None;
 
-	ESkillNumber SkillNumber = ESkillNumber::None;
+	uint8 SkillNumber = 0;
 
-	ESkillNumber NewSkillNumber = ESkillNumber::None;
+	uint8 NewSkillNumber = 0;
+	uint8 NewPassiveNumber = 0;
 
 	EEnHanceType EnHanceType = EEnHanceType::Silver;
 
 	TArray<uint8> SkillAbilities;
 
 	TArray<uint8> NewSkills;
+	TArray<uint8> NewPassives;
 
 	// ESkillAbility SkillAbility = ESkillAbility::Ability_None;
 
@@ -83,12 +110,16 @@ private:
 	uint8 Choice2;
 	uint8 Choice3;
 
-	FName TEXT_Silver = TEXT("Silver");
-	FName TEXT_Gold = TEXT("Gold");
-	FName TEXT_Platinum = TEXT("Platinum");
+	FName TEXT_Silver = TEXT("실버");
+	FName TEXT_Gold = TEXT("골드");
+	FName TEXT_Platinum = TEXT("플레티넘");
 
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
-	UHorizontalBox* ChoiceHorizontalBox;
+	USizeBox* ChoiceBox_1;
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	USizeBox* ChoiceBox_2;
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	USizeBox* ChoiceBox_3;
 	
 	UPROPERTY()
 	TArray<UChoiceButton*> ChoiceSlots;
@@ -103,9 +134,31 @@ private:
 	float SkillAppearPercent = 0.0f; // 스킬 등장 확률, 100 - 스킬 등장 확률 = 증강 등장 확률
 
 	UPROPERTY(EditAnywhere)
+	float PassiveSkillAppearPercent = 50.0f; // 스킬 등장 확률, 100 - 스킬 등장 확률 = 증강 등장 확률
+
+	UPROPERTY(EditAnywhere)
 	UDataTable* SkillAbilityRowNameData;
 
 	FSkillAbilityNestingData SkillAbilityNestingData;
 
+	TMap<uint8,FSkillAbilityNestingData> PassiveNestingData;
+
+	TArray<FName> PassiveSkills;
+
 	uint16 PlusAbilityNum = 1;
+	uint8 EnhanceSkillNum = 0;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor SilverColor;
+	UPROPERTY(EditAnywhere)
+	FLinearColor GoldColor;
+	UPROPERTY(EditAnywhere)
+	FLinearColor PlatinumColor;
+
+	FString QSkillText = TEXT("Q 스킬");
+	FString ESkillText = TEXT("E 스킬");
+	FString RSkillText = TEXT("R 스킬");
+	FString PassiveSkillText = TEXT("패시브 스킬");
+
+	uint8 ChoiceNumb = 0;
 };

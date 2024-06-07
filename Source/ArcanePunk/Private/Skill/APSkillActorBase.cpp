@@ -9,6 +9,7 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 AAPSkillActorBase::AAPSkillActorBase()
 {
@@ -49,15 +50,17 @@ void AAPSkillActorBase::DestroySKill()
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
-void AAPSkillActorBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AAPSkillActorBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
 	// SkillAbilityComp->SetSkillAbility(SkillAbility, SkillCategory);
 
     // SkillTypeComp->SetSkillType(SkillType, SkillCategory);
 	
 	SkillAbilityData = SkillAbilityNestingData;
+    SkillComp = SkillComponent;
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
-	RowDataTable = OwnerCharacter->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityData.SkillName, SkillAbilityData.SkillName.ToString());
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+	RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityData.SkillName, SkillAbilityData.SkillName.ToString());
 }
 
 void AAPSkillActorBase::SetDeadTime(float DeadTime)
@@ -67,22 +70,27 @@ void AAPSkillActorBase::SetDeadTime(float DeadTime)
 
 void AAPSkillActorBase::DeActivate(ESkillNumber SkillNumber)
 {
-	auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-	TWeakObjectPtr<USkillNumberBase> SkillNum = Character->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
-	if(SkillNum.IsValid())
-	{
-		SkillNum->SkillEnd();
-	} 
+	// auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
+	// TWeakObjectPtr<USkillNumberBase> SkillNum = Character->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+	// if(SkillNum.IsValid())
+	// {
+	// 	SkillNum->SkillEnd();
+	// } 
+    if(!OwnerCharacter.IsValid() || !SkillComp.IsValid()) return;
+    SkillComp->SkillEnd();
+
 }
 
 void AAPSkillActorBase::DeActivate_Ult()
 {
-	auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-	TWeakObjectPtr<USkillNumberBase> SkillNum = Character->GetRSkillNumber();
-	if(SkillNum.IsValid())
-	{
-		SkillNum->SkillEnd();
-	} 
+	// auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
+	// TWeakObjectPtr<USkillNumberBase> SkillNum = Character->GetRSkillNumber();
+	// if(SkillNum.IsValid())
+	// {
+	// 	SkillNum->SkillEnd();
+	// } 
+    if(!OwnerCharacter.IsValid() || !SkillComp.IsValid()) return;
+    SkillComp->SkillEnd();
 }
 
 void AAPSkillActorBase::HitDelay(AActor* DamagedActor, float Damage, uint8 HitNums, float DelayTime, bool bCriticalApply)
@@ -122,7 +130,7 @@ void AAPSkillActorBase::HomingOrderSet()
 
 void AAPSkillActorBase::CheckBuff(bool NewBool)
 {
-    if(BuffType == EBuffType::Speed) {OwnerCharacter->GetCrowdControlComponent()->FastState(FastCoefficient, NewBool);}
+    if(BuffType == EBuffType::Speed) {OwnerCharacter->GetCrowdControlComp()->FastState(FastCoefficient, NewBool);}
     if(BuffType == EBuffType::ATKSpeed) {OwnerCharacter->GetBuffComp()->ATKSpeedUp(ATKSpeedCoefficient, NewBool);}
     if(BuffType == EBuffType::ATK) {OwnerCharacter->GetBuffComp()->ATKUp(ATKCoefficient, NewBool);}
 }
@@ -132,7 +140,7 @@ bool AAPSkillActorBase::CheckSkillKey(USkillNumberBase* SkillNum)
     bool Check = false;
     if(SkillNum)
 	{
-        switch (SkillNum->SkillKey)
+        switch (SkillNum->GetSkillKey())
         {
             case ESkillKey::Q:
             Check = OwnerCharacter->GetOnQSkill();
@@ -140,6 +148,14 @@ bool AAPSkillActorBase::CheckSkillKey(USkillNumberBase* SkillNum)
 
             case ESkillKey::E:
             Check = OwnerCharacter->GetOnESkill();
+            break;
+
+            case ESkillKey::R:
+            Check = OwnerCharacter->GetOnRSkill();
+            break;
+
+            case ESkillKey::None:
+            Check = OwnerCharacter->GetOnRSkill();
             break;
         }
 	} 
@@ -168,19 +184,22 @@ void AAPSkillActorBase::CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
 	AbilityNum--;
 	auto RowName = RowDataTable->SilverRowName;
-    AbilityData = OwnerCharacter->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+    AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
 }
 
 void AAPSkillActorBase::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
 	AbilityNum--;
-    auto RowName = RowDataTable->SilverRowName;
-    AbilityData = OwnerCharacter->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
+    auto RowName = RowDataTable->GoldRowName;
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+    AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
 }
 
 void AAPSkillActorBase::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
 	AbilityNum--;
-    auto RowName = RowDataTable->SilverRowName;
-    AbilityData = OwnerCharacter->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
+    auto RowName = RowDataTable->PlatinumRowName;
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+    AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
 }

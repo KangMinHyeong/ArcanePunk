@@ -29,7 +29,7 @@ public:
 
 private:
 	virtual void AddAbilityList() override;
-	void Spawn_Skill8();	
+	virtual void Spawn_SkillRange() override;
 
 private:
 	float Skill8_LimitDistance = 700.0f;

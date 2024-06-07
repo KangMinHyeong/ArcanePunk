@@ -30,7 +30,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_UltSkill7();	
+	virtual void Spawn_SkillRange() override;
 	void PlayerCollisionChange(bool NewBool);
 	void CameraLagStart();
 	

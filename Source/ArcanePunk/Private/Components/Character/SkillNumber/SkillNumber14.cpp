@@ -45,30 +45,31 @@ void USkillNumber14::PlaySkill()
         }
         else
         {
-			if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+			if(!CheckSkillCondition()) return;
             OwnerCharacter->SetDoing(true);
             Skilling = true;
-            Spawn_Skill14();
+            Spawn_SkillRange();
         }
 	}
 }
 
-void USkillNumber14::Spawn_Skill14()
+void USkillNumber14::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = true;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_14);}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_14);}
 
 	ActivateSkillRange_Target(Skill14_LimitDistance, Skill14_LimitDistance, ESkillRangeType::Around_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill14_LimitDistance+Skill14_Wide/2);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetWide(Skill14_Wide);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(Skill14_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
@@ -80,6 +81,9 @@ void USkillNumber14::OnSkill()
     if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
 	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -93,6 +97,7 @@ void USkillNumber14::OnSkill()
 
 void USkillNumber14::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 	
     OwnerCharacter->SetDoing(false);
@@ -111,14 +116,16 @@ void USkillNumber14::Activate_Skill()
 	if(SkillRange_Target.IsValid()) SwordClutch->SetClutchSpeed(SkillRange_Target->GetMaxDist() / SkillRange_Target->GetTargetDistance());
 	SwordClutch->SetWide(Skill14_Wide);
 	SwordClutch->AddDestroyTime(AddDuration);
-	SwordClutch->SetSkill(SkillAbilityNestingData);	
+	SwordClutch->SetSkill(SkillAbilityNestingData, this);	
 	
 	bActivate = true;
 	Remove_Skill();
+	OwnerCharacter->OnSkillEndTrigger.RemoveDynamic(this, &USkillNumberBase::SkillEnd);
 }
 
 void USkillNumber14::SkillEnd()
 {
+	Super::SkillEnd();
 	bActivate = false; 	
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);

@@ -6,6 +6,7 @@
 #include "Components/Border.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPSkillSlot::NativeConstruct()
 {
@@ -26,17 +27,41 @@ void UAPSkillSlot::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
 
 void UAPSkillSlot::UpdateSkillSlot(ESkillKey UpdateSkillKey, uint8 SkillNumber)
 {
-    auto DataTable = SkillSlotDataTable->FindRow<FSkillSlotDataTable>(Name, Name.ToString()); if(!DataTable){return;}
-
-    SkillImage->SetBrushFromTexture(DataTable->SkillSlotImage[SkillNumber]); 
-
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());if(!OwnerCharacter.IsValid()) return;
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
 
     CurrentCoolTime = 0.0f;
     CurrentChargeTime = 0.0f;
     CurrentSkillKey = UpdateSkillKey;
-    SetChargeTimeText();
+    SetChargeTimeText(CurrentSkillKey);
     bStartPercent = true;
+    SetSkillSlotImage(SkillNumber);
+}
+
+void UAPSkillSlot::SetSkillSlotImage(uint8 SkillNumber)
+{
+    UEnum* SkillNum = nullptr;
+    switch (CurrentSkillKey)
+    {
+    case ESkillKey::Q:
+        SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillNumber"), true); 
+        break;
+    
+    case ESkillKey::E:
+
+        SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillNumber"), true); 
+        break;
+
+    case ESkillKey::R:
+        SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EUltSkillNumber"), true); 
+        break;
+    }
+    if(!SkillNum) return;
+    auto SkillRowName = SkillNum->GetNameStringByValue(SkillNumber);
+
+    auto DataTable = APGI->GetSkillNameList()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!DataTable){return;}
+
+    SkillImage->SetBrushFromTexture(DataTable->SkillSlotImage); 
 }
 
 void UAPSkillSlot::SetUsingSkill(bool NewBool)
@@ -80,13 +105,13 @@ void UAPSkillSlot::SetChargeTimePercent()
     ChargeTimePercent->GetDynamicMaterial()->SetScalarParameterValue(TEXT("Percent"), CoolTime);
 }
 
-void UAPSkillSlot::SetChargeTimeText()
+void UAPSkillSlot::SetChargeTimeText(ESkillKey UpdateSkillKey)
 {   
     if(!OwnerCharacter.IsValid()) return;
 
     uint8 Current = 0;
     uint8 Max = 0;
-    switch (CurrentSkillKey)
+    switch (UpdateSkillKey)
     {
         case ESkillKey::Q:
         Current = OwnerCharacter->GetQSkillNumber()->GetCurrentChargeNum();
@@ -162,7 +187,7 @@ void UAPSkillSlot::CheckChargeTime(ESkillKey UpdateSkillKey)
         break;
     }
     ChargeTime = CurrentChargeTime;
-    SetChargeTimeText();
+    SetChargeTimeText(CurrentSkillKey);
 
     if(bAlreadyCharging) return;
     bAlreadyCharging = true;
@@ -217,7 +242,7 @@ void UAPSkillSlot::ChargeCoolDown()
         ChargeTime = CurrentChargeTime;
         GetWorld()->GetTimerManager().SetTimer(ChargeTimerHandle, this, &UAPSkillSlot::ChargeCoolDown, CurrentChargeTime, false);
     }
-    SetChargeTimeText();
+    SetChargeTimeText(CurrentSkillKey);
 }
 
 float UAPSkillSlot::GetCurrentCoolTime()

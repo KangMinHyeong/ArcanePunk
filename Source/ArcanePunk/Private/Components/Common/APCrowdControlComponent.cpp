@@ -1,8 +1,7 @@
 
 #include "Components/Common/APCrowdControlComponent.h"
 
-#include "Character/ArcanePunkCharacter.h"
-#include "Enemy/Enemy_CharacterBase.h"
+#include "Character/APCharacterBase.h"
 #include "NiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,12 +16,28 @@ void UAPCrowdControlComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	CC_Priority.Init(false, 5);
-	
 }
 
 void UAPCrowdControlComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UAPCrowdControlComponent::BindCrowdComp()
+{
+	auto Owner = Cast<AAPCharacterBase>(GetOwner()); if(!Owner) return;
+
+	Owner->OnUpdateOriginStatus.AddDynamic(this, &UAPCrowdControlComponent::UpdateStatus);
+}
+
+void UAPCrowdControlComponent::UpdateStatus()
+{
+	auto Owner = Cast<AAPCharacterBase>(GetOwner()); if(!Owner) return;
+	auto PD = Owner->GetPlayerStatus_Origin(); 
+	PD.PlayerDynamicData.MoveSpeed = PD.PlayerDynamicData.MoveSpeed * CurrentSlowCoefficient * CurrentFastCoefficient;
+	Owner->GetCharacterMovement()->MaxWalkSpeed = PD.PlayerDynamicData.MoveSpeed;
+	Owner->SetDefaultSpeed(PD.PlayerDynamicData.MoveSpeed);
+	Owner->UpdateStatus();
 }
 
 bool UAPCrowdControlComponent::CalculateStateTime(ECharacterState UpdateState, FTimerHandle& StateTimerHandle,float StateTime)
@@ -66,13 +81,14 @@ void UAPCrowdControlComponent::KnockBackState(FVector KnockBackPoint, float Knoc
 
 	GetWorld()->GetTimerManager().SetTimer(KnockBackTimerHandle, this, &UAPCrowdControlComponent::KnockBackEnd, KnockBackTime, false);
 
-	if(GetOwner()->ActorHasTag(TEXT("Player"))) {KnockBackDist = KnockBackDist * 4.0f; OnPlayerState(ECharacterState::KnockBack, true);}
-	else if(GetOwner()->ActorHasTag(TEXT("Enemy"))) {KnockBackDist = KnockBackDist * 6.0f; OnEnemyState(ECharacterState::KnockBack, true);}
+	// KnockBackDist = KnockBackDist; 
+	OnCharacterState(ECharacterState::KnockBack, true);
 
 	auto Owner = Cast<ACharacter>(GetOwner()); if(!Owner) return;
 	FVector KnockBackVec = (KnockBackPoint - Owner->GetActorLocation()) * FVector(1.0f, 1.0f, 0.0f);
 	KnockBackVec = -( KnockBackVec / KnockBackVec.Size());
 	DefaultSlip = Owner->GetCharacterMovement()->BrakingFrictionFactor;
+
 	Owner->GetCharacterMovement()->BrakingFrictionFactor = 0.0f;
 	Owner->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	Owner->LaunchCharacter(KnockBackVec * KnockBackDist, false, false);
@@ -97,8 +113,7 @@ void UAPCrowdControlComponent::StunState(float StunTime)
 	if(!CalculateStateTime(ECharacterState::Stun, StunTimerHandle, StunTime)){return;}
 	GetWorld()->GetTimerManager().SetTimer(StunTimerHandle, this, &UAPCrowdControlComponent::StunEnd, StunTime, false);
 
-	if(GetOwner()->ActorHasTag(TEXT("Player"))) {OnPlayerState(ECharacterState::Stun, true);}
-	else if(GetOwner()->ActorHasTag(TEXT("Enemy"))) {OnEnemyState(ECharacterState::Stun, true);}
+	OnCharacterState(ECharacterState::Stun, true);
 
 	PlayStateEffect(ECharacterState::Stun, true);
 }
@@ -125,40 +140,31 @@ void UAPCrowdControlComponent::SleepState()
 float UAPCrowdControlComponent::GetDefaultSpeed()
 {
 	float Speed = 0.0f;
-	if(GetOwner()->ActorHasTag(TEXT("Player")))
-	{
-		auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-		if(OwnerCharacter) Speed = OwnerCharacter->GetDefaultSpeed();
-	}
-	else
-	{
-		auto Enemy = Cast<AEnemy_CharacterBase>(GetOwner());
-		if(Enemy) Speed = Enemy->GetDefaultSpeed();
-	}
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
+	if(OwnerCharacter) Speed = OwnerCharacter->GetDefaultSpeed_Origin();
+
 	return Speed;
 }
 
 void UAPCrowdControlComponent::SlowState(int32 SlowPercent, float SlowTime)
 {
 	SlowPercent = FMath::Min(SlowPercent, 99);
-	// if(!CalculateStateTime(ECharacterState::Slow, SlowTimerHandle, SlowTime)){return;}
-	auto Owner = Cast<ACharacter>(GetOwner()); if(!Owner) return;
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter) return;
 	float Speed = GetDefaultSpeed();
 
-	if(Owner->ActorHasTag(TEXT("Player"))) { OnPlayerState(ECharacterState::Slow, false);}
-	else if(Owner->ActorHasTag(TEXT("Enemy"))) {OnEnemyState(ECharacterState::Slow, false);}
+	OnCharacterState(ECharacterState::Slow, false);
 
 	PlayStateEffect(ECharacterState::Slow, true);
 
 	if(CurrentSlowCoefficient > (1.0f - SlowPercent*0.01f))
 	{
 		CurrentSlowCoefficient = (1.0f - SlowPercent*0.01f);
-		Owner->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
 	}
 	SlowPriority.Add(SlowPercent);
 
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(Owner); if(OwnerCharacter){ OwnerCharacter->SetCanJog(false);}
-	if(OwnerCharacter) {OwnerCharacter->SetDefaultSpeed(Owner->GetCharacterMovement()->MaxWalkSpeed);}
+	OwnerCharacter->SetCanJog(false);
+	OwnerCharacter->SetDefaultSpeed(OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed);
 
 	FTimerHandle SlowTimerHandle;
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UAPCrowdControlComponent::SlowEnd, &SlowTimerHandle, SlowPercent);
@@ -172,10 +178,12 @@ void UAPCrowdControlComponent::SlowEnd(FTimerHandle* SlowTimerHandle, int32 Slow
 	SlowPriority.RemoveSingle(SlowPercent);
 	if(SlowPriority.Num() > 1) SlowPriority.Sort([](const uint8& A, const uint8& B) {return A < B;});
 	
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter) return;
+
 	if(SlowPriority.IsEmpty())
 	{
 		CurrentSlowCoefficient = 1.0f;
-		auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(OwnerCharacter) OwnerCharacter->SetCanJog(true);
+		OwnerCharacter->SetCanJog(true);
 
 		StateMap.Remove(ECharacterState::Slow);
 		CC_Priority.Last((uint8)ECharacterState::Slow) = false;
@@ -187,32 +195,33 @@ void UAPCrowdControlComponent::SlowEnd(FTimerHandle* SlowTimerHandle, int32 Slow
 	{
 		CurrentSlowCoefficient = (1.0f - SlowPriority.Top()*0.01f);
 	}
-	auto Owner = Cast<ACharacter>(GetOwner()); 
-	if(Owner) Owner->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
-	if(auto Player = Cast<AArcanePunkCharacter>(Owner)) {Player->SetDefaultSpeed(Owner->GetCharacterMovement()->MaxWalkSpeed);}
+
+	OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
+	OwnerCharacter->SetDefaultSpeed(OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed);
+
 	GetWorld()->GetTimerManager().ClearTimer(*SlowTimerHandle);
 }
 
 void UAPCrowdControlComponent::FastState(float FastCoefficient, bool Start)
 {
-	auto Owner = Cast<ACharacter>(GetOwner()); if(!Owner) return;
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter) return;
 	float Speed = GetDefaultSpeed();
 
 	if(Start) {CurrentFastCoefficient = CurrentFastCoefficient + FastCoefficient;}
 	else {CurrentFastCoefficient = CurrentFastCoefficient - FastCoefficient;}
 
-	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
-	if(auto Player = Cast<AArcanePunkCharacter>(Owner)) {Player->SetDefaultSpeed(Owner->GetCharacterMovement()->MaxWalkSpeed);}
+	OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
+	OwnerCharacter->SetDefaultSpeed(OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed);
 }
 
 void UAPCrowdControlComponent::FastState(float FastCoefficient, float FastTime)
 {
-	auto Owner = Cast<ACharacter>(GetOwner()); if(!Owner) return;
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter) return;
 	float Speed = GetDefaultSpeed();
 
 	CurrentFastCoefficient = CurrentFastCoefficient + FastCoefficient;
-	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
-	if(auto Player = Cast<AArcanePunkCharacter>(Owner)) {Player->SetDefaultSpeed(Owner->GetCharacterMovement()->MaxWalkSpeed);}
+	OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = Speed * CurrentSlowCoefficient * CurrentFastCoefficient;
+	OwnerCharacter->SetDefaultSpeed(OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed);
 
 	FTimerHandle FastTimerHandle;
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UAPCrowdControlComponent::FastEnd, &FastTimerHandle, FastCoefficient);
@@ -221,11 +230,13 @@ void UAPCrowdControlComponent::FastState(float FastCoefficient, float FastTime)
 
 void UAPCrowdControlComponent::FastEnd(FTimerHandle* FastTimerHandle, float FastCoefficient)
 {
-	auto Owner = Cast<ACharacter>(GetOwner()); if(!Owner) return;
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter) return;
+	
 	DefaultSpeed = GetDefaultSpeed();
 	CurrentFastCoefficient = CurrentFastCoefficient - FastCoefficient; CurrentFastCoefficient = FMath::Max(1.0f, CurrentFastCoefficient);
-	Owner->GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * CurrentSlowCoefficient * CurrentFastCoefficient;
-	if(auto Player = Cast<AArcanePunkCharacter>(Owner)) {Player->SetDefaultSpeed(Owner->GetCharacterMovement()->MaxWalkSpeed);}
+	OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed * CurrentSlowCoefficient * CurrentFastCoefficient;
+	OwnerCharacter->SetDefaultSpeed(OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed);
+
 	GetWorld()->GetTimerManager().ClearTimer(*FastTimerHandle);
 }
 
@@ -276,31 +287,16 @@ void UAPCrowdControlComponent::BleedingEnd()
 float UAPCrowdControlComponent::GetDefaultATK()
 {
 	float ATk = 0.0f;
-	if(GetOwner()->ActorHasTag(TEXT("Player")))
-	{
-		auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-		if(OwnerCharacter) ATk = OwnerCharacter->GetDefaultATK();
-	}
-	else
-	{
-		auto Enemy = Cast<AEnemy_CharacterBase>(GetOwner());
-		if(Enemy) ATk = Enemy->GetMonsterATK();
-	}
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
+	if(OwnerCharacter) ATk = OwnerCharacter->GetDefaultATK();
+
 	return ATk;
 }
 
 void UAPCrowdControlComponent::SetDefaultATK(float NewValue)
 {
-	if(GetOwner()->ActorHasTag(TEXT("Player")))
-	{
-		auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-		if(OwnerCharacter) OwnerCharacter->SetDefaultATK(NewValue);
-	}
-	else
-	{
-		auto Enemy = Cast<AEnemy_CharacterBase>(GetOwner());
-		if(Enemy) Enemy->SetMonsterATK(NewValue);
-	}
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
+	if(OwnerCharacter) OwnerCharacter->SetDefaultATK(NewValue);
 }
 
 void UAPCrowdControlComponent::WeakState(float WeakCoefficient, float WeakTime)
@@ -317,9 +313,9 @@ void UAPCrowdControlComponent::WeakEnd(FTimerHandle* WeakTimerHandle, float Weak
 	GetWorld()->GetTimerManager().ClearTimer(*WeakTimerHandle);
 }
 
-void UAPCrowdControlComponent::OnPlayerState(ECharacterState UpdateState, bool IsStop)
+void UAPCrowdControlComponent::OnCharacterState(ECharacterState UpdateState, bool IsStop)
 {
-	auto OwnerCharater = Cast<AArcanePunkCharacter>(GetOwner());
+	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
 	if(!OwnerCharater) return;
 
 	// 우선순위 체크
@@ -328,60 +324,32 @@ void UAPCrowdControlComponent::OnPlayerState(ECharacterState UpdateState, bool I
 		OwnerCharater->SetState(UpdateState);
 		CC_Priority.Last((uint8)UpdateState) = true;
 		if(IsStop) OwnerCharater->StopState.Add(true);
+		if(OwnerCharater->ActorHasTag(TEXT("Enemy"))) OwnerCharater->OnCrowdControlCheck.Broadcast();
 	}
 
-}
-
-void UAPCrowdControlComponent::OnEnemyState(ECharacterState UpdateState, bool IsStop)
-{
-	auto OwnerEnemy = Cast<AEnemy_CharacterBase>(GetOwner());
-	if(!OwnerEnemy) return;
-
-	if ((uint8)OwnerEnemy->ReturnState() > (uint8)UpdateState || (uint8)OwnerEnemy->ReturnState() == 0)
-	{
-		OwnerEnemy->SetState(UpdateState);
-		CC_Priority.Last((uint8)UpdateState) = true;
-		if(IsStop) {OwnerEnemy->StopState.Add(true); OwnerEnemy->OnCrowdControlCheck.Broadcast();}
-	}
 }
 
 void UAPCrowdControlComponent::ClearStopState()
 {
-	if(GetOwner()->ActorHasTag(TEXT("Player"))) 
-	{
-		auto OwnerCharater = Cast<AArcanePunkCharacter>(GetOwner());
-		if(!OwnerCharater) return;
+	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
+	if(!OwnerCharater) return;
+	if(!OwnerCharater->StopState.IsEmpty()) OwnerCharater->StopState.Pop();
 
-		if(!OwnerCharater->StopState.IsEmpty()) OwnerCharater->StopState.Pop();
-	}
-	else if(GetOwner()->ActorHasTag(TEXT("Enemy"))) 
-	{
-		auto OwnerEnemy = Cast<AEnemy_CharacterBase>(GetOwner());
-		if(!OwnerEnemy) return;
-
-		if(!OwnerEnemy->StopState.IsEmpty()) {OwnerEnemy->StopState.Pop(); OwnerEnemy->OnCrowdControlCheck.Broadcast();}
-	}
+	if(OwnerCharater->ActorHasTag(TEXT("Enemy"))) OwnerCharater->OnCrowdControlCheck.Broadcast();
 }
 
 void UAPCrowdControlComponent::SwitchingState(ECharacterState UpdateState)
 {
-	if(GetOwner()->ActorHasTag(TEXT("Player"))) 
-	{
-		auto OwnerCharater = Cast<AArcanePunkCharacter>(GetOwner());
-		if(OwnerCharater) OwnerCharater->SetState(UpdateState);
+	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
+	if(!OwnerCharater) return;
 
-	}
-	else if(GetOwner()->ActorHasTag(TEXT("Enemy"))) 
-	{
-		auto OwnerEnemy = Cast<AEnemy_CharacterBase>(GetOwner());
-		if(OwnerEnemy) {OwnerEnemy->SetState(UpdateState); OwnerEnemy->OnCrowdControlCheck.Broadcast();}
-	}
+	OwnerCharater->SetState(UpdateState);
+	if(OwnerCharater->ActorHasTag(TEXT("Enemy"))) OwnerCharater->OnCrowdControlCheck.Broadcast();
 }
 
 void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool IsPlay)
 {
-	auto OwnerCharater = Cast<AArcanePunkCharacter>(GetOwner());
-	auto OwnerEnemy = Cast<AEnemy_CharacterBase>(GetOwner());
+	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
 
 	switch (UpdateState)
 	{
@@ -390,7 +358,6 @@ void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool
 		
 		case ECharacterState::Stun:
 		if(OwnerCharater) {IsPlay ? OwnerCharater->GetStunEffect()->Activate() : OwnerCharater->GetStunEffect()->DeactivateImmediate(); }
-		else if(OwnerEnemy) {IsPlay ? OwnerEnemy->GetStunEffect()->Activate() : OwnerEnemy->GetStunEffect()->DeactivateImmediate();}
 		break;
 
 		case ECharacterState::Sleep:

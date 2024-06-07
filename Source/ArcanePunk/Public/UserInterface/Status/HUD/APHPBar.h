@@ -19,6 +19,7 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	void SetMaxHP(float NewValue);
 	void SetHPPercent(float Origin);
 	void UpdatePercentBar(float InDeltaTime);
 

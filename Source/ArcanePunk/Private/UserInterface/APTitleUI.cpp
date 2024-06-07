@@ -50,7 +50,7 @@ void UAPTitleUI::NewGame()
 	}
 
 	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-	GI->bNewGame = true;
+	GI->SetNewGame(true);
 
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Intro"));
 }

@@ -20,16 +20,14 @@ void USkillNumber1::BeginPlay()
 
 void USkillNumber1::AddAbilityList()
 {
-	// EnableSkillAbilityList.Add(ESkillAbility::Gigant);
-	// EnableSkillAbilityList.Add(ESkillAbility::Homing);
-	// EnableSkillAbilityList.Add(ESkillAbility::Stun);
+
 }
 
 void USkillNumber1::PlaySkill()
 {
 	Super::PlaySkill();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 
 	OwnerCharacter->SetDoing(true);
 
@@ -40,7 +38,6 @@ void USkillNumber1::OnSkill()
 {
 	Super::OnSkill();
 	if(!OwnerCharacter.IsValid()) return;
-    
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -48,16 +45,9 @@ void USkillNumber1::OnSkill()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
-void USkillNumber1::Remove_Skill()
-{
-}
-
-void USkillNumber1::UpdateSkillData()
-{
-}
-
 void USkillNumber1::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
@@ -67,6 +57,17 @@ void USkillNumber1::Activate_Skill()
 
 	auto SwordSkill = GetWorld()->SpawnActor<ASwordImpact>(OwnerCharacter->GetAPSkillHubComponent()->GetSwordImpactClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
 	if(!SwordSkill) return;
-	SwordSkill->SetSkill(SkillAbilityNestingData);
+	SwordSkill->SetSkill(SkillAbilityNestingData, this);
 
+	Remove_Skill();
+}
+
+void USkillNumber1::Remove_Skill()
+{
+	Super::Remove_Skill();
+	
+}
+
+void USkillNumber1::UpdateSkillData()
+{
 }

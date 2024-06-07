@@ -17,8 +17,8 @@ void UAPEnemyHP::GetHealthPercentage()
 {
     if(Enemy.IsValid())
     {
-        HPPercent->SetPercent(Enemy->GetMonsterHP() / Enemy->GetMonsterMaxHP());
-        MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetMonsterMaxHP()))));
-        HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetMonsterHP()))));
+        HPPercent->SetPercent(Enemy->GetDefaultHP() / Enemy->GetDefaultMaxHP());
+        MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetDefaultMaxHP()))));
+        HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetDefaultHP()))));
     }
 }

@@ -17,6 +17,7 @@
 
 UUltSkillNumber_7::UUltSkillNumber_7()
 {
+    SkillAbilityNestingData.SkillName = TEXT("UltSkill_7");
 
 }
 
@@ -38,27 +39,28 @@ void UUltSkillNumber_7::PlaySkill()
 	{
         OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_UltSkill7();
+		Spawn_SkillRange();
 
 	}
     
 }
 
-void UUltSkillNumber_7::Spawn_UltSkill7()
+void UUltSkillNumber_7::Spawn_SkillRange()
 {
+    Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
 
 	ActivateSkillRange_Target(UltSkill7_TargetRange, UltSkill7_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(UltSkill7_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(UltSkill7_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
@@ -70,7 +72,7 @@ void UUltSkillNumber_7::OnSkill()
 	SetComponentTickEnabled(false);
 	if(!OwnerCharacter.IsValid()) return; OwnerCharacter->SetDoing(true);
     OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
-	
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
     
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;

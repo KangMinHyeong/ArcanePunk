@@ -2,6 +2,7 @@
 #include "Interaction/APInteractionTriggerBase.h"
 
 #include "Camera/CameraComponent.h"
+#include "Character/ArcanePunkCharacter.h"
 
 AAPInteractionTriggerBase::AAPInteractionTriggerBase()
 {
@@ -26,4 +27,18 @@ void AAPInteractionTriggerBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+FInteractData AAPInteractionTriggerBase::GetInteractData()
+{
+    return InteractionTrigger->GetInteractionData();
+}
+
+void AAPInteractionTriggerBase::Interact(AArcanePunkCharacter *PlayerCharacter)
+{
+    if(!PlayerCharacter) return;
+    
+    PlayerCharacter->SetInteraction(false);
+    PlayerCharacter->InteractionActorRemove(this);
+}
+
 

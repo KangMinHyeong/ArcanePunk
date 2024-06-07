@@ -15,6 +15,7 @@ void UAPAudioSetting::NativeConstruct()
     InitSliders();
     BindButton();
 }
+
 FReply UAPAudioSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -30,16 +31,19 @@ FReply UAPAudioSetting::NativeOnMouseWheel(const FGeometry &InGeometry, const FP
 void UAPAudioSetting::InitSliders()
 {
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    Master = GI->GetGameSoundVolume().MasterVolume;
+    BGM = GI->GetGameSoundVolume().BGMVolume;
+    Effect = GI->GetGameSoundVolume().EffectVolume;
 
-    Slider_Master->SetValue(GI->GameSoundVolume.MasterVolume);
-    Slider_BGM->SetValue(GI->GameSoundVolume.BGMVolume);
-    Slider_Effect->SetValue(GI->GameSoundVolume.EffectVolume);
-    
+    Slider_Master->SetValue(Master);
+    Slider_BGM->SetValue(BGM);
+    Slider_Effect->SetValue(Effect);
 }
 
 void UAPAudioSetting::BindButton()
 {
     Button_Back->OnClicked.AddDynamic(this, &UAPAudioSetting::OnClickBack);
+    Button_Apply->OnClicked.AddDynamic(this, &UAPAudioSetting::OnClickApply);
 
     Slider_Master->OnValueChanged.AddDynamic(this, &UAPAudioSetting::OnSlide_Master);
     Slider_BGM->OnValueChanged.AddDynamic(this, &UAPAudioSetting::OnSlide_BGM);
@@ -48,26 +52,34 @@ void UAPAudioSetting::BindButton()
 
 void UAPAudioSetting::OnClickBack()
 {
-    RemoveFromParent();
-    
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
-    OwnerPC->OptionSetting();
+    Master = 1.0f;
+    BGM = 1.0f;
+    Effect = 1.0f;
+
+    Slider_Master->SetValue(Master);
+    Slider_BGM->SetValue(BGM);
+    Slider_Effect->SetValue(Effect);
+}
+
+void UAPAudioSetting::OnClickApply()
+{
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    GI->SetGameMasterVolume(Master);
+    GI->SetGameBGMVolume(BGM);
+    GI->SetGameEffectVolume(Effect);
 }
 
 void UAPAudioSetting::OnSlide_Master(float Value)
 {
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-    GI->GameSoundVolume.MasterVolume = Value;
+    Master = Value;
 }
 
 void UAPAudioSetting::OnSlide_BGM(float Value)
 {
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-    GI->GameSoundVolume.BGMVolume = Value;
+    BGM = Value;
 }
 
 void UAPAudioSetting::OnSlide_Effect(float Value)
 {
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-    GI->GameSoundVolume.EffectVolume = Value;
+    Effect = Value;
 }

@@ -28,7 +28,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_UltSkill6();	
+	virtual void Spawn_SkillRange() override;
 
 private:
 	float UltSkill6_LimitDistance = 800.0f;

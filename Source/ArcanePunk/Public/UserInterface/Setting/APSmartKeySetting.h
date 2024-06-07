@@ -10,6 +10,7 @@ class UCanvasPanel;
 class UBorder;
 class UButton;
 class UWidgetSwitcher;
+class UTextBlock;
 
 UCLASS()
 class ARCANEPUNK_API UAPSmartKeySetting : public UUserWidget
@@ -31,49 +32,59 @@ private:
 	UFUNCTION()
 	void OnSmartKeyR();
 	UFUNCTION()
+	void OnSmartKeyQ_Off();
+	UFUNCTION()
+	void OnSmartKeyE_Off();
+	UFUNCTION()
+	void OnSmartKeyR_Off();
+
+	UFUNCTION()
 	void OnApply();
 	UFUNCTION()
 	void OnCancel();
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UCanvasPanel* SmartKeyCanvasPanel;
+	UButton* SmartKeyQ_Button_On;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UBorder* SmartKeyBorder;
+	UButton* SmartKeyE_Button_On;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UButton* SmartKeyR_Button_On;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UButton* SmartKeyQ_Button;
+	UButton* SmartKeyQ_Button_Off;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UButton* SmartKeyE_Button;
+	UButton* SmartKeyE_Button_Off;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UButton* SmartKeyR_Button;
+	UButton* SmartKeyR_Button_Off;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SmartKeyQ_Text_On;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SmartKeyE_Text_On;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SmartKeyR_Text_On;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SmartKeyQ_Text_Off;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SmartKeyE_Text_Off;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SmartKeyR_Text_Off;
+
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Apply_Button;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UButton* Cancel_Button;
+	UButton* RollBack_Button;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidgetSwitcher* SmartKeyQ_Switcher;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidgetSwitcher* SmartKeyE_Switcher;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidgetSwitcher* SmartKeyR_Switcher;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* EnableSmartKeyQ;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* DisableSmartKeyQ;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* EnableSmartKeyE;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* DisableSmartKeyE;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* EnableSmartKeyR;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UWidget* DisableSmartKeyR;
+	UPROPERTY(EditAnywhere)
+	FSlateColor OnColor;
+	UPROPERTY(EditAnywhere)
+	FSlateColor OffColor;
+	UPROPERTY(EditAnywhere)
+	FLinearColor TextOnColor;
+	UPROPERTY(EditAnywhere)
+	FLinearColor TextOffColor;
 	
 	TArray<bool> CopySmartKeyArr;
 };

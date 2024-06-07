@@ -28,8 +28,10 @@ public:
 
 	void InitStatusBar();
 	
+	void SetMaxHP(float NewValue);
 	void SetHPPercent(float Origin);
-
+	
+	void AddMaxMP(uint8 NewValue);
 	void UpdateMPBar(uint8 Number, bool bUse = true);
 	void RecoveryMP(uint8 Number);
 	void IncreaseMaxMP(uint8 Number);
@@ -40,6 +42,7 @@ public:
 	void UsingSkillSlot(ESkillKey SkillKey, bool NewBool);
 	void StartCoolTimeSlot(ESkillKey SkillKey);
 	void CheckChargeTime(ESkillKey SkillKey);
+	void ChangeCharginNum(ESkillKey SkillKey);
 	void ChargeGauge(float Currnet, float Max);
 	void ChargeEnd(bool Start);
 	

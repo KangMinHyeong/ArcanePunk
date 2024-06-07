@@ -27,7 +27,7 @@ void AAPSkillRange::Tick(float DeltaTime)
 
 }
 
-void AAPSkillRange::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AAPSkillRange::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
 	// if(SkillAbility.Contains(ESkillAbility::Gigant)) SetActorScale3D(GetActorScale3D() * 2.0f);
 	// if(SkillAbility.Contains(ESkillAbility::Homing)) SetHoming();

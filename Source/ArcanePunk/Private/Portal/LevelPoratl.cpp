@@ -49,7 +49,7 @@ void ALevelPoratl::Interact(AArcanePunkCharacter *PlayerCharacter)
 	UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
 	SpawnSound(PlayerLocation);
 
-	PlayerCharacter->GetPlayerPanel()->SetHiddenInGame(true);
+	PlayerCharacter->GetPlayerPanelAura()->SetHiddenInGame(true);
 
     GetWorldTimerManager().SetTimer(Delay_TimerHandle, this, &ALevelPoratl::StartLoading, Delay_Time, false);
 
@@ -90,6 +90,6 @@ void ALevelPoratl::Test_StageUnlocking()
 {
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    if(GI->CanEnterStage.Contains(UnlockedStageName)) GI->CanEnterStage[UnlockedStageName] = true;
+    if(GI->GetCanEnterStage().Contains(UnlockedStageName)) GI->SetCanEnterStage(UnlockedStageName, true);
 }
 

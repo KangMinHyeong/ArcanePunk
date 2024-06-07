@@ -13,7 +13,7 @@
 
 UUltSkillNumber_2::UUltSkillNumber_2()
 {
-	OriginCoolTime = 9.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_2");
 }
 
 void UUltSkillNumber_2::BeginPlay()
@@ -26,7 +26,7 @@ void UUltSkillNumber_2::PlaySkill()
 {
 	Super::PlaySkill();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 
 	Skilling = true;
 	OwnerCharacter->SetDoing(true);
@@ -43,7 +43,7 @@ void UUltSkillNumber_2::OnSkill()
 	auto SkillTrail = OwnerCharacter->GetGhostTrailSpawnComp()->GetSkillTrail(); if(!SkillTrail) return;
 
 	ActivateSkillRange_Round(Ult2_TargetRange);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 	
 	OwnerCharacter->GetGhostTrailSpawnComp()->CheckRelease(true);
 
@@ -71,7 +71,7 @@ void UUltSkillNumber_2::Activate_Skill()
 	TimeRewinder->SetOwner(OwnerCharacter.Get());
 	TimeRewinder->SetRewinderWidth(Ult2_TargetRange);
 	TimeRewinder->SetRewinderLocation(SkillRange_Circle->GetActorLocation());
-	TimeRewinder->SetSkill(SkillAbilityNestingData);	
+	TimeRewinder->SetSkill(SkillAbilityNestingData, this);	
 
 	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetActorHiddenInGame(true);
     // ArcaneRain = GetWorld()->SpawnActor<AArcaneRain>(OwnerCharacter->GetArcaneRainClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);

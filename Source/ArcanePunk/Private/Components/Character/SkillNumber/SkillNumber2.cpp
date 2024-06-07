@@ -44,7 +44,7 @@ void USkillNumber2::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 
 		OnSkill();
@@ -63,6 +63,7 @@ void USkillNumber2::OnSkill()
 
 void USkillNumber2::Remove_Skill()
 {
+	Super::Remove_Skill();
 }
 
 void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
@@ -74,6 +75,7 @@ void USkillNumber2::MarkingOn(AActor* OtherActor, float Time)
 
 void USkillNumber2::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 	
 	FActorSpawnParameters SpawnParams;
@@ -82,7 +84,8 @@ void USkillNumber2::Activate_Skill()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	auto SwordThrow = GetWorld()->SpawnActor<ASwordThrowBase>(OwnerCharacter->GetAPSkillHubComponent()->GetSwordThrowClass(), OwnerCharacter->GetActorLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation, OwnerCharacter->GetActorRotation(), SpawnParams);
-	// if(SwordThrow) SwordThrow->SetSkill(CurrentSkillType, CurrentSkillAbility);
+	
+	Remove_Skill();
 }
 
 void USkillNumber2::MarkErase()

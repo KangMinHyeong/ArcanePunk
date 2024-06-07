@@ -31,7 +31,7 @@ public:
 	UDecalComponent* GetDecalComponent() {return RangeDecal;};
 	USceneComponent* GetRootComponent() const {return RootComp;};
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetAngle(float AngleSize);
 
@@ -43,7 +43,7 @@ public:
 	FORCEINLINE void SetWide(float NewValue) {Wide = NewValue;};
 	FORCEINLINE void SetSkillRangeType(ESkillRangeType NewValue) {SkillRangeType = NewValue;};
 	FORCEINLINE void SetMouseControll(bool NewBool) {Targeting = NewBool;};
-	
+	FORCEINLINE FVector GetRotVector() const {return RotVector;};
 	// FORCEINLINE void SetHideAndTargeting(bool NewBool) {Targeting = !NewBool; }; // SetHideAndTargeting
 
 protected:
@@ -70,6 +70,8 @@ protected:
 	float Wide = 0.0f;	
 
 	ESkillRangeType SkillRangeType = ESkillRangeType::None;
+
+	FVector RotVector;
 
 public:
 	TWeakObjectPtr<UMaterialInterface> DefaultDecal;

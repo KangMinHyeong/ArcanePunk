@@ -23,7 +23,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	virtual void DestroySKill() override;	
 
@@ -41,8 +41,6 @@ private:
 	UNiagaraSystem* SlashEffect;
 
 	TWeakObjectPtr<UNiagaraComponent> SlashEffectComp;
-
-	TWeakObjectPtr<USkillNumberBase> Skill_18;
 
 	float CurrentTime = 0.0f;
 

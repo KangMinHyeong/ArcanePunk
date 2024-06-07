@@ -21,13 +21,13 @@
 #include "Components/Character/APAnimHubComponent.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
-#include "NiagaraComponent.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "ArcanePunk/APGameModeBase.h"
-#include "Components/Character/APHitPointComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Common/APGhostTrailSpawnComponent.h"
 #include "Components/SkillActor/APSkillAbility.h"
+#include "Components/Character/APPassiveComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -50,29 +50,23 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
-	StunEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffect"));
 	LeftBeamPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftBeamPoint"));
-	PlayerPanel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerPanel"));
+	PlayerPanelAura = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerPanelAura"));
 
-	AttackComp = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComp"));
-	MoveComp = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComp"));
-	SkillHubComp = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComp"));
-	AnimHubComp = CreateDefaultSubobject<UAPAnimHubComponent>(TEXT("AnimHubComp"));
+	SkillHubComponent = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComponent"));
 	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
 	APSpawnStepComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("APSpawnStepComp"));
-	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
-	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
 	BuffComp = CreateDefaultSubobject<UAPBuffComponent>(TEXT("BuffComp"));
 	SkillAbility = CreateDefaultSubobject<UAPSkillAbility>(TEXT("SkillAbility"));
 	GhostTrailSpawnComp = CreateDefaultSubobject<UAPGhostTrailSpawnComponent>(TEXT("GhostTrailSpawnComp"));
+	PassiveComp = CreateDefaultSubobject<UAPPassiveComponent>(TEXT("PassiveComp"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
-	PlayerPanel->SetupAttachment(GetRootComponent());
+	PlayerPanelAura->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
-	StunEffect->SetupAttachment(GetRootComponent());
 	LeftBeamPoint->SetupAttachment(GetMesh(), FName("BeamPoint"));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -113,18 +107,17 @@ void AArcanePunkCharacter::BeginPlay()
 
 	DefaultMaterial = GetMesh()->GetMaterial(0);
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
-	MoveComp->SetBind();
+	BuffComp->BindBuffComp();
 	
 	InitPlayerStatus();
 	InitEquipData(WeaponReference, DesiredWeaponID);
 	UpdateStatus();
 
 	SetHavingSkills();
-	SkillHubComp->UpdateSkill_Q();
-	SkillHubComp->UpdateSkill_E();
-	SetRSkill();
-
-	
+	SkillHubComponent->UpdatingSkill_Q();
+	SkillHubComponent->UpdatingSkill_E();
+	SkillHubComponent->UpdatingSkill_R();
+	PassiveComp->InitPassive();
 
 	SetWeaponPosition();
 }
@@ -167,6 +160,8 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Save);
 
 	PlayerInputComponent->BindAction(TEXT("WorldMap"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::WorldMap);
+
+	PlayerInputComponent->BindAction(TEXT("Alt_RightClick"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Alt_RightClick);
 	
 	// prodo
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
@@ -177,14 +172,15 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 void AArcanePunkCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	AnimHubComp->BindAttackCheck();
-	AnimHubComp->BindComboCheck();
+	AnimHubComponent->BindAttackCheck();
+	AnimHubComponent->BindComboCheck();
 }
 
 void AArcanePunkCharacter::InitComponent()
 {
 	// 컴포넌트 초기화
-	AttackComp->InitAttackComp();
+	AttackComponent->InitAttackComp();
+	TakeDamageComp->InitTakeDamageComp();
 }
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
@@ -196,7 +192,7 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 		if (PlayerVec.X > 0) HUD->UpdateTutorialWidget("PressUp");
 		else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
 	}
-	if(StopState.IsEmpty()) MoveComp->PlayerMoveForward(AxisValue);
+	if(StopState.IsEmpty()) MoveComponent->PlayerMoveForward(AxisValue);
 
 }
 
@@ -210,7 +206,7 @@ void AArcanePunkCharacter::MoveRight(float AxisValue)
 		else if (PlayerVec.Y < 0) HUD->UpdateTutorialWidget("PressLeft");
 	}
 
-	if(StopState.IsEmpty()) MoveComp->PlayerMoveRight(AxisValue);
+	if(StopState.IsEmpty()) MoveComponent->PlayerMoveRight(AxisValue);
 
 }
 
@@ -236,26 +232,27 @@ void AArcanePunkCharacter::SetAttackRotation()
 	{
 		if(!GM.IsValid()) return; 
 		// if(GM->IsBattleStage())PC->SetControlRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
-		if(GM->IsBattleStage()) MoveComp->SetAttackRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
+		if(GM->IsBattleStage()) MoveComponent->SetAttackRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
 	}
 }
 
 void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
-	if(bDoing || !StopState.IsEmpty()) return;
-	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
+	if(!StopState.IsEmpty()) return;
 	
-	AttackComp->StartAttack_A(bCanMove);	
+	if(!OnLeftMouseClick.IsBound()) {AttackComponent->StartAttack_A(bCanMove);	}
+	else {OnLeftMouseClick.Broadcast();}
+
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
 }
 
 void AArcanePunkCharacter::Attack_typeB()
 {
-
-	if(bDoing || !bCanMove || !StopState.IsEmpty()) return;
+	if(!bCanMove || !StopState.IsEmpty()) return;
 	bDoing = true;
-	AttackComp->StartAttack_B(bCanMove);
+	AttackComponent->StartAttack_B(bCanMove);
 
-	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
 }
 
 void AArcanePunkCharacter::HideClear()
@@ -273,27 +270,15 @@ void AArcanePunkCharacter::HideCheck()
 	if(InArcaneTent) SetHideMode(true);
 }
 
-float AArcanePunkCharacter::CriticalCalculate(float Multiple)
-{
-	float Percent = FMath::RandRange(0.0f, 100.0f);
-	if(Percent <= MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent)
-	{
-		bCriticalAttack = true;
-		return MyPlayerTotalStatus.PlayerDynamicData.CriticalStep * (Multiple - 1.0f) + 1;
-	}
-	else {bCriticalAttack= false;}
-
-    return 1.0f;
-}
-
 void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName EquipID)
 {
 	//후에 세이브 데이터 생기면 로직 추가해야할 듯
 	if(EquipArr.IsEmpty())
 	{
-		if (EquipDataTable && !EquipID.IsNone())
+		if (!EquipID.IsNone())
 		{
-			const FItemData* ItemData = EquipDataTable->FindRow<FItemData>(EquipID, EquipID.ToString());
+			auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+			const FItemData* ItemData = APGI->GetEquipDataTable()->FindRow<FItemData>(EquipID, EquipID.ToString());
 
 			auto ItemReference = NewObject<UAPItemBase>(this, UAPItemBase::StaticClass());
 
@@ -345,38 +330,40 @@ void AArcanePunkCharacter::SetWeaponPosition()
 void AArcanePunkCharacter::SkillBase_Q()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	if( bCanMove && StopState.IsEmpty() ) SkillHubComp->PressQ();	
+	if( bCanMove && StopState.IsEmpty()) SkillHubComponent->PressQ();	
 	OnQSkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_E()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressE");
-	if( bCanMove && StopState.IsEmpty() ) SkillHubComp->PressE();
+	if( bCanMove && StopState.IsEmpty() ) SkillHubComponent->PressE();
 	OnESkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_R()
 {
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressR");
-	if( bCanMove && StopState.IsEmpty()) SkillHubComp->PressSpace();
+	if( bCanMove && StopState.IsEmpty()) SkillHubComponent->PressSpace();
 	OnRSkill = true;
 }
 
 void AArcanePunkCharacter::StartJog()
 {
-	if(bCanJog)  CrowdControlComp->FastState(1.0f, true);
+	if(!bCanJog || bJogging)  return;
+	CrowdControlComponent->FastState(1.0f, true);
 	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2.0f;
-
 	GhostTrailSpawnComp->SetRunTrail(true);
-
+	bJogging = true;
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
 }
 
 void AArcanePunkCharacter::EndJog()
 {
-	if(bCanJog) CrowdControlComp->FastState(1.0f, false);
+	if(!bCanJog || !bJogging) return; 
+	CrowdControlComponent->FastState(1.0f, false);
 	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 0.5f;
+	bJogging = false;
 	GhostTrailSpawnComp->SetRunTrail(false);
 }
 
@@ -441,27 +428,61 @@ void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName, FString GameSlotNa
 	PC->StartSaveUI();
 }
 
-void AArcanePunkCharacter::SetRSkill()
+void AArcanePunkCharacter::SetRSkill(EUltSkillNumber NewSkill)
 {
-	if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
-	else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_2;}
-	else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_3;}
-	else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_4;}
-	else if( (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_13) ){ RSkill = EUltSkillNumber::UltSkill_5;}
-	else if( (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_12) ){ RSkill = EUltSkillNumber::UltSkill_6;}
-	else if( (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_10) ){ RSkill = EUltSkillNumber::UltSkill_7;}
-	else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_8;}
-	else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_9;}
-	else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_10;}
-	else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_11;}
-	else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_12;}
-	else if( (QSkill == ESkillNumber::Skill_4 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_4) ){ RSkill = EUltSkillNumber::UltSkill_13;}
-	else if( (QSkill == ESkillNumber::Skill_7 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_7) ){ RSkill = EUltSkillNumber::UltSkill_14;}
-	else if( (QSkill == ESkillNumber::Skill_4 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_4) ){ RSkill = EUltSkillNumber::UltSkill_15;}
-	else if( (QSkill == ESkillNumber::Skill_7 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_7) ){ RSkill = EUltSkillNumber::UltSkill_16;}
-	else {RSkill = EUltSkillNumber::None;}
+	RSkill = NewSkill;
+	// if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_1;}
+	// else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_2;}
+	// else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_3;}
+	// else if( (QSkill == ESkillNumber::Skill_8 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_8) ){ RSkill = EUltSkillNumber::UltSkill_4;}
+	// else if( (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_13) ){ RSkill = EUltSkillNumber::UltSkill_5;}
+	// else if( (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_12) ){ RSkill = EUltSkillNumber::UltSkill_6;}
+	// else if( (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_14) || (QSkill == ESkillNumber::Skill_14 &&  ESkill == ESkillNumber::Skill_10) ){ RSkill = EUltSkillNumber::UltSkill_7;}
+	// else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_8;}
+	// else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_9;}
+	// else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_13) || (QSkill == ESkillNumber::Skill_13 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_10;}
+	// else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_11;}
+	// else if( (QSkill == ESkillNumber::Skill_11 &&  ESkill == ESkillNumber::Skill_10) || (QSkill == ESkillNumber::Skill_10 &&  ESkill == ESkillNumber::Skill_11) ){ RSkill = EUltSkillNumber::UltSkill_12;}
+	// else if( (QSkill == ESkillNumber::Skill_4 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_4) ){ RSkill = EUltSkillNumber::UltSkill_13;}
+	// else if( (QSkill == ESkillNumber::Skill_7 &&  ESkill == ESkillNumber::Skill_6) || (QSkill == ESkillNumber::Skill_6 &&  ESkill == ESkillNumber::Skill_7) ){ RSkill = EUltSkillNumber::UltSkill_14;}
+	// else if( (QSkill == ESkillNumber::Skill_4 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_4) ){ RSkill = EUltSkillNumber::UltSkill_15;}
+	// else if( (QSkill == ESkillNumber::Skill_7 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_7) ){ RSkill = EUltSkillNumber::UltSkill_16;}
+	// else if( (QSkill == ESkillNumber::Skill_5 &&  ESkill == ESkillNumber::Skill_16) || (QSkill == ESkillNumber::Skill_16 &&  ESkill == ESkillNumber::Skill_5) ){ RSkill = EUltSkillNumber::UltSkill_17;}
+	// else if( (QSkill == ESkillNumber::Skill_2 &&  ESkill == ESkillNumber::Skill_3) || (QSkill == ESkillNumber::Skill_3 &&  ESkill == ESkillNumber::Skill_2) ){ RSkill = EUltSkillNumber::UltSkill_18;}
+	// else if( (QSkill == ESkillNumber::Skill_9 &&  ESkill == ESkillNumber::Skill_12) || (QSkill == ESkillNumber::Skill_12 &&  ESkill == ESkillNumber::Skill_9) ){ RSkill = EUltSkillNumber::UltSkill_19;}
+	// else if( (QSkill == ESkillNumber::Skill_19 &&  ESkill == ESkillNumber::Skill_20) || (QSkill == ESkillNumber::Skill_20 &&  ESkill == ESkillNumber::Skill_19) ){ RSkill = EUltSkillNumber::UltSkill_20;}
+	// else {RSkill = EUltSkillNumber::None;}
 
-	SkillHubComp->UpdateSkill_R();
+	SkillHubComponent->UpdatingSkill_R();
+}
+
+void AArcanePunkCharacter::AddPassive(EPassiveNumber PassiveNum)
+{
+	if(PassiveSkills.Contains((uint8)PassiveNum)) return;
+	UE_LOG(LogTemp, Display, TEXT("PassiveNum %d"), (uint8)PassiveNum);
+	FSkillAbilityNestingData SkillAbilityNestingData = {};
+	PassiveSkills.Emplace((uint8)PassiveNum, SkillAbilityNestingData);
+	PassiveComp->ApplyNewPassive(PassiveNum);
+}
+
+void AArcanePunkCharacter::AddPassive_Enhance(uint8 PassiveNum, EEnHanceType EnHanceType, uint8 AbilityNum, uint16 AbilityNestingNum)
+{
+	if(!PassiveSkills.Contains(PassiveNum)) return;
+	switch (EnHanceType)
+	{
+	case EEnHanceType::Silver:
+		PassiveSkills[PassiveNum].SilverAbilityNestingNum.Emplace(AbilityNum, AbilityNestingNum);
+		break;
+	
+	case EEnHanceType::Gold:
+		PassiveSkills[PassiveNum].GoldAbilityNestingNum.Emplace(AbilityNum, AbilityNestingNum);
+		break;
+
+	case EEnHanceType::Platinum:
+		PassiveSkills[PassiveNum].PlatinumAbilityNestingNum.Emplace(AbilityNum, AbilityNestingNum);
+		break;
+	}
+	PassiveComp->ApplyNewPassive((EPassiveNumber)PassiveNum);
 }
 
 void AArcanePunkCharacter::WorldMap()
@@ -469,6 +490,17 @@ void AArcanePunkCharacter::WorldMap()
 	if(!GM.IsValid()) return; 
 	if(!GM->IsBattleStage()) return;
 	if(HUD) HUD->OpenWorldMap();
+}
+
+void AArcanePunkCharacter::Alt_RightClick()
+{
+	if(!PC.IsValid()) return;
+	FHitResult HitResult;
+	PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+	if(HitResult.bBlockingHit)
+	{
+		OnAltRightMouseClick.Broadcast(HitResult.Location);
+	}
 }
 
 void AArcanePunkCharacter::CurrentPlayerLocation() // 후에 사용할지 말지 결정, 현재는 필요없는듯?
@@ -527,6 +559,8 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 		UpdateStatus();
 		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
 	}
+
+	PassiveComp->CheckDamagedGold();
     return DamageApplied;
 }
 
@@ -534,7 +568,7 @@ bool AArcanePunkCharacter::IsDead()
 {
 	if(!MyPlayerState) return false;
 	
-    return MyPlayerTotalStatus.PlayerDynamicData.HP<=0;
+    return MyPlayerTotalStatus.PlayerDynamicData.HP <= KINDA_SMALL_NUMBER;
 }
 
 void AArcanePunkCharacter::DeadPenalty(float DeathTime)
@@ -595,8 +629,14 @@ bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, 
 	return GetWorld()->SweepSingleByChannel(HitResult, OverlapStart, OverlapEnd, FQuat::Identity, ECC_Pawn, Sphere, Params);
 }
 
+float AArcanePunkCharacter::GetCurrentATK() const
+{
+    return FinalATK;
+}
+
 void AArcanePunkCharacter::UpdateStatus()
 {
+	MyPlayerTotalStatus.PlayerDynamicData.MaxMP = MyPlayerTotalStatus_Origin.PlayerDynamicData.MaxMP;
 	FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK;
 	WeaponReference.IsEmpty() ? FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK : FinalATK = MyPlayerTotalStatus.PlayerDynamicData.ATK + WeaponReference.Top()->ItemStatistics.DamageValue;
 
@@ -607,7 +647,7 @@ void AArcanePunkCharacter::InitPlayerStatus()
 {
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
-	MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus;
+	// MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus; // 테스트용으로 빼놈, 이 줄 넣어야 세이브 스탯으로 초기화
 	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
 
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;

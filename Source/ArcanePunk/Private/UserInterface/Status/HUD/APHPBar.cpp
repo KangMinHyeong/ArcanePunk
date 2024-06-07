@@ -23,8 +23,16 @@ void UAPHPBar::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
     Super::NativeTick(MyGeometry, InDeltaTime);
 
     if(bChange) UpdatePercentBar(InDeltaTime);
+    
 }
 
+void UAPHPBar::SetMaxHP(float NewValue)
+{
+    const auto PD = OwnerCharacter->GetPlayerStatus();
+    TEXT_CurrentMaxHP->SetText(FText::FromString(FString::FromInt(round(PD.PlayerDynamicData.MaxHP))));
+    TEXT_CurrentHP->SetText(FText::FromString(FString::FromInt(round(PD.PlayerDynamicData.HP))));
+    HPBar->SetPercent(PD.PlayerDynamicData.HP / PD.PlayerDynamicData.MaxHP);
+}
 
 void UAPHPBar::SetHPPercent(float Origin)
 {
@@ -42,7 +50,6 @@ void UAPHPBar::UpdatePercentBar(float InDeltaTime)
 
     OriginHP = FMath::FInterpConstantTo(OriginHP, PD.PlayerDynamicData.HP, InDeltaTime, BarSpeed);
     HPBar->SetPercent(OriginHP / PD.PlayerDynamicData.MaxHP);
-    TEXT_CurrentMaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(PD.PlayerDynamicData.MaxHP))));
     TEXT_CurrentHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
     // MPBar->SetPercent(PD.PlayerDynamicData.MP / PD.PlayerDynamicData.MaxMP);
 }

@@ -10,7 +10,7 @@
 
 UUltSkillNumber_5::UUltSkillNumber_5()
 {
-	OriginCoolTime = 7.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_5");
 }
 
 void UUltSkillNumber_5::BeginPlay()
@@ -29,7 +29,7 @@ void UUltSkillNumber_5::PlaySkill()
     }
     else
     {
-        if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+        if(!CheckSkillCondition()) return;
         bActivate = true;
         OwnerCharacter->SetDoing(true);
         Skilling = true;
@@ -67,7 +67,7 @@ void UUltSkillNumber_5::Activate_Skill()
     if(!ShadowShuriken.IsValid()) return;
 	ShadowShuriken->SetOwner(OwnerCharacter.Get());
     ShadowShuriken->AttachToComponent(OwnerCharacter->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform );
-	ShadowShuriken->SetSkill(SkillAbilityNestingData);	
+	ShadowShuriken->SetSkill(SkillAbilityNestingData, this);	
 
 	OwnerCharacter->SetDoing(false);
     Remove_Skill();

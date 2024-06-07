@@ -30,9 +30,14 @@ protected:
 public:	
 	FORCEINLINE float GetCurrentSlowCoefficient() const {return CurrentSlowCoefficient;}; 
 	FORCEINLINE float GetCurrentFastCoefficient() const {return CurrentFastCoefficient;}; 
-
+	
+	FORCEINLINE void AddMoveSpeedCoefficient(float Add) {CurrentFastCoefficient = CurrentFastCoefficient + Add;}; 
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void BindCrowdComp();
+	UFUNCTION()
+	void UpdateStatus();
 
 	// 플레이어 상태이상 함수
 	void KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime);//후에 인자 추가 (상태시간)
@@ -50,8 +55,7 @@ public:
 private:
 	bool CalculateStateTime(ECharacterState UpdateState, FTimerHandle& StateTimerHandle,float StateTime);
 
-	void OnPlayerState(ECharacterState UpdateState, bool IsStop);
-	void OnEnemyState(ECharacterState UpdateState, bool IsStop);
+	void OnCharacterState(ECharacterState UpdateState, bool IsStop);
 
 	void ClearStopState();
 

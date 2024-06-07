@@ -13,17 +13,25 @@ class UInteractionWidget;
 class UMainMenu;
 class UAPTuTorialUserWidget;
 class UAPStageInformationUI;
+class UImitatorSkillSlot;
 
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateMaxHPBar, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateMaxMPBar, uint8);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateMPBar, uint8, bool);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateSkillSlot, ESkillKey, uint8);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnOperateSkill, ESkillKey);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartCoolTime, ESkillKey);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHightLightSkill, ESkillKey);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUsingSkill, ESkillKey, bool);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCheckChargeNum, ESkillKey);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChargingGauge, float, float);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnChargingEnd, bool);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnOperateSkill, ESkillKey); // 스킬 사용 UI 애니메이션
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartCoolTime, ESkillKey); // 스킬 쿨타임 시작
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHightLightSkill, ESkillKey); // 스킬 하이라이트 UI 애니
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUsingSkill, ESkillKey, bool); // 스킬 시전 중 
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCheckChargeNum, ESkillKey); // 스킬 슬롯 충전 횟수 쿨타임 체크
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnOnlyChargingNumberChange, ESkillKey); // 스킬 슬롯 충전 횟수 텍스트 변경
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChargingGauge, float, float);  // 차징 스킬 게이지
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChargingEnd, bool); // 차징 스킬 시작 of 끝
 
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
@@ -71,10 +79,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UUserWidget* GetStatusWidget() const {return StatusBarWidget.Get();};
 
-	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance = false);
+	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance = false, uint8 EnhanceSkillNum = 0);
 	void DisplayEnhanceGauge(int32 TargetNum, int32 MaxNum);
 
 	void OpenWorldMap();
+
+	void StartImitatorSlot();
+	void EndImitatorSlot();
+	void UpdateImitatorSlot(uint8 SkillNumber = 0);
 
 protected:
 
@@ -101,7 +113,7 @@ private:
 	TSubclassOf<UUserWidget> BossHPUIClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
-	TArray<TSubclassOf<UUserWidget>> EnhanceChoiceClasses;
+	TSubclassOf<UUserWidget> EnhanceChoiceClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> EnhanceGaugeUIClass;
@@ -109,14 +121,23 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> StageInformationUIClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> ImitatorSlotUIClass;
+
 	TWeakObjectPtr<UUserWidget> StatusBarWidget;
 
 	TWeakObjectPtr<UUserWidget> BossHPWidget;
 
 	TWeakObjectPtr<UAPStageInformationUI> StageInformationUI;
 
+	TWeakObjectPtr<UImitatorSkillSlot> ImitatorSlotUI;
+
 public:
+	FOnUpdateMaxHPBar OnUpdateMaxHPBar;
+
 	FOnUpdateHPBar OnUpdateHPBar;
+
+	FOnUpdateMaxMPBar OnUpdateMaxMPBar;
 
 	FOnUpdateMPBar OnUpdateMPBar;
 
@@ -132,7 +153,10 @@ public:
 
 	FOnCheckChargeNum OnChargeTime;
 
+	FOnOnlyChargingNumberChange OnOnlyChargingNumberChange;
+
 	FOnChargingGauge OnChargingGauge;
 
 	FOnChargingEnd OnChargingEnd;
+
 };

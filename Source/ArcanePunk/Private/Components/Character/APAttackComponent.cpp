@@ -34,13 +34,15 @@ void UAPAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 void UAPAttackComponent::InitAttackComp()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 }
 
 void UAPAttackComponent::StartAttack_A(bool & bCanMove)
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
+	if(OwnerCharacter->GetDoing()) return;
+	
 	if(bAttack_A)
 	{
 		if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo)) return;
@@ -62,6 +64,7 @@ void UAPAttackComponent::StartAttack_A(bool & bCanMove)
 void UAPAttackComponent::StartAttack_B(bool &bCanMove)
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
+	if(OwnerCharacter->GetDoing()) return;
 
 	if(bAttack_B) return;
 	bAttack_B = true;
@@ -96,6 +99,11 @@ void UAPAttackComponent::ComboAttackStart()
 	IsComboInputOn = false;
 	if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 0, MaxCombo - 1)) return;
 	CurrentCombo = FMath::Clamp<int32>(CurrentCombo + 1, 1, MaxCombo);
+	
+	if(auto OwnerPlayer = Cast<AArcanePunkCharacter>(OwnerCharacter))
+	{
+		OwnerPlayer->OnComboAttackStart.Broadcast(CurrentCombo);
+	}
 }
 
 void UAPAttackComponent::ComboAttackEnd()
@@ -285,20 +293,19 @@ void UAPAttackComponent::MultiAttack()
 			
 			if(Actors.Contains(Actor)) {continue;}
 			else {Actors.Add(Actor);}
-			if(Actor->ActorHasTag(TEXT("Enemy")))
-			{
+			
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(OwnerCharacter->GetController()); if(!MyController) return;
 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
 				float Check = FMath::RandRange(0.0f,100.0f);
 				if(Check <= BaseInstantDeathPercent) 
 				{
-					auto Enemy = Cast<AEnemy_CharacterBase>(Actor);
-					if(Enemy) Damage = FMath::Max(Damage, Enemy->GetMonsterHP()); 
+					auto Enemy = Cast<AAPCharacterBase>(Actor);
+					if(Enemy) Damage = FMath::Max(Damage, Enemy->GetDefaultHP()); 
 				}
 				float DamageApplied = Actor->TakeDamage(Damage *  OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, GetOwner()); 
 				DrainCheck(Actor, DamageApplied, DrainCoefficient);
-			}			
+					
 		}
 	}
 	
@@ -392,8 +399,8 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 				float Check = FMath::RandRange(0.0f,100.0f);
 				if(Check <= InstantDeathPercent) 
 				{
-					auto Enemy = Cast<AEnemy_CharacterBase>(Actor);
-					if(Enemy) Damage = Enemy->GetMonsterHP(); 
+					auto Enemy = Cast<AAPCharacterBase>(Actor);
+					if(Enemy) Damage = Enemy->GetDefaultHP(); 
 				}
 				ApplyDamageToActor(Actor, Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, HitNumbers);
 			}			
@@ -470,7 +477,7 @@ void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float
 			else if(Actor->ActorHasTag(TEXT("Player")))		
 			{
 				float Dist = KnockBackDist - (OwnerCharacter->GetActorLocation()*FVector(1.0f,1.0f,0.0f) - Start*FVector(1.0f,1.0f,0.0f)).Size();
-				if(PlayerKnockBack) OwnerCharacter->GetCrowdControlComponent()->KnockBackState(Start, Dist, 0.35f);
+				if(PlayerKnockBack) OwnerCharacter->GetCrowdControlComp()->KnockBackState(Start, Dist, 0.35f);
 			}
 		}
 	}
@@ -511,8 +518,12 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(FVector Start, 
 			}	
 			else if(Actor->ActorHasTag(TEXT("Player")))		
 			{
-				float Dist = KnockBackDist - (OwnerCharacter->GetActorLocation()*FVector(1.0f,1.0f,0.0f) - Start*FVector(1.0f,1.0f,0.0f)).Size();
-				if(PlayerKnockBack) OwnerCharacter->GetCrowdControlComponent()->KnockBackState(Start, Dist, 0.35f);
+				auto OC = Cast<AAPCharacterBase>(Actor); 
+				if(OC)
+				{
+					float Dist = KnockBackDist - (OC->GetActorLocation()*FVector(1.0f,1.0f,0.0f) - Start*FVector(1.0f,1.0f,0.0f)).Size();
+					if(PlayerKnockBack) OC->GetCrowdControlComp()->KnockBackState(Start, Dist, 0.35f);
+				}
 			}
 		}
 	}
@@ -615,13 +626,14 @@ float UAPAttackComponent::ApplyDamageToActor(AActor* DamagedActor, float Damage,
 void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, float Coeff)
 {
 	if(!OwnerCharacter.IsValid()) return;
+	auto OwnerPlayer = Cast<AArcanePunkCharacter>(OwnerCharacter); if(!OwnerPlayer) return;
 	auto Enemy = Cast<AEnemy_CharacterBase>(DamagedActor); if(!Enemy) return;
 
 	float DrainCoeff = Coeff;
 
-	auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
+	auto PDD = OwnerPlayer->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
     
-	if(Enemy->IsInDrainField() && OwnerCharacter->GetInArcaneTent())
+	if(Enemy->IsInDrainField() && OwnerPlayer->GetInArcaneTent())
 	{
 		DrainCoeff = DrainCoeff + FieldDrainCoefficient;
 	}
@@ -629,8 +641,8 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 	float HP = PDD.PlayerDynamicData.HP + DamageApplied * DrainCoeff; 
     PDD.PlayerDynamicData.HP = FMath::Min(PDD.PlayerDynamicData.MaxHP, HP);
 	
-	OwnerCharacter->SetDefaultHP(PDD.PlayerDynamicData.HP); 
-	OwnerCharacter->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
+	OwnerPlayer->SetDefaultHP(PDD.PlayerDynamicData.HP); 
+	OwnerPlayer->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 
 }
 

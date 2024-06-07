@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Engine/DataTable.h"
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
@@ -61,6 +62,7 @@ enum class EInteractionType: uint8 // 상호작용 종류
 	Accost			= 2 UMETA(DisplayName = "대화"), // NPC와 대화 상호작용
 	SelectStage		= 3 UMETA(DisplayName = "스테이지 선택"), // 스테이지 선택 NPC 상호작용
 	Teleport		= 4 UMETA(DisplayName = "포탈 이동"), // Teleport 상호작용
+	ShopMesh		= 5 UMETA(DisplayName = "상점"), // 상점 상호작용
 };
 
 USTRUCT()
@@ -141,6 +143,82 @@ struct FConversationDataTable : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	TArray<FConversationDataArray> ConversationPartnerPrompt; // Left : 강조할 글자 위치, Right : 강조할 글자의 폰트 크기
+};
+
+
+USTRUCT()
+struct FShopGoodsData_Enhance
+{
+	GENERATED_USTRUCT_BODY()
+
+	FShopGoodsData_Enhance() {}
+
+	UPROPERTY(EditAnywhere)
+	EEnhanceCategory GoodsCategory;
+
+	UPROPERTY(EditAnywhere)
+	EEnHanceType GoodsType;
+
+	UPROPERTY(EditAnywhere)
+	uint8 SkillNumber = 0; // ex - 5 : Skill_5 -> 아케인빔 , UltSkill_5 -> 질풍쇄도
+
+	UPROPERTY(EditAnywhere)
+	FName SkillName; // ex - Skill_8 , Row이름으로 
+
+	UPROPERTY(EditAnywhere)
+	uint8 EnhanceNumber; // ex - 1 -> Skill_8_1
+
+	UPROPERTY(EditAnywhere)
+	FName EnhanceName; // ex - Skill_8_1 , Row이름으로 
+
+	UPROPERTY(EditAnywhere)
+	uint8 GoodsNum = 1;
+
+	UPROPERTY(EditAnywhere)
+	int32 GoodsPrice = 1;
+};
+
+USTRUCT()
+struct FShopGoodsData_NewSkill
+{
+	GENERATED_USTRUCT_BODY()
+
+	FShopGoodsData_NewSkill() {}
+
+	UPROPERTY(EditAnywhere)
+	EEnhanceCategory GoodsCategory;
+	
+	UPROPERTY(EditAnywhere)
+	EEnHanceType GoodsType;
+
+	UPROPERTY(EditAnywhere)
+	ESkillKey SkillKey;
+
+	UPROPERTY(EditAnywhere)
+	uint8 SkillNumber = 0; // ex - 5 : Skill -> 아케인빔 , UltSkill -> 질풍쇄도
+
+	UPROPERTY(EditAnywhere)
+	FName NewSkillName;
+
+	UPROPERTY(EditAnywhere)
+	int32 GoodsPrice = 1;
+
+	UPROPERTY(EditAnywhere)
+	bool bSoldOut = false;
+};
+
+USTRUCT()
+struct FShopListData
+{
+	GENERATED_USTRUCT_BODY()
+
+	FShopListData() {}
+
+	UPROPERTY(EditAnywhere)
+	TArray<FShopGoodsData_Enhance> ShopGoodsList_Enhance;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FShopGoodsData_NewSkill> ShopGoodsList_NewSkill;
 };
 
 

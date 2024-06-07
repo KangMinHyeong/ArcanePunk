@@ -7,6 +7,7 @@
 #include "Components/Common/APCrowdControlComponent.h"
 #include "APHitPointComponent.generated.h"
 
+class UNiagaraSystem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPHitPointComponent : public UActorComponent
@@ -17,6 +18,7 @@ public:
 	// Sets default values for this component's properties
 	UAPHitPointComponent();
 	void DistinctHitPoint(FVector ImpactPoint, AActor *HitActor);
+	void DistinctHitPoint(UNiagaraSystem* HitEffect, FVector ImpactPoint, AActor *HitActor);
 	void SetCrowdControl(AActor *HitActor, ECharacterState UpdateState, float StateTime);
 
 	FORCEINLINE void SetKnockBackVec(FVector NewValue) {KnockBackVec =  NewValue;};

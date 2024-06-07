@@ -43,39 +43,26 @@ void USkillNumber8::PlaySkill()
 	}
 	else
 	{
-        // if(bActivate)
-        // {
-        //     if(ArcaneBall.IsValid()) ArcaneBall->Explosion();
-        //     bActivate = false;
-        // }
-        // else
-        // {
-        //     OwnerCharacter->SetDoing(true);
-        //     SetAbility(WhichKey);
-        //     SkillKey = WhichKey;
-        //     Skilling = true;
-        //     CurrentSkillType = SkillType;
-        //     Spawn_Skill8();
-        // }
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
         Skilling = true;
-        Spawn_Skill8();
+        Spawn_SkillRange();
 	}
 }
 
-void USkillNumber8::Spawn_Skill8()
+void USkillNumber8::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-    if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_8);}
+    // if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_8);}
 	
 	ActivateSkillRange_Target(Skill8_Wide, Skill8_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill8_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	if(CheckSmartKey(SkillKey))
 	{
@@ -106,6 +93,7 @@ void USkillNumber8::OnSkill()
 
 void USkillNumber8::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
@@ -120,19 +108,17 @@ void USkillNumber8::Activate_Skill()
     ArcaneBall->SetOwner(OwnerCharacter.Get());
     ArcaneBall->SetBallRadius(Skill8_Wide);
 	float Size = ArcaneBall->GetActorScale3D().Y/ ArcaneBall->DefaultSize;
-    // ArcaneBall->SetActorLocation( ArcaneBall->GetActorLocation() + (OwnerCharacter->GetActorUpVector()*150.0f*Size));
     ArcaneBall->SetDeadTime((SkillRange_Target->GetTargetDistance() * 2.0f - SpawnAddLocation) / ArcaneBall->GetBallSpeed()); // 거리 = 속력 * 시간 으로 DeadTime 수정
-	ArcaneBall->SetSkill(SkillAbilityNestingData);	
-	// if(SkillRange_Target) ArcaneBeam->SetDistance(SkillRange_Target->GetTargetDistance() * 2.0f);
-	// if(SkillRange_Target) ArcaneBeam->SetWide(SkillRange_Target->GetTargetWide());
+	ArcaneBall->SetSkill(SkillAbilityNestingData, this);	
+
 	Remove_Skill();
-    // bActivate = true; 
 
     OwnerCharacter->SetDoing(false);
 }
 
 void USkillNumber8::SkillEnd()
 {
+	Super::SkillEnd();
     bActivate = false;
 }
 
@@ -144,10 +130,13 @@ void USkillNumber8::UpdateSkillData()
 	
 	float Dist = Skill8_LimitDistance_Origin;
 	float Wide = Skill8_Wide_Origin;
-	float Cool = OriginCoolTime;
+	float Cool = SkillNameListData.CoolTime;
 	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
     {
-        if(It.Key == 2) {UpdatAbilityData(EEnHanceType::Silver, It.Key); Dist = OwnerCharacter->GetAPSkillAbility()->Coefficient_Multiple_Return(Dist, AbilityData->Coefficient_X, It.Value);} // 사거리 강화}
+        if(It.Key == 2) {
+		UpdatAbilityData(EEnHanceType::Silver, It.Key); 
+		OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Dist, AbilityData->Coefficient_X, It.Value);
+		} // 사거리 강화}
     }
     // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
     // {

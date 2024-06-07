@@ -33,15 +33,15 @@ void USkillNumber18::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 		Skilling = true;
-        Spawn_Skill18();
+        Spawn_SkillRange();
 		OnSkill();
 	}
 }
 
-void USkillNumber18::Spawn_Skill18()
+void USkillNumber18::Spawn_SkillRange()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
@@ -53,7 +53,7 @@ void USkillNumber18::Spawn_Skill18()
 	if(SkillRange_Target.IsValid()) 
     {
         SkillRange_Target->SetMaxDist(0.0f); // 최대 사거리 0.5배 해줘야지 같은 거리로 뒤로 밀림
-	    SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	    SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
         SkillRange_Target->SetMouseControll(false);
     }
 }
@@ -64,6 +64,8 @@ void USkillNumber18::OnSkill()
     OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
     OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
     
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -76,6 +78,7 @@ void USkillNumber18::OnSkill()
 
 void USkillNumber18::Activate_Skill()
 {
+	Super::Activate_Skill();
     if(!OwnerCharacter.IsValid()) return;
 
     FActorSpawnParameters SpawnParams;
@@ -87,13 +90,17 @@ void USkillNumber18::Activate_Skill()
 	if(!SpinSlash.IsValid()) return; 
 	SpinSlash->SetOwner(OwnerCharacter.Get());
     SpinSlash->SetSlashWidth(Skill18_LimitDistance);
-    SpinSlash->SetSkill(SkillAbilityNestingData);	
+    SpinSlash->SetSkill(SkillAbilityNestingData, this);	
 
     SpinSlash->OnCharging();
+
+	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
+	
 }
 
 void USkillNumber18::SkillEnd()
 {
+	Super::SkillEnd();
     if(!OwnerCharacter.IsValid()) return;
     auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
     if(OwnerAnim) OwnerAnim->StopSkill_18_Montage();

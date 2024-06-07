@@ -12,7 +12,7 @@
 
 UUltSkillNumber_11::UUltSkillNumber_11()
 {
-    OriginCoolTime = 5.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_11");
 }
 
 void UUltSkillNumber_11::BeginPlay()
@@ -31,7 +31,7 @@ void UUltSkillNumber_11::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 		Skilling = true;
 
@@ -68,7 +68,7 @@ void UUltSkillNumber_11::Activate_UltSkill_11()
 	if(!Overload.IsValid()) return; 
 	Overload->SetOwner(OwnerCharacter.Get());
     Overload->SetRange(UltSkill11_LimitDistance);
-    Overload->SetSkill(SkillAbilityNestingData);	
+    Overload->SetSkill(SkillAbilityNestingData, this);	
 }
 
 void UUltSkillNumber_11::Enhance()

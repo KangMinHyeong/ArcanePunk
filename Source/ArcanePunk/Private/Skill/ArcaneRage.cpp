@@ -34,7 +34,7 @@ void AArcaneRage::SetRageMode()
 {
     if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetRageMode(true);
-    if(BuffType == EBuffType::Speed) {OwnerCharacter->GetCrowdControlComponent()->FastState(FastCoefficient, DestroyTime);}
+    if(BuffType == EBuffType::Speed) {OwnerCharacter->GetCrowdControlComp()->FastState(FastCoefficient, DestroyTime);}
     if(BuffType == EBuffType::ATKSpeed) {OwnerCharacter->GetBuffComp()->ATKSpeedUp(ATKSpeedCoefficient, DestroyTime); }
     if(BuffType == EBuffType::ATK) {OwnerCharacter->GetBuffComp()->ATKUp(ATKCoefficient, DestroyTime);}
 }
@@ -62,9 +62,9 @@ void AArcaneRage::ApplyRecovery()
     OwnerCharacter->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 }
 
-void AArcaneRage::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneRage::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
 
     for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)

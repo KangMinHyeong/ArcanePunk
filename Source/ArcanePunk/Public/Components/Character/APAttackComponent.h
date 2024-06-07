@@ -7,7 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "APAttackComponent.generated.h"
 
-class AArcanePunkCharacter;
+class AAPCharacterBase;
 class UArcanePunkCharacterAnimInstance;
 class UNiagaraSystem;
 
@@ -66,6 +66,8 @@ public:
 
 	FORCEINLINE float GetDrainCoefficient() const {return DrainCoefficient;};
 	FORCEINLINE void SetDrainCoefficient(float NewValue) {DrainCoefficient = NewValue;}; //
+	FORCEINLINE void AddDrainCoefficient(float NewValue) {DrainCoefficient+=NewValue;}; //
+
 	FORCEINLINE float GetFieldDrainCoefficient() const {return FieldDrainCoefficient;};
 	FORCEINLINE void SetFieldDrainCoefficient(float NewValue) {FieldDrainCoefficient = NewValue;}; //
 	FORCEINLINE float GetSkillDrainCoefficient() const {return SkillDrainCoefficient;};
@@ -87,7 +89,7 @@ private:
 	void ApplyDamageToActor(AActor* DamagedActor, float Damage, FPointDamageEvent myDamageEvent, AController* MyController, uint8 HitNumbers);
 
 private:
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
 	TWeakObjectPtr<UArcanePunkCharacterAnimInstance> OwnerAnim;
 	
 	bool bAttack_A = false;

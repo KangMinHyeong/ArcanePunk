@@ -20,7 +20,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	FORCEINLINE void SetRewinderWidth(float Width) {RewinderWidth = Width;};
 	FORCEINLINE void SetRewinderLocation(FVector Location) {RewinderLocation = Location;};

@@ -43,17 +43,27 @@ public:
 	void CreateInit();
 
 	virtual void PlaySkill();
-	virtual void OnSkill();
+	UFUNCTION()
 	virtual void Remove_Skill();	
-	virtual void SkillEnd();
+	
 	virtual void RemoveEffect();
+
+	UFUNCTION()
+	virtual void OnSkill();
+	UFUNCTION()
+	virtual void SkillEnd();
+	UFUNCTION()
 	virtual void Activate_Skill();
+	UFUNCTION()
 	virtual void Enhance();
+	UFUNCTION()
 	virtual void DoubleEnhance();
+
 	virtual void MarkingOn(AActor* OtherActor, float Time);
 	virtual void MarkErase();
 	virtual void UpdateSkillData();
 	virtual void OnCoolDown();
+	virtual bool CheckSkillCondition();
 
 	void SetMouseCursor(AArcanePunkPlayerController *PC, ESkillCursor NewCursor);
 	bool CheckSmartKey(ESkillKey WhichKey);
@@ -62,13 +72,17 @@ public:
 	void ActivateSkillRange_Round(float Range);
 	void ActivateSkillRange_Target(float Range_1, float Range_2, ESkillRangeType SkillRangeType);
 
+	UFUNCTION()
 	void CharacterRotation();
 	void CharacterRotation_TwoCircle();
 	void CharacterRotation_Cursor(FHitResult& Hit);
 	void CharacterRotation_Sector();
+
+	FORCEINLINE ESkillNumber GetCurrentSkillNumber() const {return CurrentSkillNumber;};
+	FORCEINLINE void SetCurrentSkillNumber(ESkillNumber UpdateSkillNumber) {CurrentSkillNumber = UpdateSkillNumber;};
 	
 	// Cool Time
-	FORCEINLINE float GetOriginCoolTime() const {return OriginCoolTime;};
+	FORCEINLINE float GetOriginCoolTime() const {return SkillNameListData.CoolTime;};
 	FORCEINLINE float GetCoolTime() const {return CurrentCoolTime;};
 	FORCEINLINE void SetCoolTime(float NewCoolTime) {CurrentCoolTime = NewCoolTime;};
 
@@ -81,7 +95,28 @@ public:
 	// 추가 지속시간
 	FORCEINLINE float GetAddDuration() const {return AddDuration;};
 	FORCEINLINE void SetAddDuration(float NewValue) {AddDuration = AddDuration + NewValue;};
+
+	// MP 소모값
+	FORCEINLINE void SetMPConsumption(uint8 NewValue) {MPConsumption = NewValue;};
+
+	// Skill Key
+	FORCEINLINE ESkillKey GetSkillKey() const {return SkillKey;};
+	FORCEINLINE void SetSkillKey(ESkillKey NewSkillKey) {SkillKey = NewSkillKey;};
+
+	// 스킬 범위 표시 액터
+	FORCEINLINE TWeakObjectPtr<AAPSkillRange> GetSkillRange_Circle() const {return SkillRange_Circle;};
+
+	// 스킬 활성화 여부
+	FORCEINLINE bool IsActivate() const {return bActivate;};
 	
+	// 스킬 증강 정보
+	FORCEINLINE FSkillAbilityNestingData GetSkillAbilityNestingData() const {return SkillAbilityNestingData;};
+	void ClearSkillAbilityNestingData(EEnHanceType ClearEnHanceType);
+	void AddSkillAbilityNestingData(EEnHanceType AddEnHanceType, TPair<uint8, uint16> UpdateAbilityNestingNum);
+
+protected:
+	virtual void Spawn_SkillRange();
+
 protected:
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<AArcanePunkPlayerController> OwnerCharacterPC;
@@ -96,11 +131,9 @@ protected:
 
 	float SpawnAddLocation = 35.0f;
 
-	uint8 MPConsumption = 1;
-
 	float RotSpeed = 640.0f;
 
-	float OriginCoolTime = 5.0f;
+	uint8 MPConsumption = 1;
 	float CurrentCoolTime = 5.0f;
 
 	uint8 CurrentChargeNum = 0;
@@ -111,28 +144,23 @@ protected:
 
 	FVector SpawnLocation;
 	FVector TargetLocation;
-	FRotator SpawnRoatation;
+	FRotator SpawnRotation;
 
 	FSkillAbilityRowNameData* RowDataTable;
 	FSkillAbilityDataSheet* AbilityData;
 
-	
-public:
-	// TArray<ESkillAbility> EnableSkillAbilityList;
-
+	UPROPERTY() // 스킬 기본값
+	FSkillNameList SkillNameListData;
 	UPROPERTY() // 스킬 증강 정보 (종류 및 중첩 상태)
 	FSkillAbilityNestingData SkillAbilityNestingData;
 
+	ESkillNumber CurrentSkillNumber = ESkillNumber::None;
 	ESkillKey SkillKey = ESkillKey::None;
-
-	TWeakObjectPtr<AAPSkillRange> SkillRange_Circle;
-
-	TWeakObjectPtr<AAPSkillRange> SkillRange_Target;
-
-	TWeakObjectPtr<AAPSkillRange_TwoCircle> SkillRange_TWoCircle;
 
 	bool bActivate = false;
 
-	
+	TWeakObjectPtr<AAPSkillRange> SkillRange_Circle;
+	TWeakObjectPtr<AAPSkillRange> SkillRange_Target;
+	TWeakObjectPtr<AAPSkillRange_TwoCircle> SkillRange_TWoCircle;
 
 };

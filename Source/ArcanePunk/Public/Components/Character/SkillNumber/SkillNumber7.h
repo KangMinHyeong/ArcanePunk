@@ -31,12 +31,14 @@ public:
 	
 private:
 	virtual void AddAbilityList() override;
-	void Spawn_Skill7();	
+	virtual void Spawn_SkillRange() override;	
 
 private:
 	float Skill7_LimitDistance = 1350.0f / 2.0f;
+	float Skill7_LimitDistance_Origin = 1350.0f / 2.0f;
 
 	float Skill7_Wide = 100.0f / 2.0f;
+	float Skill7_Wide_Origin = 100.0f / 2.0f;
 
 	TWeakObjectPtr<AArcaneCutter> ArcaneCutter;
 };

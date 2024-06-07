@@ -90,9 +90,9 @@ void AOverload::StartFire()
     DestroySKill();
 }
 
-void AOverload::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AOverload::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 
     OverloadTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);

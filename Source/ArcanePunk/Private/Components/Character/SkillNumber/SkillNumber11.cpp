@@ -31,7 +31,7 @@ void USkillNumber11::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
@@ -43,6 +43,8 @@ void USkillNumber11::OnSkill()
     if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
 
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -53,6 +55,7 @@ void USkillNumber11::OnSkill()
 
 void USkillNumber11::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 		
 	FActorSpawnParameters SpawnParams;
@@ -61,15 +64,17 @@ void USkillNumber11::Activate_Skill()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	auto ArcaneField = GetWorld()->SpawnActor<AArcaneField>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneFieldClass(), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
-	
     if(!ArcaneField) return;
 	ArcaneField->SetOwner(OwnerCharacter.Get());
-	ArcaneField->SetSkill(SkillAbilityNestingData);	
-    Skilling = false;
+	ArcaneField->SetSkill(SkillAbilityNestingData, this);	
+
+    Remove_Skill();
+	OwnerCharacter->OnSkillEndTrigger.RemoveDynamic(this, &USkillNumberBase::SkillEnd);
 }
 
 void USkillNumber11::SkillEnd()
 {
+	Super::SkillEnd();
 	bActivate = false; 
 	
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);

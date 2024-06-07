@@ -12,7 +12,7 @@
 
 UUltSkillNumber_9::UUltSkillNumber_9()
 {
-	OriginCoolTime = 7.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_9");
 
     UltSkill9_LimitDistance = 1800.0f;
 	UltSkill9_Width = 500.0f;	
@@ -37,25 +37,26 @@ void UUltSkillNumber_9::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
         Skilling = true;
-        Spawn_UltSkill9();
+        Spawn_SkillRange();
 	}
 }
 
-void UUltSkillNumber_9::Spawn_UltSkill9()
+void UUltSkillNumber_9::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-    if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+    // if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
 	
 	ActivateSkillRange_Target(UltSkill9_Width, UltSkill9_Length*0.5f, ESkillRangeType::Square); // 최대 길이 0.5배 해줘야지 같은 거리로 뒤로 밀림
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(UltSkill9_LimitDistance*0.25f); // 최대 사거리 0.25배 해줘야지 같은 거리로 뒤로 밀림
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	if(CheckSmartKey(SkillKey))
 	{
@@ -102,13 +103,15 @@ void UUltSkillNumber_9::Activate_Skill()
     CarpetBoom->SetCarpetBoomWidth(UltSkill9_Width);
 	CarpetBoom->SetCarpetBoomLength(UltSkill9_Length); 
     CarpetBoom->SetBoomTargetLocation(TargetLocation);
-	CarpetBoom->SetSkill(SkillAbilityNestingData);	
+	CarpetBoom->SetSkill(SkillAbilityNestingData, this);	
 
-	Remove_Skill();
+	SkillEnd();
 }
 
 void UUltSkillNumber_9::SkillEnd()
 {
+	Super::SkillEnd();
+	Remove_Skill();
 }
 
 void UUltSkillNumber_9::UpdateSkillData()

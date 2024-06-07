@@ -31,7 +31,7 @@ public:
 
 private:
 	virtual void AddAbilityList() override;
-	void Spawn_Skill14();
+	virtual void Spawn_SkillRange() override;
 
 private:
 	float Skill14_Wide = 150.0f;

@@ -29,7 +29,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_UltSkill8();	
+	virtual void Spawn_SkillRange() override;
 	
 private:	
 	float UltSkill8_TargetRange = 600.0f;

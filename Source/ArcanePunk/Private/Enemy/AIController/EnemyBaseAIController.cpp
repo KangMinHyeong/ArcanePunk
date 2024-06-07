@@ -18,7 +18,10 @@ void AEnemyBaseAIController::OnPossess(APawn *InPawn)
     if(AIBehavior != nullptr)
     {   
         RunBehaviorTree(AIBehavior);
-        GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), GetPawn()->GetActorLocation());
+        if(GetBlackboardComponent())
+        {
+            GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), GetPawn()->GetActorLocation());
+        }
     }
 }
 

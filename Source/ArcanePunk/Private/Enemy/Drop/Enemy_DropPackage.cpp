@@ -5,6 +5,7 @@
 #include "UserInterface/Drop/APDropPackageUI.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/SphereComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {
@@ -37,15 +38,24 @@ void AEnemy_DropPackage::AddItem(FName ItemID)
 	AddItemReference->ItemTextData = ItemData->ItemTextData;
 	AddItemReference->ItemAssetData = ItemData->ItemAssetData;
 	AddItemReference->ItemStatistics = ItemData->ItemStatistics;
-	AddItemReference->SetQuantity(1);	
+
+    int32 Amount = 1;
+	AddItemReference->SetQuantity(Amount);	
 
     ItemsInPackage.Add(AddItemReference);
 }
 
-void AEnemy_DropPackage::AddEnhance(uint8 EnhanceCategoryNum)
+int32 AEnemy_DropPackage::CheckGoldAmount()
 {
-	EnhanceCategory = static_cast<EEnhanceCategory>(EnhanceCategoryNum);
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return 1;
+    return APGI->CheckGoldAmount();
+}
 
+void AEnemy_DropPackage::AddEnhance()
+{
+	EnhanceCategory = GetRandCategory();
+	if(EnhanceCategory == EEnhanceCategory::None) return;
+	
     float SilverPercent = EnHanceTypePercent[0];
     float GoldPercent = EnHanceTypePercent[0] + EnHanceTypePercent[1];
     float PlatinumPercent = EnHanceTypePercent[0] + EnHanceTypePercent[1] + EnHanceTypePercent[2];
@@ -74,6 +84,39 @@ void AEnemy_DropPackage::AddEnhance(uint8 EnhanceCategoryNum)
 	
 }
 
+EEnhanceCategory AEnemy_DropPackage::GetRandCategory()
+{
+	EEnhanceCategory Category = EEnhanceCategory::None;
+
+    float Passive_Percent = EnHanceCategoryPercent[EEnhanceCategory::Enhance_Passive];
+    float Q_Percent = Passive_Percent + EnHanceCategoryPercent[EEnhanceCategory::Enhance_Q];
+    float E_Percent = Q_Percent + EnHanceCategoryPercent[EEnhanceCategory::Enhance_E];
+    float R_Percent = E_Percent + EnHanceCategoryPercent[EEnhanceCategory::Enhance_R];
+    
+    if(R_Percent <= KINDA_SMALL_NUMBER) return EEnhanceCategory::None;
+
+    float CurrentPercent = FMath::RandRange(0.0f, R_Percent);
+    
+    if(CurrentPercent >= 0.0f && CurrentPercent <= Passive_Percent)
+    {
+        Category = EEnhanceCategory::Enhance_Passive;
+    }
+    else if(CurrentPercent > Passive_Percent && CurrentPercent <= Q_Percent)
+    {
+        Category = EEnhanceCategory::Enhance_Q;
+    }
+    else if (CurrentPercent > Q_Percent && CurrentPercent <= E_Percent)
+    {
+        Category = EEnhanceCategory::Enhance_E;
+    }
+    else
+    {
+        Category = EEnhanceCategory::Enhance_R;
+    }
+
+    return Category;
+}
+
 void AEnemy_DropPackage::BeginFocus()
 {
 	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
@@ -95,9 +138,11 @@ FInteractData AEnemy_DropPackage::GetInteractData()
 void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
 	if(!IsInit) return; if(!PlayerCharacter) return;
+    if(PlayerCharacter->GetbJogging()) {PlayerCharacter->EndJog();}
 
 	for(auto DropItems : ItemsInPackage)
 	{
+        if(DropItems->ID == "Gold") {DropItems->SetQuantity(CheckGoldAmount());}
 		PlayerCharacter->GetInventory()->HandleAddItem(DropItems);
 		PlayerCharacter->InteractionActorRemove(this);
 	}

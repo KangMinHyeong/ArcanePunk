@@ -14,7 +14,7 @@ void AAPTitlePlayerController::BeginPlay()
 
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    if(GI->bNewGame)
+    if(GI->IsNewGame())
     {
         CreateIntroUI();
     }
@@ -67,15 +67,6 @@ void AAPTitlePlayerController::RemoveIntroUI(UUserWidget* IntroWidget)
 
 void AAPTitlePlayerController::OptionSetting()
 {
-    if(OptionSettingUI.IsValid()) {OptionSettingUI->AddToViewport(); return;}
-    else
-    {
-        OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); 
-        if(!OptionSettingUI.IsValid()) return;
-
-        OptionSettingUI->InitGraphicsSetting();
-        OptionSettingUI->InitAudioSetting();
-        OptionSettingUI->BindButton();
-        OptionSettingUI->AddToViewport();
-    } 
+    auto OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); if(!OptionSettingUI) return;
+    OptionSettingUI->AddToViewport();
 }
