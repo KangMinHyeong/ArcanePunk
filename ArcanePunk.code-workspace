@@ -47,7 +47,10 @@
 			"cstdlib": "cpp",
 			"variant": "cpp",
 			"chrono": "cpp",
-			"fft": "cpp"
+			"fft": "cpp",
+			"__config": "cpp",
+			"cmath": "cpp",
+			"xiosbase": "cpp"
 		}
 	},
 	"extensions": {

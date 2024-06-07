@@ -1,6 +1,7 @@
 
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 
+#include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
@@ -22,43 +23,89 @@ void UAPEnhanceChoice::NativeConstruct()
 
     // InitSuffle();
     SetPauseGame();
+
 }
 
 void UAPEnhanceChoice::SetPauseGame()
 {
-    if(!OwnerCharacter.IsValid()) return;
-    auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-
+    auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!PC) return;
     PC->SetPause(true);
 }
 
-void UAPEnhanceChoice::TextSetting()
+void UAPEnhanceChoice::OnDisplayChoiceButton()
+{
+    ChoiceSlots[ChoiceNumb]->OnChoice_FadeIn();
+    switch (ChoiceNumb)
+    {
+    case 0:
+        ChoiceNumb = 1;
+        break;
+    case 1:
+        ChoiceNumb = 2;
+        break;
+    
+    case 2:
+        ChoiceNumb = 0;
+        break;
+    }
+}
+
+void UAPEnhanceChoice::OnDisplayRerollButton()
+{
+    for(auto & Choice : ChoiceSlots) Choice->OnRerollButton_FadeIn();
+}
+
+void UAPEnhanceChoice::OnPlayingChoiceButton(uint8 CurrentNum)
+{
+    // ChoiceSlots[ChoiceNumb]->OnChoice_FadeIn();
+}
+
+void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType, uint8 UpdateEnhanceSkillNum)
+{
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
+    OnBackGround_FadeIn();
+
+    EnhanceCategory = UpdateEnhanceCategory;
+    EnHanceType = UpdateEnHanceType;
+    EnhanceSkillNum = UpdateEnhanceSkillNum;
+
+    NewSkills.Empty(); SkillAbilities.Empty(); ChoiceSizeBoxes.Empty();
+
+    ChoiceSizeBoxes.Emplace(ChoiceBox_1); 
+    ChoiceSizeBoxes.Emplace(ChoiceBox_2);
+    ChoiceSizeBoxes.Emplace(ChoiceBox_3);
+
+    InitTypeSetting();
+    SetAbility();
+    SetChoiceButton();
+    
+    Cancel_Button->OnClicked.AddDynamic(this, &UAPEnhanceChoice::OnCancel);
+}
+
+void UAPEnhanceChoice::InitTypeSetting()
 {
     if(!OwnerCharacter.IsValid()) return;
     
-    if(EnHanceType == EEnHanceType::Silver) {EnHanceType_Text->SetText(FText::FromName(TEXT_Silver));}
-    else if(EnHanceType == EEnHanceType::Gold) {EnHanceType_Text->SetText(FText::FromName(TEXT_Gold));}
-    else if(EnHanceType == EEnHanceType::Platinum) {EnHanceType_Text->SetText(FText::FromName(TEXT_Platinum));}
+    if(EnHanceType == EEnHanceType::Silver) 
+    {
+        EnHanceType_Text->SetText(FText::FromName(TEXT_Silver));
+        ChoiceBorder->SetBrushColor(SilverColor);
+    }
+    else if(EnHanceType == EEnHanceType::Gold) 
+    {
+        EnHanceType_Text->SetText(FText::FromName(TEXT_Gold));
+        ChoiceBorder->SetBrushColor(GoldColor);
+    }
+    else 
+    {
+        EnHanceType_Text->SetText(FText::FromName(TEXT_Platinum));
+        ChoiceBorder->SetBrushColor(PlatinumColor);
+    }
     
-    
-    auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("test_005")); 
+    auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Dice")); 
     if(!Item){ RerollDice_Text->SetText(FText::FromString(FString::FromInt(0)));}
     else { RerollDice_Text->SetText(FText::FromString(FString::FromInt(Item->Quantity)));}
-}
-
-void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHanceType UpdateEnHanceType)
-{
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
-    EnhanceCategory = UpdateEnhanceCategory;
-    EnHanceType = UpdateEnHanceType;
-
-    NewSkills.Empty(); SkillAbilities.Empty();
-
-    SetAbility();
-    SetChoiceButton();
-    TextSetting();
-    
-    Cancel_Button->OnClicked.AddDynamic(this, &UAPEnhanceChoice::OnCancel);
 }
 
 void UAPEnhanceChoice::SetAbility()
@@ -68,39 +115,41 @@ void UAPEnhanceChoice::SetAbility()
     switch (EnhanceCategory)
     {
         case EEnhanceCategory::Enhance_Q:
-        SkillNumber = OwnerCharacter->GetQSkill();
-        // OriginSkillAbilityList = OwnerCharacter->GetAbilitySkillQ();
-        EnHanceCategory_Text->SetText(FText::FromString("Q Skill Enhance"));
-        SkillAbilityNestingData = OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData;
+        SkillNumber = (uint8)OwnerCharacter->GetQSkill();
+        EnHanceCategory_Text->SetText(FText::FromString(QSkillText));
+        SkillAbilityNestingData = OwnerCharacter->GetQSkillNumber()->GetSkillAbilityNestingData();
         break;
 
         case EEnhanceCategory::Enhance_E:
-        SkillNumber = OwnerCharacter->GetESkill();
+        SkillNumber = (uint8)OwnerCharacter->GetESkill();
         // OriginSkillAbilityList = OwnerCharacter->GetAbilitySkillE();
-        EnHanceCategory_Text->SetText(FText::FromString("E Skill Enhance"));
-        SkillAbilityNestingData = OwnerCharacter->GetESkillNumber()->SkillAbilityNestingData;
+        EnHanceCategory_Text->SetText(FText::FromString(ESkillText));
+        SkillAbilityNestingData = OwnerCharacter->GetESkillNumber()->GetSkillAbilityNestingData();
 
         break;
         case EEnhanceCategory::Enhance_R:
-        EnHanceCategory_Text->SetText(FText::FromString("R Skill Enhance"));
+        SkillNumber = (uint8)OwnerCharacter->GetRSkill();
+        EnHanceCategory_Text->SetText(FText::FromString(RSkillText));
         // SkillAbilityNestingData = OwnerCharacter->GetRSkillNumber()->SkillAbilityNestingData;
+        SkillAbilityNestingData = OwnerCharacter->GetRSkillNumber()->GetSkillAbilityNestingData();
         break;
 
         case EEnhanceCategory::Enhance_Passive:
-        EnHanceCategory_Text->SetText(FText::FromString("Passive Skill Enhance"));
+        EnHanceCategory_Text->SetText(FText::FromString(PassiveSkillText));
+        PassiveNestingData = OwnerCharacter->GetPassiveSkills();
         break;
 
-        case EEnhanceCategory::Enhance_Dash:
-        EnHanceCategory_Text->SetText(FText::FromString("Dash Skill Enhance"));
-        break;
+        // case EEnhanceCategory::Enhance_Dash:
+        // EnHanceCategory_Text->SetText(FText::FromString("Dash Skill Enhance"));
+        // break;
 
-        case EEnhanceCategory::Enhance_LeftMouse:
-        EnHanceCategory_Text->SetText(FText::FromString("LeftMouse Attack Enhance"));
-        break;
+        // case EEnhanceCategory::Enhance_LeftMouse:
+        // EnHanceCategory_Text->SetText(FText::FromString("LeftMouse Attack Enhance"));
+        // break;
 
-        case EEnhanceCategory::Enhance_RightMouse:
-        EnHanceCategory_Text->SetText(FText::FromString("RightMouse Attack Enhance"));
-        break;
+        // case EEnhanceCategory::Enhance_RightMouse:
+        // EnHanceCategory_Text->SetText(FText::FromString("RightMouse Attack Enhance"));
+        // break;
     }
     EnhanceListing();
 }
@@ -122,39 +171,38 @@ void UAPEnhanceChoice::SetChoiceButton()
     ChoiceSlots.Empty();
 
     for(int32 i = 0; i<3; i++)
-    {
-        auto SizeBox = NewObject<USizeBox>(this, USizeBox::StaticClass());
-        ChoiceSizeBoxes.Add(SizeBox);
-        
+    {       
         auto ChoiceSlot = CreateWidget<UChoiceButton>(this, ChoiceSlotClass);
         ChoiceSlot->SetChoiceIndexNum(i);
-        ChoiceSlots.Add(ChoiceSlot);
+        ChoiceSlots.Emplace(ChoiceSlot);
 
-        auto PanelSlot = ChoiceHorizontalBox->AddChildToHorizontalBox(SizeBox);
-        FSlateChildSize SlotSize = PanelSlot->GetSize(); SlotSize.SizeRule = ESlateSizeRule::Fill;
-        PanelSlot->SetSize(SlotSize);
-        SizeBox->AddChild(ChoiceSlot); 
+        ChoiceSizeBoxes[i]->AddChild(ChoiceSlot); 
     }
 
-    if(EnhanceCategory == EEnhanceCategory::Enhance_Q || EnhanceCategory == EEnhanceCategory::Enhance_E || EnhanceCategory == EEnhanceCategory::Enhance_R)
+    for(int32 i = 0; i<ChoiceSlots.Num(); i++)
     {
-        for(int32 i = 0; i<ChoiceSlots.Num(); i++)
+        if(EnhanceCategory == EEnhanceCategory::Enhance_Q || EnhanceCategory == EEnhanceCategory::Enhance_E || EnhanceCategory == EEnhanceCategory::Enhance_R)
         {
             ActiveSuffle(i); // Active
         }
+        else
+        {
+            InitPassiveSuffle(i); // Passive
+        } 
     }
-    else
-    {
-        InitPassiveSuffle(); // Passive
-    }    
+
+       
 }
 
 void UAPEnhanceChoice::ActiveSuffle(uint8 Index)
 {
     float EnhanceAppearPercent = FMath::RandRange(0.0f, 100.0f);
-    if(EnhanceAppearPercent >= SkillAppearPercent) // 증강 등장
+    float CurrentSkillAppearPercent = SkillAppearPercent;
+    if(EnhanceCategory == EEnhanceCategory::Enhance_R) CurrentSkillAppearPercent = 0.0f;
+
+    if(EnhanceAppearPercent >= CurrentSkillAppearPercent) // 증강 등장
     {
-        EnhanceSuffle();
+        EnhanceSuffle(SkillAbilityNestingData.SkillName);
         // ChoiceSlots[i]->SetEnhance(this, SkillNumber, SkillAbility);
         ChoiceSlots[Index]->SetEnhance(this, SkillNumber, SkillAbilities.Top(), PlusAbilityNum);
         SkillAbilities.Pop();
@@ -167,7 +215,7 @@ void UAPEnhanceChoice::ActiveSuffle(uint8 Index)
         }
         else // 스킬을 이미 다 한번씩 획득한 경우 -> 증강으로
         {
-            EnhanceSuffle();
+            EnhanceSuffle(SkillAbilityNestingData.SkillName);
             ChoiceSlots[Index]->SetEnhance(this, SkillNumber, SkillAbilities.Top(), PlusAbilityNum);
             SkillAbilities.Pop();
         }
@@ -175,22 +223,88 @@ void UAPEnhanceChoice::ActiveSuffle(uint8 Index)
     
 }
 
-void UAPEnhanceChoice::InitPassiveSuffle()
+void UAPEnhanceChoice::InitPassiveSuffle(uint8 Index)
 {
+    if(PassiveNestingData.Num() == 0) 
+    {
+        PassiveSuffle(); 
+        ChoiceSlots[Index]->SetNewSkill(this, NewPassiveNumber);
+        return;
+    } // 스킬 셔플
+    
+    float EnhanceAppearPercent = FMath::RandRange(0.0f, 100.0f);
 
+    if(EnhanceAppearPercent >= PassiveSkillAppearPercent) // 증강 등장
+    {
+        InitPassiveSkillName();
+        EnhanceSuffle(PassiveSkills.Top());
+        ChoiceSlots[Index]->SetEnhance(this, SkillNumber, SkillAbilities.Top(), PlusAbilityNum);
+        SkillAbilities.Pop();
+    }
+    else // 스킬 등장
+    {
+        if(PassiveSuffle())
+        {
+            ChoiceSlots[Index]->SetNewSkill(this, NewPassiveNumber);
+        }
+        else // 스킬을 이미 다 한번씩 획득한 경우 -> 증강으로
+        {
+            InitPassiveSkillName();
+            EnhanceSuffle(PassiveSkills.Top());
+            ChoiceSlots[Index]->SetEnhance(this, SkillNumber, SkillAbilities.Top(), PlusAbilityNum);
+            SkillAbilities.Pop();
+        }
+    }     
 }
 
-void UAPEnhanceChoice::EnhanceSuffle()
+void UAPEnhanceChoice::InitPassiveSkillName()
+{
+    if(!PassiveSkills.IsEmpty()) return;
+
+    const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EPassiveNumber"), true); if(!SkillNum) return;
+    
+
+    if(EnhanceSkillNum != 0)
+    {
+        SkillNumber = EnhanceSkillNum;
+        FName PassiveName = FName(*SkillNum->GetNameStringByValue(SkillNumber));
+        PassiveSkills.Emplace(PassiveName);
+        SkillAbilityNestingData = PassiveNestingData[SkillNumber];
+        SkillAbilityNestingData.SkillName = PassiveName;
+        return;
+    }
+    else
+    {
+        TArray<uint8> PassiveSkillKeys;
+        for(auto It : PassiveNestingData)
+        {
+            PassiveSkillKeys.Emplace(It.Key);
+        }
+        while(PassiveSkills.Num() != PassiveSkillKeys.Num())
+        {
+            uint8 CurrentNum = FMath::RandRange(0, PassiveSkillKeys.Num() - 1);
+            
+            FName PassiveName = (FName(*SkillNum->GetNameStringByValue(PassiveSkillKeys[CurrentNum])));
+            if(!PassiveSkills.Contains(PassiveName))
+            {
+                PassiveSkills.Emplace(PassiveName);
+                SkillNumber = PassiveSkillKeys[CurrentNum];
+                SkillAbilityNestingData = PassiveNestingData[SkillNumber];
+                SkillAbilityNestingData.SkillName = PassiveName;
+            }
+        }
+    }
+}
+
+void UAPEnhanceChoice::EnhanceSuffle(FName SkillName)
 {  
     if(!OwnerCharacter.IsValid()) return;
-    auto DataTable = SkillAbilityRowNameData->FindRow<FSkillAbilityRowNameData>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString()); if(!DataTable) return;
+    auto DataTable = SkillAbilityRowNameData->FindRow<FSkillAbilityRowNameData>(SkillName, SkillName.ToString()); if(!DataTable) return;
     
     TArray<FString> RowName;
     uint8 Num = 0;
-    // if(EnHanceType == EEnHanceType::Silver) {Num = DataTable->SilverAbilityInformation.Num(); AbilityNestingNum = SkillAbilityNestingData.SilverAbilityNestingNum;}
-    // else if(EnHanceType == EEnHanceType::Gold) {Num = DataTable->GoldAbilityInformation.Num(); AbilityNestingNum = SkillAbilityNestingData.GoldAbilityNestingNum;}
-    // else {Num = DataTable->PlatinumAbilityInformation.Num(); AbilityNestingNum = SkillAbilityNestingData.PlatinumAbilityNestingNum;}
     TMap<uint8, uint16> AbilityNestingNum;
+
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
@@ -216,7 +330,7 @@ void UAPEnhanceChoice::EnhanceSuffle()
     {
         for(int32 i = 0; i<Num; i++)
         {
-            SkillAbilities.Add(i);
+            SkillAbilities.Emplace(i);
         }   
 
         int32 LastIndex = SkillAbilities.Num()-1;
@@ -236,15 +350,15 @@ void UAPEnhanceChoice::EnhanceSuffle()
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        AbilityData = OwnerCharacter->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Gold:
-        AbilityData = OwnerCharacter->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Platinum:
-        AbilityData = OwnerCharacter->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
     }
     if(!AbilityData) return;
@@ -253,11 +367,11 @@ void UAPEnhanceChoice::EnhanceSuffle()
     if(AbilityNestingNum.Contains(SkillAbilities.Top()+1))
     {
         bool Nestable = AbilityData->Nestable;
-        if(!Nestable) {SkillAbilities.Pop(); EnhanceSuffle();}
+        if(!Nestable) {SkillAbilities.Pop(); EnhanceSuffle(SkillName);}
         else 
         {
             PlusAbilityNum = AbilityNestingNum[SkillAbilities.Top()+1];
-            if(PlusAbilityNum == AbilityData->MaxNesting) {SkillAbilities.Pop(); EnhanceSuffle();}
+            if(PlusAbilityNum == AbilityData->MaxNesting) {SkillAbilities.Pop(); EnhanceSuffle(SkillName);}
             else {PlusAbilityNum++;}
         }
     }
@@ -289,7 +403,7 @@ bool UAPEnhanceChoice::SkillSuffle()
                 if(!ESkill->IsValidEnumValue(i)) continue;
             }
         
-            NewSkills.Add(i);
+            NewSkills.Emplace(i);
         }
         if(NewSkills.IsEmpty()) return false;
 
@@ -305,7 +419,40 @@ bool UAPEnhanceChoice::SkillSuffle()
         }
     }
 
-    NewSkillNumber = (ESkillNumber)NewSkills.Top(); NewSkills.Pop();
+    NewSkillNumber = NewSkills.Top(); NewSkills.Pop();
+    return true;
+}
+
+bool UAPEnhanceChoice::PassiveSuffle()
+{
+    const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EPassiveNumber"), true); if(!SkillNum) return false;
+    uint8 NewSkillNum = SkillNum->NumEnums() - 2;
+
+    if(NewPassives.IsEmpty())
+    {
+        if(OwnerCharacter->GetPassiveSkills().Num() == NewSkillNum) return false;
+
+        for(int32 i = 1; i<=NewSkillNum; i++)
+        {
+            if(OwnerCharacter->GetPassiveSkills().Contains(i)) continue;
+        
+            NewPassives.Emplace(i);
+        }
+        if(NewPassives.IsEmpty()) return false;
+
+        int32 LastIndex = NewPassives.Num() - 1;
+        for (int32 i = 0; i <= LastIndex; i += 1) 
+        {
+            int32 Index = FMath::RandRange(i, LastIndex);
+            if (i == Index) 
+            {
+                continue;
+            }
+            NewPassives.Swap(i, Index);
+        }
+    }
+
+    NewPassiveNumber = NewPassives.Top(); NewPassives.Pop();
     return true;
 }
 
@@ -313,7 +460,7 @@ void UAPEnhanceChoice::OnReroll(uint8 ChoiceIndexNum)
 {
     if(!OwnerCharacter.IsValid()) return;
     
-    auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("test_005")); if(!Item) return;
+    auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Dice")); if(!Item) return;
     if(Item->Quantity == 0) return;
     OwnerCharacter->GetInventory()->RemoveAmountOfItem(Item, 1);
     RerollDice_Text->SetText(FText::FromString(FString::FromInt(Item->Quantity)));
@@ -324,10 +471,19 @@ void UAPEnhanceChoice::OnReroll(uint8 ChoiceIndexNum)
     auto ChoiceSlot = CreateWidget<UChoiceButton>(this, ChoiceSlotClass);
     ChoiceSlot->SetChoiceIndexNum(ChoiceIndexNum);
     ChoiceSlots[ChoiceIndexNum] = ChoiceSlot;
+    ChoiceSlots[ChoiceIndexNum]->OnChoice_FadeIn();
+    ChoiceSlots[ChoiceIndexNum]->OnRerollButton_FadeIn();
 
     ChoiceSizeBoxes[ChoiceIndexNum]->AddChild(ChoiceSlot); 
 
-    ActiveSuffle(ChoiceIndexNum);
+    if(EnhanceCategory == EEnhanceCategory::Enhance_Q || EnhanceCategory == EEnhanceCategory::Enhance_E || EnhanceCategory == EEnhanceCategory::Enhance_R)
+    {
+        ActiveSuffle(ChoiceIndexNum); // Active
+    }
+    else
+    {
+        InitPassiveSuffle(ChoiceIndexNum); // Passive
+    } 
 }
 
 void UAPEnhanceChoice::OnCancel()
@@ -337,32 +493,42 @@ void UAPEnhanceChoice::OnCancel()
     PC->SetPause(false);
 }
 
-void UAPEnhanceChoice::ApplyEnhance(uint8 UpdateSkillAbility, uint16 UpdateNestingNumb, uint16 MaxNestingNumb)
+void UAPEnhanceChoice::ApplyEnhance(uint8 UpdateSkillNumber, uint8 UpdateSkillAbility, uint16 UpdateNestingNumb, uint16 MaxNestingNumb)
 {
     if(!OwnerCharacter.IsValid()) return;
 
-    UpdateSkillAbility++;
-    auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    UpdateSkillAbility++;  
     switch (EnhanceCategory)
     {
     case EEnhanceCategory::Enhance_Q:
 
-        if(EnHanceType == EEnHanceType::Silver) {OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData.SilverAbilityNestingNum.Empty(); OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData.SilverAbilityNestingNum.Add(UpdateSkillAbility, UpdateNestingNumb);}
-        else if(EnHanceType == EEnHanceType::Gold) {OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData.GoldAbilityNestingNum.Empty(); OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData.GoldAbilityNestingNum.Add(UpdateSkillAbility, UpdateNestingNumb);}
-        else { OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData.PlatinumAbilityNestingNum.Add(UpdateSkillAbility, UpdateNestingNumb);}
+        if(EnHanceType != EEnHanceType::Platinum) {OwnerCharacter->GetQSkillNumber()->ClearSkillAbilityNestingData(EnHanceType);}
         
-        GI->OnSkillEnhanceDataUpdate.Broadcast(ESkillKey::Q, OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData);
+        OwnerCharacter->GetQSkillNumber()->AddSkillAbilityNestingData(EnHanceType, MakeTuple(UpdateSkillAbility, UpdateNestingNumb));
+        APGI->OnSkillEnhanceDataUpdate.Broadcast(ESkillKey::Q, OwnerCharacter->GetQSkillNumber()->GetSkillAbilityNestingData());
         OwnerCharacter->GetQSkillNumber()->UpdateSkillData();
         break;
 
     case EEnhanceCategory::Enhance_E:
 
-        if(EnHanceType == EEnHanceType::Silver) {OwnerCharacter->GetESkillNumber()->SkillAbilityNestingData.SilverAbilityNestingNum.Empty(); OwnerCharacter->GetESkillNumber()->SkillAbilityNestingData.SilverAbilityNestingNum.Add(UpdateSkillAbility, UpdateNestingNumb);}
-        else if(EnHanceType == EEnHanceType::Gold) {OwnerCharacter->GetESkillNumber()->SkillAbilityNestingData.GoldAbilityNestingNum.Empty(); OwnerCharacter->GetESkillNumber()->SkillAbilityNestingData.GoldAbilityNestingNum.Add(UpdateSkillAbility, UpdateNestingNumb);}
-        else { OwnerCharacter->GetESkillNumber()->SkillAbilityNestingData.PlatinumAbilityNestingNum.Add(UpdateSkillAbility, UpdateNestingNumb);}
-
-        GI->OnSkillEnhanceDataUpdate.Broadcast(ESkillKey::E, OwnerCharacter->GetQSkillNumber()->SkillAbilityNestingData);
+        if(EnHanceType != EEnHanceType::Platinum) {OwnerCharacter->GetESkillNumber()->ClearSkillAbilityNestingData(EnHanceType);}
+        
+        OwnerCharacter->GetESkillNumber()->AddSkillAbilityNestingData(EnHanceType, MakeTuple(UpdateSkillAbility, UpdateNestingNumb));
+        APGI->OnSkillEnhanceDataUpdate.Broadcast(ESkillKey::E, OwnerCharacter->GetESkillNumber()->GetSkillAbilityNestingData());
         OwnerCharacter->GetESkillNumber()->UpdateSkillData();
+        break;
+
+    case EEnhanceCategory::Enhance_R:
+
+        if(EnHanceType != EEnHanceType::Platinum) {OwnerCharacter->GetRSkillNumber()->ClearSkillAbilityNestingData(EnHanceType);}
+        
+        OwnerCharacter->GetRSkillNumber()->AddSkillAbilityNestingData(EnHanceType, MakeTuple(UpdateSkillAbility, UpdateNestingNumb));
+        APGI->OnSkillEnhanceDataUpdate.Broadcast(ESkillKey::R, OwnerCharacter->GetRSkillNumber()->GetSkillAbilityNestingData());
+        OwnerCharacter->GetRSkillNumber()->UpdateSkillData();
+        break;
+
+    case EEnhanceCategory::Enhance_Passive:
+        OwnerCharacter->AddPassive_Enhance( UpdateSkillNumber, EnHanceType, UpdateSkillAbility, UpdateNestingNumb);
         break;
     }
     OwnerCharacter->GetAPHUD()->DisplayEnhanceGauge(UpdateNestingNumb, MaxNestingNumb);
@@ -373,34 +539,39 @@ void UAPEnhanceChoice::ApplyEnhance(uint8 UpdateSkillAbility, uint16 UpdateNesti
 
 }
 
-void UAPEnhanceChoice::ApplyNewSkill(ESkillNumber UpdateSkillNumber)
+void UAPEnhanceChoice::ApplyNewSkill(uint8 UpdateSkillNumber)
 {
     // OriginSkillAbilityList.Empty();
-    auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
     switch (EnhanceCategory)
     {
-        case EEnhanceCategory::Enhance_Q:
-        OwnerCharacter->SetQSkill(UpdateSkillNumber);
+    case EEnhanceCategory::Enhance_Q:
+        OwnerCharacter->SetQSkill((ESkillNumber)UpdateSkillNumber);
         // OwnerCharacter->SetAbilitySkillQ(OriginSkillAbilityList);
-        OwnerCharacter->GetAPSkillHubComponent()->UpdateSkill_Q();
+        OwnerCharacter->GetAPSkillHubComponent()->UpdatingSkill_Q();
         OwnerCharacter->GetAPHUD()->OnHightLightSkill.Broadcast(ESkillKey::Q);
-        GI->OnSkillEnhanceDataClear.Broadcast(ESkillKey::Q);
+        APGI->OnSkillEnhanceDataClear.Broadcast(ESkillKey::Q);
         break;
-        case EEnhanceCategory::Enhance_E:
-        OwnerCharacter->SetESkill(UpdateSkillNumber);
+
+    case EEnhanceCategory::Enhance_E:
+        OwnerCharacter->SetESkill((ESkillNumber)UpdateSkillNumber);
         // OwnerCharacter->SetAbilitySkillE(OriginSkillAbilityList);
-        OwnerCharacter->GetAPSkillHubComponent()->UpdateSkill_E();
+        OwnerCharacter->GetAPSkillHubComponent()->UpdatingSkill_E();
         OwnerCharacter->GetAPHUD()->OnHightLightSkill.Broadcast(ESkillKey::E);
-        GI->OnSkillEnhanceDataClear.Broadcast(ESkillKey::E);
+        APGI->OnSkillEnhanceDataClear.Broadcast(ESkillKey::E);
+        break;
+
+    case EEnhanceCategory::Enhance_Passive:
+        OwnerCharacter->AddPassive((EPassiveNumber)UpdateSkillNumber);
         break;
     }
     OwnerCharacter->SetHavingSkills();
-    OwnerCharacter->SetRSkill();
-    OwnerCharacter->GetAPHUD()->OnHightLightSkill.Broadcast(ESkillKey::R);
+    // OwnerCharacter->SetRSkill();
+    // OwnerCharacter->GetAPHUD()->OnHightLightSkill.Broadcast(ESkillKey::R);
     // R 증강은 초기화? GI->OnSkillEnhanceDataUpdate.Broadcast(ESkillKey::R);
 
     RemoveFromParent();
 
+    uint8 CurrentSkillNum = 0;
     if(EnHanceType == EEnHanceType::Silver)
     {
         auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
@@ -408,10 +579,13 @@ void UAPEnhanceChoice::ApplyNewSkill(ESkillNumber UpdateSkillNumber)
     }
     else if(EnHanceType == EEnHanceType::Gold)
     {
-        OwnerCharacter->GetAPHUD()->DisplayEnhanceChoice(EnhanceCategory, EEnHanceType::Silver, true);
+        if(EnhanceCategory == EEnhanceCategory::Enhance_Passive) CurrentSkillNum = UpdateSkillNumber;
+        OwnerCharacter->GetAPHUD()->DisplayEnhanceChoice(EnhanceCategory, EEnHanceType::Silver, true, CurrentSkillNum);
     }
     else
     {
-        OwnerCharacter->GetAPHUD()->DisplayEnhanceChoice(EnhanceCategory, EEnHanceType::Gold, true);
+        if(EnhanceCategory == EEnhanceCategory::Enhance_Passive) CurrentSkillNum = UpdateSkillNumber;
+        OwnerCharacter->GetAPHUD()->DisplayEnhanceChoice(EnhanceCategory, EEnHanceType::Gold, true, CurrentSkillNum);
     }
+    
 }

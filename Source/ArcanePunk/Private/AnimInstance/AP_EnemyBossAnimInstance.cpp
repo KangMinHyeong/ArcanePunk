@@ -12,7 +12,7 @@ void UAP_EnemyBossAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UAP_EnemyBossAnimInstance::PlayMismatchedAttack_Montage()
 {
     if(IsDead) return;
-    Montage_Play(MismatchedAttack_Montage,1.5f);
+    Montage_Play(MismatchedAttack_Montage, 1.0f);
 }
 
 void UAP_EnemyBossAnimInstance::PlayKnockBackAttack_Montage()
@@ -24,7 +24,7 @@ void UAP_EnemyBossAnimInstance::PlayKnockBackAttack_Montage()
 void UAP_EnemyBossAnimInstance::PlayStrongAttack_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Strong_Montage, 2.0f);
+    Montage_Play(Strong_Montage, 1.65f);
 }
 
 void UAP_EnemyBossAnimInstance::PlaySpawnMonster_Montage()
@@ -54,6 +54,18 @@ void UAP_EnemyBossAnimInstance::PlayRangeAttack2_Montage()
     Montage_Play(RangeAttack2_Montage);
 }
 
+void UAP_EnemyBossAnimInstance::PlayPillarAttack_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(PillarAttack_Montage, 1.35f);
+}
+
+void UAP_EnemyBossAnimInstance::PlayPillarThrowing_Montage()
+{
+    if(IsDead) return;
+    Montage_Play(PillarThrowing_Montage, 0.88f);
+}
+
 void UAP_EnemyBossAnimInstance::AnimNotify_MismatchedAttack()
 {
     if(IsDead) return;
@@ -67,13 +79,13 @@ void UAP_EnemyBossAnimInstance::AnimNotify_MismatchedAttack()
 void UAP_EnemyBossAnimInstance::AnimNotify_AttackMove()
 {
     auto Boss = Cast<AEnemy_Boss>(TryGetPawnOwner());
-    if(Boss) Boss->SetAttackMove(true);
+    if(Boss) { Boss->SetAttackMove(true); Boss->SetActorTickEnabled(true);}
 }
 
 void UAP_EnemyBossAnimInstance::AnimNotify_AttackMoveEnd()
 {
     auto Boss = Cast<AEnemy_Boss>(TryGetPawnOwner());
-    if(Boss) Boss->SetAttackMove(false);
+    if(Boss) {Boss->SetAttackMove(false); Boss->SetActorTickEnabled(false);}
 }
 
 void UAP_EnemyBossAnimInstance::AnimNotify_KnockBackAttack()
@@ -104,6 +116,12 @@ void UAP_EnemyBossAnimInstance::AnimNotify_RangeAttack2()
 {
     auto Boss = Cast<AEnemy_Boss>(TryGetPawnOwner());
     if(Boss) Boss->SpawnRangeAttack_2();
+}
+
+void UAP_EnemyBossAnimInstance::AnimNotify_ThrowingPillar()
+{
+    auto Boss = Cast<AEnemy_Boss>(TryGetPawnOwner());
+    if(Boss) Boss->OnThrowingPillar();
 }
 
 FName UAP_EnemyBossAnimInstance::GetAttackMontageSectionName(uint8 Section)

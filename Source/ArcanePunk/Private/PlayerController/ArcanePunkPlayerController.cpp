@@ -16,6 +16,8 @@
 #include "Interfaces/InteractionInterface.h"
 #include "UserInterface/Conversation/APConversationUI.h"
 #include "ArcanePunk/APGameModeBase.h"
+#include "UserInterface/Shop/APShoppingUI.h"
+#include "UserInterface/Inform/APSkillWindow.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -40,6 +42,7 @@ void AArcanePunkPlayerController::SetupInputComponent()
     InputComponent->BindAction(TEXT("Status"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::LookStatus);
     InputComponent->BindAction(TEXT("FreeCameraMode"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::FreeCameraMode);
     InputComponent->BindAction(TEXT("Setting"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::OptionSetting);
+    InputComponent->BindAction(TEXT("SkillWindow"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::DisplaySkillWindow);
 }
 
 void AArcanePunkPlayerController::PlayerTick(float DeltaTime)
@@ -115,17 +118,8 @@ void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
 
 void AArcanePunkPlayerController::OptionSetting()
 {
-    if(OptionSettingUI.IsValid()) {OptionSettingUI->AddToViewport(); return;}
-    else
-    {
-        OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); 
-        if(!OptionSettingUI.IsValid()) return;
-
-        OptionSettingUI->InitGraphicsSetting();
-        OptionSettingUI->InitAudioSetting();
-        OptionSettingUI->BindButton();
-        OptionSettingUI->AddToViewport();
-    }    
+    auto OptionSettingUI = Cast<UAPOptionSetting>(CreateWidget(this, OptionSettingClass)); if(!OptionSettingUI) return;
+    OptionSettingUI->AddToViewport();
 }
 
 void AArcanePunkPlayerController::StartFadeIn()
@@ -236,6 +230,8 @@ void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName 
 
 void AArcanePunkPlayerController::OnConversationUI(FName Name, uint8 State)
 {
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+
     GetWorld()->GetTimerManager().ClearTimer(InteractionTimerHandle);
     ConversationUI = CreateWidget<UAPConversationUI>(GetWorld(), ConversationUIClass); if(!ConversationUI.IsValid()) return;
     ConversationUI->AddToViewport();
@@ -247,6 +243,33 @@ void AArcanePunkPlayerController::CloseConversationUI()
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Visible);
     if(ConversationUI.IsValid()) ConversationUI->RemoveFromParent();
     if(MyCharacter.IsValid()) {MyCharacter->SetActorHiddenInGame(false); SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); MyCharacter->EnableInput(this);} 
+}
+
+void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, FShopListData ShopListData)
+{
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+    ShoppingUI = Cast<UAPShoppingUI>(CreateWidget<UUserWidget>(this, ShoppingUIClass));
+
+    if(ShoppingUI.IsValid())
+    {
+        ShoppingUI->InitShopData(ShopActor, ShopListData);
+        ShoppingUI->AddToViewport();
+        
+        MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
+        MyCharacter->DisableInput(this); 
+    }
+}
+
+void AArcanePunkPlayerController::CloseShoppingUI()
+{
+    if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+
+    if(MyCharacter.IsValid() && ShoppingUI.IsValid()) 
+    {
+        MyCharacter->SetActorHiddenInGame(false);
+        MyCharacter->EnableInput(this);
+        ShoppingUI->RemoveFromParent();
+    } 
 }
 
 void AArcanePunkPlayerController::EndSaveUI()
@@ -350,4 +373,10 @@ void AArcanePunkPlayerController::DisplayNotEnoughMPUI()
 {
     auto NotEnoughMPUI = CreateWidget<UUserWidget>(GetWorld(), NotEnoughMPUIClass); if(!NotEnoughMPUI) return;
     NotEnoughMPUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::DisplaySkillWindow()
+{
+	auto SkillWindowUI = CreateWidget<UAPSkillWindow>(GetWorld(), SkillWindowUIClass);
+	if(SkillWindowUI) SkillWindowUI->AddToViewport();
 }

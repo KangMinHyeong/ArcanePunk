@@ -11,7 +11,7 @@
 
 UUltSkillNumber_15::UUltSkillNumber_15()
 {
-	OriginCoolTime = 5.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_15");
 }
 
 void UUltSkillNumber_15::BeginPlay()
@@ -26,7 +26,7 @@ void UUltSkillNumber_15::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
@@ -58,7 +58,7 @@ void UUltSkillNumber_15::Activate_Skill()
 	BomberMan = GetWorld()->SpawnActor<ABomberMan>(OwnerCharacter->GetAPSkillHubComponent()->GetBomberMan(), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
     if(!BomberMan.IsValid()) return;
 	BomberMan->SetOwner(OwnerCharacter.Get());
-	BomberMan->SetSkill(SkillAbilityNestingData);	
+	BomberMan->SetSkill(SkillAbilityNestingData, this);	
     BomberMan->AttachToComponent(OwnerCharacter->GetRootComponent(), FAttachmentTransformRules ::KeepWorldTransform);
 
 	Skilling = false;

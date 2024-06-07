@@ -6,9 +6,7 @@
 #include "Components/Character/SkillNumber/SkillNumberBase.h"
 #include "SkillNumber1.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class ARCANEPUNK_API USkillNumber1 : public USkillNumberBase
 {
@@ -20,7 +18,7 @@ protected:
 
 public:
 	virtual void PlaySkill() override;
-	
+
 	virtual void Activate_Skill() override;
 
 	virtual void OnSkill() override;

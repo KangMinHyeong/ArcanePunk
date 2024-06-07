@@ -10,7 +10,7 @@
 
 UUltSkillNumber_1::UUltSkillNumber_1()
 {
-	OriginCoolTime = 15.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_1");
 }
 
 void UUltSkillNumber_1::BeginPlay()
@@ -23,7 +23,7 @@ void UUltSkillNumber_1::PlaySkill()
 {
 	Super::PlaySkill();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 
 	OwnerCharacter->SetDoing(true);
 
@@ -55,12 +55,16 @@ void UUltSkillNumber_1::Activate_Skill()
 	if(!ArcaneRain.IsValid()) return;
 	// ArcaneRain->SetSkill(CurrentSkillType, CurrentSkillAbility);	
 	ArcaneRain->SetOwner(OwnerCharacter.Get());
-	ArcaneRain->SetRainEffect();
+	ArcaneRain->SetSkill(SkillAbilityNestingData, this);	
+	// ArcaneRain->SetRainEffect();
+
+	SkillEnd();
 }
 
 void UUltSkillNumber_1::SkillEnd()
 {
-	if(ArcaneRain.IsValid()) ArcaneRain->DestroySKill();
+	Super::SkillEnd();
+	// if(ArcaneRain.IsValid()) ArcaneRain->DestroySKill();
 }
 
 void UUltSkillNumber_1::UpdateSkillData()

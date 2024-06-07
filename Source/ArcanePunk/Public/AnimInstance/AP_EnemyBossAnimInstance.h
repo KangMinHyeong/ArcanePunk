@@ -24,6 +24,8 @@ public:
 	void PlayDrainMonster_Montage();
 	void PlayRangeAttack1_Montage();
 	void PlayRangeAttack2_Montage();
+	void PlayPillarAttack_Montage();
+	void PlayPillarThrowing_Montage();
 
 	UFUNCTION()
 	void AnimNotify_MismatchedAttack();
@@ -41,6 +43,8 @@ public:
 	void AnimNotify_RangeAttack1();
 	UFUNCTION()
 	void AnimNotify_RangeAttack2();
+	UFUNCTION()
+	void AnimNotify_ThrowingPillar();
 
 private:
 	FName GetAttackMontageSectionName(uint8 Section);
@@ -72,4 +76,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* RangeAttack2_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* PillarAttack_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* PillarThrowing_Montage;
 };

@@ -822,10 +822,7 @@ void UAPGraphicsSetting::Change_RS(float RS)
 //  Back to the Option Setting
 void UAPGraphicsSetting::OnClickButton_Back()
 {
-    RemoveFromParent();
-    
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) return;
-    OwnerPC->OptionSetting();
+    // 초기화
 }
 
 //  Svae Graphics Setting
@@ -844,7 +841,12 @@ void UAPGraphicsSetting::OnClickButton_OptimalSetting()
 void UAPGraphicsSetting::NativeConstruct()
 {
     Super::NativeConstruct();
+
+    InitGraphicsSetting();
+    InitWindowSetting();
+    InitBindSetting();
 }
+
 FReply UAPGraphicsSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);

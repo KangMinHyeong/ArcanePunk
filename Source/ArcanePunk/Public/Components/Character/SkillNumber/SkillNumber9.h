@@ -27,9 +27,11 @@ public:
 
 	virtual void UpdateSkillData() override;
 
+	virtual bool CheckSkillCondition() override;
+
 private:
 	virtual void AddAbilityList() override;
-	void Spawn_Skill9();	
+	virtual void Spawn_SkillRange() override;	
 
 private:
 	TWeakObjectPtr<AArcaneMine> ArcaneMine;

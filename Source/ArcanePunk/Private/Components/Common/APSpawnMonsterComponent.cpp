@@ -96,7 +96,7 @@ void UAPSpawnMonsterComponent::PlaySpawnEffect(FVector Location)
 
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GM->GetSpawnEffect(),  Location);
 
-    float SpawnSoundVolume = GI->GameSoundVolume.MasterVolume * GI->GameSoundVolume.EffectVolume * GM->GetSpawnSoundVolume();
+    float SpawnSoundVolume = GI->GetGameSoundVolume().MasterVolume * GI->GetGameSoundVolume().EffectVolume * GM->GetSpawnSoundVolume();
     UGameplayStatics::SpawnSoundAtLocation(GetWorld(), GM->GetSpawnSound(), Location, FRotator::ZeroRotator, SpawnSoundVolume, 1.0f, Sink);
 }
 

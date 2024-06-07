@@ -24,35 +24,93 @@ AShouting::AShouting()
 void AShouting::BeginPlay()
 {
     Super::BeginPlay();
+    InitShoutRadius = ShoutRadius;
 }
 
 void AShouting::DestroySKill()
 {
     Super::DestroySKill();
-
-    // if(ShoutComp.IsValid()) {ShoutComp->DestroyComponent();}
 }
 
 void AShouting::SetShoutingEffect()
 {
-    // float Size =  GetActorScale3D().Y / DefaultSize;
-    // auto Character = Cast<AArcanePunkCharacter>(GetOwner()); if(!Character) return;
-    // if(ShoutEffect) ShoutComp = UNiagaraFunctionLibrary::SpawnSystemAttached(ShoutEffect, Character->GetMesh(), TEXT("Shouting"), FVector(0,0,0), FRotator::ZeroRotator, Size * ShoutScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
-    // if(!ShoutComp.IsValid()) return; 
-    // ShoutComp->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
-    SetShoutingAttack();
+    if(!OwnerCharacter.IsValid()) return;
+    if(ShoutEffect) ShoutComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ShoutEffect, GetActorLocation() + GetActorUpVector()*50.0f, GetActorRotation());
+    if(!ShoutComp.IsValid()) return; 
+    ShoutComp->SetNiagaraVariableFloat(TEXT("Size"), ShoutRadius / InitShoutRadius);
+    
 }
 
 void AShouting::SetShoutingAttack()
 {
-    float Size =  GetActorScale3D().Y / DefaultSize;
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
-    OwnerCharacter->GetAttackComponent()->MultiAttack(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius * Size, DamageCoefficient, 1, true, StateTime);
-    DrawDebugSphere(GetWorld(), OwnerCharacter->GetMesh()->GetComponentLocation(), ShoutRadius* Size, 18, FColor::Green,false, 2.5f);
+    if(!OwnerCharacter.IsValid()) return;
+    OwnerCharacter->GetAttackComponent()->MultiAttack(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius, DamageCoefficient, 1, true, StateTime);
+    DestroySKill();
 }
 
-void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
+
+    for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+        CheckSilverEnhance(It.Key, It.Value);
+    }
+    for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+        CheckGoldEnhance(It.Key, It.Value);
+    }
+    for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+        CheckPlatinumEnhance(It.Key, It.Value);
+    }
+
+    SetShoutingEffect();
+    SetShoutingAttack();
+}
+
+
+void AShouting::CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+	Super::CheckSilverEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+		case 2: // 범위 증가
+		SkillAbilityComponent->Coefficient_AddMultiple(ShoutRadius, AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
+}
+
+void AShouting::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+    Super::CheckGoldEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 2: // 기절 시간 증가
+		SkillAbilityComponent->Coefficient_Add(StateTime, AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
+}
+
+void AShouting::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+    Super::CheckPlatinumEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
 }
 

@@ -12,7 +12,7 @@
 
 UUltSkillNumber_13::UUltSkillNumber_13()
 {
-	OriginCoolTime = 3.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_13");
 
 }
 
@@ -26,21 +26,21 @@ void UUltSkillNumber_13::PlaySkill()
 	Super::PlaySkill();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 	
-    if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+    if(!CheckSkillCondition()) return;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
-	Spawn_UltSkill13();   
+	Spawn_SkillRange();   
     OnSkill();
 }
 
-void UUltSkillNumber_13::Spawn_UltSkill13()
+void UUltSkillNumber_13::Spawn_SkillRange()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
 	ActivateSkillRange_Round(UltSkill13_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 }
 
 void UUltSkillNumber_13::OnSkill()
@@ -49,7 +49,7 @@ void UUltSkillNumber_13::OnSkill()
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
     OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
-	
+
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -71,7 +71,7 @@ void UUltSkillNumber_13::Activate_Skill()
     if(!ArcaneWave.IsValid()) return;
 	ArcaneWave->SetOwner(OwnerCharacter.Get());
     ArcaneWave->SetMaxRadius(UltSkill13_LimitDistance);
-	ArcaneWave->SetSkill(SkillAbilityNestingData);	
+	ArcaneWave->SetSkill(SkillAbilityNestingData, this);	
 
 }
 

@@ -137,9 +137,9 @@ void AArcaneTurret::SpawnDamageText(AController *EventInstigator, float Damage)
 	
 }
 
-void AArcaneTurret::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneTurret::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     CurrentDamage = OwnerCharacter->GetCurrentATK() * DamageCoefficient;

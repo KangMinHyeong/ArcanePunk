@@ -28,7 +28,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_Skill18();
+	virtual void Spawn_SkillRange() override;
 
 private:
 	float Skill18_LimitDistance = 0.0f;		

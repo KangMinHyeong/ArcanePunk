@@ -106,9 +106,9 @@ void AArcaneField::DestroySKill()
     Super::DestroySKill();
 }
 
-void AArcaneField::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneField::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     FieldDamage = OwnerCharacter->GetCurrentATK() * DamageCoefficient;

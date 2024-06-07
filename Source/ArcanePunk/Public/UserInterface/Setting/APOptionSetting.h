@@ -7,8 +7,10 @@
 #include "APOptionSetting.generated.h"
 
 class UButton;
+class UTextBlock;
 class UAPGraphicsSetting;
 class UAPAudioSetting;
+class UWidgetSwitcher;
 
 UCLASS()
 class ARCANEPUNK_API UAPOptionSetting : public UUserWidget
@@ -16,7 +18,9 @@ class ARCANEPUNK_API UAPOptionSetting : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	virtual FReply NativeOnKeyDown( const FGeometry& InGeometry, const FKeyEvent& InKeyEvent ) override;
 
 	void BindButton();
 
@@ -31,8 +35,8 @@ public:
 	void OnClickButton_Back();
 
 	// Option Setting
-	void InitGraphicsSetting();
-	void InitAudioSetting();
+	// void InitGraphicsSetting();
+	// void InitAudioSetting();
 
 	void SmartKeySetting();
 	void GraphicsSetting();
@@ -51,20 +55,45 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Back;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UWidgetSwitcher* Switcher_Option;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UWidget* GraphicsSettingUI;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UWidget* AudioSettingUI;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UWidget* SmartKeySettingUI;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Graphic;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Audio;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_SmartKey;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor OnColor;
+	UPROPERTY(EditAnywhere)
+	FLinearColor OffColor;
 
 	// Option Setting 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> GraphicsSettingClass; // Graphics
+	// UPROPERTY(EditAnywhere)
+	// TSubclassOf<UUserWidget> GraphicsSettingClass; // Graphics
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> AudioSettingClass;
+	// UPROPERTY(EditAnywhere)
+	// TSubclassOf<UUserWidget> AudioSettingClass;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> SmartKeySettingClass;
+	// UPROPERTY(EditAnywhere)
+	// TSubclassOf<UUserWidget> SmartKeySettingClass;
 
-	TWeakObjectPtr<UAPGraphicsSetting> GraphicsSettingUI;
+	// TWeakObjectPtr<UAPGraphicsSetting> GraphicsSettingUI;
 
-	TWeakObjectPtr<UAPAudioSetting> AudioSettingUI;
+	// TWeakObjectPtr<UAPAudioSetting> AudioSettingUI;
 
 
 };

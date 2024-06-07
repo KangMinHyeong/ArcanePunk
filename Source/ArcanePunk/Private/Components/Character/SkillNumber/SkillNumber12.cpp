@@ -29,7 +29,7 @@ void USkillNumber12::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
@@ -41,6 +41,8 @@ void USkillNumber12::OnSkill()
     if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
 	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -51,6 +53,7 @@ void USkillNumber12::OnSkill()
 
 void USkillNumber12::Activate_Skill()
 {
+	Super::Activate_Skill();
     if(!OwnerCharacter.IsValid()) return;
 		
 	FActorSpawnParameters SpawnParams;
@@ -62,13 +65,16 @@ void USkillNumber12::Activate_Skill()
 	
     if(!ArcaneRage) return;
 	ArcaneRage->SetOwner(OwnerCharacter.Get());
-	ArcaneRage->SetSkill(SkillAbilityNestingData);	
+	ArcaneRage->SetSkill(SkillAbilityNestingData, this);	
     ArcaneRage->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules ::KeepWorldTransform);
-	Skilling = false;
+	
+	Remove_Skill();
+	OwnerCharacter->OnSkillEndTrigger.RemoveDynamic(this, &USkillNumberBase::SkillEnd);
 }
 
 void USkillNumber12::SkillEnd()
 {
+	Super::SkillEnd();
 	bActivate = false; 
 	
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
@@ -81,7 +87,7 @@ void USkillNumber12::UpdateSkillData()
 	Super::UpdateSkillData();
 	if(!OwnerCharacter.IsValid()) return;
 
-	float Cool = OriginCoolTime;
+	float Cool = SkillNameListData.CoolTime;
 	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
     {
         if(It.Key == 2)
@@ -96,6 +102,6 @@ void USkillNumber12::UpdateSkillData()
     // for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
     // {
     // }
-	Cool = FMath::Max(OriginCoolTime * 0.4f, Cool);
+	Cool = FMath::Max(SkillNameListData.CoolTime * 0.4f, Cool);
 	CurrentCoolTime = Cool;
 }

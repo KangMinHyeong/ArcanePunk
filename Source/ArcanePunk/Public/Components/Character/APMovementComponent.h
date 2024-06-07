@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "APMovementComponent.generated.h"
 
-class AArcanePunkCharacter;
+class AAPCharacterBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
@@ -71,5 +71,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	float Combo_3_Distance = 300.0f;
 
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
 };

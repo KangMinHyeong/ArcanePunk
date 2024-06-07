@@ -18,7 +18,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void Spawn_UltSkill3();
+	virtual void Spawn_SkillRange() override;
 
 public:
 	virtual void PlaySkill() override;

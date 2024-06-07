@@ -37,7 +37,6 @@ void AArcaneMeteor::Tick(float DeltaTime)
 
 void AArcaneMeteor::DestroySKill()
 {
-    DeActivate_Ult();
     Super::DestroySKill();
 }
 
@@ -55,24 +54,22 @@ void AArcaneMeteor::OnMeteorDrop()
     GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AArcaneMeteor::DestroySKill , DestroyTime+ 1.0f, false);
     
     TArray<AActor*> EnhanceActors; FHitResult HitResult;
-    DamageEnhanceTrigger->GetOverlappingActors(EnhanceActors, AEnemy_CharacterBase::StaticClass());
+    DamageEnhanceTrigger->GetOverlappingActors(EnhanceActors, AActor::StaticClass());
     for (AActor* Actor : EnhanceActors)
     {           
-        auto Enemy = Cast<AEnemy_CharacterBase>(Actor); 
-            
-        float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Enemy, OwnerCharacter->GetCurrentATK() * DamageCoefficient * EnhanceDamageCoefficient, HitResult, false);
-	    OwnerCharacter->GetAttackComponent()->DrainCheck(Enemy, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());       
+
+        float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Actor, OwnerCharacter->GetCurrentATK() * DamageCoefficient * EnhanceDamageCoefficient, HitResult, true);
+	    OwnerCharacter->GetAttackComponent()->DrainCheck(Actor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());       
     } 
 
     TArray<AActor*> NormalActors;
-    DamageTrigger->GetOverlappingActors(NormalActors, AEnemy_CharacterBase::StaticClass());
+    DamageTrigger->GetOverlappingActors(NormalActors, AActor::StaticClass());
     for (AActor* Actor : NormalActors)
     {
         if(EnhanceActors.Contains(Actor)) continue;       
-        auto Enemy = Cast<AEnemy_CharacterBase>(Actor); 
-            
-        float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Enemy, OwnerCharacter->GetCurrentATK() * DamageCoefficient, HitResult, false);
-	    OwnerCharacter->GetAttackComponent()->DrainCheck(Enemy, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());           
+      
+        float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Actor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, HitResult, true);
+	    OwnerCharacter->GetAttackComponent()->DrainCheck(Actor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());           
     } 
 
     GetWorldTimerManager().SetTimer(MeteorTimerHandle, this, &AArcaneMeteor::BurnDamage , BurnRate, true);
@@ -91,9 +88,9 @@ void AArcaneMeteor::BurnDamage()
     BurnNumber--;
 }
 
-void AArcaneMeteor::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneMeteor::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     float Multiple = TriggerRadius_2 / DamageEnhanceTrigger->GetScaledSphereRadius();

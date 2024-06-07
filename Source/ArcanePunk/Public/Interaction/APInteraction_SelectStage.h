@@ -9,7 +9,7 @@
 class UUserWidget;
 
 UCLASS()
-class ARCANEPUNK_API AAPInteraction_SelectStage : public AAPInteractionTriggerBase, public IInteractionInterface
+class ARCANEPUNK_API AAPInteraction_SelectStage : public AAPInteractionTriggerBase
 {
 	GENERATED_BODY()
 
@@ -18,7 +18,7 @@ public:
 
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual FInteractData GetInteractData() override;
+
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 private:

@@ -16,9 +16,9 @@ void AAPSkillRange_TwoCircle::Tick(float DeltaTime)
 
 }
 
-void AAPSkillRange_TwoCircle::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AAPSkillRange_TwoCircle::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 
 
 }

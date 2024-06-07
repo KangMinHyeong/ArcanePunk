@@ -27,7 +27,7 @@ void USkillNumber15::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
@@ -38,6 +38,8 @@ void USkillNumber15::OnSkill()
 {
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
 	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -48,6 +50,7 @@ void USkillNumber15::OnSkill()
 
 void USkillNumber15::Activate_Skill()
 {
+	Super::Activate_Skill();
     if(!OwnerCharacter.IsValid()) return;
 
     auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
@@ -64,6 +67,7 @@ void USkillNumber15::Activate_Skill()
 
 void USkillNumber15::SkillEnd()
 {
+	Super::SkillEnd();
     Remove_Skill();
 	bActivate = false; 
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);

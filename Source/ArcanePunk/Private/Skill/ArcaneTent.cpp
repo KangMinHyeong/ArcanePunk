@@ -94,7 +94,7 @@ void AArcaneTent::SetDotDamage()
         {              
             auto Enemy = Cast<AEnemy_CharacterBase>(Actor); bool AlreadyHitCheck = Enemy->IsHitting(); FHitResult HitResult;
             
-            float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Enemy, Enemy->GetMonsterHP() * DotPercent, HitResult, false);
+            float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Enemy, Enemy->GetDefaultHP() * DotPercent, HitResult, false);
 		    OwnerCharacter->GetAttackComponent()->DrainCheck(Enemy, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
             // UGameplayStatics::ApplyDamage(Actor, , OwnerCharacter->GetInstigatorController(), this, UDamageType::StaticClass());
             if(!AlreadyHitCheck) Enemy->SetHitting(false);        
@@ -116,9 +116,9 @@ void AArcaneTent::CheckOverlap(bool NewBool)
     }
 }
 
-void AArcaneTent::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneTent::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)

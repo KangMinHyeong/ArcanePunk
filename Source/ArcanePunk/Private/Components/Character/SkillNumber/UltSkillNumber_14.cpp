@@ -13,8 +13,8 @@
 
 UUltSkillNumber_14::UUltSkillNumber_14()
 {
-	OriginCoolTime = 3.0f;
-    UltSkill14_LimitDistance = 800.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_14");
+    UltSkill14_LimitDistance = 1500.0f;
 	UltSkill14_Angle = 0.10f;
 }
 
@@ -34,27 +34,28 @@ void UUltSkillNumber_14::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
         OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_UltSkill14();
+		Spawn_SkillRange();
 	}
 }
 
-void UUltSkillNumber_14::Spawn_UltSkill14()
+void UUltSkillNumber_14::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
 
 	ActivateSkillRange_Target(UltSkill14_LimitDistance, UltSkill14_LimitDistance, ESkillRangeType::SectorCircle);
 	if(SkillRange_Target.IsValid())
     {
         SkillRange_Target->SetMaxDist(0.01f);
-	    SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	    SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
         SkillRange_Target->SetAngle(UltSkill14_Angle);
     } 
 
@@ -88,15 +89,15 @@ void UUltSkillNumber_14::Activate_Skill()
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	WindCutter = GetWorld()->SpawnActor<AWindCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetWindCutter(), OwnerCharacter->GetActorLocation() , SpawnRoatation);
+	WindCutter = GetWorld()->SpawnActor<AWindCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetWindCutter(), OwnerCharacter->GetActorLocation() , SpawnRotation);
 	if(!WindCutter.IsValid()) return; 
     WindCutter->SetOwner(OwnerCharacter.Get());
     WindCutter->SetMaxWindWitdh(UltSkill14_Width);
     WindCutter->SetMaxLocation(TargetLocation);
     WindCutter->SetMaxRadius(UltSkill14_LimitDistance);
-	WindCutter->SetSkill(SkillAbilityNestingData);	
+	WindCutter->SetSkill(SkillAbilityNestingData, this);	
     
-	Remove_Skill();
+	SkillEnd();
 }
 
 void UUltSkillNumber_14::SetWindInform()
@@ -105,7 +106,7 @@ void UUltSkillNumber_14::SetWindInform()
     UltSkill14_Width = UltSkill14_LimitDistance * FMath::Sin(Degree);
 
     TargetLocation = SkillRange_Target->GetActorForwardVector() * UltSkill14_LimitDistance * FMath::Cos(Degree);
-    SpawnRoatation = SkillRange_Target->GetActorRotation();
+    SpawnRotation = SkillRange_Target->GetActorRotation();
 
 	// float Degree = UltSkill14_Angle * 180.0f; Degree = FMath::DegreesToRadians(Degree);
     // UltSkill14_Width = UltSkill14_LimitDistance * FMath::Sin(Degree);
@@ -121,7 +122,8 @@ void UUltSkillNumber_14::SetWindInform()
 
 void UUltSkillNumber_14::SkillEnd()
 {
-
+	Super::SkillEnd();
+	Remove_Skill();
 }
 
 void UUltSkillNumber_14::UpdateSkillData()

@@ -29,7 +29,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_UltSkill14();	
+	virtual void Spawn_SkillRange() override;
 	void SetWindInform();
 	
 private:	

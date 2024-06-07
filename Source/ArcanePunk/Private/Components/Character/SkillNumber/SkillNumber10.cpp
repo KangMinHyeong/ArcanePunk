@@ -39,28 +39,29 @@ void USkillNumber10::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey) || CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_Skill10();
+		Spawn_SkillRange();
 	}
 }
 
-void USkillNumber10::Spawn_Skill10()
+void USkillNumber10::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_10);}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_10);}
 
 	ActivateSkillRange_Target(Skill10_TargetRange, Skill10_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill10_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(Skill10_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
@@ -73,9 +74,15 @@ void USkillNumber10::OnSkill()
 	if(!OwnerCharacter.IsValid()) return; OwnerCharacter->SetDoing(true);
     OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
 
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
+
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetActorHiddenInGame(true);
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetActorHiddenInGame(true);
 
 	OwnerAnim->PlaySkill_10_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -86,6 +93,7 @@ void USkillNumber10::OnSkill()
 
 void USkillNumber10::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 	CurrentChargeNum--;
 	OwnerCharacter->GetAPHUD()->OnChargeTime.Broadcast(SkillKey);
@@ -99,7 +107,7 @@ void USkillNumber10::Activate_Skill()
 	
     if(!ArcaneTurret) return;
 	ArcaneTurret->SetOwner(OwnerCharacter.Get());
-	ArcaneTurret->SetSkill(SkillAbilityNestingData);	
+	ArcaneTurret->SetSkill(SkillAbilityNestingData, this);	
 	OwnerCharacter->SetDoing(false);
 
 	Remove_Skill();
@@ -122,4 +130,13 @@ void USkillNumber10::UpdateSkillData()
 		}// 충전횟수 증가
 	}
 }
+
+bool USkillNumber10::CheckSkillCondition()
+{
+	bool Check = Super::CheckSkillCondition();
+	if(CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); Check = false;}
+
+    return Check;
+}
+
 

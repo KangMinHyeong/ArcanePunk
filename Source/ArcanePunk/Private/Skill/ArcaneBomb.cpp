@@ -81,9 +81,9 @@ void AArcaneBomb::Explosion(UPrimitiveComponent *OverlappedComp, AActor *OtherAc
     // UKismetSystemLibrary::Delay(this, 0.2f, LatentActionInfo); Destroy();
 }
 
-void AArcaneBomb::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneBomb::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     // SkillAbilityComp->TraceSpeed = ThrowSpeed;
     // SkillAbilityComp->SetSkillAbility(SkillAbility, SkillCategory);
     // SkillAbilityComp->TraceSpeed = SkillAbilityComp->TraceSpeed * 0.55f;

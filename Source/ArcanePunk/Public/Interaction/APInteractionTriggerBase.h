@@ -10,7 +10,7 @@
 class UCameraComponent;
 
 UCLASS()
-class ARCANEPUNK_API AAPInteractionTriggerBase : public AActor
+class ARCANEPUNK_API AAPInteractionTriggerBase : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,10 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+
+	virtual FInteractData GetInteractData() override;
+
+	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 	FORCEINLINE void SetPartnerName(FName Name) {ConversationPartnerName = Name;};
 	FORCEINLINE UAPInteractionBoxComponent* GetInteractionBox() {return InteractionTrigger;};

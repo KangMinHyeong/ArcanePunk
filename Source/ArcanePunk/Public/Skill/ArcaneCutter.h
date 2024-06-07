@@ -9,6 +9,7 @@
 class UBoxComponent;
 class UNiagaraComponent;
 class UProjectileMovementComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class ARCANEPUNK_API AArcaneCutter : public AAPSkillActorBase
@@ -25,27 +26,41 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	FORCEINLINE float GetCutterSpeed() const;
-	void SetDeadTime(float DeadTime);
+	FORCEINLINE void SetDist(float Dist) { CutterDist = Dist;};
+
+	// void SetDeadTime(float DeadTime);
 	float GetTriggerWide() const;
 
 private:
 	UFUNCTION()
 	void OnHitting(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 	UFUNCTION()
+	void OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+	
 	void BintHit();
+
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 
 private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* CutterTrigger;
 	
 	UPROPERTY(EditAnywhere)
-	UNiagaraComponent* CutterEffect;
+	UNiagaraSystem* CutterEffect;
+
+	TWeakObjectPtr<UNiagaraComponent> CutterEffectComp;
 
 	UPROPERTY(EditAnywhere)
 	float CutterSpeed = 1500.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Drag = 6.0f;
+
+	float CutterDist = 0.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	UProjectileMovementComponent* CutterMovementComponent;

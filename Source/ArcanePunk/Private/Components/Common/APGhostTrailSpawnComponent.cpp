@@ -149,7 +149,7 @@ void UAPGhostTrailSpawnComponent::TimeLineFinishFunc_Skill()
 
 	if(bCheckRelease)
 	{
-		if(FinalSkillActor) OwnerCharacter->GetRSkillNumber()->SkillRange_Circle->SetActorLocation(FinalSkillActor->GetActorLocation()); // AttachToActor(FinalSkillActor, FAttachmentTransformRules::KeepWorldTransform);
+		if(FinalSkillActor) OwnerCharacter->GetRSkillNumber()->GetSkillRange_Circle()->SetActorLocation(FinalSkillActor->GetActorLocation()); // AttachToActor(FinalSkillActor, FAttachmentTransformRules::KeepWorldTransform);
 		if(!OwnerCharacter->GetOnRSkill())  OwnerCharacter->GetRSkillNumber()->Activate_Skill();
 	}
 	// if (TimeLineSkill.GetPlaybackPosition() == 0.0f)

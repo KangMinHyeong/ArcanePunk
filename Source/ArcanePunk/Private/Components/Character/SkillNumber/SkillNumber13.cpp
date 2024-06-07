@@ -32,7 +32,7 @@ void USkillNumber13::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
@@ -44,6 +44,8 @@ void USkillNumber13::OnSkill()
     if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
 	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -54,6 +56,7 @@ void USkillNumber13::OnSkill()
 
 void USkillNumber13::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 	
     OwnerCharacter->SetDoing(false);
@@ -68,13 +71,15 @@ void USkillNumber13::Activate_Skill()
 	
     if(!ArcaneTent) return;
 	ArcaneTent->SetOwner(OwnerCharacter.Get());
-	ArcaneTent->SetSkill(SkillAbilityNestingData);	
+	ArcaneTent->SetSkill(SkillAbilityNestingData, this);	
 	
-	Skilling = false;
+	Remove_Skill();
+	OwnerCharacter->OnSkillEndTrigger.RemoveDynamic(this, &USkillNumberBase::SkillEnd);
 }
 
 void USkillNumber13::SkillEnd()
 {
+	Super::SkillEnd();
 	bActivate = false; 
 	
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);

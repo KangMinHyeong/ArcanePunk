@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Skill/APSkillActorBase.h"
 #include "ClutchTrigger.generated.h"
 
 class USphereComponent;
@@ -11,7 +11,7 @@ class UNiagaraComponent;
 class UAPHitPointComponent;
 
 UCLASS()
-class ARCANEPUNK_API AClutchTrigger : public AActor
+class ARCANEPUNK_API AClutchTrigger : public AAPSkillActorBase
 {
 	GENERATED_BODY()
 	
@@ -23,13 +23,14 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	UFUNCTION()
   	void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	FORCEINLINE USphereComponent* GetClutchSphere() {return ClutchSphere;}; 
 	void SetClutchSphere(float NewValue);
-	void SetSlowPercent(uint8 SlowPercent);
+	void SetSlowPercent(uint8 UpdateSlowPercent);
 	void SetDestroy(float Time);
 
 private:
@@ -43,7 +44,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* ClutchEffect;
-
-	UPROPERTY()
-	UAPHitPointComponent* HitPointComp;
 };

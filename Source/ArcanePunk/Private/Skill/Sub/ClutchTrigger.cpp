@@ -5,7 +5,6 @@
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Components/Character/APHitPointComponent.h"
 #include "Skill/SwordClutch.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APSkillHubComponent.h"
@@ -19,8 +18,6 @@ AClutchTrigger::AClutchTrigger()
 	ClutchSphere = CreateDefaultSubobject<USphereComponent>(TEXT("ClutchSphere"));
 	ClutchEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ClutchEffect"));
 
-	HitPointComp = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComp"));
-
 	SetRootComponent(ClutchSphere);
 	ClutchEffect->SetupAttachment(ClutchSphere);
 }
@@ -28,14 +25,18 @@ AClutchTrigger::AClutchTrigger()
 void AClutchTrigger::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
+	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);  
 }
 
 void AClutchTrigger::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void AClutchTrigger::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase *SkillComponent)
+{
+	Super::SetSkill(SkillAbilityNestingData, SkillComponent);
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()->GetOwner()); if(!OwnerCharacter.IsValid()) return;
 }
 
 void AClutchTrigger::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -50,7 +51,7 @@ void AClutchTrigger::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *Othe
 	auto DamageTypeClass = UDamageType::StaticClass();
 
 	auto SkillActor = Cast<AAPSkillActorBase>(MyOwner);
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(MyOwner->GetOwner()); if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner && SkillActor)
 	{
 		HitPointComp->DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
@@ -63,27 +64,28 @@ void AClutchTrigger::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *Othe
 	}
 }
 
-void AClutchTrigger::SetSlowPercent(uint8 SlowPercent)
+void AClutchTrigger::SetSlowPercent(uint8 UpdateSlowPercent)
 {
-	HitPointComp->SetSlowPercent(SlowPercent);
+	HitPointComp->SetSlowPercent(UpdateSlowPercent);
 }
 
 void AClutchTrigger::CheckEnemyDeath(AActor* OtherActor)
 {
+	if(!SkillComp.IsValid()) return;
+	
 	auto SwordClutch = Cast<ASwordClutch>(GetOwner()); if(!SwordClutch) return;
 	if(!SwordClutch->IsDurationUpgrade()) return;
 	auto Enemy = Cast<AEnemy_CharacterBase>(OtherActor); if(!Enemy) return;
-	if(Enemy->GetMonsterHP() < 0.001f)
+	if(Enemy->GetDefaultHP() <= KINDA_SMALL_NUMBER)
 	{
-		auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()->GetOwner()); if(!OwnerCharacter) return;
-		OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_14)->SetAddDuration(SwordClutch->GetDurationUpgradeCoefficient());
+		SkillComp->SetAddDuration(SwordClutch->GetDurationUpgradeCoefficient());
 	}
 }
 
 void AClutchTrigger::DrainCheck(AActor* OtherActor, float DamageApplied)
 {
 	auto SkillActor = Cast<AAPSkillActorBase>(GetOwner()); if(!SkillActor) return;
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()->GetOwner()); if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 
 	float Coeff = OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient();
 	if(auto SwordClutch = Cast<ASwordClutch>(SkillActor))
@@ -103,7 +105,6 @@ void AClutchTrigger::SetClutchSphere(float NewValue)
 
 void AClutchTrigger::SetDestroy(float Time)
 {
-	FTimerHandle DestroyTimerHandle;
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AClutchTrigger::OnDestroy, Time, false);
 }
 

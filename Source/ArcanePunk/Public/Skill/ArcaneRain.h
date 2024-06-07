@@ -22,26 +22,23 @@ protected:
 	virtual void BeginPlay() override;	
 
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
-
-	void SetRainEffect();
-	void SetRainAttack();
-
-	virtual void DestroySKill() override;
-
-	void ReceiveParticleData(const TArray<FBasicParticleData>& Data, UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset);
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	
-	UFUNCTION(BlueprintImplementableEvent)
-	void SpawnRainEffect(FVector SpawnLocation, FRotator SpawnRotation);
+	UFUNCTION(BlueprintCallable)
+	void SetRainAttack(FVector CollisionLocation);
+
+private:
+	virtual void DestroySKill() override;
 
 private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* RainRoot;
 
-	UPROPERTY(EditAnywhere , BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
-	UNiagaraSystem* RainEffect;
+	// UPROPERTY(EditAnywhere , BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
+	// UNiagaraSystem* RainEffect;
 
-	TWeakObjectPtr<UNiagaraComponent> RainComp;
+	UPROPERTY(EditAnywhere , BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
+	UNiagaraComponent* RainComp;
 
 	UPROPERTY(EditAnywhere)
 	FVector RainScale = FVector(1,1,1);
@@ -49,4 +46,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RainRadius = 550.0f;
 
+	UPROPERTY(EditAnywhere)
+	float RainSize = 1.0f;
+	float RainSpawnRate = 40.0f;
 };

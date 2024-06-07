@@ -25,7 +25,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetWindRushWidth(float Width);
 	void SetTargetLocation(FVector Location, float Dist);

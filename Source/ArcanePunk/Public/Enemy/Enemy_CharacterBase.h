@@ -3,14 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "Components/Common/APCrowdControlComponent.h"
+#include "Character/APCharacterBase.h"
 #include "Enemy_CharacterBase.generated.h"
 
 #define Defense_constant 1000
 
 DECLARE_MULTICAST_DELEGATE(FOnHPChanged);
-DECLARE_MULTICAST_DELEGATE(FOnCrowdControlCheck);
 
 class ATextRenderActor;
 class UAP_EnemyBaseAnimInstance;
@@ -21,9 +19,10 @@ class AEnemyBaseAIController;
 class AEnemy_DropPackage;
 class UNiagaraSystem;
 class UAPMovementComponent;
+class USkillNumberBase;
 
 UCLASS()
-class ARCANEPUNK_API AEnemy_CharacterBase : public ACharacter
+class ARCANEPUNK_API AEnemy_CharacterBase : public AAPCharacterBase
 {
 	GENERATED_BODY()
 
@@ -43,17 +42,6 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
-	FORCEINLINE UAPMovementComponent* GetMoveComp() const {return MoveComp;};
-
-	// 몬스터 Dead , Hit 관련 함수
-	UFUNCTION(BlueprintPure)
-	virtual bool IsDead();
-
-	UFUNCTION(BlueprintPure)
-	bool IsHitting();
-
-	FORCEINLINE void SetHitting(bool NewBool) {bHitting = NewBool;};
-
 	UFUNCTION(BlueprintPure)
 	float GetForward();
 
@@ -72,14 +60,10 @@ public:
 	FORCEINLINE float GetDistanceLimit()const {return Distance_Limit;}; 
 	FORCEINLINE float GetDetectLimit()const {return DetectLimit;}; 
 
-	void TeleportMarkActivate(float Time, AActor * MarkOwner);
+	void TeleportMarkActivate(float Time, AActor * MarkOwner, USkillNumberBase* SkillComp);
 	void TeleportMarkDeactivate();
 
 	bool AttackPushBack(FVector NewLocation);
-
-	FORCEINLINE float GetMonsterATK() const { return Monster_ATK;}; //Monster_ATK 반환
-	FORCEINLINE void SetMonsterATK(float NewValue) { Monster_ATK = NewValue;}; //Monster_ATK 설정
-	FORCEINLINE bool IsCriticalAttack() const {return bCriticalAttack;};
 
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
@@ -92,20 +76,9 @@ public:
 	UFUNCTION()
 	void EnemyMontageEnded(UAnimMontage *Montage, bool bInterrupted);
 
-	// 몬스터 HP 관련 함수
-	FORCEINLINE float GetMonsterMaxHP() const { return MaxHP;}; //Monster_MaxHP 반환
-	FORCEINLINE float GetMonsterHP() const { return HP;}; //Monster_HP 반환
-
 	// 몬스터 CrowdControl 관련 함수
-	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComp() const { return CrowdControlComp;};
-	UFUNCTION(BlueprintPure)
-	FORCEINLINE ECharacterState ReturnState() const { return CurrentState;};
-	FORCEINLINE void SetState(ECharacterState UpdateState) { CurrentState = UpdateState;};
-	FORCEINLINE UNiagaraComponent* GetStunEffect() const { return StunEffect;};
 	UFUNCTION(BlueprintPure)
 	bool IsHardCC();
-
-	FORCEINLINE float GetDefaultSpeed() const {return DefaultSpeed;}; // DefaultSpeed 반환;
 
 	// 몬스터 어그로
 	AActor* IsAggro();
@@ -119,9 +92,6 @@ protected:
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
 	void ResetHitStiffness();
 	void SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation);
-
-	// Critical Damage Calculate
-	float CriticalCalculate(float Multiple = 2);
 
 	//Monster 세팅 초기화
 	void InitMonster();
@@ -149,36 +119,14 @@ protected:
 	void MultipleEnd(FTimerHandle* TimerHandle, float Multiple);
 
 protected:
-	//Component
-	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPCrowdControlComponent* CrowdControlComp;
-
-	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPMovementComponent* MoveComp;
-
-	// 몬스터 Status 관련 변수
-	UPROPERTY(EditAnywhere, Category = "Status")
-	float MaxHP = 100.0f;
-
-	float HP = 100.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Status")
-	float DefaultSpeed = 400.0f;
-
 	UPROPERTY(EditAnywhere, Category = "Status")
 	UWidgetComponent* HealthWidgetComp;
-
-	UPROPERTY(EditAnywhere, Category = "Status")
-	float Character_Defense = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRange = 250.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRadius = 80.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Status")
-	float Monster_ATK = 25.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Distance_Limit = 800.0f;
@@ -189,17 +137,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* TeleportMark;
 
-	UPROPERTY(EditAnywhere)
-	float CriticalPercent = 5.0f;
-
-	UPROPERTY(EditAnywhere)
-	int32 CriticalStep = 1;
-
-	UPROPERTY(EditAnywhere)
-	int32 NormalAttack_CriticalMultiple = 2;
-
-	bool bCriticalAttack = false;
-
 	bool bKnockBackAttack = false;
 
 	// TimerHandle
@@ -209,35 +146,23 @@ protected:
 	FTimerHandle DeathTimerHandle;
 	FTimerHandle StopTimerHandle;
 	// 머터리얼
-	UMaterialInterface* DefaultMaterial;
-
-	float DefaultSlip;
 
 	// 드롭 관련 변수
 	// UPROPERTY(EditAnywhere, Category = "Drop")
 	// TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률 (따로 드랍)
 
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TMap<FName , float> PackageDropMap; // Item ID , Drop 확률 (보따리 드랍)
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AEnemy_DropPackage> DropPackageClass;
-
 	TWeakObjectPtr<AEnemy_DropPackage> DropPackage;
 
-	bool OnDrop = false;
+	UPROPERTY(EditAnywhere)
+	bool OnDrop = true;
 
 	// 몬스터 Dead 관련 변수
 	UPROPERTY(EditAnywhere, Category = "Dead")
 	float DeathLoadingTime = 3.0f;
 
-	bool bIsDead = false;
-
 	TWeakObjectPtr<AActor> MarkActor;
 
 	// 몬스터 Hit 관련 변수
-	bool bHitting = false;
-
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	float HitStiffnessTime = 0.75f;
 
@@ -271,11 +196,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "KnockBackAttack")
 	float KnockBackDist = 1500.0f;
-	
-	UPROPERTY(EditAnywhere, Category = "CC")
-	UNiagaraComponent* StunEffect;
-	
-	ECharacterState CurrentState = ECharacterState::None;
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* Weapon;
@@ -287,10 +207,12 @@ protected:
 
 	bool InDrainField = false;
 
+	TWeakObjectPtr<USkillNumberBase> SkillComponent;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* DefaultWeapon;
+
 public:
 	FOnHPChanged OnEnemyHPChanged;
 
-	FOnCrowdControlCheck OnCrowdControlCheck;
-
-	TArray<bool> StopState;
 };

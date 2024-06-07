@@ -97,32 +97,32 @@ void UAPSaveDataSlot::Load()
     switch (SlotNumber)
     {
         case 1:
-        GI->DefaultGameSlot = GameSlotName_1;
-        GI->DefaultPlayerSlot = PlayerSlotName_1;
+        GI->SetDefaultGameSlot(GameSlotName_1);
+        GI->SetDefaultPlayerSlot(PlayerSlotName_1);
         break;
 
         case 2:
-        GI->DefaultGameSlot = GameSlotName_2;
-        GI->DefaultPlayerSlot = PlayerSlotName_2;
+        GI->SetDefaultGameSlot(GameSlotName_2);
+        GI->SetDefaultPlayerSlot(PlayerSlotName_2);
         break;
 
         case 3:
-        GI->DefaultGameSlot = GameSlotName_3;
-        GI->DefaultPlayerSlot = PlayerSlotName_3;
+        GI->SetDefaultGameSlot(GameSlotName_3);
+        GI->SetDefaultPlayerSlot(PlayerSlotName_3);
         break;
 
         case 4:
-        GI->DefaultGameSlot = GameSlotName_4;
-        GI->DefaultPlayerSlot = PlayerSlotName_4;
+        GI->SetDefaultGameSlot(GameSlotName_4);
+        GI->SetDefaultPlayerSlot(PlayerSlotName_4);
         break;
 
         case 5:
-        GI->DefaultGameSlot = GameSlotName_5;
-        GI->DefaultPlayerSlot = PlayerSlotName_5;
+        GI->SetDefaultGameSlot(GameSlotName_5);
+        GI->SetDefaultPlayerSlot(PlayerSlotName_5);
         break;
     }
 
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->DefaultGameSlot, 0));
+    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->GetDefaultGameSlot(), 0));
 	if (!SaveGameData)
 	{
 		SaveGameData = GetMutableDefault<UAPSaveGame>();

@@ -17,30 +17,30 @@ FReply UHomingTargetUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, con
     
     if(!OwnerCharacterPC.IsValid()) return Reply.Unhandled(); if(!OwnerCharacter.IsValid()) return Reply.Unhandled();
 
-    if(InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
-	{
-        TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
-        if(SkillNum.IsValid())
-        {
-            SkillNum->SkillCancel();
-        }
-        // OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumberBase()->SkillCancel();
-        OwnerCharacterPC->ReturnToDefault();
-        RemoveFromParent();
-		return Reply.Handled();
-	}
-    if(InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-	{
-        FHitResult HitResult;
-        OwnerCharacterPC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+    // if(InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	// {
+    //     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+    //     if(SkillNum.IsValid())
+    //     {
+    //         SkillNum->SkillCancel();
+    //     }
+    //     // OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillNumberComponent()->GetSkillNumberBase()->SkillCancel();
+    //     OwnerCharacterPC->ReturnToDefault();
+    //     RemoveFromParent();
+	// 	return Reply.Handled();
+	// }
+    // if(InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	// {
+    //     FHitResult HitResult;
+    //     OwnerCharacterPC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 
-        OwnerCharacter->SetHomingPoint(HitResult.Location);
+    //     OwnerCharacter->SetHomingPoint(HitResult.Location);
 
-        HomingSkill();
-        OwnerCharacterPC->ReturnToDefault();
-        RemoveFromParent();
-		return Reply.Handled();
-	}
+    //     HomingSkill();
+    //     OwnerCharacterPC->ReturnToDefault();
+    //     RemoveFromParent();
+	// 	return Reply.Handled();
+	// }
 
     OwnerCharacterPC->ReturnToDefault();
     return Reply.Unhandled();
@@ -53,11 +53,11 @@ void UHomingTargetUI::InputSkillInfo(ESkillNumber UpdateSkillNumber)
 
 void UHomingTargetUI::HomingSkill()
 {
-    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
-    if(SkillNum.IsValid())
-    {
-        SkillNum->OnSkill();
-    }
+    // TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+    // if(SkillNum.IsValid())
+    // {
+    //     SkillNum->OnSkill();
+    // }
 
     // switch (SkillNumber)
     // {

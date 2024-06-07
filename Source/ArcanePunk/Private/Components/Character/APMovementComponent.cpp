@@ -22,7 +22,7 @@ void UAPMovementComponent::BeginPlay()
 void UAPMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	if(bMove) TickMove(DeltaTime);
 	if(bRotation) TickRotate(DeltaTime);
 	TickCheck();
@@ -30,7 +30,7 @@ void UAPMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UAPMovementComponent::SetBind()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
+	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
 }
 
 void UAPMovementComponent::PlayerMoveForward(float AxisValue)
@@ -67,7 +67,7 @@ void UAPMovementComponent::TickRotate(float DeltaTime)
 	if(!OwnerCharacter.IsValid()) return;
 	Current = FMath::RInterpConstantTo(Current, TargetRot, DeltaTime, RotSpeed  * OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed );
 	GetOwner()->SetActorRotation(Current);
-
+	
 	if(abs(Current.Yaw - TargetRot.Yaw) < 0.01f) 
 	{
 		RotSpeed = InitRotSpeed;
@@ -92,7 +92,6 @@ void UAPMovementComponent::ComboMovement()
 	if(!OwnerCharacter.IsValid()) return;
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
 	int32 Section = OwnerAnim->GetAttackSection();
-
 	switch (Section)
 	{
 		case 2:
@@ -134,6 +133,6 @@ void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float Speed)
 	if(Speed < 1.0f) {RotSpeed = InitRotSpeed;}
 	else if(abs(Speed - RotSpeed)  >= 1.0f) RotSpeed = Speed;
 	// SetComponentTickEnabled(true);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UAPMovementComponent::RotateMovement, 0.0001f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UAPMovementComponent::RotateMovement, 0.00001f, false);
 }
 

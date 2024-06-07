@@ -42,33 +42,33 @@ void UAPMouseClickBase::InputSkillInfo_Ult(bool Loop)
 
 void UAPMouseClickBase::SkillCancel()
 {
-    if(UltMode)
-    {
-        OwnerCharacter->GetRSkillNumber()->Remove_Skill();
-    }
-    else
-    {
-        TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
-        if(SkillNum.IsValid())
-        {
-            SkillNum->Remove_Skill();
-        } 
-    }
+    // if(UltMode)
+    // {
+    //     OwnerCharacter->GetRSkillNumber()->Remove_Skill();
+    // }
+    // else
+    // {
+    //     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+    //     if(SkillNum.IsValid())
+    //     {
+    //         SkillNum->Remove_Skill();
+    //     } 
+    // }
     
 }
 
 void UAPMouseClickBase::SkillPlay()
 {
-    if(UltMode)
-    {
-        OwnerCharacter->GetRSkillNumber()->OnSkill();
-    }
-    else
-    {
-        TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
-        if(SkillNum.IsValid())
-        {
-            SkillNum->OnSkill();
-        }
-    }
+    // if(UltMode)
+    // {
+    //     OwnerCharacter->GetRSkillNumber()->OnSkill();
+    // }
+    // else
+    // {
+    //     TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(SkillNumber);
+    //     if(SkillNum.IsValid())
+    //     {
+    //         SkillNum->OnSkill();
+    //     }
+    // }
 }

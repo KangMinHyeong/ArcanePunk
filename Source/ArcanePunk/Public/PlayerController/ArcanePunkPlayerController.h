@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/InteractionInterface.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "ArcanePunkPlayerController.generated.h"
@@ -17,6 +18,8 @@ class UInteractionWidget;
 struct FInteractData;
 struct FConversationData;
 class UAPConversationUI;
+class UAPShoppingUI;
+class UAPSkillWindow;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
 
@@ -56,6 +59,10 @@ public:
 	// Conversation UI
 	void OpenConversationUI(AActor* CameraActor, FName Name, uint8 State);
 	void CloseConversationUI();
+
+	// Shopping UI
+	void OpenShoppingUI(AActor* ShopActor, FShopListData ShopListData);
+	void CloseShoppingUI();
 	
 	// Hit UI
 	void HitUI();
@@ -74,8 +81,6 @@ public:
 	// Option Menu
 	void OptionSetting();
 
-	UAPOptionSetting* GetOptionSettingUI() {return OptionSettingUI.Get();};
-
 	// Interaction UI
 	void OpenInteraction(AActor* NewActor, FInteractData InteractData);
 	void CloseInteraction(AActor* NewActor);
@@ -85,6 +90,9 @@ public:
 
 	// Not Enough MP
 	void DisplayNotEnoughMPUI();
+
+	// Skill Window
+	void DisplaySkillWindow();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -178,8 +186,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OptionSettingClass;
 
-	TWeakObjectPtr<UAPOptionSetting> OptionSettingUI;
-
 	// Stage Select 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StageSelectingUIClasss;
@@ -203,9 +209,17 @@ private:
 	
 	TWeakObjectPtr<UAPConversationUI> ConversationUI;
 
+	// Conversation UI
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> ShoppingUIClass;
+	TWeakObjectPtr<UAPShoppingUI> ShoppingUI;
+
 	// Not Enough MP
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> NotEnoughMPUIClass;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> SkillWindowUIClass;
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;

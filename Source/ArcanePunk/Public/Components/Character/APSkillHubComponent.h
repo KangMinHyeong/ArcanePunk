@@ -22,6 +22,8 @@
 #include "Components/Character/SkillNumber/SkillNumber16.h"
 #include "Components/Character/SkillNumber/SkillNumber17.h"
 #include "Components/Character/SkillNumber/SkillNumber18.h"
+#include "Components/Character/SkillNumber/SkillNumber19.h"
+#include "Components/Character/SkillNumber/SkillNumber20.h"
 #include "Components/Character/SkillNumber/UltSkillNumber_1.h"
 #include "Components/Character/SkillNumber/UltSkillNumber_2.h"
 #include "Components/Character/SkillNumber/UltSkillNumber_3.h"
@@ -38,6 +40,10 @@
 #include "Components/Character/SkillNumber/UltSkillNumber_14.h"
 #include "Components/Character/SkillNumber/UltSkillNumber_15.h"
 #include "Components/Character/SkillNumber/UltSkillNumber_16.h"
+#include "Components/Character/SkillNumber/UltSkillNumber_17.h"
+#include "Components/Character/SkillNumber/UltSkillNumber_18.h"
+#include "Components/Character/SkillNumber/UltSkillNumber_19.h"
+#include "Components/Character/SkillNumber/UltSkillNumber_20.h"
 #include "Components/ActorComponent.h"
 #include "APSkillHubComponent.generated.h"
 
@@ -79,6 +85,12 @@ class AArcaneWave;
 class AWindCutter;
 class ABomberMan;
 class ASuperiorMode;
+class AArcaneArea;
+class AMoonSlash;
+class AArcaneBlast;
+class AArcaneCannon;
+class AArcaneAlterEgo;
+class AImitator;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPSkillHubComponent : public UActorComponent
@@ -102,6 +114,9 @@ public:
 	FORCEINLINE TSubclassOf<AArcaneRage> GetArcaneRageClass() const {return ArcaneRageClass;}; // ArcaneRageClass 반환
 	FORCEINLINE TSubclassOf<AArcaneTent> GetArcaneTentClass() const {return ArcaneTentClass;}; // ArcaneTentClass 반환
 	FORCEINLINE TSubclassOf<ASwordClutch> GetSwordClutchClass() const {return SwordClutchClass;}; // SwordClutchClass 반환
+	FORCEINLINE TSubclassOf<ASpinSlash> GetSpinSlash() const {return SpinSlashClass;}; // SpinSlashClass 반환
+	FORCEINLINE TSubclassOf<AMoonSlash> GetMoonSlash() const {return MoonSlashClass;}; // MoonSlashClass 반환
+	FORCEINLINE TSubclassOf<AArcaneCannon> GetArcaneCannon() const {return ArcaneCannonClass;}; // ArcaneCannonClass 반환
 
 	FORCEINLINE TSubclassOf<AArcaneRain> GetArcaneRainClass() const {return ArcaneRainClasss;}; // ArcaneRainClass 반환
 	FORCEINLINE TSubclassOf<ATimeRewinder> GetTimeRewinderClass() const {return TimeRewinderClass;}; // TimeRewinderClass 반환
@@ -114,17 +129,20 @@ public:
 	FORCEINLINE TSubclassOf<ATerminator> GetTerminator() const {return TerminatorClass;}; // TerminatorClass 반환
 	FORCEINLINE TSubclassOf<AOverload> GetOverload() const {return OverloadClass;}; // OverloadClass 반환
 	FORCEINLINE TSubclassOf<AArcaneReflector> GetArcaneReflector() const {return ArcaneReflectorClass;}; // ArcaneReflectorClass 반환
-	FORCEINLINE TSubclassOf<ASpinSlash> GetSpinSlash() const {return SpinSlashClass;}; // SpinSlashClass 반환
 	FORCEINLINE TSubclassOf<AArcaneWave> GetArcaneWave() const {return ArcaneWaveClass;}; // ArcaneWaveClass 반환
 	FORCEINLINE TSubclassOf<AWindCutter> GetWindCutter() const {return WindCutterClass;}; // WindCutterClass 반환
 	FORCEINLINE TSubclassOf<ABomberMan> GetBomberMan() const {return BomberManClass;}; // BomberManClass 반환
 	FORCEINLINE TSubclassOf<ASuperiorMode> GetSuperiorMode() const {return SuperiorModeClass;}; // SuperiorModeClass 반환
-		
+	FORCEINLINE TSubclassOf<AArcaneArea> GetArcaneArea() const {return ArcaneAreaClass;}; // ArcaneAreaClass 반환
+	FORCEINLINE TSubclassOf<AArcaneBlast> GetArcaneBlast() const {return ArcaneBlastClass;}; // ArcaneBlastClass 반환
+	FORCEINLINE TSubclassOf<AArcaneAlterEgo> GetArcaneAlterEgo() const {return ArcaneAlterEgoClass;}; // ArcaneAlterEgoClass 반환
+	FORCEINLINE TSubclassOf<AImitator> GetImitator() const {return ImitatorClass;}; // ImitatorClass 반환
 
 	FORCEINLINE UNiagaraSystem* GetArcaneTeleportEffect() const {return ArcaneTeleportEffect;}; // ArcaneTeleportEffect 반환
 	FORCEINLINE UNiagaraSystem* GetHealingEffect() const {return HealingEffect;}; // HealingEffect 반환
 	FORCEINLINE UNiagaraSystem* GetSkill16Effect() const {return Skill16Effect;}; // Skill16Effect 반환
 	FORCEINLINE UNiagaraSystem* GetSkill17Effect() const {return Skill17Effect;}; // Skill17Effect 반환
+	FORCEINLINE UNiagaraSystem* GetSkill20Effect() const {return Skill20Effect;}; // Skill20Effect 반환
 	
 	// 공격 범위 액터
 	FORCEINLINE TSubclassOf<AAPSkillRange> GetAPSkillRange() const {return SkillRange;};
@@ -150,13 +168,18 @@ public:
 	ESkillKey GetSkillState();
 
 
-	void UpdateSkill_Q();
-	void UpdateSkill_E();
-	void UpdateSkill_R();
+	void UpdatingSkill_Q();
+	void UpdatingSkill_E();
+	void UpdatingSkill_R();
 
-	USkillNumberBase* GetSKillNumberComponent(ESkillNumber SkillNumber);
+	USkillNumberBase* CreateSkillNumber(ESkillNumber CreatedNumber);
+
+	USkillNumberBase* GetSKillNumberComp(ESkillNumber SkillNumber);
 
 	void AutoRecoveryMP();
+
+	FORCEINLINE float GetRecoveryTime_MP() const {return RecoveryTime_MP;};
+	FORCEINLINE void SetRecoveryTime_MP(float NewValue) {RecoveryTime_MP = NewValue;};
 
 private:
 	void PlayBasicSkill();
@@ -271,6 +294,24 @@ private:
 	TSubclassOf<ASuperiorMode> SuperiorModeClass;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneArea> ArcaneAreaClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneBlast> ArcaneBlastClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneAlterEgo> ArcaneAlterEgoClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AArcaneCannon> ArcaneCannonClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AMoonSlash> MoonSlashClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<AImitator> ImitatorClass;
+
+	UPROPERTY(EditAnywhere, Category = "Skill")
 	UNiagaraSystem*  ArcaneTeleportEffect;	
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	UNiagaraSystem* HealingEffect;
@@ -278,6 +319,8 @@ private:
 	UNiagaraSystem* Skill16Effect;
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	UNiagaraSystem* Skill17Effect;
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	UNiagaraSystem* Skill20Effect;
 
 	UPROPERTY(EditAnywhere, Category = "Skill Range")
 	TSubclassOf<AAPSkillRange> SkillRange;

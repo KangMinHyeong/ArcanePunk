@@ -9,6 +9,7 @@
 #define Defense_constant 1000
 
 class UNiagaraSystem;
+class AArcanePunkCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPTakeDamageComponent : public UActorComponent
@@ -23,7 +24,8 @@ protected:
 
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	void InitTakeDamageComp();
+	
 	void DamageCalculation(float &DamageApplied);
 	void ReflectDamage(float & DamageApplied, AActor* DamageCauser);
 	
@@ -39,6 +41,7 @@ public:
 
 private:
 	void OnHitting();
+	bool CheckingDamaged();
 
 private:
 	FTimerHandle HittingTimerHandle;
@@ -64,4 +67,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Death")
 	float DeathTime = 3.0f;
 
+	uint8 DamagedNumber = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	TSubclassOf<AActor> DamagedShieldClass;
+
+	TWeakObjectPtr<AActor> DamagedShield;
+
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 };

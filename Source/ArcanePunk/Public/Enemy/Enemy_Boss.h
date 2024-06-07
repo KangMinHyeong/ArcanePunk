@@ -13,6 +13,7 @@ class UParticleSystem;
 class ASwordImpact;
 class AAPHUD;
 class UAPSpawnMonsterComponent;
+class AAPPillarAttack;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_Boss : public AEnemy_CharacterBase
@@ -56,6 +57,16 @@ public:
 	void RangeAttack_2_Ready();
 	void SpawnRangeAttack_2();
 
+	//Pillar Attakc 관련 함수
+	void OnPillarWeapon();
+	void OnPillarCombo();
+	void OnThrowingPillarReady(FVector Target);
+	void OnThrowingPillar();
+	void OnPillarAttackEnd();
+	FORCEINLINE bool HasPillar() const {return bGetPillar;};
+	FORCEINLINE bool IsPillarAttack() const {return bPillarAttack;};
+	FORCEINLINE void SetPillarAttack(bool NewBool) {bPillarAttack = NewBool;};
+
 	// Attack Move 관련 함수
 	FORCEINLINE void SetAttackMove(bool NewBool) { bAttackMove = NewBool;}; //bAttackMove 설정
 
@@ -78,6 +89,7 @@ protected:
 	void OnRangeAttack1_MontageEnd();
 	void OnRangeAttack2_MontageEnd();
 	void OnDrainMonster_MontageEnd();
+	void OnPillarAttackMontageEnd();
 
 	// RushAttack 관련 함수
 	void BindRushAttack();
@@ -240,9 +252,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Stop")
 	float StopTime = 1.1f;
 
-	// UPROPERTY()
-	// bool bDoing = false;
-
 	// Test Rotator
 	UPROPERTY(EditAnywhere, Category = "Test Rotator")
 	FRotator KnockBackSlashRotator = FRotator(0,0,0);
@@ -258,4 +267,23 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	int32 BossSkillNum = 7;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AAPPillarAttack> PillarClass;
+
+	bool bPillarAttack = false;
+	bool bGetPillar = false;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* SecondWeapon;
+	UPROPERTY(EditAnywhere)
+	FVector SecondWeaponLocation;
+	UPROPERTY(EditAnywhere)
+	FVector SecondWeaponScale = FVector(0.8f, 0.8f, 0.8f);
+	UPROPERTY(EditAnywhere)
+	float PillarRangeCoefficient = 1.5f;
+	UPROPERTY(EditAnywhere)
+	FRotator ThrowingPillarRot = FRotator(90.0f, 0.0f, 0.0f);
+
+	FVector PillarTarget;
 };

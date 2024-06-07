@@ -7,7 +7,8 @@
 #include "UObject/Interface.h"
 #include "SkillInterface.generated.h"
 
-// This class does not need to be modified.
+class USkillNumberBase;
+
 UINTERFACE(MinimalAPI)
 class USkillInterface : public UInterface
 {
@@ -20,5 +21,5 @@ class ARCANEPUNK_API ISkillInterface
 	GENERATED_BODY()
 
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData);
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent);
 };

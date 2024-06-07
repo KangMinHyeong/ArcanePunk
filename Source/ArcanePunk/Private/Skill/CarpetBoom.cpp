@@ -83,9 +83,9 @@ void ACarpetBoom::SetCarpetBoomWidth(float Width)
     CarpetBoomTrigger->SetBoxExtent(FVector(5.0f, Width, Width), true);
 }
 
-void ACarpetBoom::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ACarpetBoom::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     LavaEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), LavaEffect, GetActorLocation(), GetActorRotation());

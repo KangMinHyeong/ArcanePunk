@@ -38,7 +38,7 @@ void AAPGhostTrail::Tick(float DeltaTime)
 	}
 	if(bSkillTrail && OwnerCharacter.IsValid())
 	{
-		if(OwnerCharacter->GetRSkillNumber()->bActivate) {Destroy(); return;}
+		if(OwnerCharacter->GetRSkillNumber()->IsActivate()) {Destroy(); return;}
 	}
 	
 }
@@ -115,7 +115,7 @@ void AAPGhostTrail::SetVisibility()
 {
 	if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetGhostTrailSpawnComp()->SetSkillTrail(this);
-	if(OwnerCharacter->GetRSkillNumber()->bActivate) {Destroy(); return;}
+	if(OwnerCharacter->GetRSkillNumber()->IsActivate()) {Destroy(); return;}
 	SetActorHiddenInGame(false); 
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPGhostTrail::OnDestory, UGameplayStatics::GetWorldDeltaSeconds(GetWorld()), false);
 }

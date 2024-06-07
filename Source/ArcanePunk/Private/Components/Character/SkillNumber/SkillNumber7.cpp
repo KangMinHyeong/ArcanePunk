@@ -38,25 +38,26 @@ void USkillNumber7::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
 		Skilling = true;
-		Spawn_Skill7();
+		Spawn_SkillRange();
 	}
 }
 
-void USkillNumber7::Spawn_Skill7()
+void USkillNumber7::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-    if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_7);}
+    // if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_7);}
 	
 	ActivateSkillRange_Target(Skill7_Wide, Skill7_LimitDistance, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill7_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	if(CheckSmartKey(SkillKey))
 	{
@@ -92,6 +93,7 @@ void USkillNumber7::Remove_Skill()
 
 void USkillNumber7::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
@@ -99,23 +101,42 @@ void USkillNumber7::Activate_Skill()
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ArcaneCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation()+OwnerCharacter->GetActorForwardVector()*SpawnAddLocation , OwnerCharacter->GetActorRotation());
+	ArcaneCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*150.0f , OwnerCharacter->GetActorRotation()); // 
 	if(!ArcaneCutter.IsValid()) return; 
-	ArcaneCutter->SetSkill(SkillAbilityNestingData);	
-    float Size = ArcaneCutter->GetActorScale3D().Y/ ArcaneCutter->DefaultSize;
-    ArcaneCutter->SetActorLocation( ArcaneCutter->GetActorLocation() + (OwnerCharacter->GetActorUpVector()*150.0f*Size));
 	ArcaneCutter->SetOwner(OwnerCharacter.Get());
-    ArcaneCutter->SetDeadTime((Skill7_LimitDistance * 2.0f - SpawnAddLocation - ArcaneCutter->GetTriggerWide() * 2.0f) / ArcaneCutter->GetCutterSpeed()); // 거리 = 속력 * 시간 으로 DeadTime 수정
-	// if(SkillRange_Target) ArcaneBeam->SetDistance(SkillRange_Target->GetTargetDistance() * 2.0f);
-	// if(SkillRange_Target) ArcaneBeam->SetWide(SkillRange_Target->GetTargetWide());
+    ArcaneCutter->SetDist((Skill7_LimitDistance * 2.0f - ArcaneCutter->GetTriggerWide() * 2.0f )); // 거리 = 속력 * 시간 으로 DeadTime 수정
+	ArcaneCutter->SetSkill(SkillAbilityNestingData, this);	
+
 	Remove_Skill();
 }
 
 void USkillNumber7::SkillEnd()
 {
-	// if(ArcaneBeam.IsValid()) ArcaneBeam->DestroySKill();
+	Super::SkillEnd();
 }
 
 void USkillNumber7::UpdateSkillData()
 {
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+	
+	float Dist = Skill7_LimitDistance_Origin;
+	float Wide = Skill7_Wide_Origin;
+	float Cool = SkillNameListData.CoolTime;
+	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+		if(It.Key == 2) {
+			UpdatAbilityData(EEnHanceType::Silver, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Dist, AbilityData->Coefficient_X, It.Value); // 사거리 강화}
+		} 
+	}
+    // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    // {
+    // }
+    // for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    // {
+    // }
+	Skill7_LimitDistance = Dist;
+	Skill7_Wide = Wide;
+	CurrentCoolTime = Cool;
 }

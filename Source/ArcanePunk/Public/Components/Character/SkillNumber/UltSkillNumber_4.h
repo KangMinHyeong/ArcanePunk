@@ -29,7 +29,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_UltSkill4();	
+	virtual void Spawn_SkillRange() override;
 
 private:
 	TWeakObjectPtr<ABlackHole> BlackHole;

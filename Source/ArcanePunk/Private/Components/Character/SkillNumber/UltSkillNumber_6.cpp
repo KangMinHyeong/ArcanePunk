@@ -11,15 +11,13 @@
 
 UUltSkillNumber_6::UUltSkillNumber_6()
 {
-	OriginCoolTime = 7.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_6");
 }
 
 void UUltSkillNumber_6::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Skill8_LimitDistance = Skill8_LimitDistance_Origin;
-	// Skill8_Wide = Skill8_Wide_Origin;
 }
 
 void UUltSkillNumber_6::PlaySkill()
@@ -33,25 +31,26 @@ void UUltSkillNumber_6::PlaySkill()
 	}
 	else
 	{
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+		if(!CheckSkillCondition()) return;
 		OwnerCharacter->SetDoing(true);
         Skilling = true;
-        Spawn_UltSkill6();
+        Spawn_SkillRange();
 	}
 }
 
-void UUltSkillNumber_6::Spawn_UltSkill6()
+void UUltSkillNumber_6::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-    if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+    // if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
 	
 	ActivateSkillRange_Target(UltSkill6_Width, UltSkill6_LimitDistance * 0.5f, ESkillRangeType::Arrow);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(UltSkill6_LimitDistance * 0.5f);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	if(CheckSmartKey(SkillKey))
 	{
@@ -95,7 +94,7 @@ void UUltSkillNumber_6::Activate_Skill()
     WindRush->AttachToComponent(OwnerCharacter->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
     WindRush->SetWindRushWidth(UltSkill6_Width);
     WindRush->SetTargetLocation(SpawnLocation, UltSkill6_LimitDistance);
-	WindRush->SetSkill(SkillAbilityNestingData);	
+	WindRush->SetSkill(SkillAbilityNestingData, this);	
 
     // bActivate = true; 
 
@@ -104,6 +103,7 @@ void UUltSkillNumber_6::Activate_Skill()
 
 void UUltSkillNumber_6::SkillEnd()
 {
+	Super::SkillEnd();
     OwnerCharacter->SetDoing(false);
     Remove_Skill();
 }

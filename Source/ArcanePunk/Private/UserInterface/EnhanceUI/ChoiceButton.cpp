@@ -7,25 +7,9 @@
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Character/ArcanePunkCharacter.h"
+#include "GameInstance/APGameInstance.h"
 
-// void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, ESkillNumber UpdateSkillNumber ,ESkillAbility UpdateSkillAbility)
-// {
-//     bEnhance = true;
-    
-//     ParentWidget = UpdateParentWidget;
-//     SkillNumber = UpdateSkillNumber;
-//     SkillAbility = UpdateSkillAbility;
-
-//     const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillNumber"), true); if(!SkillNum) return;
-//     SkillNumber_Text->SetText(FText::FromString(SkillNum->GetDisplayNameTextByIndex((uint8)UpdateSkillNumber).ToString()));
-
-//     const UEnum* SkillAbil = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillAbility"), true); if(!SkillAbil) return;
-//     SkillAbility_Text->SetText(FText::FromString(SkillAbil->GetDisplayNameTextByIndex((uint8)UpdateSkillAbility).ToString()));
-
-//     BindButton();
-// }
-
-void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, ESkillNumber UpdateSkillNumber, uint8 UpdateSkillAbility ,uint16 UpdateNestingNumb)
+void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkillNumber, uint8 UpdateSkillAbility ,uint16 UpdateNestingNumb)
 {
     bEnhance = true;
 
@@ -33,33 +17,29 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, ESkillNumber Upd
     SkillNumber = UpdateSkillNumber;
     SkillAbility = UpdateSkillAbility;
     NestingNumb = UpdateNestingNumb;
-     
-    const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillNumber"), true); if(!SkillNum) return;
-    FName SkillNumberName = ParentWidget->GetSkillAbilityNestingData().SkillName;
-    
+
+    SetSkillName();
     auto DataTable = ParentWidget->GetSkillAbilityRowNameData()->FindRow<FSkillAbilityRowNameData>(SkillNumberName, SkillNumberName.ToString()); if(!DataTable) return;
-    auto SlotTable = SkillSlotDataTable->FindRow<FSkillSlotDataTable>(Name, Name.ToString()); if(!SlotTable){return;}
-    
-    SkillNumber_Image->SetBrushFromTexture(SlotTable->SkillSlotImage[(uint8)UpdateSkillNumber]); 
 
     FSkillAbilityDataSheet* AbilityData = nullptr;
     TArray<FString> RowName;
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(ParentWidget->GetOwningPlayerPawn()); if(!OwnerCharacter) return;
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
     switch (ParentWidget->GetEnHanceType())
     {
         case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName;
-        AbilityData = OwnerCharacter->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName;
-        AbilityData = OwnerCharacter->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName;
-        AbilityData = OwnerCharacter->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
     }
     if(!AbilityData) return;
@@ -69,54 +49,64 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, ESkillNumber Upd
 
     SkillNumber_Text->SetText(FText::FromString(AbilityData->AbilityName));  
     SkillAbility_Text->SetText(FText::FromString(AbilityData->AbilityInformation));
-
-    // if(ParentWidget->GetEnHanceType() == EEnHanceType::Silver) {SkillNumber_Text->SetText(FText::FromString(DataTable->SilverAbilityInformation[SkillAbility].AbilityName));  SkillAbility_Text->SetText(FText::FromString(DataTable->SilverAbilityInformation[SkillAbility].AbilityInformation));}
-    // else if(ParentWidget->GetEnHanceType() == EEnHanceType::Gold) {SkillNumber_Text->SetText(FText::FromString(DataTable->GoldAbilityInformation[SkillAbility].AbilityName));  SkillAbility_Text->SetText(FText::FromString(DataTable->GoldAbilityInformation[SkillAbility].AbilityInformation));}
-    // else {SkillNumber_Text->SetText(FText::FromString(DataTable->PlatinumAbilityInformation[SkillAbility].AbilityName)); SkillAbility_Text->SetText(FText::FromString(DataTable->PlatinumAbilityInformation[SkillAbility].AbilityInformation));}
-
     SkillAbility_Nesting->SetText(FText::FromString(FString::FromInt(UpdateNestingNumb - 1)));
-    
+    SkillNumber_Image->SetBrushFromTexture(AbilityData->EnhanceSlotImage); 
+
     BindButton();
 }
 
-void UChoiceButton::SetNewSkill(UUserWidget* UpdateParentWidget, ESkillNumber UpdateSkillNumber)
+void UChoiceButton::SetNewSkill(UUserWidget* UpdateParentWidget, uint8 UpdateSkillNumber)
 {
     bEnhance = false;
     
     ParentWidget = Cast<UAPEnhanceChoice>(UpdateParentWidget);
     SkillNumber = UpdateSkillNumber;
 
-    const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillNumber"), true); if(!SkillNum) return;
-    SkillNumber_Text->SetText(FText::FromString(SkillNum->GetDisplayNameTextByIndex((uint8)UpdateSkillNumber).ToString()));
-
-    FString NewSkill_TEXT = TEXT("스킬 설명 추가");
-    SkillAbility_Text->SetText(FText::FromString(NewSkill_TEXT));
-
-    auto SlotTable = SkillSlotDataTable->FindRow<FSkillSlotDataTable>(Name, Name.ToString()); if(!SlotTable){return;}
-    
-    SkillNumber_Image->SetBrushFromTexture(SlotTable->SkillSlotImage[(uint8)UpdateSkillNumber]); 
+    SetSkillName();
+    auto NameTable = SkillNameDataTable->FindRow<FSkillNameList>(SkillNumberName, SkillNumberName.ToString()); if(!NameTable){return;}
+    SkillAbility_Text->SetText(FText::FromString(NameTable->Skill_Information));   
+    SkillNumber_Text->SetText(FText::FromString(NameTable->SkillName_Korean));
+    SkillNumber_Image->SetBrushFromTexture(NameTable->SkillSlotImage); 
+    Text_New->SetVisibility(ESlateVisibility::Visible);
 
     BindButton();
 }
 
-void UChoiceButton::BindButton()
-{   
-    Choice_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnEnhanceChoice);
-    Reroll_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnReroll);
-}
-
-void UChoiceButton::OnEnhanceChoice()
+void UChoiceButton::SetSkillName()
 {
     if(!ParentWidget.IsValid()) return;
-
-    if(bEnhance)
+    if(ParentWidget->GetEnHanceCategory() == EEnhanceCategory::Enhance_Passive)
     {
-        ParentWidget->ApplyEnhance(SkillAbility, NestingNumb, MaxNestingNum);
+        const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EPassiveNumber"), true); if(!SkillNum) return;
+        SkillNumberName = FName(*SkillNum->GetNameStringByValue(SkillNumber));
     }
     else
     {
-        ParentWidget->ApplyNewSkill(SkillNumber);
+        if(bEnhance)
+        {
+            SkillNumberName = ParentWidget->GetSkillAbilityNestingData().SkillName;
+        }
+        else
+        {
+            const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ESkillNumber"), true); if(!SkillNum) return;
+            SkillNumberName = FName(*SkillNum->GetNameStringByValue(SkillNumber));
+        }
     }
+}
+
+void UChoiceButton::BindButton()
+{   
+    Choice_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnClickChoice);
+    Reroll_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnReroll);
+
+    Choice_Button->OnHovered.AddDynamic(this, &UChoiceButton::OnChoiceButton_Hovered);
+    Choice_Button->OnUnhovered.AddDynamic(this, &UChoiceButton::OnChoiceButton_UnHovered);
+}
+
+void UChoiceButton::OnClickChoice()
+{
+    OnEnhanceChoice();
+    if(ParentWidget.IsValid()) ParentWidget->OnBackGround_FadeOut();
 }
 
 void UChoiceButton::OnReroll()
@@ -127,3 +117,16 @@ void UChoiceButton::OnReroll()
 
 }
 
+void UChoiceButton::ApplyChoice()
+{
+    if(!ParentWidget.IsValid()) return;
+
+    if(bEnhance)
+    {
+        ParentWidget->ApplyEnhance(SkillNumber, SkillAbility, NestingNumb, MaxNestingNum);
+    }
+    else
+    {
+        ParentWidget->ApplyNewSkill(SkillNumber);
+    }
+}

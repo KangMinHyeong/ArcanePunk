@@ -12,7 +12,7 @@
 
 UUltSkillNumber_10::UUltSkillNumber_10()
 {
-	OriginCoolTime = 7.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_10");
 }
 
 void UUltSkillNumber_10::BeginPlay()
@@ -29,7 +29,7 @@ void UUltSkillNumber_10::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
     OwnerCharacter->SetDoing(true);
 	Skilling = true;
@@ -67,7 +67,7 @@ void UUltSkillNumber_10::Activate_Skill()
 	Terminator = GetWorld()->SpawnActor<ATerminator>(OwnerCharacter->GetAPSkillHubComponent()->GetTerminator(), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
     if(!Terminator.IsValid()) return;
 	Terminator->SetOwner(OwnerCharacter.Get());
-	Terminator->SetSkill(SkillAbilityNestingData);	
+	Terminator->SetSkill(SkillAbilityNestingData, this);	
     Terminator->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules ::KeepWorldTransform);
 
 	Skilling = false;

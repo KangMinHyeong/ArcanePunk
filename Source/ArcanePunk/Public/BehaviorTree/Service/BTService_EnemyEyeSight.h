@@ -19,6 +19,9 @@ public:
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;	
 
+	AActor* GetPlayerActor(AActor* AIOwner);
+
+private:
 	float Current = 0.0f;
 
 	UPROPERTY(EditAnywhere)
@@ -28,4 +31,5 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float RotateSpeed = 450.0f;
+	
 };

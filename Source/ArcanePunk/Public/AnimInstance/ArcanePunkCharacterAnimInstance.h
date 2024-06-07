@@ -10,6 +10,7 @@ DECLARE_MULTICAST_DELEGATE(FOnComboCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnUltChargeEnd);
 
 class AArcanePunkCharacter;
+class AAPCharacterBase;
 
 UCLASS()
 class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
@@ -40,8 +41,11 @@ public:
 	void PlaySkill_14_Montage();
 	void PlaySkill_15_Montage();
 	void PlaySkill_18_Montage();
+	void PlaySkill_19_Montage();
+	void PlaySkill_20_Montage();
 
 	void StopSkill_5_Montage();
+	void StopSkill_5_Fire_Montage();
 	void StopSkill_18_Montage();
 	
 	void PlaySkill_5_Fire_Montage();
@@ -60,6 +64,7 @@ public:
 	void PlayUltSkill_13_Montage();
 	void PlayUltSkill_14_Montage();
 	void PlayUltSkill_15_Montage();
+	void PlayUltSkill_17_Montage();
 
 	void StopUltSkill_3_Montage();
 	void StopUltSkill_6_Montage();
@@ -80,41 +85,13 @@ public:
 	void AnimNotify_SwordTrail_3();
 
 	UFUNCTION()
-	void AnimNotify_Skill_1_Trigger(); // Skill_1
+	void AnimNotify_Skill_Trigger();
 	UFUNCTION()
-	void AnimNotify_Skill_2_Trigger(); // Skill_2
+	void AnimNotify_Skill_Charging();
 	UFUNCTION()
-	void AnimNotify_Skill_4_Trigger();
+	void AnimNotify_Skill_End();
 	UFUNCTION()
-	void AnimNotify_Skill_5_Trigger();
-
-	UFUNCTION()
-	void AnimNotify_Skill_5_Fire();
-	UFUNCTION()
-	void AnimNotify_Skill_5_FireEnd();
-	UFUNCTION()
-	void AnimNotify_Skill_6_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_7_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_8_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_9_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_10_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_11_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_12_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_13_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_14_Trigger();
-	UFUNCTION()
-	void AnimNotify_Skill_15_Trigger();
-
-	UFUNCTION()
-	void AnimNotify_Skill_5_Enhance();
+	void AnimNotify_Skill_Enhance();
 
 	UFUNCTION()
 	void AnimNotify_UltSkill_Trigger();
@@ -164,7 +141,8 @@ private:
 
 	int32 AttackSection = 0;
 
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerPlayer;
 
 public:
 	FOnComboCheckDelegate OnComboCheck;
@@ -231,6 +209,12 @@ public:
 	UAnimMontage* Skill_18_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_19_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Skill_20_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_5_Fire_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
@@ -274,6 +258,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* UltSkill_15_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* UltSkill_17_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* UltSkill_Fire_Montage;

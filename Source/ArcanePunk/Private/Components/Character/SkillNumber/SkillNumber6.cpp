@@ -28,29 +28,12 @@ void USkillNumber6::PlaySkill()
 {
 	Super::PlaySkill();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 
 	OwnerCharacter->SetDoing(true);
 	
 	OnSkill();
 
-	// if(CurrentSkillAbility.Contains(ESkillAbility::Homing))
-	// {
-	// 	if(CheckSmartKey(WhichKey, OwnerCharacter))
-	// 	{
-	// 		OnSkill(SkillType);
-	// 	}
-	// 	else
-	// 	{
-	// 		auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
-	// 		SetMouseCursor(PC, ESkillCursor::Crosshairs);
-	// 		PC->DisplayHomingUI(ESkillNumber::Skill_4, SkillType);
-	// 	}
-	// }
-	// else
-	// {
-		
-	// }
 }
 
 void USkillNumber6::OnSkill()
@@ -67,10 +50,12 @@ void USkillNumber6::OnSkill()
 
 void USkillNumber6::Remove_Skill()
 {
+	Super::Remove_Skill();
 }
 
 void USkillNumber6::Activate_Skill()
 {
+	Super::Activate_Skill();
 	if(!OwnerCharacter.IsValid()) return;
 
 	FActorSpawnParameters SpawnParams;
@@ -80,14 +65,15 @@ void USkillNumber6::Activate_Skill()
 
     Shouting = GetWorld()->SpawnActor<AShouting>(OwnerCharacter->GetAPSkillHubComponent()->GetShoutingClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
 	if(!Shouting.IsValid()) return;
-	Shouting->SetSkill(SkillAbilityNestingData);	
 	Shouting->SetOwner(OwnerCharacter.Get());
-	Shouting->SetShoutingEffect();
+	Shouting->SetSkill(SkillAbilityNestingData, this);
+
+	Remove_Skill();
 }
 
 void USkillNumber6::SkillEnd()
 {
-	if(Shouting.IsValid()) Shouting->DestroySKill();
+	Super::SkillEnd();
 }
 
 void USkillNumber6::UpdateSkillData()

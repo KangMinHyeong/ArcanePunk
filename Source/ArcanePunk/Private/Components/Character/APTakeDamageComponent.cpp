@@ -12,6 +12,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "GameMode/APGameModeBattleStage.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Character/APPassiveComponent.h"
 
 UAPTakeDamageComponent::UAPTakeDamageComponent()
 {
@@ -28,10 +29,17 @@ void UAPTakeDamageComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UAPTakeDamageComponent::InitTakeDamageComp()
+{
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+}
+
 void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	bool Check = false;
+	if(OwnerCharacter->GetAPPassiveComp()->IsDamagedPassive()) Check = CheckingDamaged();
+	if(Check) return;
+
 	auto PD = OwnerCharacter->GetPlayerStatus();
 
 	DamageApplied = FMath::Min(PD.PlayerDynamicData.HP, DamageApplied);
@@ -71,8 +79,8 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 
 void UAPTakeDamageComponent::ReflectDamage(float & DamageApplied, AActor* DamageCauser)
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter) return;
-	UGameplayStatics::ApplyDamage(DamageCauser, DamageApplied, OwnerCharacter->GetInstigatorController(), OwnerCharacter, UDamageType::StaticClass());
+	if(!OwnerCharacter.IsValid()) return;
+	UGameplayStatics::ApplyDamage(DamageCauser, DamageApplied, OwnerCharacter->GetInstigatorController(), OwnerCharacter.Get(), UDamageType::StaticClass());
 }
 
 void UAPTakeDamageComponent::SetHitPoint(float Forward, float Right)
@@ -93,8 +101,7 @@ float UAPTakeDamageComponent::GetRight()
 
 void UAPTakeDamageComponent::OnHitting()
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 
 	OwnerCharacter->SetHitting(false);
 	if(OwnerCharacter->GetHideMode()) { OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetHideMaterial()); }
@@ -103,10 +110,24 @@ void UAPTakeDamageComponent::OnHitting()
 	GetWorld()->GetTimerManager().ClearTimer(HittingTimerHandle);
 }
 
+bool UAPTakeDamageComponent::CheckingDamaged()
+{
+	if(!OwnerCharacter.IsValid()) return false;
+	DamagedNumber++;
+	UE_LOG(LogTemp, Display, TEXT("DamagedNumber %d"), DamagedNumber);
+	if(DamagedNumber == 8 && DamagedShield.IsValid()) {DamagedNumber = 0; DamagedShield->Destroy(); return true;}
+	else if(DamagedNumber == 7)
+	{
+		DamagedShield = GetWorld()->SpawnActor<AActor>(DamagedShieldClass, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+		DamagedShield->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+	}
+
+    return false;
+}
+
 void UAPTakeDamageComponent::SetHitEffect(FVector HitLocation)
 {
-	auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
-	if(!OwnerCharacter) return;
+	if(!OwnerCharacter.IsValid()) return;
 
 	if(HitMaterial) OwnerCharacter->GetMesh()->SetMaterial(0, HitMaterial);
 

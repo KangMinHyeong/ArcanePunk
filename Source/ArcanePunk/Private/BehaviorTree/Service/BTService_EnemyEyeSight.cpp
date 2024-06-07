@@ -33,9 +33,12 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
     TWeakObjectPtr<AActor> TargetActor = Monster->IsAggro();
     if(!Monster->IsAggro())
     {
-        AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));  if(!TargetPlayer) return;
-        if(!TargetPlayer->GetHideMode()){TargetActor = TargetPlayer;}
-        else {TargetActor = nullptr;}
+        TargetActor = GetPlayerActor(Monster);
+        if(AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(TargetActor.Get())) 
+        {
+            if(!TargetPlayer->GetHideMode()){TargetActor = TargetPlayer;}
+            else {TargetActor = nullptr;}
+        }
     }   
 
     if(TargetActor.IsValid())
@@ -70,4 +73,23 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
         Anim->SetbBattleMode(0.0f);
     }
 
+}
+
+AActor *UBTService_EnemyEyeSight::GetPlayerActor(AActor* AIOwner)
+{
+    // Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(this, 0)); 
+    TArray<AActor*> Actors;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
+
+    if(Actors.IsEmpty()) return nullptr;
+
+    if(Actors.Num() >= 2)
+	{
+		Actors.Sort([AIOwner](AActor& A, AActor& B) 
+		{
+			return (A.GetActorLocation() - AIOwner->GetActorLocation()).Size() > (B.GetActorLocation() - AIOwner->GetActorLocation()).Size();
+		});
+	}
+
+    return Actors.Top();
 }

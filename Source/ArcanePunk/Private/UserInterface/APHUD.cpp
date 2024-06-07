@@ -8,12 +8,10 @@
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 #include "UserInterface/Inform/APStageInformationUI.h"
 #include "UserInterface/EnhanceUI/EnhanceGauge.h"
+#include "UserInterface/Status/HUD/ImitatorSkillSlot.h"
 
 AAPHUD::AAPHUD()
 {
-
-	// Minhyeong
-	EnhanceChoiceClasses.SetNum(3);
 }
 
 void AAPHUD::BeginPlay()
@@ -166,13 +164,13 @@ void AAPHUD::SetBossHPUI()
 	BossHPWidget->AddToViewport(-1);
 }
 
-void AAPHUD::DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance)
+void AAPHUD::DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance, uint8 EnhanceSkillNum)
 {
-	if(!EnhanceChoiceClasses[(uint8)UpdateEnHanceType]) return;
+	if(!EnhanceChoiceClass) return;
 
-	auto EnhanceUI = CreateWidget<UAPEnhanceChoice>(GetWorld(), EnhanceChoiceClasses[(uint8)UpdateEnHanceType]); if(!EnhanceUI) return;
+	auto EnhanceUI = CreateWidget<UAPEnhanceChoice>(GetWorld(), EnhanceChoiceClass); if(!EnhanceUI) return;
 	if(bOnlyEnhance) EnhanceUI->SetSkillAppearPercent(0.0f);
-	EnhanceUI->InitType(EnhanceCategory, UpdateEnHanceType);
+	EnhanceUI->InitType(EnhanceCategory, UpdateEnHanceType, EnhanceSkillNum);
 	// ESkillTypeState, EnHanceType 의 정보를 EnhanceUI에게 넘겨주기
 	EnhanceUI->AddToViewport(20);
 }
@@ -197,3 +195,21 @@ void AAPHUD::OpenWorldMap()
 		StageInformationUI->AddToViewport();
 	}
 }
+
+void AAPHUD::StartImitatorSlot()
+{
+	ImitatorSlotUI = CreateWidget<UImitatorSkillSlot>(GetWorld(), ImitatorSlotUIClass);
+	if(ImitatorSlotUI.IsValid()) ImitatorSlotUI->AddToViewport();
+}
+
+void AAPHUD::EndImitatorSlot()
+{
+	if(ImitatorSlotUI.IsValid()) ImitatorSlotUI->RemoveFromParent();
+}
+
+void AAPHUD::UpdateImitatorSlot(uint8 SkillNumber)
+{
+	if(!ImitatorSlotUI.IsValid()) return;
+	ImitatorSlotUI->UpdateSkillSlot(SkillNumber);
+}
+

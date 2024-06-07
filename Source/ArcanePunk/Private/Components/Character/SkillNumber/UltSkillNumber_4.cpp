@@ -13,7 +13,7 @@
 
 UUltSkillNumber_4::UUltSkillNumber_4()
 {
-	OriginCoolTime = 7.0f;
+	SkillAbilityNestingData.SkillName = TEXT("UltSkill_4");
     UltSkill4_TargetRange = 400.0f;
 	UltSkill4_TargetRange_2 = 250.0f;
     UltSkill4_LimitDistance = 650.0f;
@@ -41,10 +41,10 @@ void UUltSkillNumber_4::PlaySkill()
         }
         else
         {
-			if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+			if(!CheckSkillCondition()) return;
             OwnerCharacter->SetDoing(true);
 			Skilling = true;
-			Spawn_UltSkill4();
+			Spawn_SkillRange();
         }
 		
 		// OnSkill();
@@ -52,21 +52,22 @@ void UUltSkillNumber_4::PlaySkill()
     
 }
 
-void UUltSkillNumber_4::Spawn_UltSkill4()
+void UUltSkillNumber_4::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
 
 	ActivateSkillRange_Target(UltSkill4_TargetRange, UltSkill4_TargetRange_2, ESkillRangeType::Two_Circle);
 	if(SkillRange_TWoCircle.IsValid()) SkillRange_TWoCircle->SetMaxDist(UltSkill4_LimitDistance);
-	if(SkillRange_TWoCircle.IsValid()) SkillRange_TWoCircle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_TWoCircle.IsValid()) SkillRange_TWoCircle->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(UltSkill4_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	OwnerCharacter->SetDoing(false);
 	SetComponentTickEnabled(true);
@@ -80,8 +81,8 @@ void UUltSkillNumber_4::OnSkill()
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
     OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
-	
-    
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
+	    
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -108,7 +109,7 @@ void UUltSkillNumber_4::Activate_Skill()
 	if(!BlackHole.IsValid()) return; 
     BlackHole->SetOwner(OwnerCharacter.Get());
     BlackHole->SetHoleRadius(UltSkill4_TargetRange, UltSkill4_TargetRange_2);
-	BlackHole->SetSkill(SkillAbilityNestingData);	
+	BlackHole->SetSkill(SkillAbilityNestingData, this);	
 
 	bActivate = true;
 	Remove_Skill();

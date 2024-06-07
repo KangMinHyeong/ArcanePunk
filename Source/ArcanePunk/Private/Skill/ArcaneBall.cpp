@@ -12,18 +12,18 @@
 
 AArcaneBall::AArcaneBall()
 {
-    BallMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BallMesh"));
+    BallCenter = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BallCenter"));
     BallTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("BallTrigger"));
     BallEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BallEffect"));
     GravityBallTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("GravityBallTrigger"));
 
     SetRootComponent(BallTrigger);
-    BallMesh->SetupAttachment(BallTrigger);
+    BallCenter->SetupAttachment(BallTrigger);
     BallEffect->SetupAttachment(BallTrigger);
     GravityBallTrigger->SetupAttachment(BallTrigger);
 
     BallMoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("BallMoveComp"));
-    UpdateBallSpeed();
+    HomingMoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("HomingMoveComp"));
 
     SkillCategory = ESkillCategory::Projecitle;
 }
@@ -31,7 +31,7 @@ AArcaneBall::AArcaneBall()
 void AArcaneBall::BeginPlay()
 {
     Super::BeginPlay();
-
+    UpdateBallSpeed();
 }
 
 void AArcaneBall::Tick(float DeltaTime)
@@ -46,7 +46,7 @@ void AArcaneBall::Tick(float DeltaTime)
         for(auto Actor : DragegedActors)
         {
             auto Enemy = Cast<AEnemy_CharacterBase>(Actor); if(!Enemy) continue; 
-            if(Enemy->GetMonsterHP() <= 0.001f ) continue;
+            if(Enemy->GetDefaultHP() <= KINDA_SMALL_NUMBER ) continue;
             FVector Current = Enemy->GetActorLocation();
             Current = FMath::VInterpConstantTo(Current, GetActorLocation(), DeltaTime, GravitySpeed);
             Enemy->SetActorLocation(Current);
@@ -55,21 +55,32 @@ void AArcaneBall::Tick(float DeltaTime)
     }
     if(bHoming && !HomingActors.IsEmpty())
     {
-        auto Enemy = Cast<AEnemy_CharacterBase>(HomingActors.Top()); if(!Enemy) {HomingActors.Pop(); HomingOrderSet(); return;}
-        if(Enemy->GetMonsterHP() > 0.001f )
+        auto Enemy = Cast<AEnemy_CharacterBase>(HomingActors.Top()); if(!Enemy) { HomingActors.Pop(); HomingOrderSet(); return;}
+        if(Enemy->GetDefaultHP() > KINDA_SMALL_NUMBER )
         {
-            float speed = BallMoveComp->MaxSpeed;
-            speed = FMath::FInterpConstantTo(speed, 0.01f, DeltaTime, HomingSpeed * 2);
-            BallMoveComp->MaxSpeed = speed;
-
-            FVector Current = GetActorLocation();
-            Current = FMath::VInterpConstantTo(Current, HomingActors.Top()->GetActorLocation(), DeltaTime, HomingSpeed);
-            SetActorLocation(Current);
+            
+            
+            
+		    HomingMoveComp->HomingTargetComponent = Enemy->GetRootComponent();
+            
+            // FVector Current = GetActorLocation();
+            // Current = FMath::VInterpConstantTo(Current, Enemy->GetActorLocation(), DeltaTime, HomingSpeed);
+            // SetActorLocation(Current);
         }
         else
         {
             HomingActors.Pop();
             HomingOrderSet();
+        }
+    }
+    if(bDrag)
+    {
+        CurrentBallSpeed = FMath::FInterpConstantTo(CurrentBallSpeed, 0.01f, DeltaTime, HomingSpeed);
+        BallMoveComp->SetVelocityInLocalSpace(FVector(CurrentBallSpeed, 0.0f, 0.0f));
+        if(CurrentBallSpeed < 1.0f) 
+        {
+            BallMoveComp->SetVelocityInLocalSpace(FVector(0.0f, 0.0f, 0.0f));
+            bDrag = false;  
         }
     }
 }
@@ -91,6 +102,7 @@ void AArcaneBall::BintOverlap()
         BallTrigger->SetCollisionResponseToChannel(ECC_Vehicle, ECollisionResponse::ECR_Block);
         BallTrigger->SetCollisionResponseToChannel(ECC_Destructible, ECollisionResponse::ECR_Block);
         BallMoveComp->bShouldBounce = true;
+        HomingMoveComp->bShouldBounce = true;
     }    
 }
 
@@ -108,7 +120,7 @@ void AArcaneBall::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherAc
     if(OtherActor && OtherActor != this && OtherActor != MyOwner)
 	{
 		if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
-		HitPointComp->DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
+		HitPointComp->DistinctHitPoint(BallHitEffect, OtherActor->GetActorLocation(), OtherActor);
         OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); 
         if(OwnerCharacter.IsValid()) 
         {
@@ -154,7 +166,8 @@ void AArcaneBall::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UP
         if(OtherActor->ActorHasTag(TEXT("Enemy"))) {PenetrateCount--;}
         else {Destroy();}
        	if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
-		HitPointComp->DistinctHitPoint(Hit.Location, OtherActor);
+
+		HitPointComp->DistinctHitPoint(BallHitEffect, Hit.Location, OtherActor);
         OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); 
         if(OwnerCharacter.IsValid()) 
         {
@@ -168,13 +181,15 @@ void AArcaneBall::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UP
 
 void AArcaneBall::UpdateBallSpeed()
 {
+    BallMoveComp->SetVelocityInLocalSpace(FVector(BallSpeed, 0.0f, 0.0f));
     BallMoveComp->MaxSpeed = BallSpeed;
-	BallMoveComp->InitialSpeed = BallSpeed;
+    HomingMoveComp->MaxSpeed = BallSpeed;
+    CurrentBallSpeed = BallSpeed;
 }
 
 float AArcaneBall::GetBallSpeed() const
 {
-    return BallMoveComp->InitialSpeed;
+    return BallSpeed;
 }
 
 void AArcaneBall::SetDeadTime(float DeadTime)
@@ -191,17 +206,6 @@ void AArcaneBall::SetBallRadius(float Radius)
 
 void AArcaneBall::Explosion()
 {
-    // float Size =  GetActorScale3D().Y / DefaultSize;
-    // OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
-    // OwnerCharacter->GetAttackComponent()->MultiAttack(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius * Size, DamageCoefficient, HitNumbers, bStun, StateTime);
-    // DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius* Size, 18, FColor::Green,false, 2.5f);
-
-    // TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_8);
-	// if(SkillNum.IsValid())
-	// {
-	// 	SkillNum->SkillEnd();
-	// } 
-
     Destroy();
     GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
@@ -213,9 +217,16 @@ void AArcaneBall::SpawnGravityBall(float Radius)
     bGravityMode = true;
 }
 
-void AArcaneBall::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneBall::HomingOrderSet()
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::HomingOrderSet();
+    HomingMoveComp->bIsHomingProjectile = true;
+    HomingMoveComp->HomingAccelerationMagnitude = HomingSpeed;
+}
+
+void AArcaneBall::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+{
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
@@ -268,16 +279,17 @@ void AArcaneBall::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
         case 1: // 관통 - 몬스터
         SkillAbilityComponent->Coefficient_Add(PenetrateCount,AbilityData->Coefficient_X, NestingNum);
         PenetrateType = EPenetrateType::Enemy;
+        bPenetrate = true;
         break;
 
         case 2: // 관통 - 오브젝트
         SkillAbilityComponent->Coefficient_Add(PenetrateCount,AbilityData->Coefficient_X, NestingNum);
         PenetrateType = EPenetrateType::Object;
+        bPenetrate = true;
         break;
 
         case 3: // 바운스
         SkillAbilityComponent->Coefficient_Add(PenetrateCount,AbilityData->Coefficient_X, NestingNum);
-        bPenetrate = false;
         break;
     }
 }
@@ -297,12 +309,16 @@ void AArcaneBall::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
 
         case 2: // 기절
         SkillAbilityComponent->Coefficient_Add(StateTime, AbilityData->Coefficient_X, NestingNum);
-        StateTime = FMath::Min(OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_8)->GetCoolTime() *0.8f, StateTime);
+        StateTime = FMath::Min(SkillComp->GetCoolTime() *0.8f, StateTime);
         bStun = true;
+        UE_LOG(LogTemp, Display, TEXT("StateTime %f"), StateTime);
         break;
 
         case 3: // 가장 가까운적 유도
-        GetWorld()->GetTimerManager().SetTimer(HomingTimerHandle, this, &AArcaneBall::HomingOrderSet, AbilityData->Coefficient_X, true);
+        // GetWorld()->GetTimerManager().SetTimer(HomingTimerHandle, this, &AArcaneBall::HomingOrderSet, AbilityData->Coefficient_X, false);
+        bDrag = true;
+        HomingOrderSet();
+        GetWorldTimerManager().ClearTimer(DestroyTimerHandle);   
         break;
     }
 }

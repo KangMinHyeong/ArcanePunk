@@ -7,13 +7,13 @@
 #include "APInteraction_Conversation.generated.h"
 
 UCLASS()
-class ARCANEPUNK_API AAPInteraction_Conversation : public AAPInteractionTriggerBase, public IInteractionInterface
+class ARCANEPUNK_API AAPInteraction_Conversation : public AAPInteractionTriggerBase
 {
 	GENERATED_BODY()
 public:	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual FInteractData GetInteractData() override;
+
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 private:

@@ -31,13 +31,13 @@ void UAPStatusText::UpdatePlayerStatus()
     Gender->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.Gender)));
     CharacterRace->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.CharacterRace)));
     CharacterType->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerStaticData.CharacterType)));
-    HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.HP))));
-    MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.MaxHP))));
+    HP->SetText(FText::FromString(FString::FromInt(round(Character->GetPlayerStatus().PlayerDynamicData.HP))));
+    MaxHP->SetText(FText::FromString(FString::FromInt(round(Character->GetPlayerStatus().PlayerDynamicData.MaxHP))));
     MP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.MP)));
     MaxMP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.MaxMP)));
-    ATK->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetCurrentATK()))));
+    ATK->SetText(FText::FromString(FString::FromInt(round(Character->GetCurrentATK()))));
     ATKSpeed->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), Character->GetPlayerStatus().PlayerDynamicData.ATKSpeed)));
-    DEF->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.DEF))));
-    MoveSpeed->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Character->GetPlayerStatus().PlayerDynamicData.MoveSpeed))));
+    DEF->SetText(FText::FromString(FString::FromInt(round(Character->GetPlayerStatus().PlayerDynamicData.DEF))));
+    MoveSpeed->SetText(FText::FromString(FString::FromInt(round(Character->GetPlayerStatus().PlayerDynamicData.MoveSpeed))));
     SP->SetText(FText::FromString(FString::FromInt(Character->GetPlayerStatus().PlayerDynamicData.SP)));
 }

@@ -48,7 +48,7 @@ void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 	PlayerCharacter->SetCanMove(false);
 	UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
 	SpawnSound(PlayerLocation);
-	PlayerCharacter->GetPlayerPanel()->SetHiddenInGame(true);
+	PlayerCharacter->GetPlayerPanelAura()->SetHiddenInGame(true);
 
 	if((PlayerLocation - PortalInteractionTrigger->GetComponentLocation()).Size() < (PlayerLocation - DestinationTrigger->GetComponentLocation()).Size())
 	{
@@ -74,7 +74,7 @@ void APortal_Normal::BeginPlay()
 void APortal_Normal::StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint)
 {
 	Super::StartTeleport(Character, TeleportPoint);
-	Character->GetPlayerPanel()->SetHiddenInGame(false);
+	Character->GetPlayerPanelAura()->SetHiddenInGame(false);
 
 	auto CharacterPC = Cast<AArcanePunkPlayerController>(Character->GetController()); if(!CharacterPC) return;
     Character->EnableInput(CharacterPC);

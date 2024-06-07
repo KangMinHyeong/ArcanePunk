@@ -13,14 +13,10 @@
 AArcaneCutter::AArcaneCutter()
 {
 	CutterTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("CutterTrigger"));
-	CutterEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("CutterEffect"));
 
 	SetRootComponent(CutterTrigger);
-	CutterEffect->SetupAttachment(CutterTrigger);
 
     CutterMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("CutterMovementComponent"));
-	CutterMovementComponent->MaxSpeed = CutterSpeed;
-	CutterMovementComponent->InitialSpeed = CutterSpeed;
 
     SkillCategory = ESkillCategory::Projecitle;
 }
@@ -28,10 +24,17 @@ AArcaneCutter::AArcaneCutter()
 void AArcaneCutter::BeginPlay()
 {
     Super::BeginPlay();
+
+    GetWorldTimerManager().ClearTimer(DestroyTimerHandle);   
 }
 
 void AArcaneCutter::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
+	CutterSpeed = FMath::FInterpTo(CutterSpeed, 0.0f, DeltaTime, Drag);
+	CutterMovementComponent->SetVelocityInLocalSpace(FVector(CutterSpeed, 0.0f, 0.0f));
+	if(CutterSpeed <= 5.0f) {Destroy();}
 }
 
 void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
@@ -53,21 +56,45 @@ void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, 
 		
 		float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, Hit, true);
 		OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
-		// UGameplayStatics::ApplyDamage(OtherActor, OwnerCharacter->GetCurrentATK()* OwnerCharacter->CriticalCalculate() * DamageCoefficient, MyOwnerInstigator, this, DamageTypeClass);
-        // HitImpact & DestroyEffect
+		if(CutterEffectComp.IsValid()) CutterEffectComp->Deactivate();
 	}
     Destroy();
 }
 
-float AArcaneCutter::GetCutterSpeed() const
+
+void AArcaneCutter::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-    return CutterMovementComponent->InitialSpeed;
+	auto MyOwner = GetOwner();
+	if(MyOwner == nullptr)
+	{
+		Destroy();
+		return;
+	} 
+	auto MyOwnerInstigator = MyOwner->GetInstigatorController();
+	auto DamageTypeClass = UDamageType::StaticClass();
+	
+    if(OtherActor && OtherActor != this && OtherActor != MyOwner)
+	{
+		if(bStun) HitPointComp->SetCrowdControl(OtherActor, ECharacterState::Stun, StateTime);
+		HitPointComp->DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
+
+        float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, OwnerCharacter->GetCurrentATK() * DamageCoefficient, SweepResult, true);
+		OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
+	}
+
+    PenetrateCount--;
+    if(PenetrateCount == 0) {if(CutterEffectComp.IsValid()) CutterEffectComp->Deactivate(); Destroy();}
 }
 
-void AArcaneCutter::SetDeadTime(float DeadTime)
+float AArcaneCutter::GetCutterSpeed() const
 {
-    GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AArcaneCutter::DestroySKill, DeadTime, false);
+    return CutterSpeed;
 }
+
+// void AArcaneCutter::SetDeadTime(float DeadTime)
+// {
+// 	DestroyTime = DeadTime;
+// }
 
 float AArcaneCutter::GetTriggerWide() const
 {
@@ -82,14 +109,97 @@ void AArcaneCutter::DestroySKill()
 void AArcaneCutter::BintHit()
 {
     // CutterTrigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-    CutterTrigger->OnComponentHit.AddDynamic(this, &AArcaneCutter::OnHitting);
+    if(bPenetrate)
+    {
+        CutterTrigger->OnComponentBeginOverlap.AddDynamic(this, &AArcaneCutter::OnOverlap);
+        CutterTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
+    }
+    else
+    {
+        CutterTrigger->OnComponentHit.AddDynamic(this, &AArcaneCutter::OnHitting);
+        CutterTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+    }
+    CutterTrigger->SetCollisionResponseToChannel(ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+    CutterTrigger->SetCollisionResponseToChannel(ECC_WorldStatic, ECollisionResponse::ECR_Block); 
+    CutterTrigger->SetCollisionResponseToChannel(ECC_PhysicsBody, ECollisionResponse::ECR_Block); 
+    CutterTrigger->SetCollisionResponseToChannel(ECC_Vehicle, ECollisionResponse::ECR_Block); 
 }
 
-void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
+	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	CutterMovementComponent->SetVelocityInLocalSpace(FVector(CutterSpeed, 0.0f, 0.0f));
 
-	CutterEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+        CheckSilverEnhance(It.Key, It.Value);
+    }
+    for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+        CheckGoldEnhance(It.Key, It.Value);
+    }
+    for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+        CheckPlatinumEnhance(It.Key, It.Value);
+    }
+    
+    CutterSpeed = CutterDist * Drag;
+	CutterEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), CutterEffect, OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetActorRotation());
+	if(CutterEffectComp.IsValid())
+	{
+		CutterEffectComp->SetNiagaraVariableFloat(TEXT("Speed"),  CutterSpeed);
+		CutterEffectComp->SetNiagaraVariableFloat(TEXT("Drag"),  Drag);
+	}
+	
 	BintHit();
-	CutterTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+	SetActorTickEnabled(true);
 }
+
+
+void AArcaneCutter::CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+	Super::CheckSilverEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+		case 3: // 속도 증가
+		SkillAbilityComponent->Coefficient_AddMultiple(Drag, AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
+}
+
+void AArcaneCutter::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+    Super::CheckGoldEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 2: // 관통
+        SkillAbilityComponent->Coefficient_Add(PenetrateCount,AbilityData->Coefficient_X, NestingNum);
+        PenetrateType = EPenetrateType::Enemy;
+        bPenetrate = true;
+        break;
+    }
+}
+
+void AArcaneCutter::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+    Super::CheckPlatinumEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
+}
+

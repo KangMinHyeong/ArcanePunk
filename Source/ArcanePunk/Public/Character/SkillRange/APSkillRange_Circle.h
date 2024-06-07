@@ -16,7 +16,7 @@ class ARCANEPUNK_API AAPSkillRange_Circle : public AAPSkillRange
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 private:
 

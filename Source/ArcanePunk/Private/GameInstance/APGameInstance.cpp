@@ -43,3 +43,13 @@ void UAPGameInstance::ClearSkillEnhanceData(ESkillKey UpdateSkillKey)
         break;
     }
 }
+
+int32 UAPGameInstance::CheckGoldAmount()
+{
+    int32 Amount = 1;
+    float PlusPercent = FMath::RandRange(0.0f, 100.0f);
+    if(PlusPercent <= GoldPlusPercent) Amount++;
+    OnGettingGold.Broadcast(Amount);
+
+    return Amount;
+}

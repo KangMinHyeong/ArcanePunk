@@ -28,6 +28,8 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	FORCEINLINE uint8 GetTotalSpawnNumber() const {return TotalSpawnNum;};
 	FORCEINLINE FName GetBattleSectionID() const {return BattleSectionID;};
+	FORCEINLINE USceneComponent* GetSpawnRoot() const {return SpawnRoot;};
+	FORCEINLINE USceneComponent* GetSpawnRoot2() const {return SpawnRoot2;};
 
 	bool CheckSpawnEnd();
 

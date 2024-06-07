@@ -25,9 +25,9 @@ void AAPSkillRange_Circle::Tick(float DeltaTime)
 	}
 }
 
-void AAPSkillRange_Circle::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AAPSkillRange_Circle::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     
     MaxDistance = MaxDistance * (GetActorScale3D().Z / DefaultSize);
     

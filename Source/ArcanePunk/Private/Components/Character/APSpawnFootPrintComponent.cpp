@@ -94,7 +94,7 @@ void UAPSpawnFootPrintComponent::SpawnSound(USoundBase* Sound, FVector Location)
 {
 	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-	float SoundVolume = GI->GameSoundVolume.MasterVolume * GI->GameSoundVolume.EffectVolume;
+	float SoundVolume = GI->GetGameSoundVolume().MasterVolume * GI->GetGameSoundVolume().EffectVolume;
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Sound, Location, FRotator::ZeroRotator, SoundVolume * SoundCoefficient);
 }
 

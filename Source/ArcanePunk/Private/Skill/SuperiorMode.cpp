@@ -53,9 +53,9 @@ void ASuperiorMode::SpawnAddtionalAttack(float Dist, float Width)
     } 
 }
 
-void ASuperiorMode::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ASuperiorMode::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(SuperiorModeEffect, OwnerCharacter->GetMesh(), TEXT("WindRushEffect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);

@@ -25,7 +25,7 @@ void USkillNumber17::PlaySkill()
 	
 	if(bActivate) return;
 
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+	if(!CheckSkillCondition()) return;
 	bActivate = true;
 	Skilling = true;
 	OnSkill();
@@ -38,10 +38,12 @@ void USkillNumber17::OnSkill()
 	
 	Activate_Skill();
     Remove_Skill();
+	OwnerCharacter->OnSkillEndTrigger.RemoveDynamic(this, &USkillNumberBase::SkillEnd);
 }
 
 void USkillNumber17::Activate_Skill()
 {
+	Super::Activate_Skill();
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(OwnerCharacter->GetAPSkillHubComponent()->GetSkill17Effect(), OwnerCharacter->GetMesh(), TEXT("Skill17Effect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);
     NC->SetNiagaraVariableFloat(TEXT("Time"), BuffTime);
 
@@ -51,6 +53,7 @@ void USkillNumber17::Activate_Skill()
 
 void USkillNumber17::SkillEnd()
 {
+	Super::SkillEnd();
     GetWorld()->GetTimerManager().ClearTimer(Skill17_TimerHandle);
     // NC->DestroyComponent();
 	bActivate = false; 

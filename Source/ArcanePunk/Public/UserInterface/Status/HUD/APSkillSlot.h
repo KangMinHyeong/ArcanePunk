@@ -11,6 +11,7 @@ class UImage;
 class UTextBlock;
 class UBorder;
 class AArcanePunkCharacter;
+class UAPGameInstance;
 
 UCLASS()
 class ARCANEPUNK_API UAPSkillSlot : public UUserWidget
@@ -31,12 +32,12 @@ public:
 	void SetUsingSkill(bool NewBool);
 	void StartSkillCoolTime(ESkillKey UpdateSkillKey);
 	void CheckChargeTime(ESkillKey UpdateSkillKey);
+	void SetChargeTimeText(ESkillKey UpdateSkillKey);
 
 private:
 	void SetCoolTimePercent();
 	void SetCoolTimeText();
 	void SetChargeTimePercent();
-    void SetChargeTimeText();
 
 	void SkillCoolDown();
 	float GetCurrentCoolTime();
@@ -45,6 +46,7 @@ private:
 	float GetCurrentChargeTime();
 
 	void SetSkillLimit(bool NewBool);
+	void SetSkillSlotImage(uint8 SkillNumber);
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -52,9 +54,6 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* Text_SkillKey;
-
-	UPROPERTY(EditAnywhere)
-	UDataTable* SkillSlotDataTable;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* SkillUsingImage;
@@ -92,6 +91,7 @@ private:
 	FTimerHandle ChargeTimerHandle;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<UAPGameInstance> APGI;
 
 	ESkillKey CurrentSkillKey;
 

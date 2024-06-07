@@ -22,7 +22,17 @@ enum class EBuffType : uint8
 	Damage		 = 4,
 };
 
+UENUM(BlueprintType)
+enum class EPenetrateType : uint8 // 관통 종류
+{
+	None 	= 0 UMETA(DisplayName = "None"),
+	Enemy 	= 1 UMETA(DisplayName = "Enemy 관통"),
+	Object 	= 2 UMETA(DisplayName = "Object 관통"),
+	Both 	= 3	UMETA(DisplayName = "모두 관통")
+};
+
 class AEnemy_CharacterBase;
+class USkillNumberBase;
 
 UCLASS()
 class ARCANEPUNK_API AAPSkillActorBase : public AActor, public ISkillInterface
@@ -45,7 +55,7 @@ protected:
 	
 	void HitDelay(AActor* DamagedActor, float Damage, uint8 HitNums, float DelayTime, bool bCriticalApply);
 
-	void HomingOrderSet();
+	virtual void HomingOrderSet();
 
 	void CheckBuff(bool NewBool);
 	bool CheckSkillKey(USkillNumberBase* SkillNum);
@@ -53,7 +63,7 @@ protected:
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	virtual void OnCharging();
 
 	FORCEINLINE void SetbStun(bool NewBool) {bStun = NewBool;};
@@ -65,6 +75,7 @@ public:
 	FORCEINLINE float GetStateTime() const {return StateTime;};
 	FORCEINLINE float GetDamage() const {return CurrentDamage;};
 	FORCEINLINE bool IsSlow() const {return bSlow;};
+	FORCEINLINE void SetbCharging(bool NewBool) {bCharging = NewBool;};
 	virtual void SetDeadTime(float DeadTime);
 
 protected:
@@ -149,6 +160,13 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	float HitDelayTime = 0.25f;
+
+	TWeakObjectPtr<USkillNumberBase> SkillComp;
+
+	// 관통 관련
+	int32 PenetrateCount = 1;
+	bool bPenetrate = false;
+	EPenetrateType PenetrateType = EPenetrateType::None;
 	
 public:
 	float DefaultSize = 1.0f;

@@ -38,7 +38,7 @@ void ADamageText::Tick(float DeltaTime)
 
 void ADamageText::SetDamageText(float Damage, bool bCriticalAttack)
 {
-    MyTextRender->SetText(FText::FromString(FString::FromInt((int)Damage)));
+    MyTextRender->SetText(FText::FromString(FString::FromInt(round(Damage))));
 	
 	if(bCriticalAttack)
 	{

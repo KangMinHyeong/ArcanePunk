@@ -26,7 +26,7 @@ void ABomberMan::BeginPlay()
 
 void ABomberMan::FastBuff()
 {
-    OwnerCharacter->GetCrowdControlComponent()->FastState(FastCoefficient, DestroyTime);
+    OwnerCharacter->GetCrowdControlComp()->FastState(FastCoefficient, DestroyTime);
 }
 
 void ABomberMan::DestroySKill()
@@ -50,9 +50,9 @@ void ABomberMan::OnExplosion()
     }
 }
 
-void ABomberMan::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ABomberMan::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
 
     BomberTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);

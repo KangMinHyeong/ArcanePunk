@@ -28,7 +28,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_UltSkill9();	
+	virtual void Spawn_SkillRange() override;
 	void SetBoomLocation();
 	
 private:

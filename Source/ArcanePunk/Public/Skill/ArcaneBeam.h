@@ -9,7 +9,6 @@
 class UNiagaraSystem;
 class UBoxComponent;
 class UNiagaraComponent;
-class USkillNumberBase;
 
 UCLASS()
 class ARCANEPUNK_API AArcaneBeam : public AAPSkillActorBase
@@ -25,7 +24,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetBeamEffect();
 	void SetBeamAttack();
@@ -36,7 +35,13 @@ public:
 	void OnChargingEnhance();
 private:
 	void OnChargindCheck(float DeltaTime);
+	void SetSkillComp();
 
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+
+	void FireEnd();
 protected:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BeamBox;
@@ -54,6 +59,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	float Distance = 1000.0f;
+	float InitDist = 750.0f;
 
 	UPROPERTY(EditAnywhere)
 	FVector BeamScale = FVector(1,1,1);
@@ -64,14 +70,14 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float BeamRadius = 15.0f;
+	float InitRadius = 50.0f;
 
 	FTimerHandle BeamHitLoopTimerHandle;
+	FTimerHandle BeamTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float BeamHitLoopTime = 0.3f;
 	
-	TWeakObjectPtr<USkillNumberBase> Skill_5;
-
 	UPROPERTY(EditAnywhere)
 	float MaxDamageCoefficient = 3.0f;
 
@@ -79,6 +85,9 @@ protected:
 	float InitIncreasingSpeed = 1.0f;
 
 	float IncreasingSpeed = 1.0f;
+
+	float OriginTime = 0.72;
+	float BeamTime;
 
 	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
 	TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;

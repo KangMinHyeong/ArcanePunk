@@ -26,12 +26,12 @@ void ASwordThrow_Teleport::ActiveMark(AActor *OtherActor)
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());
     if(!OwnerCharacter.IsValid()) return;
 
-    Enemy->TeleportMarkActivate(DestroyTime, GetOwner());
+    Enemy->TeleportMarkActivate(DestroyTime, GetOwner(), SkillComp.Get());
 
-    TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
-	if(SkillNum.IsValid())
+    // TWeakObjectPtr<USkillNumberBase> SkillNum = OwnerCharacter->GetAPSkillHubComponent()->GetSKillNumberComponent(ESkillNumber::Skill_2);
+	if(SkillComp.IsValid())
 	{
-		SkillNum->MarkingOn(OtherActor, DestroyTime);
+		SkillComp->MarkingOn(OtherActor, DestroyTime);
 	} 
 }
 

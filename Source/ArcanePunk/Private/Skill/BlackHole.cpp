@@ -39,7 +39,7 @@ void ABlackHole::Tick(float DeltaTime)
     for(auto Actor : DragegedActors)
     {
         auto Enemy = Cast<AEnemy_CharacterBase>(Actor); if(!Enemy) continue; 
-        if(Enemy->GetMonsterHP() <= 0.001f ) continue;
+        if(Enemy->GetDefaultHP() <= KINDA_SMALL_NUMBER ) continue;
         FVector Current = Enemy->GetActorLocation();
         Current = FMath::VInterpConstantTo(Current, GetActorLocation(), DeltaTime, GravitySpeed);
         Enemy->SetActorLocation(Current); 
@@ -109,9 +109,9 @@ void ABlackHole::UpdateSlowPercent(FVector EnemyLocation)
     HitPointComp->SetSlowPercent(SlowPercent * size);
 }
 
-void ABlackHole::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ABlackHole::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
     BlackHoleEffect->SetNiagaraVariableFloat(TEXT("CastingTime"),  CastingTime);

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Interfaces/SkillInterface.h"
 
@@ -7,6 +5,6 @@
 // {
 // }
 
-void ISkillInterface::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ISkillInterface::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
 }

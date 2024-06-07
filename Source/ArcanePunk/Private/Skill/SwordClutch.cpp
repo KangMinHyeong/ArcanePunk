@@ -66,14 +66,15 @@ void ASwordClutch::SpawnClutchTrigger()
             ClutchTrigger->SetClutchSphere(Wide/2.0f);
             ClutchTrigger->SetDestroy(DestroyTime);
             ClutchTrigger->SetSlowPercent(SlowPercent);
+            ClutchTrigger->SetSkill(SkillAbilityData, SkillComp.Get());
         }
     }
     
 }
 
-void ASwordClutch::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void ASwordClutch::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData); // Wide 곱해주기 추가
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent); // Wide 곱해주기 추가
     if(!OwnerCharacter.IsValid()) return;
     
     CurrentDamage = OwnerCharacter->GetCurrentATK() * DamageCoefficient;

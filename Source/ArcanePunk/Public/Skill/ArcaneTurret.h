@@ -25,7 +25,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;

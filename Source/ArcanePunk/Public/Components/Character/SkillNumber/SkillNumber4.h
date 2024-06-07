@@ -31,7 +31,7 @@ public:
 	virtual void UpdateSkillData() override;
 
 private:
-	void Spawn_Skill4();
+	virtual void Spawn_SkillRange() override;
 	virtual void AddAbilityList() override;
 	
 private:

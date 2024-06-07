@@ -22,9 +22,9 @@ FReply UAPStageSlotUI::NativeOnMouseButtonDoubleClick( const FGeometry& InGeomet
 
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return Reply.Handled();
 
-    if(!GI->CanEnterStage.Contains(BattleStageLevelName)) return Reply.Handled();
+    if(!GI->GetCanEnterStage().Contains(BattleStageLevelName)) return Reply.Handled();
 
-    if(GI->CanEnterStage[BattleStageLevelName])
+    if(GI->GetCanEnterStage()[BattleStageLevelName])
     {   
         UGameplayStatics::OpenLevel(GetWorld(), BattleStageLevelName);
     }
@@ -36,9 +36,9 @@ void UAPStageSlotUI::CheckLock()
 {
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    if(!GI->CanEnterStage.Contains(BattleStageLevelName)) return;
+    if(!GI->GetCanEnterStage().Contains(BattleStageLevelName)) return;
 
-    if(GI->CanEnterStage[BattleStageLevelName])
+    if(GI->GetCanEnterStage()[BattleStageLevelName])
     {   
         Switcher_CanEnter->SetActiveWidget(Unlocked);
     }

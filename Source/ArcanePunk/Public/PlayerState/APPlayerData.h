@@ -72,37 +72,40 @@ struct FPlayerDynamicData
 	bool SaveOperation = false;
 
 	// Player Status
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float HP = 100.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float MaxHP = 100.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	int32 MP = 3;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	int32 MaxMP = 3;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float ATK = 25.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float ATKSpeed = 1.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float DEF = 0.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float MoveSpeed = 500.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	int32 SP = 500.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float CriticalPercent = 10.0f;
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
+	float CriticalDamageCoefficient = 2.0f;
+
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	int32 CriticalStep = 1;
 
 	// Player Location
@@ -131,16 +134,16 @@ struct FPlayerTotalData
 
 	FPlayerTotalData() {}
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	FPlayerStaticData PlayerStaticData = {};
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	FPlayerDynamicData PlayerDynamicData = {};
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	FPlayerGoodsData PlayerGoodsData = {};
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	FString SaveSlotName = TEXT("PlayerSlot_0");
 };
 

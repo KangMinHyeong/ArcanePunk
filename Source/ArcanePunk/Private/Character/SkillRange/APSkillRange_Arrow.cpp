@@ -19,9 +19,9 @@ void AAPSkillRange_Arrow::Tick(float DeltaTime)
 	}
 }
 
-void AAPSkillRange_Arrow::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData)
+void AAPSkillRange_Arrow::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
-    Super::SetSkill(SkillAbilityNestingData);
+    Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     // if(SkillAbility.Contains(ESkillAbility::Stun)) bStun = true;
     
     MaxDistance = MaxDistance * (GetActorScale3D().Z / DefaultSize);
@@ -45,7 +45,7 @@ void AAPSkillRange_Arrow::ObstacleCheck()
     }
     else {return;}
 
-    HitPoint = HitPoint - GetActorLocation();  HitPoint = HitPoint/HitPoint.Size(); 
+    HitPoint = HitPoint - GetActorLocation(); HitPoint = HitPoint/HitPoint.Size();  
 
     FHitResult Hits;
     FCollisionShape Shape = FCollisionShape::MakeSphere(RangeDecal->DecalSize.Y/2.0f);
@@ -66,7 +66,7 @@ void AAPSkillRange_Arrow::ObstacleCheck()
 
     RangeDecal->SetRelativeLocation(FVector(TargetDistance, 0.0f, 0.0f));
     
-    HitPoint.Z = 0.0f;
+    HitPoint.Z = 0.0f; RotVector = HitPoint; 
     SetActorRotation(FRotationMatrix::MakeFromX(HitPoint).Rotator());
 
     if(SkillRangeType == ESkillRangeType::Arrow) RangeDecal->DecalSize.Z = TargetDistance;

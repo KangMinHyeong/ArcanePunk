@@ -22,18 +22,12 @@ void AAPInteraction_SelectStage::EndFocus()
     GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
 }
 
-FInteractData AAPInteraction_SelectStage::GetInteractData()
-{
-    return InteractionTrigger->GetInteractionData();
-}
-
 void AAPInteraction_SelectStage::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
+    Super::Interact(PlayerCharacter);
     if(!PlayerCharacter) return;
 
     auto PC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!PC) return;
     PC->OpenStageSelectingUI(this);
-    
-    PlayerCharacter->SetInteraction(false);
-    PlayerCharacter->InteractionActorRemove(this);
+
 }

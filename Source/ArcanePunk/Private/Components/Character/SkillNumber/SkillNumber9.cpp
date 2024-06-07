@@ -51,10 +51,10 @@ void USkillNumber9::PlaySkill()
         }
         else
         {
-			if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey) || CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+			if(!CheckSkillCondition()) return;
             OwnerCharacter->SetDoing(true);
 			Skilling = true;
-			Spawn_Skill9();
+			Spawn_SkillRange();
         }
 		
 		// OnSkill();
@@ -62,21 +62,22 @@ void USkillNumber9::PlaySkill()
     
 }
 
-void USkillNumber9::Spawn_Skill9()
+void USkillNumber9::Spawn_SkillRange()
 {
+	Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
 	OwnerCharacterPC->bShowMouseCursor = false;
 	CursorImmediately();
 
-	if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_9);}
+	// if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick(ESkillNumber::Skill_9);}
 
 	ActivateSkillRange_Target(Skill9_TargetRange, Skill9_TargetRange, ESkillRangeType::Control_Circle);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill9_LimitDistance);
-	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
 	ActivateSkillRange_Round(Skill9_LimitDistance);
-	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+	if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
 	// OwnerCharacter->GetAPSkillHubComponent()->RemoveSkillState();
 	OwnerCharacter->SetDoing(false);
@@ -90,7 +91,10 @@ void USkillNumber9::OnSkill()
 	if(!OwnerCharacter.IsValid()) return; OwnerCharacter->SetDoing(true);
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, true);
-    
+    OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
+	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
 
@@ -106,6 +110,7 @@ void USkillNumber9::OnSkill()
 
 void USkillNumber9::Activate_Skill()
 {
+	Super::Activate_Skill();
     if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 	CurrentChargeNum--;
 	OwnerCharacter->GetAPHUD()->OnChargeTime.Broadcast(SkillKey);
@@ -120,7 +125,7 @@ void USkillNumber9::Activate_Skill()
     ArcaneMine->SetOwner(OwnerCharacter.Get());
 	ArcaneMine->SetExplosionRadius(Skill9_TargetRange);
 	ArcaneMine->SetTarget(SpawnLocation);
-	ArcaneMine->SetSkill(SkillAbilityNestingData);	
+	ArcaneMine->SetSkill(SkillAbilityNestingData, this);	
 
 	bActivate = true;
 	Remove_Skill();
@@ -128,6 +133,7 @@ void USkillNumber9::Activate_Skill()
 
 void USkillNumber9::SkillEnd()
 {
+	Super::SkillEnd();
 	bActivate = false; 
 	
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
@@ -141,12 +147,12 @@ void USkillNumber9::UpdateSkillData()
 	
 	float Dist = Skill9_LimitDistance_Origin;
 	float Wide = Skill9_TargetRange_Origin;
-	float Cool = OriginCoolTime;
+	float Cool = SkillNameListData.CoolTime;
 	int32 Charge = MaxChargeNum_Origin;
 	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
     {
-        if(It.Key == 1){UpdatAbilityData(EEnHanceType::Silver, It.Key); Dist = OwnerCharacter->GetAPSkillAbility()->Coefficient_Multiple_Return(Dist, AbilityData->Coefficient_X, It.Value); }// 사거리 강화}
-		if(It.Key == 2) {UpdatAbilityData(EEnHanceType::Silver, It.Key); Wide = OwnerCharacter->GetAPSkillAbility()->Coefficient_Multiple_Return(Wide, AbilityData->Coefficient_X, It.Value); }// 사이즈 강화}
+        if(It.Key == 1){UpdatAbilityData(EEnHanceType::Silver, It.Key); OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Dist, AbilityData->Coefficient_X, It.Value); }// 사거리 강화}
+		if(It.Key == 2) {UpdatAbilityData(EEnHanceType::Silver, It.Key); OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Wide, AbilityData->Coefficient_X, It.Value); }// 사이즈 강화}
     }
     // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
     // {
@@ -164,4 +170,12 @@ void USkillNumber9::UpdateSkillData()
 	Skill9_LimitDistance = Dist;
 	Skill9_TargetRange = Wide;
 	CurrentCoolTime = Cool;
+}
+
+bool USkillNumber9::CheckSkillCondition()
+{
+	bool Check = Super::CheckSkillCondition();
+	if(CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); Check = false;}
+
+    return Check;
 }

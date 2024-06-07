@@ -19,7 +19,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void AddItem(FName ItemID);
-	void AddEnhance(uint8 EnhanceCategoryNum);
+	void AddEnhance();
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
@@ -28,7 +28,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	EEnhanceCategory GetRandCategory();
+	int32 CheckGoldAmount();
+	
 private:
 	UPROPERTY()
 	TArray<UAPItemBase*> ItemsInPackage;
@@ -39,6 +41,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "EnHanceType Percent")
 	TArray<float> EnHanceTypePercent; // 0.0f ~ 100.0f percent;
+
+	UPROPERTY(EditAnywhere, Category = "EnHanceCategory Percent")
+	TMap<EEnhanceCategory, float> EnHanceCategoryPercent; // 0.0f ~ 100.0f percent;
 
 	FTimerHandle InteractTimerHandle;
 

@@ -23,7 +23,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	void StartFireCheck();
 	void StartFire();
 	virtual void DestroySKill() override;	

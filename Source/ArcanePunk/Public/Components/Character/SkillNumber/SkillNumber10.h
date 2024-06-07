@@ -26,9 +26,11 @@ public:
 
 	virtual void UpdateSkillData() override;
 
+	virtual bool CheckSkillCondition() override;
+
 private:
 	virtual void AddAbilityList() override;
-	void Spawn_Skill10();
+	virtual void Spawn_SkillRange() override;
 
 private:
 	float Skill10_TargetRange = 60.0f;

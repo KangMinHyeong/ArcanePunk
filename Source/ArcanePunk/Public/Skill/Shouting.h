@@ -22,8 +22,12 @@ public:
 protected:
 	virtual void BeginPlay() override;	
 
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData) override;
+	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	
 	void SetShoutingEffect();
 	void SetShoutingAttack();
@@ -42,4 +46,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float ShoutRadius = 550.0f;
+
+	float InitShoutRadius;
 };	

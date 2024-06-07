@@ -13,7 +13,7 @@
 
 UUltSkillNumber_3::UUltSkillNumber_3()
 {
-	OriginCoolTime = 7.0f;
+    SkillAbilityNestingData.SkillName = TEXT("UltSkill_3");
 }
 
 void UUltSkillNumber_3::BeginPlay()
@@ -38,21 +38,22 @@ void UUltSkillNumber_3::PlaySkill()
             OwnerCharacter->SetDoing(true);
             Skilling = true;
 
-            Spawn_UltSkill3();
+            Spawn_SkillRange();
         }
         else
         {
-            if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP <= 0 || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+            if(!CheckSkillCondition()) return;
             OwnerCharacter->SetDoing(true);
             Skilling = true;
             
-            Spawn_UltSkill3();
+            Spawn_SkillRange();
         }
 	}
 }
 
-void UUltSkillNumber_3::Spawn_UltSkill3()
+void UUltSkillNumber_3::Spawn_SkillRange()
 {
+    Super::Spawn_SkillRange();
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 
     if(!bActivate)
@@ -60,10 +61,10 @@ void UUltSkillNumber_3::Spawn_UltSkill3()
         OwnerCharacterPC->CurrentMouseCursor = EMouseCursor::Crosshairs;
         CursorImmediately();
 
-        if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult(true);}
+        // if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult(true);}
         
         ActivateSkillRange_Round(Ult3_CircleRange);
-        if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData);	
+        if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetSkill(SkillAbilityNestingData, this);	
 
         if(CheckSmartKey(SkillKey))
         {
@@ -78,11 +79,11 @@ void UUltSkillNumber_3::Spawn_UltSkill3()
         OwnerCharacterPC->bShowMouseCursor = false;
         CursorImmediately();
 
-        if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
+        // if(!CheckSmartKey(SkillKey)) {OwnerCharacterPC->PreventOtherClick_Ult();}
         
         ActivateSkillRange_Target(Ult3_TargetWidth, Ult3_TargetRange, ESkillRangeType::Arrow);
         if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Ult3_TargetRange);
-        if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData);	
+        if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
         if(CheckSmartKey(SkillKey))
         {
@@ -100,6 +101,7 @@ void UUltSkillNumber_3::Spawn_UltSkill3()
 void UUltSkillNumber_3::OnSkill()
 { 
     if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+    
 
     if(!bActivate)
     {
@@ -121,11 +123,13 @@ void UUltSkillNumber_3::OnSkill()
                 TargetEnemy = Hit.GetActor();
                 CharacterRotation_Cursor(Hit);
                 Activate_Skill();
+                OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
             }
         }
     }
     else
     {
+        OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
         SetComponentTickEnabled(false);
         if(!OwnerCharacter.IsValid()) return; 
 
@@ -157,7 +161,7 @@ void UUltSkillNumber_3::Activate_Skill()
         ArcaneExecution->SetOwner(OwnerCharacter.Get());
         ArcaneExecution->SetTargetEnemy(Cast<ACharacter>(TargetEnemy));
         ArcaneExecution->SetExecutionType(1);
-        ArcaneExecution->SetSkill(SkillAbilityNestingData);	
+        ArcaneExecution->SetSkill(SkillAbilityNestingData, this);	
         OwnerAnim->PlayUltSkill_3_Montage();
     }
     else
