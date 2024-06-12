@@ -11,6 +11,7 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Character/SkillRange/APSkillRange.h"
+#include "Enemy/Enemy_CharacterBase.h"
 
 AArcaneBeam::AArcaneBeam()
 {    
@@ -98,8 +99,26 @@ void AArcaneBeam::SetBeamEffect()
 void AArcaneBeam::SetBeamAttack()
 {
     if(!OwnerCharacter.IsValid()) return;
-    OwnerCharacter->GetAttackComponent()->MultiAttack(BeamStart, BeamEnd, BeamRadius, DamageCoefficient, 1, bStun, StateTime);
+    auto Actors = OwnerCharacter->GetAttackComponent()->MultiAttack_Return(BeamStart, BeamEnd, BeamRadius, DamageCoefficient, 1, InstantDeathPercent, bStun, StateTime);
     GetWorldTimerManager().SetTimer(BeamHitLoopTimerHandle, this, &AArcaneBeam::SetBeamAttack, BeamHitLoopTime, false);
+    
+    if(AddCool)
+    {
+        if(KillsNum < 3)
+        {
+            for(auto Actor : Actors)
+            {
+                auto Enemy = Cast<AEnemy_CharacterBase>(Actor); if(!Enemy) continue;
+                if(Enemy->IsDead()) {KillsNum++;}
+            }
+        }
+
+        if(KillsNum >= 3)
+        {
+            UE_LOG(LogTemp, Display, TEXT("Your message"));
+            SkillComp->AddCoolTime(AddCoolTime);
+        }
+    }
 }
 
 void AArcaneBeam::FireEnd()
@@ -179,6 +198,11 @@ void AArcaneBeam::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
     {
         case 1: // Damage Up
         SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 2: // 3 Kills 
+        AddCool = true;
+        SkillAbilityComponent->Coefficient_Add(AddCoolTime,AbilityData->Coefficient_X, NestingNum);
         break;
     }
 }

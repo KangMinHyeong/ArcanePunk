@@ -89,6 +89,10 @@ protected:
 	float OriginTime = 0.72;
 	float BeamTime;
 
+	bool AddCool = false;
+	uint8 KillsNum = 0;
+	float AddCoolTime = 0.0f;
+
 	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
 	TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;
 };

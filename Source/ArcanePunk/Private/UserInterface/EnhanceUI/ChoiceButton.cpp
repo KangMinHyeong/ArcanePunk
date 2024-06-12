@@ -4,6 +4,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/SizeBox.h"
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Character/ArcanePunkCharacter.h"
@@ -58,7 +59,7 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkil
 void UChoiceButton::SetNewSkill(UUserWidget* UpdateParentWidget, uint8 UpdateSkillNumber)
 {
     bEnhance = false;
-    
+    SizeBox_Nesting->SetVisibility(ESlateVisibility::Hidden);
     ParentWidget = Cast<UAPEnhanceChoice>(UpdateParentWidget);
     SkillNumber = UpdateSkillNumber;
 
@@ -101,6 +102,9 @@ void UChoiceButton::BindButton()
 
     Choice_Button->OnHovered.AddDynamic(this, &UChoiceButton::OnChoiceButton_Hovered);
     Choice_Button->OnUnhovered.AddDynamic(this, &UChoiceButton::OnChoiceButton_UnHovered);
+
+    Reroll_Button->OnHovered.AddDynamic(this, &UChoiceButton::OnRerollButton_Hovered);
+    Reroll_Button->OnUnhovered.AddDynamic(this, &UChoiceButton::OnRerollButton_UnHovered);
 }
 
 void UChoiceButton::OnClickChoice()
@@ -114,7 +118,6 @@ void UChoiceButton::OnReroll()
     if(!ParentWidget.IsValid()) return;
     ParentWidget->OnReroll(ChoiceIndexNum);
     // SetChoiceButton();
-
 }
 
 void UChoiceButton::ApplyChoice()

@@ -28,24 +28,40 @@ public:
 
 	void InitStatusBar();
 	
+	UFUNCTION()
 	void SetMaxHP(float NewValue);
+	UFUNCTION()
 	void SetHPPercent(float Origin);
 	
+	UFUNCTION()
 	void AddMaxMP(uint8 NewValue);
+	UFUNCTION()
 	void UpdateMPBar(uint8 Number, bool bUse = true);
-	void RecoveryMP(uint8 Number);
+
+	UFUNCTION()
 	void IncreaseMaxMP(uint8 Number);
 
+	UFUNCTION()
 	void UpdateSkillSlot(ESkillKey SkillKey, uint8 SkillNumber);
+	UFUNCTION()
 	void OperateSkillSlot(ESkillKey SkillKey);
+	UFUNCTION()
 	void HightLightSkillSlot(ESkillKey SkillKey);
+	UFUNCTION()
 	void UsingSkillSlot(ESkillKey SkillKey, bool NewBool);
-	void StartCoolTimeSlot(ESkillKey SkillKey);
+	UFUNCTION()
+	void StartCoolTimeSlot(ESkillKey SkillKey, float CoolTime);
+	UFUNCTION()
 	void CheckChargeTime(ESkillKey SkillKey);
+	UFUNCTION()
 	void ChangeCharginNum(ESkillKey SkillKey);
+	UFUNCTION()
 	void ChargeGauge(float Currnet, float Max);
+	UFUNCTION()
 	void ChargeEnd(bool Start);
-	
+	UFUNCTION()
+	void AddSkillCoolTime(ESkillKey SkillKey, float AddTime);
+
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPHPBar* APHPBar;

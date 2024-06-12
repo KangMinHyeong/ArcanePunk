@@ -32,6 +32,8 @@ public:
 	void SetShoutingEffect();
 	void SetShoutingAttack();
 
+	FORCEINLINE void SetLionHowling(bool NewBool) {LionHowling = NewBool;};
+
 private:
 	UPROPERTY()
 	UBoxComponent* ShoutingRoot;
@@ -48,4 +50,6 @@ private:
 	float ShoutRadius = 550.0f;
 
 	float InitShoutRadius;
+
+	bool LionHowling = false;
 };	

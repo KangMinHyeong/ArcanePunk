@@ -65,15 +65,15 @@ void USkillNumber5::Spawn_SkillRange()
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetMaxDist(Skill5_LimitDistance);
 	if(SkillRange_Target.IsValid()) SkillRange_Target->SetSkill(SkillAbilityNestingData, this);	
 
-	if(CheckSmartKey(SkillKey))
-	{
-		OwnerCharacterPC->bShowMouseCursor = true;
-		CursorImmediately();
-		SkillRange_Target->SetActorHiddenInGame(true);
-	}
+	// if(CheckSmartKey(SkillKey))
+	// {
+	// 	OwnerCharacterPC->bShowMouseCursor = true;
+	// 	CursorImmediately();
+	// 	SkillRange_Target->SetActorHiddenInGame(true);
+	// }
 
 	OwnerCharacter->SetDoing(false);
-	SetComponentTickEnabled(true);
+	// SetComponentTickEnabled(true);
 }
 
 void USkillNumber5::OnSkill()
@@ -83,11 +83,11 @@ void USkillNumber5::OnSkill()
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 	OwnerCharacter->SetDoing(true);
 
-	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumberBase::Activate_Skill);
-	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumberBase::SkillEnd);
-	OwnerCharacter->OnSkillChargingTrigger.AddDynamic(this, &USkillNumberBase::Enhance);
-	OwnerCharacter->OnSkillEnhanceTrigger.AddDynamic(this, &USkillNumberBase::DoubleEnhance);
-	OwnerCharacter->OnSkillRotationTrigger.AddDynamic(this, &USkillNumberBase::Remove_Skill);
+	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &USkillNumber5::Activate_Skill);
+	OwnerCharacter->OnSkillEndTrigger.AddDynamic(this, &USkillNumber5::SkillEnd);
+	OwnerCharacter->OnSkillChargingTrigger.AddDynamic(this, &USkillNumber5::Enhance);
+	OwnerCharacter->OnSkillEnhanceTrigger.AddDynamic(this, &USkillNumber5::DoubleEnhance);
+	OwnerCharacter->OnSkillRotationTrigger.AddDynamic(this, &USkillNumber5::Remove_Skill);
 	    
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
 	if(!OwnerAnim) return;
@@ -130,7 +130,7 @@ void USkillNumber5::Activate_Skill()
 void USkillNumber5::Remove_Skill()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
-	OwnerCharacter->OnSkillRotationTrigger.RemoveDynamic(this, &USkillNumberBase::Remove_Skill);
+	OwnerCharacter->OnSkillRotationTrigger.RemoveDynamic(this, &USkillNumber5::Remove_Skill);
 	CharacterRotation();
 	
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
@@ -151,12 +151,13 @@ void USkillNumber5::SkillEnd()
 	Super::SkillEnd();
 	if(!OwnerCharacter.IsValid()) return;
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
-	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	AddSkillCoolTime = 0.0f;
 
-	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
-	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumberBase::Enhance);
-	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumberBase::DoubleEnhance);
-	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
+	// OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumber5::Activate_Skill);
+	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumber5::Enhance);
+	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumber5::DoubleEnhance);
+	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumber5::OnSkill);
 
 	if(ArcaneBeam.IsValid()) ArcaneBeam->DestroySKill();
 }

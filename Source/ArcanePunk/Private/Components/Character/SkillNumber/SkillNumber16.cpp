@@ -60,7 +60,8 @@ void USkillNumber16::SkillEnd()
     GetWorld()->GetTimerManager().ClearTimer(Skill16_TimerHandle);
 	bActivate = false; 
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
-	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	AddSkillCoolTime = 0.0f;
 }
 
 void USkillNumber16::UpdateSkillData()

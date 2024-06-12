@@ -45,6 +45,8 @@ private:
 	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 
+	void Explosion();
+
 private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* CutterTrigger;
@@ -65,4 +67,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	UProjectileMovementComponent* CutterMovementComponent;
 	
+	bool bExplosion = false;
+	float ExplosionCoefficient = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float ExplosionRadius = 200.0f;
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ExplosionEffect;
 };

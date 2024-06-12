@@ -56,7 +56,8 @@ void UUltSkillNumber_2::Activate_Skill()
 	bActivate = true;
 	OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(MPConsumption, true);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
-	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	AddSkillCoolTime = 0.0f;
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
 
 	OwnerCharacter->GetGhostTrailSpawnComp()->CheckRelease(false);

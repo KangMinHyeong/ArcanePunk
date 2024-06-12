@@ -63,6 +63,8 @@ void UAPStatusBar::InitStatusBar()
 
     HUD->OnChargingGauge.AddUObject(this, &UAPStatusBar::ChargeGauge);
     HUD->OnChargingEnd.AddUObject(this, &UAPStatusBar::ChargeEnd);
+
+    HUD->OnAddingCoolTime.AddUObject(this, &UAPStatusBar::AddSkillCoolTime);
 }
 
 void UAPStatusBar::SetMaxHP(float NewValue)
@@ -184,20 +186,20 @@ void UAPStatusBar::OperateSkillSlot(ESkillKey SkillKey)
     }
 }
 
-void UAPStatusBar::StartCoolTimeSlot(ESkillKey SkillKey)
+void UAPStatusBar::StartCoolTimeSlot(ESkillKey SkillKey, float CoolTime)
 {
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->StartSkillCoolTime(SkillKey);
+        QSkillSlot->StartSkillCoolTime(SkillKey, CoolTime);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->StartSkillCoolTime(SkillKey);
+        ESkillSlot->StartSkillCoolTime(SkillKey, CoolTime);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->StartSkillCoolTime(SkillKey);
+        RSkillSlot->StartSkillCoolTime(SkillKey, CoolTime);
         break;
     }
 }
@@ -284,5 +286,20 @@ void UAPStatusBar::ChargeEnd(bool Start)
     SkillChargingGauge->ChargeEnd(Start);
 }
 
+void UAPStatusBar::AddSkillCoolTime(ESkillKey SkillKey, float AddTime)
+{
+    switch (SkillKey)
+    {
+        case ESkillKey::Q:
+        QSkillSlot->AddSkillCoolTime(AddTime);
+        break;
+    
+        case ESkillKey::E:
+        ESkillSlot->AddSkillCoolTime(AddTime);
+        break;
 
-
+        case ESkillKey::R:
+        RSkillSlot->AddSkillCoolTime(AddTime);
+        break;
+    }
+}
