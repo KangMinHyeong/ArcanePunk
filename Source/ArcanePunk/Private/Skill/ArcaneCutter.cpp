@@ -34,7 +34,7 @@ void AArcaneCutter::Tick(float DeltaTime)
 
 	CutterSpeed = FMath::FInterpTo(CutterSpeed, 0.0f, DeltaTime, Drag);
 	CutterMovementComponent->SetVelocityInLocalSpace(FVector(CutterSpeed, 0.0f, 0.0f));
-	if(CutterSpeed <= 5.0f) {Destroy();}
+	if(CutterSpeed <= 5.0f) {DestroySKill();}
 }
 
 void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
@@ -58,7 +58,7 @@ void AArcaneCutter::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, 
 		OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
 		if(CutterEffectComp.IsValid()) CutterEffectComp->Deactivate();
 	}
-    Destroy();
+    DestroySKill();
 }
 
 
@@ -83,7 +83,7 @@ void AArcaneCutter::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *Other
 	}
 
     PenetrateCount--;
-    if(PenetrateCount == 0) {if(CutterEffectComp.IsValid()) CutterEffectComp->Deactivate(); Destroy();}
+    if(PenetrateCount == 0) {if(CutterEffectComp.IsValid()) CutterEffectComp->Deactivate(); DestroySKill();}
 }
 
 float AArcaneCutter::GetCutterSpeed() const
@@ -104,6 +104,14 @@ float AArcaneCutter::GetTriggerWide() const
 void AArcaneCutter::DestroySKill()
 {
 	Super::DestroySKill();
+
+    if(bExplosion) Explosion();
+}
+
+void AArcaneCutter::Explosion()
+{
+    OwnerCharacter->GetAttackComponent()->MultiAttack(GetActorLocation(), GetActorLocation(), ExplosionRadius, ExplosionCoefficient, 1, false, StateTime);
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(), GetActorRotation());
 }
 
 void AArcaneCutter::BintHit()
@@ -199,6 +207,11 @@ void AArcaneCutter::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
     {
         case 1: // Damage Up
         SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+        
+        case 2: // Bang
+        bExplosion = true;
+        SkillAbilityComponent->Coefficient_Add(ExplosionCoefficient, AbilityData->Coefficient_X, NestingNum);
         break;
     }
 }

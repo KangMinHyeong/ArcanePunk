@@ -80,4 +80,9 @@ protected:
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<UAPGameInstance> APGI;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_ON;
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_OFF;
 };

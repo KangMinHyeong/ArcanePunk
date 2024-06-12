@@ -38,10 +38,6 @@ public:
 	// void InitGraphicsSetting();
 	// void InitAudioSetting();
 
-	void SmartKeySetting();
-	void GraphicsSetting();
-	void AudioSetting();
-
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Button_Graphics;
@@ -81,19 +77,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	FLinearColor OffColor;
 
-	// Option Setting 
-	// UPROPERTY(EditAnywhere)
-	// TSubclassOf<UUserWidget> GraphicsSettingClass; // Graphics
-
-	// UPROPERTY(EditAnywhere)
-	// TSubclassOf<UUserWidget> AudioSettingClass;
-
-	// UPROPERTY(EditAnywhere)
-	// TSubclassOf<UUserWidget> SmartKeySettingClass;
-
-	// TWeakObjectPtr<UAPGraphicsSetting> GraphicsSettingUI;
-
-	// TWeakObjectPtr<UAPAudioSetting> AudioSettingUI;
-
-
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_ON;
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_OFF;
 };

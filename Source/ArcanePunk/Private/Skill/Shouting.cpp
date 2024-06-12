@@ -44,7 +44,10 @@ void AShouting::SetShoutingEffect()
 void AShouting::SetShoutingAttack()
 {
     if(!OwnerCharacter.IsValid()) return;
-    OwnerCharacter->GetAttackComponent()->MultiAttack(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius, DamageCoefficient, 1, true, StateTime);
+    float LionHowlingCoeff = 1.0f;
+    if(LionHowling) LionHowlingCoeff = 2.0f;
+
+    OwnerCharacter->GetAttackComponent()->MultiAttack(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius, DamageCoefficient, 1, true, StateTime * LionHowlingCoeff);
     DestroySKill();
 }
 
@@ -68,7 +71,6 @@ void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkil
     SetShoutingEffect();
     SetShoutingAttack();
 }
-
 
 void AShouting::CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum)
 {

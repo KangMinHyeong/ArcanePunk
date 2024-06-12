@@ -85,6 +85,7 @@ public:
 	FORCEINLINE float GetOriginCoolTime() const {return SkillNameListData.CoolTime;};
 	FORCEINLINE float GetCoolTime() const {return CurrentCoolTime;};
 	FORCEINLINE void SetCoolTime(float NewCoolTime) {CurrentCoolTime = NewCoolTime;};
+	FORCEINLINE void AddCoolTime(float Add) {AddSkillCoolTime = Add;};
 
 	// ChargeNum , 특정 스킬만
 	FORCEINLINE void SetMaxChargeNum(uint8 NewValue) {MaxChargeNum = NewValue;};
@@ -135,6 +136,7 @@ protected:
 
 	uint8 MPConsumption = 1;
 	float CurrentCoolTime = 5.0f;
+	float AddSkillCoolTime = 0.0f;
 
 	uint8 CurrentChargeNum = 0;
 	uint8 MaxChargeNum = 0;

@@ -31,7 +31,12 @@ public:
 
 private:
 	void AddAbilityList();	
+	void CheckLionHowling();
 
 private:
 	TWeakObjectPtr<AShouting> Shouting;	
+
+	bool LionHowling = false;
+
+	uint8 LionHowlingCount = 0;
 };

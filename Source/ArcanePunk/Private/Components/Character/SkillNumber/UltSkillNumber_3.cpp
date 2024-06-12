@@ -168,7 +168,8 @@ void UUltSkillNumber_3::Activate_Skill()
     {
         if(!ArcaneExecution.IsValid()) return;
         OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
-	    OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	    OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	    AddSkillCoolTime = 0.0f;
         
         FVector Loc = SkillRange_Target->GetDecalComponent()->GetComponentLocation() - OwnerCharacter->GetMesh()->GetComponentLocation(); Loc = (Loc/Loc.Size()) * Ult3_TargetRange *2.0f;
         ArcaneExecution->SetTargetEnemyLocation(Loc);

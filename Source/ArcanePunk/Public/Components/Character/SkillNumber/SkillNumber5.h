@@ -31,6 +31,7 @@ public:
 	
 	virtual void Enhance() override;
 	virtual void DoubleEnhance() override;
+
 private:
 	virtual void Spawn_SkillRange() override;
 	void Activate_Skill_5();

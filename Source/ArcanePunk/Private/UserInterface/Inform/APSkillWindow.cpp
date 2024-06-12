@@ -70,6 +70,12 @@ void UAPSkillWindow::OnActive()
     Text_Active->SetColorAndOpacity(OnColor);
     Text_Passive->SetColorAndOpacity(OffColor);
     ScrollBox_Information->ClearChildren();
+
+    auto ButtonStyle = Button_Active->GetStyle(); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Button_Active->SetStyle(ButtonStyle); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
+    Button_Passive->SetStyle(ButtonStyle); 
 }
 
 void UAPSkillWindow::OnPassive()
@@ -78,6 +84,12 @@ void UAPSkillWindow::OnPassive()
     Text_Active->SetColorAndOpacity(OffColor);
     Text_Passive->SetColorAndOpacity(OnColor);
     ScrollBox_Information->ClearChildren();
+
+    auto ButtonStyle = Button_Passive->GetStyle(); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Button_Passive->SetStyle(ButtonStyle); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
+    Button_Active->SetStyle(ButtonStyle); 
 }
 
 void UAPSkillWindow::InitActiveSkill()

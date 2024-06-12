@@ -78,7 +78,8 @@ void UUltSkillNumber_5::SkillEnd()
 	bActivate = false; 
 	OwnerCharacter->SetHideMode(false);
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
-	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	AddSkillCoolTime = 0.0f;
 }
 
 void UUltSkillNumber_5::UpdateSkillData()

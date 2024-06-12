@@ -55,17 +55,47 @@ void UAPOptionSetting::BindButton()
 
 void UAPOptionSetting::OnClickButton_Graphics()
 {
-    GraphicsSetting();
+    Switcher_Option->SetActiveWidget(GraphicsSettingUI);
+    Text_Graphic->SetColorAndOpacity(OnColor);
+    Text_Audio->SetColorAndOpacity(OffColor);
+    Text_SmartKey->SetColorAndOpacity(OffColor);
+
+    auto ButtonStyle = Button_Graphics->GetStyle(); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Button_Graphics->SetStyle(ButtonStyle); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
+    Button_Audio->SetStyle(ButtonStyle); 
+    Button_Key->SetStyle(ButtonStyle); 
 }
 
 void UAPOptionSetting::OnClickButton_Audio()
 {
-    AudioSetting();
+    Switcher_Option->SetActiveWidget(AudioSettingUI);
+    Text_Graphic->SetColorAndOpacity(OffColor);
+    Text_Audio->SetColorAndOpacity(OnColor);
+    Text_SmartKey->SetColorAndOpacity(OffColor);
+
+    auto ButtonStyle = Button_Audio->GetStyle(); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Button_Audio->SetStyle(ButtonStyle); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
+    Button_Graphics->SetStyle(ButtonStyle); 
+    Button_Key->SetStyle(ButtonStyle); 
 }
 
 void UAPOptionSetting::OnClickButton_Key()
 {
-    SmartKeySetting();
+    Switcher_Option->SetActiveWidget(SmartKeySettingUI);
+    Text_Graphic->SetColorAndOpacity(OffColor);
+    Text_Audio->SetColorAndOpacity(OffColor);
+    Text_SmartKey->SetColorAndOpacity(OnColor);
+
+    auto ButtonStyle = Button_Key->GetStyle(); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Button_Key->SetStyle(ButtonStyle); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
+    Button_Graphics->SetStyle(ButtonStyle); 
+    Button_Audio->SetStyle(ButtonStyle); 
 }
 
 void UAPOptionSetting::OnClickButton_Back()
@@ -73,50 +103,3 @@ void UAPOptionSetting::OnClickButton_Back()
     RemoveFromParent();
 }
 
-// void UAPOptionSetting::InitGraphicsSetting()
-// {
-//     GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); if(!GraphicsSettingUI.IsValid()) return;
-
-//     GraphicsSettingUI->InitGraphicsSetting();
-//     GraphicsSettingUI->InitWindowSetting();
-//     GraphicsSettingUI->InitBindSetting();
-// }
-
-// void UAPOptionSetting::InitAudioSetting()
-// {
-//     AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI.IsValid()) return;
-// }
-
-void UAPOptionSetting::GraphicsSetting()
-{
-    Switcher_Option->SetActiveWidget(GraphicsSettingUI);
-    Text_Graphic->SetColorAndOpacity(OnColor);
-    Text_Audio->SetColorAndOpacity(OffColor);
-    Text_SmartKey->SetColorAndOpacity(OffColor);
-    // if(!GraphicsSettingUI.IsValid()) GraphicsSettingUI = Cast<UAPGraphicsSetting>(CreateWidget(this, GraphicsSettingClass)); 
-    // if(!GraphicsSettingUI.IsValid()) return;
-    
-    // GraphicsSettingUI->AddToViewport();
-}
-
-void UAPOptionSetting::AudioSetting()
-{
-    Switcher_Option->SetActiveWidget(AudioSettingUI);
-    Text_Graphic->SetColorAndOpacity(OffColor);
-    Text_Audio->SetColorAndOpacity(OnColor);
-    Text_SmartKey->SetColorAndOpacity(OffColor);
-    // if(!AudioSettingUI.IsValid()) return; AudioSettingUI = Cast<UAPAudioSetting>(CreateWidget(this, AudioSettingClass)); if(!AudioSettingUI.IsValid()) return;
-    
-    // AudioSettingUI->AddToViewport();
-}
-
-void UAPOptionSetting::SmartKeySetting()
-{
-    Switcher_Option->SetActiveWidget(SmartKeySettingUI);
-    Text_Graphic->SetColorAndOpacity(OffColor);
-    Text_Audio->SetColorAndOpacity(OffColor);
-    Text_SmartKey->SetColorAndOpacity(OnColor);
-    // auto SmartKeySettingUI = Cast<UAPSmartKeySetting>(CreateWidget(this, SmartKeySettingClass)); if(!SmartKeySettingUI) return;
-    
-    // SmartKeySettingUI->AddToViewport();
-}

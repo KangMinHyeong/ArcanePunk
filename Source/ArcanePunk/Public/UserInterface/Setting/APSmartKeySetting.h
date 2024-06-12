@@ -78,13 +78,14 @@ private:
 	UButton* RollBack_Button;
 
 	UPROPERTY(EditAnywhere)
-	FSlateColor OnColor;
-	UPROPERTY(EditAnywhere)
-	FSlateColor OffColor;
-	UPROPERTY(EditAnywhere)
 	FLinearColor TextOnColor;
 	UPROPERTY(EditAnywhere)
 	FLinearColor TextOffColor;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_ON;
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_OFF;
 	
 	TArray<bool> CopySmartKeyArr;
 };

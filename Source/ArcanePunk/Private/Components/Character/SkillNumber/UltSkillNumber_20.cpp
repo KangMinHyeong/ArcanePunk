@@ -92,7 +92,8 @@ void UUltSkillNumber_20::SkillEnd()
 	Skilling = false;
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
 	OwnerCharacter->GetAPHUD()->OnOperateSkill.Broadcast(SkillKey);
-	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+	OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	AddSkillCoolTime = 0.0f;
 	OwnerCharacter->GetAPHUD()->EndImitatorSlot();
 
 	CopySkillEnded(SkillKey, CurrentSkillNumber);

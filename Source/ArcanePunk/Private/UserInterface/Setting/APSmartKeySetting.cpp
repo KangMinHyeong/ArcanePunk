@@ -34,8 +34,8 @@ void UAPSmartKeySetting::InitSmartKey()
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     if(CopySmartKeyArr[1]) 
     {
@@ -102,8 +102,8 @@ void UAPSmartKeySetting::OnSmartKeyQ()
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     SmartKeyQ_Button_On->SetStyle(On_ButtonStyle); 
     SmartKeyQ_Button_Off->SetStyle(Off_ButtonStyle); 
@@ -117,8 +117,8 @@ void UAPSmartKeySetting::OnSmartKeyE()
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     SmartKeyE_Button_On->SetStyle(On_ButtonStyle); 
     SmartKeyE_Button_Off->SetStyle(Off_ButtonStyle); 
@@ -132,8 +132,8 @@ void UAPSmartKeySetting::OnSmartKeyR()
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     SmartKeyR_Button_On->SetStyle(On_ButtonStyle); 
     SmartKeyR_Button_Off->SetStyle(Off_ButtonStyle); 
@@ -147,8 +147,8 @@ void UAPSmartKeySetting::OnSmartKeyQ_Off()
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     SmartKeyQ_Button_On->SetStyle(Off_ButtonStyle); 
     SmartKeyQ_Button_Off->SetStyle(On_ButtonStyle); 
@@ -162,8 +162,8 @@ void UAPSmartKeySetting::OnSmartKeyE_Off()
 
     auto On_ButtonStyle = SmartKeyE_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyE_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     SmartKeyE_Button_On->SetStyle(Off_ButtonStyle); 
     SmartKeyE_Button_Off->SetStyle(On_ButtonStyle); 
@@ -177,8 +177,8 @@ void UAPSmartKeySetting::OnSmartKeyR_Off()
 
     auto On_ButtonStyle = SmartKeyR_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyR_Button_On->GetStyle(); 
-    On_ButtonStyle.Normal.TintColor = OnColor;
-    Off_ButtonStyle.Normal.TintColor = OffColor;
+    On_ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Off_ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
 
     SmartKeyR_Button_On->SetStyle(Off_ButtonStyle); 
     SmartKeyR_Button_Off->SetStyle(On_ButtonStyle); 

@@ -65,10 +65,20 @@ void USkillNumber6::Activate_Skill()
 
     Shouting = GetWorld()->SpawnActor<AShouting>(OwnerCharacter->GetAPSkillHubComponent()->GetShoutingClass(), OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
 	if(!Shouting.IsValid()) return;
+	CheckLionHowling();
 	Shouting->SetOwner(OwnerCharacter.Get());
 	Shouting->SetSkill(SkillAbilityNestingData, this);
 
 	Remove_Skill();
+}
+
+void USkillNumber6::CheckLionHowling()
+{
+	if(LionHowling) 
+	{
+		LionHowlingCount++;
+		if(LionHowlingCount == 5) {Shouting->SetLionHowling(true); LionHowlingCount = 0;}
+	}
 }
 
 void USkillNumber6::SkillEnd()
@@ -78,4 +88,18 @@ void USkillNumber6::SkillEnd()
 
 void USkillNumber6::UpdateSkillData()
 {
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+	
+	float Cool = SkillNameListData.CoolTime;
+	
+	for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+		if(It.Key == 2) {
+			UpdatAbilityData(EEnHanceType::Platinum, It.Key); 
+			LionHowling = true;
+		} 
+	}
+    
+	CurrentCoolTime = Cool;
 }

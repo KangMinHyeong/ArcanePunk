@@ -107,7 +107,8 @@ void USkillNumber18::SkillEnd()
 
     Remove_Skill();
 	OwnerCharacter->GetAPHUD()->OnUsingSkill.Broadcast(SkillKey, false);
-    OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey);
+    OwnerCharacter->GetAPHUD()->OnStartCoolTime.Broadcast(SkillKey, CurrentCoolTime - AddSkillCoolTime);
+	AddSkillCoolTime = 0.0f;
 }
 
 void USkillNumber18::UpdateSkillData()

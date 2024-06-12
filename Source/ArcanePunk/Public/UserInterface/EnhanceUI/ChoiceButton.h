@@ -12,6 +12,7 @@ class UButton;
 class UTextBlock;
 class UAPEnhanceChoice;
 class UImage;
+class USizeBox;
 
 UCLASS()
 class ARCANEPUNK_API UChoiceButton : public UUserWidget
@@ -33,6 +34,11 @@ public:
 	void OnChoiceButton_UnHovered();
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void OnRerollButton_Hovered();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnRerollButton_UnHovered();
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void OnEnhanceChoice();
 
 private:
@@ -41,7 +47,7 @@ private:
 
 	UFUNCTION()
 	void OnClickChoice();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnReroll();
 	UFUNCTION(BlueprintCallable)
 	void ApplyChoice();
@@ -64,6 +70,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* Text_New;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	USizeBox* SizeBox_Nesting;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* SkillNumber_Image;

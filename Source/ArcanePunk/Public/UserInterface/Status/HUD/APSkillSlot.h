@@ -30,10 +30,11 @@ public:
 	void OnCoolDown();
 
 	void SetUsingSkill(bool NewBool);
-	void StartSkillCoolTime(ESkillKey UpdateSkillKey);
+	void StartSkillCoolTime(ESkillKey UpdateSkillKey, float CoolTime);
 	void CheckChargeTime(ESkillKey UpdateSkillKey);
 	void SetChargeTimeText(ESkillKey UpdateSkillKey);
 
+	void AddSkillCoolTime(float AddTime);
 private:
 	void SetCoolTimePercent();
 	void SetCoolTimeText();
@@ -77,11 +78,10 @@ private:
 	UTextBlock* ChargeTimeText;
 
 	float CurrentCoolTime = 0.0f;
-
 	float SkillCoolTime = 1.0f;
+	float AddCoolTime = 0.0f;
 
 	float CurrentChargeTime = 0.0f;
-
 	float ChargeTime = 1.0f;
 
 	bool bStartPercent = false;

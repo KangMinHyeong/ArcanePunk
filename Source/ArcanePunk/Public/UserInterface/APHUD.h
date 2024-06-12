@@ -23,7 +23,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateMPBar, uint8, bool);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateSkillSlot, ESkillKey, uint8);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnOperateSkill, ESkillKey); // 스킬 사용 UI 애니메이션
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartCoolTime, ESkillKey); // 스킬 쿨타임 시작
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStartCoolTime, ESkillKey, float); // 스킬 쿨타임 시작
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHightLightSkill, ESkillKey); // 스킬 하이라이트 UI 애니
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUsingSkill, ESkillKey, bool); // 스킬 시전 중 
 
@@ -32,6 +32,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnOnlyChargingNumberChange, ESkillKey); // 
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChargingGauge, float, float);  // 차징 스킬 게이지
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnChargingEnd, bool); // 차징 스킬 시작 of 끝
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAddingCoolTime, ESkillKey, float); // 쿨타임 빼기
 
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
@@ -158,5 +160,7 @@ public:
 	FOnChargingGauge OnChargingGauge;
 
 	FOnChargingEnd OnChargingEnd;
+
+	FOnAddingCoolTime OnAddingCoolTime;
 
 };

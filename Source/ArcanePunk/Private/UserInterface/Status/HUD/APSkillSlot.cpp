@@ -135,26 +135,21 @@ void UAPSkillSlot::SetChargeTimeText(ESkillKey UpdateSkillKey)
     ChargeTimeText->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Current))));
 }
 
-void UAPSkillSlot::StartSkillCoolTime(ESkillKey UpdateSkillKey)
+void UAPSkillSlot::StartSkillCoolTime(ESkillKey UpdateSkillKey, float CoolTime)
 {
     if(!OwnerCharacter.IsValid()) return;
     SetSkillLimit(false);
-    switch (UpdateSkillKey)
-    {
-        case ESkillKey::Q:
-        CurrentCoolTime = OwnerCharacter->GetQSkillNumber()->GetCoolTime();
-        break;
-    
-        case ESkillKey::E:
-        CurrentCoolTime = OwnerCharacter->GetESkillNumber()->GetCoolTime();
-        break;
-
-        case ESkillKey::R:
-        CurrentCoolTime = OwnerCharacter->GetRSkillNumber()->GetCoolTime();
-        break;
-    }
-    SkillCoolTime = CurrentCoolTime;
+    CurrentCoolTime = CoolTime;
+    SkillCoolTime = CoolTime;
     GetWorld()->GetTimerManager().SetTimer(SkillCoolTimerHandle, this, &UAPSkillSlot::SkillCoolDown, CurrentCoolTime, false);
+}
+
+void UAPSkillSlot::AddSkillCoolTime(float AddTime)
+{
+    AddCoolTime = AddTime + GetWorld()->GetTimerManager().GetTimerRate(SkillCoolTimerHandle) - GetWorld()->GetTimerManager().GetTimerElapsed(SkillCoolTimerHandle);
+    GetWorld()->GetTimerManager().ClearTimer(SkillCoolTimerHandle);
+    float Current = FMath::Max(0.00001f, CurrentCoolTime - AddCoolTime);
+    GetWorld()->GetTimerManager().SetTimer(SkillCoolTimerHandle, this, &UAPSkillSlot::SkillCoolDown, Current, false);
 }
 
 void UAPSkillSlot::CheckChargeTime(ESkillKey UpdateSkillKey)
@@ -247,13 +242,13 @@ void UAPSkillSlot::ChargeCoolDown()
 
 float UAPSkillSlot::GetCurrentCoolTime()
 {
-	float CoolTime = CurrentCoolTime - (GetWorld()->GetTimerManager().GetTimerRate(SkillCoolTimerHandle) - GetWorld()->GetTimerManager().GetTimerElapsed(SkillCoolTimerHandle));
+	float CoolTime = CurrentCoolTime - AddCoolTime - (GetWorld()->GetTimerManager().GetTimerRate(SkillCoolTimerHandle) - GetWorld()->GetTimerManager().GetTimerElapsed(SkillCoolTimerHandle));
     return CoolTime;
 }
 
 float UAPSkillSlot::GetCurrentChargeTime()
 {
-	float CoolTime = CurrentChargeTime - (GetWorld()->GetTimerManager().GetTimerRate(ChargeTimerHandle) - GetWorld()->GetTimerManager().GetTimerElapsed(ChargeTimerHandle));
+	float CoolTime = CurrentChargeTime - AddCoolTime - (GetWorld()->GetTimerManager().GetTimerRate(ChargeTimerHandle) - GetWorld()->GetTimerManager().GetTimerElapsed(ChargeTimerHandle));
     return CoolTime;
 }
 
