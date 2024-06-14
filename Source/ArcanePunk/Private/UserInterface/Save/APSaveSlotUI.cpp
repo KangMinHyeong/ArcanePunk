@@ -10,12 +10,26 @@
 #include "UserInterface/Save/APSaveDataSlot.h"
 #include "Components/ScrollBox.h"
 #include "PlayerController/APTitlePlayerController.h"
+#include "Components/TextBlock.h"
 
 void UAPSaveSlotUI::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    // BindButton();
+    SetIsFocusable(true);
+    SetKeyboardFocus();
+}
+
+FReply UAPSaveSlotUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
+{
+    FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+    return Reply.Handled();
+}
+
+FReply UAPSaveSlotUI::NativeOnMouseButtonDoubleClick(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
+{
+    FReply Reply = Super::NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);
+    return Reply.Handled();
 }
 
 FReply UAPSaveSlotUI::NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
@@ -27,140 +41,54 @@ FReply UAPSaveSlotUI::NativeOnMouseWheel( const FGeometry& InGeometry, const FPo
 void UAPSaveSlotUI::BindButton()
 {
     Button_Back->OnClicked.AddDynamic(this, &UAPSaveSlotUI::OnClickButton_Back);
+    Button_Delete->OnClicked.AddDynamic(this, &UAPSaveSlotUI::OnClickButton_Delete);
+    Button_Select->OnClicked.AddDynamic(this, &UAPSaveSlotUI::OnClickButton_Select);
 
     auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer());
     if(TitlePC) {IsTitle = true;}
     else {IsTitle = false;}
-
 }
 
 void UAPSaveSlotUI::BindSlot()
 {
-    auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer());
-    if(TitlePC) {IsTitle = true;}
-    else {IsTitle = false;}
+    if(IsTitle)
+    {
+        FString LoadText = TEXT("불러오기");
+        TextBlock_Select->SetText(FText::FromString(LoadText));
+    }
+    
+    OnSlot();
+}
 
+void UAPSaveSlotUI::ChangingCurrentSaveSlot(UUserWidget *ClickedSlot)
+{
+    if(CurrentSaveSlot.IsValid()) CurrentSaveSlot->TurnOffSlot();
+    CurrentSaveSlot = Cast<UAPSaveDataSlot>(ClickedSlot);
+}
+
+void UAPSaveSlotUI::OnSlot()
+{
     ScrollBox->ClearChildren();
 
-    OnSlot1();
-    OnSlot2();
-    OnSlot3();
-    OnSlot4();
-    OnSlot5();
-}
-
-void UAPSaveSlotUI::OnSlot1()
-{
-    FString SlotName = "PlayerSlot_1";
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-    if(SaveGameData)
+    uint8 SlotNum = 1;
+    for(auto SlotName : SlotNames)
     {
-        auto SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, SaveDataSlotClass)); if(!SaveDataSlot) return;
-        SaveDataSlot->SetSlotName(SlotName);
-        SaveDataSlot->SetSlotNumber(1);
-        SaveDataSlot->SetLoadMode(IsTitle);
+        UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+        
+        UAPSaveDataSlot* SaveDataSlot = nullptr;
+        if(SaveGameData)
+        {
+            SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, SaveDataSlotClass)); if(!SaveDataSlot) return;
+            SaveDataSlot->SetSlotData(SaveGameData);
+        }
+        else
+        {
+            SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, NoDataSlotClass)); if(!SaveDataSlot) return;
+        }
+        SaveDataSlot->SetSlotName(SlotName, this);
+        SaveDataSlot->SetSlotNumber(SlotNum);
         ScrollBox->AddChild(SaveDataSlot);
-        // To Do : 저장된 슬롯 띄우기
-        // 슬롯에 PlayerSlot_1 값 넘겨주기
-    }
-    else
-    {
-        auto NoDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, NoDataSlotClass)); if(!NoDataSlot) return;
-        NoDataSlot->SetLoadMode(IsTitle);
-        NoDataSlot->SetSlotNumber(1);
-        ScrollBox->AddChild(NoDataSlot);
-    }
-}
-
-void UAPSaveSlotUI::OnSlot2()
-{
-    FString SlotName = "PlayerSlot_2";
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-    if(SaveGameData)
-    {
-        auto SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, SaveDataSlotClass)); if(!SaveDataSlot) return;
-        SaveDataSlot->SetSlotName(SlotName);
-        SaveDataSlot->SetSlotNumber(2);
-        SaveDataSlot->SetLoadMode(IsTitle);
-        ScrollBox->AddChild(SaveDataSlot);
-        // To Do : 저장된 슬롯 띄우기
-        // 슬롯에 PlayerSlot_1 값 넘겨주기
-    }
-    else
-    {
-        auto NoDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, NoDataSlotClass)); if(!NoDataSlot) return;
-        NoDataSlot->SetLoadMode(IsTitle);
-        NoDataSlot->SetSlotNumber(2);
-        ScrollBox->AddChild(NoDataSlot);
-    }
-}
-
-void UAPSaveSlotUI::OnSlot3()
-{
-    FString SlotName = "PlayerSlot_3";
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-    if(SaveGameData)
-    {
-        auto SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, SaveDataSlotClass)); if(!SaveDataSlot) return;
-        SaveDataSlot->SetSlotName(SlotName);
-        SaveDataSlot->SetSlotNumber(3);
-        SaveDataSlot->SetLoadMode(IsTitle);
-        ScrollBox->AddChild(SaveDataSlot);
-        // To Do : 저장된 슬롯 띄우기
-        // 슬롯에 PlayerSlot_1 값 넘겨주기
-    }
-    else
-    {
-        auto NoDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, NoDataSlotClass)); if(!NoDataSlot) return;
-        NoDataSlot->SetLoadMode(IsTitle);
-        NoDataSlot->SetSlotNumber(3);
-        ScrollBox->AddChild(NoDataSlot);
-    }
-}
-
-void UAPSaveSlotUI::OnSlot4()
-{
-    FString SlotName = "PlayerSlot_4";
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-    if(SaveGameData)
-    {
-        auto SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, SaveDataSlotClass)); if(!SaveDataSlot) return;
-        SaveDataSlot->SetSlotName(SlotName);
-        SaveDataSlot->SetSlotNumber(4);
-        SaveDataSlot->SetLoadMode(IsTitle);
-        ScrollBox->AddChild(SaveDataSlot);
-        // To Do : 저장된 슬롯 띄우기
-        // 슬롯에 PlayerSlot_1 값 넘겨주기
-    }
-    else
-    {
-        auto NoDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, NoDataSlotClass)); if(!NoDataSlot) return;
-        NoDataSlot->SetLoadMode(IsTitle);
-        NoDataSlot->SetSlotNumber(4);
-        ScrollBox->AddChild(NoDataSlot);
-    }
-}
-
-void UAPSaveSlotUI::OnSlot5()
-{
-    FString SlotName = "PlayerSlot_5";
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-    if(SaveGameData)
-    {
-        auto SaveDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, SaveDataSlotClass)); if(!SaveDataSlot) return;
-        SaveDataSlot->SetSlotName(SlotName);
-        SaveDataSlot->SetSlotNumber(5);
-        SaveDataSlot->SetLoadMode(IsTitle);
-        ScrollBox->AddChild(SaveDataSlot);
-        // To Do : 저장된 슬롯 띄우기
-        // 슬롯에 PlayerSlot_1 값 넘겨주기
-    }
-    else
-    {
-        auto NoDataSlot = Cast<UAPSaveDataSlot>(CreateWidget(this, NoDataSlotClass)); if(!NoDataSlot) return;
-        NoDataSlot->SetLoadMode(IsTitle);
-        NoDataSlot->SetSlotNumber(5);
-        ScrollBox->AddChild(NoDataSlot);
+        SlotNum++;
     }
 }
 
@@ -170,4 +98,18 @@ void UAPSaveSlotUI::OnClickButton_Back()
 
     auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer());
     if(TitlePC) TitlePC->CreateTitleUI();    
+}
+
+void UAPSaveSlotUI::OnClickButton_Delete()
+{
+    if(!CurrentSaveSlot.IsValid()) return;
+    CurrentSaveSlot->Delete();
+}
+
+void UAPSaveSlotUI::OnClickButton_Select()
+{
+    if(!CurrentSaveSlot.IsValid()) return;
+
+    if(IsTitle) {CurrentSaveSlot->Load();}
+    else {CurrentSaveSlot->Save();}
 }

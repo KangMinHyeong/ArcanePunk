@@ -78,7 +78,7 @@ void AArcaneMine::Explosion()
         Enemy->GetCrowdControlComp()->BurnState(OwnerCharacter.Get(), DOT, DOT_Time, DOT_InRate);
         if(bSlow) Enemy->GetCrowdControlComp()->SlowState(SlowPercent, DOT_Time);
         if(bWeak) Enemy->GetCrowdControlComp()->WeakState(WeakCoefficient, DOT_Time);
-        if(BuffType == EBuffType::Damage) {Enemy->SetDamageMultiple(DamageBuff, DOT_Time);}
+        if(BuffType == EBuffType::Damage) {Enemy->AddDamageMultiple(DamageBuff, DOT_Time - 0.001f);}
     }
     // OwnerCharacter->GetAttackComponent()->MultiAttack_Burn(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius, DOT, DOT_Time, DOT_InRate );
     // if(bSlow) OwnerCharacter->GetAttackComponent()->MultiAttack_Slow(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius, SlowPercent, DOT_Time);
@@ -158,6 +158,7 @@ void AArcaneMine::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
     Super::CheckGoldEnhance(AbilityNum, NestingNum);
 
+    DamageBuff = 0.0f;
     switch (AbilityNum)
     {
         case 1: // 스킬 데미지 증가

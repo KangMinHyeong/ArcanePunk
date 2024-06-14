@@ -15,7 +15,7 @@ UAPCrowdControlComponent::UAPCrowdControlComponent()
 void UAPCrowdControlComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	CC_Priority.Init(false, 5);
+	CC_Priority.Init(false, 6);
 }
 
 void UAPCrowdControlComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -126,6 +126,28 @@ void UAPCrowdControlComponent::StunEnd()
 	StateMap.Remove(ECharacterState::Stun);
 	CC_Priority.Last((uint8)ECharacterState::Stun) = false;
 	PlayStateEffect(ECharacterState::Stun, false);
+
+	NormalState();
+}
+
+void UAPCrowdControlComponent::FrozenState(float FrozenTime)
+{
+	if(!CalculateStateTime(ECharacterState::Frozen, FrozenTimerHandle, FrozenTime)){return;}
+	GetWorld()->GetTimerManager().SetTimer(FrozenTimerHandle, this, &UAPCrowdControlComponent::FrozenEnd, FrozenTime, false);
+
+	OnCharacterState(ECharacterState::Frozen, true);
+
+	PlayStateEffect(ECharacterState::Frozen, true);
+}
+
+void UAPCrowdControlComponent::FrozenEnd()
+{
+	GetWorld()->GetTimerManager().ClearTimer(FrozenTimerHandle);
+
+	ClearStopState();
+	StateMap.Remove(ECharacterState::Frozen);
+	CC_Priority.Last((uint8)ECharacterState::Frozen) = false;
+	PlayStateEffect(ECharacterState::Frozen, false);
 
 	NormalState();
 }
@@ -364,6 +386,10 @@ void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool
 		break;
 		
 		case ECharacterState::Slow:
+		break;
+
+		case ECharacterState::Frozen:
+		if(OwnerCharater) {IsPlay ? OwnerCharater->GetStunEffect()->Activate() : OwnerCharater->GetStunEffect()->DeactivateImmediate(); }
 		break;
 	}
 }

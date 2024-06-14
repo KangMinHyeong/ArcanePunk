@@ -51,7 +51,8 @@ public:
 	void SetHitPoint(float Forward, float Right);
 
 	FORCEINLINE float GetDamageMultiple() const {return DamageMultiple;};
-	void SetDamageMultiple(float Multiple, float Time);
+	void AddDamageMultiple(float Add, float Time);
+	void OnAttachingDamagedMark(float Time);
 
 	// 몬스터 Attack 관련 함수
 	virtual void PossessedBy(AController* NewController) override;
@@ -115,8 +116,9 @@ protected:
 	void OnPlayerStun(AActor *Actor, float Time);
 	void CrowdControlCheck();
 
-	// 데미지 배수 관련 함수
-	void MultipleEnd(FTimerHandle* TimerHandle, float Multiple);
+	// 피격 데미지 배수 관련 함수
+	void SubtractDamageMultiple(float Subtract);
+	void OnDetachingDamagedMark();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
@@ -137,6 +139,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* TeleportMark;
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* DamagedMark;
+
 	bool bKnockBackAttack = false;
 
 	// TimerHandle
@@ -145,6 +150,8 @@ protected:
 	FTimerHandle HitTimerHandle;
 	FTimerHandle DeathTimerHandle;
 	FTimerHandle StopTimerHandle;
+	FTimerHandle DamageMultipleTimerHandle;
+	FTimerHandle DamagedMarkTimerHandle;
 	// 머터리얼
 
 	// 드롭 관련 변수

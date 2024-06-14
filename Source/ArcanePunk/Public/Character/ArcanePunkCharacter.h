@@ -179,7 +179,7 @@ public:
 	FORCEINLINE UAPBuffComponent* GetBuffComp() const {return BuffComp;}; // BuffComp 반환
 
 	// Save 관련 함수
-	void SaveStatus(FString PlayerSlotName, FString GameSlotName);
+	void SaveStatus(FString PlayerSlotName);
 
 	// Interaction 관련 함수
 	bool IsInteraction() const {return bInteract;};

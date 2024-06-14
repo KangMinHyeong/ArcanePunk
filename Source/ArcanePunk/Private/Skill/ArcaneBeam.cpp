@@ -86,23 +86,35 @@ void AArcaneBeam::SetBeamEffect()
     float Width = BeamRadius / InitRadius;
     float Length = Distance / InitDist;
     // BeamComp->SetNiagaraVariableVec3(TEXT("Beam End"),  BeamEnd);
-    BeamComp->SetNiagaraVariableFloat(TEXT("AddTime"),  BeamTime - OriginTime);
-    BeamComp->SetNiagaraVariableFloat(TEXT("Width"),  Width);
-    BeamComp->SetNiagaraVariableFloat(TEXT("Length"),  Length);
-    BeamComp->SetNiagaraVariableVec2(TEXT("Size2D"),  FVector2D(Width, Length));
-    BeamComp->SetNiagaraVariableVec3(TEXT("Size3D"),  FVector(Width, Length, 1.0f));
-    BeamComp->SetNiagaraVariableVec3(TEXT("AddVector"),  FVector((Distance - InitDist) * 0.5f, 0.0f, 0.0f));
+    BeamComp->SetVariableFloat(TEXT("AddTime"),  BeamTime - OriginTime);
+    BeamComp->SetVariableFloat(TEXT("Width"),  Width);
+    BeamComp->SetVariableFloat(TEXT("Length"),  Length);
+    BeamComp->SetVariableVec2(TEXT("Size2D"),  FVector2D(Width, Length));
+    BeamComp->SetVariableVec3(TEXT("Size3D"),  FVector(Width, Length, 1.0f));
+    BeamComp->SetVariableVec3(TEXT("AddVector"),  FVector((Distance - InitDist) * 0.5f, 0.0f, 0.0f));
 
     SetBeamAttack();
 }
 
 void AArcaneBeam::SetBeamAttack()
 {
+    HitCount++;
     if(!OwnerCharacter.IsValid()) return;
     auto Actors = OwnerCharacter->GetAttackComponent()->MultiAttack_Return(BeamStart, BeamEnd, BeamRadius, DamageCoefficient, 1, InstantDeathPercent, bStun, StateTime);
-    GetWorldTimerManager().SetTimer(BeamHitLoopTimerHandle, this, &AArcaneBeam::SetBeamAttack, BeamHitLoopTime, false);
-    
-    if(AddCool)
+    GetWorldTimerManager().SetTimer(BeamHitLoopTimerHandle, this, &AArcaneBeam::SetBeamAttack, BeamHitLoopTime, false);    
+
+    CheckSideEffect(Actors);
+}
+
+void AArcaneBeam::FireEnd()
+{
+    auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+    if(OwnerAnim) OwnerAnim->StopSkill_5_Fire_Montage();
+}
+
+void AArcaneBeam::CheckSideEffect(TArray<AActor*> Actors) // 증강 부가효과
+{
+    if(AddCool) // 쿨타임 감소
     {
         if(KillsNum < 3)
         {
@@ -115,16 +127,22 @@ void AArcaneBeam::SetBeamAttack()
 
         if(KillsNum >= 3)
         {
-            UE_LOG(LogTemp, Display, TEXT("Your message"));
             SkillComp->AddCoolTime(AddCoolTime);
         }
     }
-}
 
-void AArcaneBeam::FireEnd()
-{
-    auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-    if(OwnerAnim) OwnerAnim->StopSkill_5_Fire_Montage();
+    if(bFrozen && HitCount == 1)
+    {
+        for( auto Actor : Actors)
+        {
+            float Percent = FMath::RandRange(0.0f, 100.0f);
+            if(Percent <= FrozenPercent*100.0f)
+            {
+                auto Enemy = Cast<AEnemy_CharacterBase>(Actor);
+                if(Enemy) Enemy->GetCrowdControlComp()->FrozenState(FrozenTime);
+            }
+        }
+    }
 }
 
 void AArcaneBeam::OnCharging()
@@ -203,6 +221,11 @@ void AArcaneBeam::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
         case 2: // 3 Kills 
         AddCool = true;
         SkillAbilityComponent->Coefficient_Add(AddCoolTime,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 3: // Frozen
+        bFrozen = true;
+        SkillAbilityComponent->Coefficient_Add(FrozenPercent,AbilityData->Coefficient_X, NestingNum - 1);
         break;
     }
 }

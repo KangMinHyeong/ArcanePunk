@@ -407,20 +407,25 @@ void AArcanePunkCharacter::Save()
 	PC->OpenSaveSlot();
 }
 
-void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName, FString GameSlotName)
+void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName)
 {
 	// if (!HUD->TutorialDone) {
 	// 	HUD->UpdateTutorialWidget("PressCtrl + 9");
 	// 	return;
 	// }
+	auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+
 	MyPlayerTotalStatus_Origin.SaveSlotName = PlayerSlotName;
 	MyPlayerTotalStatus_Origin.PlayerDynamicData.PlayerLocation = GetActorLocation();
 	
 	MyPlayerState->UpdatePlayerData(MyPlayerTotalStatus_Origin);
 
 	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
-	MyGameStatus.SaveSlotName = GameSlotName;
-	MyGameStatus.LevelName = FName(*UGameplayStatics::GetCurrentLevelName(this));
+	MyGameStatus.SaveSlotName = PlayerSlotName;
+	MyGameStatus.LevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	float RT = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+	MyGameStatus.SaveRealTime += RT - APGI->GetSavedRealTime(); APGI->SetSavedRealTime(RT);
+	MyGameStatus.SaveDateTime = FDateTime::Now();
 
 	MyGameState->UpdateGameData(MyGameStatus);	
 
@@ -647,11 +652,16 @@ void AArcanePunkCharacter::InitPlayerStatus()
 {
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
-	// MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus; // 테스트용으로 빼놈, 이 줄 넣어야 세이브 스탯으로 초기화
+	MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus; // 테스트용으로 빼놈, 이 줄 넣어야 세이브 스탯으로 초기화
 	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
 
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
 	CurrentPlayerLocation();
+
+	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
+	MyGameStatus = MyGameState->GameData;
+
+	if(HUD) HUD->OnUpdateHPBar.Broadcast(MyPlayerTotalStatus_Origin.PlayerDynamicData.HP);
 }
 
 void AArcanePunkCharacter::BeginInteract()

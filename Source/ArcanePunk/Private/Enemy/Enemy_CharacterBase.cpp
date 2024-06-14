@@ -35,8 +35,10 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 
 	TeleportMark = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TeleportMark"));
-	TeleportMark->SetupAttachment(GetMesh());
-	TeleportMark->Deactivate();
+	TeleportMark->SetupAttachment(GetMesh()); TeleportMark->Deactivate();
+	
+	DamagedMark = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DamagedMark"));
+	DamagedMark->SetupAttachment(GetMesh()); DamagedMark->Deactivate();
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
@@ -146,7 +148,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
-	SpawnDamageText(EventInstigator, DamageAmount, DamageTextAddLocation);
+	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
 
 	if(IsDead())
 	{
@@ -157,6 +159,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		TeleportMarkDeactivate();
 		CheckAllEnemyKilled();
 		StunEffectComp->DeactivateImmediate();
+		StunEffectComp->DestroyComponent();
 		TeleportMark->DeactivateImmediate();
 	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
 	}
@@ -174,6 +177,7 @@ bool AEnemy_CharacterBase::IsHardCC()
 	if(CurrentState == ECharacterState::KnockBack) {return true;}
 	else if(CurrentState == ECharacterState::Stun) {return true;}
 	else if(CurrentState == ECharacterState::Sleep) {return true;}
+	else if(CurrentState == ECharacterState::Frozen) {return true;}
 	return false;
 }
 
@@ -371,18 +375,29 @@ void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
 	MonsterIsRight = Right;
 }
 
-void AEnemy_CharacterBase::SetDamageMultiple(float Multiple, float Time)
+void AEnemy_CharacterBase::AddDamageMultiple(float Add, float Time)
 {
-	DamageMultiple = DamageMultiple * Multiple;
-	FTimerHandle Timer;
-	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemy_CharacterBase::MultipleEnd, &Timer, Multiple);
-	GetWorld()->GetTimerManager().SetTimer(Timer, TimerDelegate, Time, false);
+	DamageMultiple = DamageMultiple + Add;
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemy_CharacterBase::SubtractDamageMultiple, Add);
+	GetWorld()->GetTimerManager().SetTimer(DamageMultipleTimerHandle, TimerDelegate, Time, false);
 }
 
-void AEnemy_CharacterBase::MultipleEnd(FTimerHandle* TimerHandle, float Multiple)
+void AEnemy_CharacterBase::OnAttachingDamagedMark(float Time)
 {
-	DamageMultiple = DamageMultiple / Multiple;
-	GetWorld()->GetTimerManager().ClearTimer(*TimerHandle);
+	if(DamagedMark) DamagedMark->Activate();
+	GetWorldTimerManager().SetTimer(DamagedMarkTimerHandle, this, &AEnemy_CharacterBase::OnDetachingDamagedMark, Time, false);
+}
+
+void AEnemy_CharacterBase::SubtractDamageMultiple(float Subtract)
+{
+	DamageMultiple = DamageMultiple - Subtract;
+	GetWorld()->GetTimerManager().ClearTimer(DamageMultipleTimerHandle);
+}
+
+void AEnemy_CharacterBase::OnDetachingDamagedMark()
+{
+	if(DamagedMark) DamagedMark->DeactivateImmediate();
+	GetWorldTimerManager().ClearTimer(DamagedMarkTimerHandle);
 }
 
 void AEnemy_CharacterBase::SetHitEffect(FVector HitLocation)

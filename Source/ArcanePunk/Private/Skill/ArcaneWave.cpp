@@ -67,8 +67,8 @@ void AArcaneWave::SetWaveSize()
 {
     float CurrentSize = MaxDist / WaveOutSphere->GetScaledSphereRadius();
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), WaveEffect, GetActorLocation(), GetActorRotation());
-    NC->SetNiagaraVariableFloat(TEXT("Size"), CurrentSize);
-    NC->SetNiagaraVariableFloat(TEXT("Speed"), WaveSpeed / MaxDist);
+    NC->SetVariableFloat(TEXT("Size"), CurrentSize);
+    NC->SetVariableFloat(TEXT("Speed"), WaveSpeed / MaxDist);
 
     OutRadius = 0.0f;
     WaveOutSphere->SetSphereRadius(OutRadius, true);

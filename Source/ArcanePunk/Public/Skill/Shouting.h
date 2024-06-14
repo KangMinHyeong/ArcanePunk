@@ -26,6 +26,7 @@ protected:
 	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 
+	virtual void CheckSideEffect(TArray<AActor*> Actors) override;
 public:
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	
@@ -52,4 +53,8 @@ private:
 	float InitShoutRadius;
 
 	bool LionHowling = false;
+	float LionHowlingCoeff = 1.0f;
+
+	bool bScratch = false;
+	float ScratchCoeff = 0.1f;
 };	

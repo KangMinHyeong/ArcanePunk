@@ -52,8 +52,8 @@ void AMoonSlash::ApplyMoonSlashSetting()
     TargetRot = GetActorRotation() - FRotator(0.0f, MoonSlashAngle * 360.0f, 0.0f);
 
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MoonSlashEffect, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation() + PlusEffectRot);
-    NC->SetNiagaraVariableFloat(TEXT("Size"),  MoonSlashWidth * 0.01f);
-    NC->SetNiagaraVariableFloat(TEXT("Speed"),  MoonSlashSpeed * 0.001f);
+    NC->SetVariableFloat(TEXT("Size"),  MoonSlashWidth * 0.01f);
+    NC->SetVariableFloat(TEXT("Speed"),  MoonSlashSpeed * 0.001f);
 
     GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AMoonSlash::DestroySKill, (MoonSlashAngle * 360.0f) / MoonSlashSpeed, false);
 }

@@ -52,7 +52,8 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 		PD.PlayerDynamicData.HP = PD.PlayerDynamicData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.PlayerDynamicData.DEF)));
 	}
 	OwnerCharacter->SetDefaultHP(PD.PlayerDynamicData.HP); 
-	
+	OwnerCharacter->SetDefaultHP_Origin(PD.PlayerDynamicData.HP); 
+
 	if(OwnerCharacter->IsDead())
 	{
 	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));

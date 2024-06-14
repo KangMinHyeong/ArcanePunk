@@ -39,8 +39,8 @@ void ABomberMan::OnExplosion()
 {
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(BomberEffect, GetRootComponent(), TEXT("BomberEffect"), FVector(0,0,0), FRotator::ZeroRotator, FVector(1,1,1),EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
     // SpawnSystemAttached(BomberEffect, OwnerCharacter->GetRootComponent(), TEXT("BomberEffect"), FVector(0,0,0), FRotator::ZeroRotator, FVector(1,1,1),EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
-    NC->SetNiagaraVariableFloat(TEXT("Time"), BomberHitRate);
-    NC->SetNiagaraVariableFloat(TEXT("Size"), BomberTrigger->GetScaledSphereRadius() * 0.01f);
+    NC->SetVariableFloat(TEXT("Time"), BomberHitRate);
+    NC->SetVariableFloat(TEXT("Size"), BomberTrigger->GetScaledSphereRadius() * 0.01f);
 
     TArray<AActor*> Actors;
     BomberTrigger->GetOverlappingActors(Actors, AEnemy_CharacterBase::StaticClass());

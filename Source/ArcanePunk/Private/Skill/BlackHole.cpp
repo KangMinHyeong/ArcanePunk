@@ -60,8 +60,8 @@ void ABlackHole::SetHoleRadius(float Radius, float Radius_2)
 
 void ABlackHole::SetBlackHoleSize()
 {
-    BlackHoleEffect->SetNiagaraVariableFloat(TEXT("OutSize"),  OutSize / GravityTrigger->GetScaledSphereRadius());
-    BlackHoleEffect->SetNiagaraVariableFloat(TEXT("Size"),  InSize / DamageTrigger->GetScaledSphereRadius());
+    BlackHoleEffect->SetVariableFloat(TEXT("OutSize"),  OutSize / GravityTrigger->GetScaledSphereRadius());
+    BlackHoleEffect->SetVariableFloat(TEXT("Size"),  InSize / DamageTrigger->GetScaledSphereRadius());
 
     GravityTrigger->SetSphereRadius(OutSize); DamageTrigger->SetSphereRadius(InSize);
 }
@@ -114,8 +114,8 @@ void ABlackHole::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USki
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
     
-    BlackHoleEffect->SetNiagaraVariableFloat(TEXT("CastingTime"),  CastingTime);
-    BlackHoleEffect->SetNiagaraVariableFloat(TEXT("Lifetime"),  LifeTime);
+    BlackHoleEffect->SetVariableFloat(TEXT("CastingTime"),  CastingTime);
+    BlackHoleEffect->SetVariableFloat(TEXT("Lifetime"),  LifeTime);
     BlackHoleEffect->Activate(true);
 
     SetBlackHoleSize();

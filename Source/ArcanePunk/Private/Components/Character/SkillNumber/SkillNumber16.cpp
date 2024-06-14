@@ -47,7 +47,7 @@ void USkillNumber16::Activate_Skill()
 {
 	Super::Activate_Skill();
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(OwnerCharacter->GetAPSkillHubComponent()->GetSkill16Effect(), OwnerCharacter->GetMesh(), TEXT("Skill16Effect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);
-    NC->SetNiagaraVariableFloat(TEXT("Time"), BuffTime);
+    NC->SetVariableFloat(TEXT("Time"), BuffTime);
 
     OwnerCharacter->GetCrowdControlComp()->FastState(BuffCoefficient, BuffTime);
     OwnerCharacter->GetBuffComp()->ATKSpeedUp(BuffCoefficient, BuffTime); 

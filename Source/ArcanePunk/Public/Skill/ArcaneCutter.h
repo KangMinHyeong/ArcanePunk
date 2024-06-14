@@ -29,6 +29,7 @@ public:
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	FORCEINLINE float GetCutterSpeed() const;
 	FORCEINLINE void SetDist(float Dist) { CutterDist = Dist;};
+	void SetCutterWide(float Wide);
 
 	// void SetDeadTime(float DeadTime);
 	float GetTriggerWide() const;
@@ -63,6 +64,8 @@ private:
 	float Drag = 6.0f;
 
 	float CutterDist = 0.0f;
+
+	FVector2D WidthScale;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	UProjectileMovementComponent* CutterMovementComponent;

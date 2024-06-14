@@ -96,8 +96,8 @@ void AArcaneMeteor::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, U
     float Multiple = TriggerRadius_2 / DamageEnhanceTrigger->GetScaledSphereRadius();
     DamageTrigger->SetSphereRadius(TriggerRadius_1); DamageEnhanceTrigger->SetSphereRadius(TriggerRadius_2);
 
-    MeteorEffect->SetNiagaraVariableFloat(TEXT("Size"),  MeteorSize * Multiple);
-    MeteorEffect->SetNiagaraVariableFloat(TEXT("Lifetime"),  DestroyTime);
+    MeteorEffect->SetVariableFloat(TEXT("Size"),  MeteorSize * Multiple);
+    MeteorEffect->SetVariableFloat(TEXT("Lifetime"),  DestroyTime);
     // Effect 시간 조절
     GetWorldTimerManager().SetTimer(MeteorTimerHandle, this, &AArcaneMeteor::OnMeteorDrop, CastingDelay, false);
 }

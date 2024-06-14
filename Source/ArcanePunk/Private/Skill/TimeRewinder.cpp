@@ -83,8 +83,8 @@ void ATimeRewinder::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, U
     SetActorScale3D(GetActorScale3D() * (RewinderWidth / RewinderSize )); 
     SetActorLocation(RewinderLocation);
 
-    RewinderEffect->SetNiagaraVariableFloat(TEXT("Size"), RewinderSize * 0.1f);
-    RewinderEffect->SetNiagaraVariableFloat(TEXT("LoopDelay"),  (OwnerCharacter->GetActorLocation() - RewinderLocation).Size() / RewindSpeed);
+    RewinderEffect->SetVariableFloat(TEXT("Size"), RewinderSize * 0.1f);
+    RewinderEffect->SetVariableFloat(TEXT("LoopDelay"),  (OwnerCharacter->GetActorLocation() - RewinderLocation).Size() / RewindSpeed);
 
     // 투명화 추가?
     bRewind = true; SetActorTickEnabled(true);

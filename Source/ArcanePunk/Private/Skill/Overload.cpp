@@ -73,7 +73,7 @@ void AOverload::ChargeEffectEnd()
     OwnerCharacter->GetAPHUD()->OnChargingEnd.Broadcast(false);
     OverloadRangeEffect->DeactivateImmediate();
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), OverloadFireEffect, GetActorLocation(), GetActorRotation());
-    NC->SetNiagaraVariableFloat(TEXT("Size"), RangeSize);
+    NC->SetVariableFloat(TEXT("Size"), RangeSize);
 }
 
 void AOverload::StartFire()
@@ -99,7 +99,7 @@ void AOverload::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkil
     ChargeSpeed = (MaxDamageCoefficient - DamageCoefficient) / MaxTime;
 
     OverloadTrigger->SetSphereRadius(RangeSize * OverloadRange);
-    OverloadRangeEffect->SetNiagaraVariableFloat(TEXT("Size"), RangeSize);
+    OverloadRangeEffect->SetVariableFloat(TEXT("Size"), RangeSize);
     OverloadRangeEffect->Activate();
 
     auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());

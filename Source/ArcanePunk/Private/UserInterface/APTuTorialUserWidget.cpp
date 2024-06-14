@@ -87,11 +87,11 @@ void UAPTuTorialUserWidget::NativeTick(const FGeometry& MyGeometry, float DeltaT
 void UAPTuTorialUserWidget::WidgetBlink()
 {
 
-	if (Keys[NowIndex]->Visibility == ESlateVisibility::Collapsed) {
+	if (Keys[NowIndex]->GetVisibility() == ESlateVisibility::Collapsed) {
 		UE_LOG(LogTemp, Warning, TEXT("To Visible"));
 		Keys[NowIndex]->SetVisibility(ESlateVisibility::Visible);
 	}
-	else if (Keys[NowIndex]->Visibility == ESlateVisibility::Visible) {
+	else if (Keys[NowIndex]->GetVisibility() == ESlateVisibility::Visible) {
 		UE_LOG(LogTemp, Warning, TEXT("To Collapsed"));
 		Keys[NowIndex]->SetVisibility(ESlateVisibility::Collapsed);
 	}
@@ -102,12 +102,12 @@ void UAPTuTorialUserWidget::WidgetBlink()
 bool UAPTuTorialUserWidget::UpdateWidget(const FString PressedKey)
 {
 
-	// ÇöÀç ÇÊ¿äÇÑ ÀÔ·ÂÀÇ Å°º¸µå ÀÌ¹ÌÁö È°¼ºÈ­
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ È°ï¿½ï¿½È­
 	//Keys[NowIndex]->SetVisibility(ESlateVisibility::Visible);
 
 
-	// ÇöÀç È­¸é»ó º¸¿©ÁÖ°í ÀÖ´Â Å° ÀÔ·ÂÀÌ µé¾î¿ÔÀ»¶§ ´ÙÀ½ Å°ÀÔ·ÂÀ¸·Î ³Ñ¾î°¡¾ßÇÔ
-	// ³Ñ¾î°¡±â Àü ÇÊ¿äÇÑ ÀÔ·ÂÀÇ Å°º¸µå ÀÌ¹ÌÁö ºñÈ°¼ºÈ­
+	// ï¿½ï¿½ï¿½ï¿½ È­ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö°ï¿½ ï¿½Ö´ï¿½ Å° ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å°ï¿½Ô·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ¾î°¡ï¿½ï¿½ï¿½ï¿½
+	// ï¿½Ñ¾î°¡ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
 	if (NeedInput[NowIndex] == PressedKey) {
 		Keys[NowIndex]->SetVisibility(ESlateVisibility::Collapsed);
 		NowIndex++;

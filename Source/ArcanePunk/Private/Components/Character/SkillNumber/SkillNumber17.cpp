@@ -45,7 +45,7 @@ void USkillNumber17::Activate_Skill()
 {
 	Super::Activate_Skill();
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(OwnerCharacter->GetAPSkillHubComponent()->GetSkill17Effect(), OwnerCharacter->GetMesh(), TEXT("Skill17Effect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);
-    NC->SetNiagaraVariableFloat(TEXT("Time"), BuffTime);
+    NC->SetVariableFloat(TEXT("Time"), BuffTime);
 
     OwnerCharacter->GetBuffComp()->ATKUp(BuffCoefficient, BuffTime); 
     GetWorld()->GetTimerManager().SetTimer(Skill17_TimerHandle, this, &USkillNumber17::SkillEnd, BuffTime, false);

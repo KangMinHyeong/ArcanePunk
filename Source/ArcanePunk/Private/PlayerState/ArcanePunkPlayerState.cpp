@@ -12,13 +12,11 @@ AArcanePunkPlayerState::AArcanePunkPlayerState()
 
 void AArcanePunkPlayerState::SavePlayerData()
 {
-    UAPSaveGame* SaveGameData = NewObject<UAPSaveGame>();
-    
-    //SaveGameData->SaveRerollDice = PlayerTotalStatus.PlayerGoodsData.RerollDice;
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    SaveGameData->SavePlayerTotalData = PlayerTotalStatus;
+    GI->GetAPSaveGameData()->SavePlayerTotalData = PlayerTotalStatus;
 
-	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, PlayerTotalStatus.SaveSlotName, 0))
+	if (!UGameplayStatics::SaveGameToSlot(GI->GetAPSaveGameData(), PlayerTotalStatus.SaveSlotName, 0))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Save Fail"));
 	}
@@ -28,7 +26,7 @@ void AArcanePunkPlayerState::InitPlayerData()
 {
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->GetDefaultPlayerSlot(), 0));
+    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->GetDefaultSlotName(), 0));
 	if (!SaveGameData)
 	{
 		SaveGameData = GetMutableDefault<UAPSaveGame>();

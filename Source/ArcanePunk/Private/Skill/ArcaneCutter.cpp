@@ -91,6 +91,12 @@ float AArcaneCutter::GetCutterSpeed() const
     return CutterSpeed;
 }
 
+void AArcaneCutter::SetCutterWide(float Wide)
+{
+    FVector Origin = CutterTrigger->GetScaledBoxExtent();
+    WidthScale.X = 1.0f + (Wide /( 4.0f * Origin.Y)) ;
+    CutterTrigger->SetBoxExtent(FVector(Origin.X, Wide, Origin.Z));
+}
 // void AArcaneCutter::SetDeadTime(float DeadTime)
 // {
 // 	DestroyTime = DeadTime;
@@ -153,11 +159,14 @@ void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, U
     }
     
     CutterSpeed = CutterDist * Drag;
-	CutterEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), CutterEffect, OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetActorRotation());
+	CutterEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), CutterEffect, OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetActorRotation(), FVector(1.0f, 1.0f, 1.0f), true, false);
 	if(CutterEffectComp.IsValid())
 	{
-		CutterEffectComp->SetNiagaraVariableFloat(TEXT("Speed"),  CutterSpeed);
-		CutterEffectComp->SetNiagaraVariableFloat(TEXT("Drag"),  Drag);
+        CutterEffectComp->DeactivateImmediate();
+		CutterEffectComp->SetVariableFloat(TEXT("Speed"),  CutterSpeed);
+		CutterEffectComp->SetVariableFloat(TEXT("Drag"),  Drag);
+        CutterEffectComp->SetVariableVec2(TEXT("Size"), FVector2D(WidthScale.X,1.0f));
+        CutterEffectComp->Activate();
 	}
 	
 	BintHit();

@@ -52,7 +52,7 @@ void AArcaneField::SetFieldDamage()
         if (Actor->ActorHasTag(TEXT("Enemy")))
         {               
             auto Enemy = Cast<AEnemy_CharacterBase>(Actor); bool AlreadyHitCheck = Enemy->IsHitting();
-            if(BuffType == EBuffType::Damage) {Enemy->SetDamageMultiple(DamageBuff, DamageRateTime - 0.001f);} FHitResult HitResult;
+            if(BuffType == EBuffType::Damage) {Enemy->AddDamageMultiple(DamageBuff, DamageRateTime - 0.001f);} FHitResult HitResult;
             
             float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(Enemy, FieldDamage * DamageCoefficient, HitResult, false);
 		    OwnerCharacter->GetAttackComponent()->DrainCheck(Enemy, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
@@ -163,7 +163,7 @@ void AArcaneField::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
     Super::CheckGoldEnhance(AbilityNum, NestingNum);
 
-    DamageBuff = 1.0f;
+    DamageBuff = 0.0f;
     switch (AbilityNum)
     {
         case 1: // 스킬 데미지 증가

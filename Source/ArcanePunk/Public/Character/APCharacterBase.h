@@ -53,6 +53,7 @@ public:
 	FORCEINLINE ECharacterState returnState() const {return CurrentState;}; // CurrentState 반환
 	FORCEINLINE void SetState(ECharacterState UpdateState) { CurrentState = UpdateState;}; // CurrentState 설정
 	FORCEINLINE UNiagaraComponent* GetStunEffect() const { return StunEffectComp;};
+	FORCEINLINE UNiagaraComponent* GetFrozenEffect() const { return FrozenEffectComp;};
 
 	// Hit 관련
 	UFUNCTION(BlueprintPure)
@@ -139,6 +140,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "CC State")
 	UNiagaraComponent* StunEffectComp;
+
+	UPROPERTY(EditAnywhere, Category = "CC State")
+	UNiagaraComponent* FrozenEffectComp;
 
 	// 무적기 관련 변수
 	FTimerHandle BlockTimerHandle;

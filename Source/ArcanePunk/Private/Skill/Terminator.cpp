@@ -78,7 +78,7 @@ void ATerminator::SetTerminatorMode()
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TerminatorStartEffect, GetActorLocation(), GetActorRotation());
 
     TerminatorEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(TerminatorEffect, OwnerCharacter->GetMesh(), TEXT("TerminatorEffect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);
-    TerminatorEffectComp->SetNiagaraVariableFloat(TEXT("Time"), DestroyTime);
+    TerminatorEffectComp->SetVariableFloat(TEXT("Time"), DestroyTime);
 
     CurrentFastCoefficient = FastCoefficient;
     CurrentATKCoefficient = ATKCoefficient;

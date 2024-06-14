@@ -90,13 +90,13 @@ void ACarpetBoom::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USk
     
     LavaEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), LavaEffect, GetActorLocation(), GetActorRotation());
     float WidthSize = CollisionWidth * 0.01f; float SpeedScale = CollisionLength * 0.001f;
-    LavaEffectComp->SetNiagaraVariableFloat(TEXT("Size"),  WidthSize);
+    LavaEffectComp->SetVariableFloat(TEXT("Size"),  WidthSize);
     // LavaEffectComp->SetNiagaraVariableFloat(TEXT("SpeedScale"), SpeedScale);
-    LavaEffectComp->SetNiagaraVariableFloat(TEXT("SpawnRate"),  (DefaultSpawnRate * SpeedScale) / WidthSize);
-    LavaEffectComp->SetNiagaraVariableFloat(TEXT("LoopDuration"), CollisionLength / BoomSpeed);
+    LavaEffectComp->SetVariableFloat(TEXT("SpawnRate"),  (DefaultSpawnRate * SpeedScale) / WidthSize);
+    LavaEffectComp->SetVariableFloat(TEXT("LoopDuration"), CollisionLength / BoomSpeed);
 
     // FVector BoomScale = BoomEffectComp->GetComponentScale();
-    BoomEffectComp->SetNiagaraVariableFloat(TEXT("Size"),  WidthSize);
+    BoomEffectComp->SetVariableFloat(TEXT("Size"),  WidthSize);
     
 
     UE_LOG(LogTemp, Display, TEXT("size %f, speed : %f, spawn : %f"), WidthSize, SpeedScale, (DefaultSpawnRate * BoomSpeed) / WidthSize );

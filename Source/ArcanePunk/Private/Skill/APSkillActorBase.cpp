@@ -127,6 +127,9 @@ void AAPSkillActorBase::HomingOrderSet()
 	bHoming = true;
 }
 
+void AAPSkillActorBase::CheckSideEffect(TArray<AActor *> Actors)
+{
+}
 
 void AAPSkillActorBase::CheckBuff(bool NewBool)
 {

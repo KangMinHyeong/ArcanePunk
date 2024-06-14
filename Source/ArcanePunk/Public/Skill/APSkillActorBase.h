@@ -57,6 +57,8 @@ protected:
 
 	virtual void HomingOrderSet();
 
+	virtual void CheckSideEffect(TArray<AActor*> Actors);
+
 	void CheckBuff(bool NewBool);
 	bool CheckSkillKey(USkillNumberBase* SkillNum);
 	void SetPlayerCollisionEnable(bool NewBool);
@@ -76,6 +78,7 @@ public:
 	FORCEINLINE float GetDamage() const {return CurrentDamage;};
 	FORCEINLINE bool IsSlow() const {return bSlow;};
 	FORCEINLINE void SetbCharging(bool NewBool) {bCharging = NewBool;};
+	FORCEINLINE void SetDamagedCoeff(float NewValue) {DamageCoefficient = NewValue;};
 	virtual void SetDeadTime(float DeadTime);
 
 protected:

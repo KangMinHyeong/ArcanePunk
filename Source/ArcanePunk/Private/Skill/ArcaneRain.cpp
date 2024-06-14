@@ -45,8 +45,8 @@ void AArcaneRain::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USk
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
-    RainComp->SetNiagaraVariableFloat(TEXT("Size"), RainSize);
-    RainComp->SetNiagaraVariableFloat(TEXT("RainSpawnRate"), RainSpawnRate);
+    RainComp->SetVariableFloat(TEXT("Size"), RainSize);
+    RainComp->SetVariableFloat(TEXT("RainSpawnRate"), RainSpawnRate);
 
 }
 

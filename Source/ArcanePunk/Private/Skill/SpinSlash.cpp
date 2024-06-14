@@ -81,8 +81,8 @@ void ASpinSlash::SetSlashSize()
     SlashTrigger->SetBoxExtent(BoxSize);
 
     SlashEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SlashEffect, GetActorLocation(), GetActorRotation());
-    SlashEffectComp->SetNiagaraVariableVec3(TEXT("BoxSize"), BoxSize);
-    SlashEffectComp->SetNiagaraVariableFloat(TEXT("Time"), DestroyTime);
+    SlashEffectComp->SetVariableVec3(TEXT("BoxSize"), BoxSize);
+    SlashEffectComp->SetVariableFloat(TEXT("Time"), DestroyTime);
 }
 
 void ASpinSlash::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
