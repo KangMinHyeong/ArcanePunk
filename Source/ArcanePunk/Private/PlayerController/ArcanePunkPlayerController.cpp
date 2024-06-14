@@ -175,6 +175,7 @@ void AArcanePunkPlayerController::OpenSaveSlot()
 void AArcanePunkPlayerController::CloseSaveSlot()
 {
     if(SelectSlotUI.IsValid()) SelectSlotUI->RemoveFromParent();
+    OpenSaveSlot();
 }
 
 void AArcanePunkPlayerController::StartSaveUI()

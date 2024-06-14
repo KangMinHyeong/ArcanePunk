@@ -25,7 +25,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
-
+	
 	void SetBeamEffect();
 	void SetBeamAttack();
 	void SetDistance(float Dist) {Distance = Dist;};
@@ -33,6 +33,9 @@ public:
 
 	virtual void OnCharging() override;
 	void OnChargingEnhance();
+
+	virtual void CheckSideEffect(TArray<AActor*> Actors) override;
+	
 private:
 	void OnChargindCheck(float DeltaTime);
 	void SetSkillComp();
@@ -42,6 +45,7 @@ private:
 	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
 
 	void FireEnd();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* BeamBox;
@@ -93,6 +97,12 @@ protected:
 	uint8 KillsNum = 0;
 	float AddCoolTime = 0.0f;
 
+	bool bFrozen = true;
+	float FrozenPercent = 0.1f;
+	float FrozenTime = 5.0f;
+
 	TWeakObjectPtr<UNiagaraComponent> ChargeEffectComp;
 	TWeakObjectPtr<UNiagaraComponent> ChargeEnhanceEffectComp;
+
+	uint8 HitCount = 0;
 };

@@ -123,7 +123,7 @@ void AArcaneExecution::SetExecutionType(uint8 NewValue)
         AttackType = EAttackType::Second;
         ExecutionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
         auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(SecondEffect, OwnerCharacter->GetMesh(), TEXT("SecondEffect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);
-        NC->SetNiagaraVariableFloat(TEXT("Time"), (TargetEnemyLocation - OwnerCharacter->GetActorLocation() ).Size() / SecondAttackSpeed);
+        NC->SetVariableFloat(TEXT("Time"), (TargetEnemyLocation - OwnerCharacter->GetActorLocation() ).Size() / SecondAttackSpeed);
         SetPlayerCollisionEnable(false);
     }
 }

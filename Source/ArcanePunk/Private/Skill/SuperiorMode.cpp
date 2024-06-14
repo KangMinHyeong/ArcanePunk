@@ -59,7 +59,7 @@ void ASuperiorMode::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, U
     if(!OwnerCharacter.IsValid()) return;
     
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(SuperiorModeEffect, OwnerCharacter->GetMesh(), TEXT("WindRushEffect"), OwnerCharacter->GetMesh()->GetComponentLocation(), OwnerCharacter->GetMesh()->GetComponentRotation(), FVector(1,1,1), EAttachLocation::KeepWorldPosition, true, ENCPoolMethod::None, true);
-    NC->SetNiagaraVariableFloat(TEXT("Time"), DestroyTime);
+    NC->SetVariableFloat(TEXT("Time"), DestroyTime);
 
     OwnerCharacter->GetBuffComp()->ATKSpeedUp(ATKSpeedCoefficient, DestroyTime); 
 

@@ -246,7 +246,7 @@ void AArcaneBall::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USk
     // CheckPlatinumEnhance(SkillAbilityNestingData.PlatinumAbilityNestingNum);
     BintOverlap();
         
-	BallEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+	BallEffect->SetVariableLinearColor(TEXT("Color"),  EffectColor);
     SetActorTickEnabled(true);
 }
 

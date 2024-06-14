@@ -17,7 +17,13 @@ struct FGameData
 	FString SaveSlotName = TEXT("GameSlot_0");
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	FName LevelName = TEXT("Test1");
+	FString LevelName = TEXT("Test1");
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	float SaveRealTime = 0.0f;
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FDateTime SaveDateTime = {};
 };
 
 UCLASS()

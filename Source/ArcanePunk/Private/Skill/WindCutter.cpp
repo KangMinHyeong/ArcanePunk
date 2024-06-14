@@ -125,7 +125,7 @@ void AWindCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USk
 
     float CurrentEffectScale = (MaxWindWitdh * EffectScale) / 100.0f;
     WindEffect->SetRelativeScale3D(FVector(CurrentEffectScale, CurrentEffectScale, CurrentEffectScale));
-    WindEffect->SetNiagaraVariableFloat(TEXT("Time"), 2.0f/ WindSpeed);
+    WindEffect->SetVariableFloat(TEXT("Time"), 2.0f/ WindSpeed);
 
     // WindEffectComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), WindEffect, WindTrigger->GetComponentLocation(), WindTrigger->GetComponentRotation());
     // WindEffect->SetNiagaraVariableFloat(TEXT("Time"), 2.0f/ WindSpeed);

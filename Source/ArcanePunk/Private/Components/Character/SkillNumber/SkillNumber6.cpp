@@ -93,6 +93,13 @@ void USkillNumber6::UpdateSkillData()
 	
 	float Cool = SkillNameListData.CoolTime;
 	
+	for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+		if(It.Key == 3) {
+			UpdatAbilityData(EEnHanceType::Gold, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_SubtractMultiple(Cool, AbilityData->Coefficient_X, It.Value); // 쿨타임 강화
+		} 
+	}
 	for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
     {
 		if(It.Key == 2) {
@@ -100,6 +107,7 @@ void USkillNumber6::UpdateSkillData()
 			LionHowling = true;
 		} 
 	}
+	
     
 	CurrentCoolTime = Cool;
 }

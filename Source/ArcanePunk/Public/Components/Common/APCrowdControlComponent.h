@@ -7,13 +7,14 @@
 #include "APCrowdControlComponent.generated.h"
 
 UENUM()
-enum class ECharacterState : uint8
+enum class ECharacterState : uint8 // 추가할때마다 CC_priority 업데이트
 {
     None        = 0,
     KnockBack   = 1,
     Stun 		= 2,
-    Sleep       = 3,
-	Slow		= 4,
+	Frozen		= 3,
+    Sleep       = 4,
+	Slow		= 5,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -40,9 +41,10 @@ public:
 	void UpdateStatus();
 
 	// 플레이어 상태이상 함수
-	void KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime);//후에 인자 추가 (상태시간)
-	void StunState(float StunTime);//후에 인자 추가 (상태시간)
-	void SleepState();//후에 인자 추가 (상태시간)
+	void KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime);
+	void StunState(float StunTime);
+	void FrozenState(float FrozenTime);
+	void SleepState();
 	void SlowState(int32 SlowPercent, float SlowTime);
 	void BurnState(APawn* DamageCauser, float DOT, float TotalTime, float InRate);
 	void BleedingState(APawn* DamageCauser, float BleedingDamage, float TotalTime, float InRate);
@@ -68,6 +70,7 @@ private:
 		
 	void KnockBackEnd();
 	void StunEnd();
+	void FrozenEnd();
 	void SlowEnd(FTimerHandle* SlowTimerHandle, int32 SlowPercent);
 	void BurnEnd();
 	void BleedingEnd();
@@ -86,6 +89,8 @@ private:
 	FTimerHandle KnockBackTimerHandle;
 
 	FTimerHandle StunTimerHandle;
+
+	FTimerHandle FrozenTimerHandle;
 
 	FTimerHandle SleepTimerHandle;
 

@@ -13,6 +13,7 @@
 USkillNumber7::USkillNumber7()
 {
 	SkillAbilityNestingData.SkillName = TEXT("Skill_7");
+
 }
 
 void USkillNumber7::BeginPlay()
@@ -101,13 +102,35 @@ void USkillNumber7::Activate_Skill()
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ArcaneCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*150.0f , OwnerCharacter->GetActorRotation()); // 
+	ArcaneCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*151.0f , OwnerCharacter->GetActorRotation()); // 
 	if(!ArcaneCutter.IsValid()) return; 
 	ArcaneCutter->SetOwner(OwnerCharacter.Get());
     ArcaneCutter->SetDist((Skill7_LimitDistance * 2.0f - ArcaneCutter->GetTriggerWide() * 2.0f )); // 거리 = 속력 * 시간 으로 DeadTime 수정
+	ArcaneCutter->SetCutterWide(Skill7_Wide);	
 	ArcaneCutter->SetSkill(SkillAbilityNestingData, this);	
 
-	Remove_Skill();
+	Remove_Skill();	
+	GetWorld()->GetTimerManager().SetTimer(Skill7_TimerHandle, this, &USkillNumber7::CheckDoubleCutter, DoubleCutDelay, false);
+}
+
+void USkillNumber7::CheckDoubleCutter()
+{
+	GetWorld()->GetTimerManager().ClearTimer(Skill7_TimerHandle);
+	if(bDoubleCutter)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = OwnerCharacter.Get();
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		auto DoubleCutter = GetWorld()->SpawnActor<AArcaneCutter>(OwnerCharacter->GetAPSkillHubComponent()->GetArcaneCutterClass(), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*150.0f , OwnerCharacter->GetActorRotation()); // 
+		if(!DoubleCutter) return; 
+		DoubleCutter->SetOwner(OwnerCharacter.Get());
+		DoubleCutter->SetDist((Skill7_LimitDistance * 2.0f - DoubleCutter->GetTriggerWide() * 2.0f )); // 거리 = 속력 * 시간 으로 DeadTime 수정
+		DoubleCutter->SetSkill(SkillAbilityNestingData, this);	
+		DoubleCutter->SetCutterWide(Skill7_Wide);	
+		DoubleCutter->SetDamagedCoeff(DoubleCutterDamaged);	
+	}
 }
 
 void USkillNumber7::SkillEnd()
@@ -123,6 +146,7 @@ void USkillNumber7::UpdateSkillData()
 	float Dist = Skill7_LimitDistance_Origin;
 	float Wide = Skill7_Wide_Origin;
 	float Cool = SkillNameListData.CoolTime;
+	float Damaged = DoubleCutterDamaged_Origin;
 	for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
     {
 		if(It.Key == 2) {
@@ -130,13 +154,23 @@ void USkillNumber7::UpdateSkillData()
 			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Dist, AbilityData->Coefficient_X, It.Value); // 사거리 강화}
 		} 
 	}
-    // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
-    // {
-    // }
-    // for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
-    // {
-    // }
+    for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+		if(It.Key == 3) {
+			UpdatAbilityData(EEnHanceType::Gold, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Wide, AbilityData->Coefficient_X, It.Value); // 가로 강화}
+		}
+    }
+    for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+		if(It.Key == 3) {
+			bDoubleCutter = true;
+			UpdatAbilityData(EEnHanceType::Platinum, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Damaged, AbilityData->Coefficient_X, It.Value); // 가로 강화}
+		}
+    }
 	Skill7_LimitDistance = Dist;
 	Skill7_Wide = Wide;
 	CurrentCoolTime = Cool;
+	DoubleCutterDamaged = Damaged;
 }

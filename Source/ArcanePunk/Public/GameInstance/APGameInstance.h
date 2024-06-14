@@ -12,6 +12,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillEnhanceDataClear, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGettingGold, int32);
 
 class AEnemy_DropPackage;
+class UAPSaveGame;
 
 USTRUCT(BlueprintType)
 struct FGameSoundVolume
@@ -45,10 +46,10 @@ public:
 	FORCEINLINE UDataTable* GetPlatinumAbilityDataTable() const {return PlatinumAbilityDataTable;};
 	FORCEINLINE UDataTable* GetEquipDataTable() const {return EquipDataTable;};
 
-	FORCEINLINE FString GetDefaultGameSlot() const {return DefaultGameSlot;};
-	FORCEINLINE void SetDefaultGameSlot(FString NewName) {DefaultGameSlot = NewName;};
-	FORCEINLINE FString GetDefaultPlayerSlot() const {return DefaultPlayerSlot;};
-	FORCEINLINE void SetDefaultPlayerSlot(FString NewName) {DefaultPlayerSlot = NewName;};
+	FORCEINLINE FString GetDefaultSlotName() const {return DefaultSlotName;};
+	FORCEINLINE void SetDefaultSlotName(FString NewName) {DefaultSlotName = NewName;};
+	
+	FORCEINLINE UAPSaveGame* GetAPSaveGameData() const {return APSaveGameData;};
 
 	FORCEINLINE FGameSoundVolume GetGameSoundVolume() const {return GameSoundVolume;};
 	// 후에 값이 변할때마다 업데이트
@@ -72,12 +73,12 @@ public:
 	FORCEINLINE float GetGoldPlusPercent() const {return GoldPlusPercent;};
 	FORCEINLINE void SetGoldPlusPercent(float NewValue) {GoldPlusPercent = NewValue;};
 	int32 CheckGoldAmount();
+
+	FORCEINLINE float GetSavedRealTime() const {return SavedRealTime;};
+	FORCEINLINE void SetSavedRealTime(float NewValue) {SavedRealTime = NewValue;};
 private:
 	UPROPERTY()
-	FString DefaultGameSlot = "GameSlot_0";
-
-	UPROPERTY()
-	FString DefaultPlayerSlot = "PlayerSlot_0";	
+	FString DefaultSlotName = "PlayerSlot_0";
 
 	UPROPERTY()
 	bool bNewGame = false;
@@ -120,6 +121,12 @@ private:
 
 	UPROPERTY()
 	float GoldPlusPercent = 0.0f;
+
+	UPROPERTY()
+	UAPSaveGame* APSaveGameData;
+
+	UPROPERTY()
+	float SavedRealTime = 0.0f;
 
 public:
 	FOnSkillEnhanceDataUpdate OnSkillEnhanceDataUpdate;

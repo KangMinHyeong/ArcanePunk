@@ -126,7 +126,7 @@ void AArcaneReflector::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData
 
     DotTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
     DotTrigger->SetSphereRadius(DotTriggerRangeSize * DotTriggerRange);
-    DotRangeEffect->SetNiagaraVariableFloat(TEXT("Size"), DotTriggerRangeSize);
+    DotRangeEffect->SetVariableFloat(TEXT("Size"), DotTriggerRangeSize);
     DotRangeEffect->Activate();
 
     ChargeSpeed = (ReflectTime - CurrentReflectTime) / ReflectTime;

@@ -147,7 +147,7 @@ void UAPAttackComponent::SpawnSwordTrail(uint8 ComboStack)
 	}
 	FVector PlusLoc = SwordTrailHeight.X * OwnerCharacter->GetActorForwardVector() + OwnerCharacter->GetActorUpVector()*SwordTrailHeight.Z;
 	auto SwordTrail = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SwordTrailEffect, OwnerCharacter->GetActorLocation() + PlusLoc, OwnerCharacter->GetActorRotation() + PlusRot);
-	SwordTrail->SetNiagaraVariableFloat(TEXT("AttackSpeed"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+	SwordTrail->SetVariableFloat(TEXT("AttackSpeed"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
 }
 
 //AttackTrace 코드 시작

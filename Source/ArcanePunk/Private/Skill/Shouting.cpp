@@ -9,6 +9,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/Character/APAttackComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Enemy/Enemy_CharacterBase.h"
 
 AShouting::AShouting()
 {
@@ -37,18 +38,33 @@ void AShouting::SetShoutingEffect()
     if(!OwnerCharacter.IsValid()) return;
     if(ShoutEffect) ShoutComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ShoutEffect, GetActorLocation() + GetActorUpVector()*50.0f, GetActorRotation());
     if(!ShoutComp.IsValid()) return; 
-    ShoutComp->SetNiagaraVariableFloat(TEXT("Size"), ShoutRadius / InitShoutRadius);
+    ShoutComp->SetVariableFloat(TEXT("Size"), ShoutRadius / InitShoutRadius);
     
 }
 
 void AShouting::SetShoutingAttack()
 {
     if(!OwnerCharacter.IsValid()) return;
-    float LionHowlingCoeff = 1.0f;
-    if(LionHowling) LionHowlingCoeff = 2.0f;
+    LionHowlingCoeff = 1.0f;
+    if(LionHowling)  LionHowlingCoeff = 2.0f;
 
-    OwnerCharacter->GetAttackComponent()->MultiAttack(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius, DamageCoefficient, 1, true, StateTime * LionHowlingCoeff);
+    auto Actors = OwnerCharacter->GetAttackComponent()->MultiAttack_Return(OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ShoutRadius, DamageCoefficient, 1, InstantDeathPercent, true, StateTime * LionHowlingCoeff);
     DestroySKill();
+
+    CheckSideEffect(Actors);
+}
+
+void AShouting::CheckSideEffect(TArray<AActor*> Actors) // 증강 부가효과
+{
+    if(bScratch)
+    {
+        for( auto Actor : Actors)
+        {
+            auto Enemy = Cast<AEnemy_CharacterBase>(Actor); if(!Enemy) return;
+            Enemy->AddDamageMultiple(ScratchCoeff, StateTime * LionHowlingCoeff);
+            Enemy->OnAttachingDamagedMark(StateTime * LionHowlingCoeff);
+        }
+    }
 }
 
 void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
@@ -112,6 +128,11 @@ void AShouting::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
     {
         case 1: // Damage Up
         SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 3: // 표식
+        bScratch = true;
+        SkillAbilityComponent->Coefficient_Add(ScratchCoeff,AbilityData->Coefficient_X, NestingNum - 1);
         break;
     }
 }

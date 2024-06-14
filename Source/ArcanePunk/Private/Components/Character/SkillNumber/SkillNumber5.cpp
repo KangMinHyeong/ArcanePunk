@@ -195,6 +195,13 @@ void USkillNumber5::UpdateSkillData()
 			OwnerCharacter->GetAPSkillAbility()->Coefficient_AddMultiple(Wide, AbilityData->Coefficient_X, It.Value); // 사거리 강화}
 		} 
 	}
+	for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+		if(It.Key == 3) {
+			UpdatAbilityData(EEnHanceType::Gold, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_SubtractMultiple(Cool, AbilityData->Coefficient_X, It.Value); // 쿨타임 강화
+		} 
+	}
     // for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
     // {
     // }

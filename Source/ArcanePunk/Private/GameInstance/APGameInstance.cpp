@@ -1,9 +1,14 @@
 
 #include "GameInstance/APGameInstance.h"
 
+#include "Save/APSaveGame.h"
+
 void UAPGameInstance::Init()
 {
     Super::Init();
+
+    APSaveGameData = NewObject<UAPSaveGame>();
+
     OnSkillEnhanceDataUpdate.AddUObject(this, &UAPGameInstance::UpdateSkillEnhanceData);
     OnSkillEnhanceDataClear.AddUObject(this, &UAPGameInstance::ClearSkillEnhanceData);
 }

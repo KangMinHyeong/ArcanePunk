@@ -123,6 +123,6 @@ void ASwordImpact::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, US
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 
-	BaseEffect->SetNiagaraVariableLinearColor(TEXT("Color"),  EffectColor);
+	BaseEffect->SetVariableLinearColor(TEXT("Color"),  EffectColor);
 	ImpactComp->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }

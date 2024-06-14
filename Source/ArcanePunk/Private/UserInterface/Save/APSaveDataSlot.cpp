@@ -2,137 +2,108 @@
 #include "UserInterface/Save/APSaveDataSlot.h"
 
 #include "Components/TextBlock.h"
+#include "Components/Border.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameState/APGameState.h"
 #include "GameInstance/APGameInstance.h"
 #include "Save/APSaveGame.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "UserInterface/Save/APSaveSlotUI.h"
 
 void UAPSaveDataSlot::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    TEXT_SlotName->SetText(FText::FromString(SlotName));
+}
+
+FReply UAPSaveDataSlot::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
+{
+    FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+    if(ParentWidget.IsValid()) ParentWidget->ChangingCurrentSaveSlot(this);
+    TurnOnSlot();
+
+    return Reply.Handled();
 }
 
 FReply UAPSaveDataSlot::NativeOnMouseButtonDoubleClick( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
     FReply Reply = Super::NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);
 
-    if(LoadMode) // Title
-    {
-        if(SlotName == "No Data") // Load 데이터가 없으므로 리턴
-        {
-            return Reply.Handled();
-        }
-        else // Load 데이터가 있으므로 이 데이터로 시작
-        {
-            Load();
-        }
-    }
-    else // InGame
-    {
-        if(SlotName == "No Data") // 유효 데이터가 없으므로 바로 저장
-        {
-            Save();
-        }
-        else // 유효 데이터가 있으므로 덮어씌울 지 되묻고 저장
-        {
-            Save();
-        }
-    }
-    
-
 	return Reply.Handled();
 }
 
-void UAPSaveDataSlot::SetSlotName(FString NewName)
+void UAPSaveDataSlot::SetSlotData(UAPSaveGame * SavedData)
 {
-    SlotName = NewName;
-    TEXT_SlotName->SetText(FText::FromString(SlotName));
+    HasSavingData = true;
+    TEXT_SlotName->SetText(FText::FromString(SavedData->SaveInGameData.LevelName));
+
+    int32 RealTime = round(SavedData->SaveInGameData.SaveRealTime);
+    TEXT_PlayTime_Hours->SetText(FText::FromString(FString::FromInt(RealTime / 3600))); RealTime = RealTime % 3600;
+    TEXT_PlayTime_Minutes->SetText(FText::FromString(FString::FromInt(RealTime / 60))); RealTime = RealTime % 60;
+    TEXT_PlayTime_Seconds->SetText(FText::FromString(FString::FromInt(RealTime)));
+
+    TEXT_Year->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetYear()))); 
+    TEXT_Month->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetMonth()))); 
+    TEXT_Day->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetDay())));
+    TEXT_Hours->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetHour()))); 
+    TEXT_Minutes->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetMinute()))); 
+}
+
+void UAPSaveDataSlot::SetSlotName(FString PlayerSlot, UUserWidget* Parent)
+{
+    PlayerSlotName = PlayerSlot;
+    ParentWidget = Cast<UAPSaveSlotUI>(Parent);
 }
 
 void UAPSaveDataSlot::SetSlotNumber(uint8 NewSlotNumber)
 {
-    SlotNumber = NewSlotNumber;
     TEXT_SlotNumber->SetText(FText::FromString(FString::FromInt(NewSlotNumber)));
+}
+
+void UAPSaveDataSlot::TurnOnSlot()
+{
+    Border_Background->Background.SetResourceObject(TabImage_ON);
+}
+
+void UAPSaveDataSlot::TurnOffSlot()
+{
+    Border_Background->Background.SetResourceObject(TabImage_OFF);
 }
 
 void UAPSaveDataSlot::Save()
 {
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter) return;
 
-    switch (SlotNumber)
-    {
-        case 1:
-        OwnerCharacter->SaveStatus(PlayerSlotName_1, GameSlotName_1);
-        break;
-
-        case 2:
-        OwnerCharacter->SaveStatus(PlayerSlotName_2, GameSlotName_2);
-        break;
-
-        case 3:
-        OwnerCharacter->SaveStatus(PlayerSlotName_3, GameSlotName_3);
-        break;
-
-        case 4:
-        OwnerCharacter->SaveStatus(PlayerSlotName_4, GameSlotName_4);
-        break;
-
-        case 5:
-        OwnerCharacter->SaveStatus(PlayerSlotName_5, GameSlotName_5);
-        break;
-    }
-
+    OwnerCharacter->SaveStatus(PlayerSlotName);
+    
     auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); 
     if(PC) PC->CloseSaveSlot();
 }
 
 void UAPSaveDataSlot::Load()
 {
+    if(!HasSavingData) return;
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    switch (SlotNumber)
-    {
-        case 1:
-        GI->SetDefaultGameSlot(GameSlotName_1);
-        GI->SetDefaultPlayerSlot(PlayerSlotName_1);
-        break;
-
-        case 2:
-        GI->SetDefaultGameSlot(GameSlotName_2);
-        GI->SetDefaultPlayerSlot(PlayerSlotName_2);
-        break;
-
-        case 3:
-        GI->SetDefaultGameSlot(GameSlotName_3);
-        GI->SetDefaultPlayerSlot(PlayerSlotName_3);
-        break;
-
-        case 4:
-        GI->SetDefaultGameSlot(GameSlotName_4);
-        GI->SetDefaultPlayerSlot(PlayerSlotName_4);
-        break;
-
-        case 5:
-        GI->SetDefaultGameSlot(GameSlotName_5);
-        GI->SetDefaultPlayerSlot(PlayerSlotName_5);
-        break;
-    }
-
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->GetDefaultGameSlot(), 0));
+    GI->SetDefaultSlotName(PlayerSlotName);
+    
+    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(PlayerSlotName, 0));
 	if (!SaveGameData)
 	{
 		SaveGameData = GetMutableDefault<UAPSaveGame>();
 	}
-    UGameplayStatics::OpenLevel(this, SaveGameData->SaveLevelName);
     
+    UGameplayStatics::OpenLevel(this, FName(*SaveGameData->SaveInGameData.LevelName));
+}
 
-    // auto GS = Cast<AAPGameState>(UGameplayStatics::GetGameState(this));
-	// if(GS != nullptr)
-	// {
-    //     UGameplayStatics::OpenLevel(this, GS->GameData.LevelName);
-    // }	    
+void UAPSaveDataSlot::Delete()
+{
+    auto SaveGameData = NewObject<UAPSaveGame>();
+
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, PlayerSlotName, 0))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Save Fail"));
+	}
 }

@@ -49,15 +49,15 @@ void AAreaBeam::OnBeamAttack()
 	GetWorldTimerManager().ClearTimer(FireTimerHandle);
 	AreaStartEffect->DeactivateImmediate();
 	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AreaBeamEffect, GetActorLocation(), GetActorRotation());
-	NC->SetNiagaraVariableFloat(TEXT("Time"),  DestroyTime);
+	NC->SetVariableFloat(TEXT("Time"),  DestroyTime);
 
 	float Width = AreaWidth / InitWidth;
     float Length = AreaLength / InitLength;
-	NC->SetNiagaraVariableFloat(TEXT("Width"),  Width);
-    NC->SetNiagaraVariableFloat(TEXT("Length"),  Length);
-    NC->SetNiagaraVariableVec2(TEXT("Size2D"),  FVector2D(Width, Length));
-    NC->SetNiagaraVariableVec3(TEXT("Size3D"),  FVector(Width, Length, 1.0f));
-    NC->SetNiagaraVariableVec3(TEXT("AddVector"),  FVector((AreaLength - InitLength) * 0.5f, 0.0f, 0.0f));
+	NC->SetVariableFloat(TEXT("Width"),  Width);
+    NC->SetVariableFloat(TEXT("Length"),  Length);
+    NC->SetVariableVec2(TEXT("Size2D"),  FVector2D(Width, Length));
+    NC->SetVariableVec3(TEXT("Size3D"),  FVector(Width, Length, 1.0f));
+    NC->SetVariableVec3(TEXT("AddVector"),  FVector((AreaLength - InitLength) * 0.5f, 0.0f, 0.0f));
 
 	// Attack
 	SetAreaDamage();
@@ -75,7 +75,7 @@ void AAreaBeam::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkil
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
 
-	AreaStartEffect->SetNiagaraVariableFloat(TEXT("Time"),  BeamDelay);
+	AreaStartEffect->SetVariableFloat(TEXT("Time"),  BeamDelay);
 	AreaStartEffect->Activate();
 	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AAreaBeam::OnBeamAttack, BeamDelay, false);
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AAreaBeam::DestroySKill, DestroyTime, false);

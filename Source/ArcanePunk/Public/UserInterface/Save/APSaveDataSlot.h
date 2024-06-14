@@ -7,6 +7,9 @@
 #include "APSaveDataSlot.generated.h"
 
 class UTextBlock;
+class UAPSaveSlotUI;
+class UBorder;
+class UAPSaveGame;
 
 UCLASS()
 class ARCANEPUNK_API UAPSaveDataSlot : public UUserWidget
@@ -15,50 +18,60 @@ class ARCANEPUNK_API UAPSaveDataSlot : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)override;
 	virtual FReply NativeOnMouseButtonDoubleClick( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 
-	void SetSlotName(FString NewName);
+	void SetSlotData(UAPSaveGame* SavedData);
+	void SetSlotName(FString PlayerSlot, UUserWidget* Parent);
 	void SetSlotNumber(uint8 NewSlotNumber);
-	void SetLoadMode(bool NewBool) {LoadMode = NewBool;};
 
-private:
+	void TurnOnSlot();
+	void TurnOffSlot();
+
 	void Save();
 	void Load();
+	void Delete();
+private:
 
 private:
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UBorder* Border_Background;
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TEXT_SlotName;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TEXT_SlotNumber;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_PlayTime_Hours;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_PlayTime_Minutes;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_PlayTime_Seconds;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_Year;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_Month;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_Day;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_Hours;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TEXT_Minutes;
+
 	FString SlotName = "No Data";
 
-	uint8 SlotNumber = 0;
-
-	FString PlayerSlotName_1 = TEXT("PlayerSlot_1");
-
-	FString PlayerSlotName_2 = TEXT("PlayerSlot_2");
-
-	FString PlayerSlotName_3 = TEXT("PlayerSlot_3");
-
-	FString PlayerSlotName_4 = TEXT("PlayerSlot_4");
-
-	FString PlayerSlotName_5 = TEXT("PlayerSlot_5");
-
+	FString PlayerSlotName = TEXT("PlayerSlot_1");
 	FString DefaultPlayerSlot = TEXT("PlayerSlot_0");
 
-	FString GameSlotName_1 = TEXT("GameSlot_1");
+	TWeakObjectPtr<UAPSaveSlotUI> ParentWidget;
 
-	FString GameSlotName_2 = TEXT("GameSlot_2");
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_ON;
+	UPROPERTY(EditAnywhere)
+	UTexture2D* TabImage_OFF;
 
-	FString GameSlotName_3 = TEXT("GameSlot_3");
-
-	FString GameSlotName_4 = TEXT("GameSlot_4");
-
-	FString GameSlotName_5 = TEXT("GameSlot_5");
-
-	FString DefaultGameSlot = TEXT("GameSlot_0");
-
-	bool LoadMode = false; // T : Title and Load , F : InGame and Save
+	bool HasSavingData = false;
 };

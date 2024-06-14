@@ -85,7 +85,7 @@ void UAPGhostTrailSpawnComponent::SetSkillTrail(bool NewBool)
 		if (SkillTrail.IsValid()){FinalSkillActor = SkillTrail.Get(); SkillTrail->SetOwner(OwnerCharacter.Get()); SkillTrail->InitSkillPoseFirst(OwnerCharacter->GetMesh(), TraceTime);}
 
 		FloorTrail = UNiagaraFunctionLibrary::SpawnSystemAttached(SkillFloorTrailSystem, OwnerCharacter->GetMesh(), TEXT("FloorTrail"), FVector(0,0,0), FRotator::ZeroRotator, SkillFloorTrailSize, EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
-		FloorTrail->SetNiagaraVariableFloat(TEXT("CustomLifetime"),  TraceTime);
+		FloorTrail->SetVariableFloat(TEXT("CustomLifetime"),  TraceTime);
 
 	}
 	else

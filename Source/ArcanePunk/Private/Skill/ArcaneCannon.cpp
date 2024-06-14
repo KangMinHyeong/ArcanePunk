@@ -62,7 +62,7 @@ void AArcaneCannon::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, 
 	}
 
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), CannonHitEffect, GetActorLocation(), GetActorRotation());
-    NC->SetNiagaraVariableFloat(TEXT("Size"), (CannonWidth * ExplosionRange) / DefaultCannonWidth);
+    NC->SetVariableFloat(TEXT("Size"), (CannonWidth * ExplosionRange) / DefaultCannonWidth);
 
     DestroySKill();
 }

@@ -9,11 +9,11 @@
 
 void AAPGameState::SaveGameData()
 {
-    UAPSaveGame* SaveGameData = NewObject<UAPSaveGame>();
-    
-    SaveGameData->SaveLevelName = GameData.LevelName;
+	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+        
+    GI->GetAPSaveGameData()->SaveInGameData = GameData;
 
-	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, GameData.SaveSlotName, 0))
+	if (!UGameplayStatics::SaveGameToSlot(GI->GetAPSaveGameData(), GameData.SaveSlotName, 0))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Save Fail"));
 	}
@@ -23,13 +23,13 @@ void AAPGameState::InitGameData()
 {
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
-    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->GetDefaultGameSlot(), 0));
+    UAPSaveGame* SaveGameData = Cast<UAPSaveGame>(UGameplayStatics::LoadGameFromSlot(GI->GetDefaultSlotName(), 0));
 	if (!SaveGameData)
 	{
 		SaveGameData = GetMutableDefault<UAPSaveGame>();
 	}
 
-    GameData.LevelName = SaveGameData->SaveLevelName;
+    GameData = SaveGameData->SaveInGameData;
 }
 
 void AAPGameState::UpdateGameData(FGameData& GD)
