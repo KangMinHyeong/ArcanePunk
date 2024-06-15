@@ -93,7 +93,7 @@ public:
 
 	// Skill Window
 	void DisplaySkillWindow();
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -103,15 +103,11 @@ private:
 	void LookStatus();
 	void FreeCameraMode();
 
-	void EndSaveUI();
-
 	//Interaction
 	void OnStageSelectingUI();
 	void OnConversationUI(FName Name, uint8 State);
 
 private:
-	FTimerHandle SaveTimerHandle;
-
 	bool bLookStatus = false;
 
 	UPROPERTY(EditAnywhere)
@@ -218,6 +214,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> NotEnoughMPUIClass;
 	
+	// SkillWindowUIClass 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SkillWindowUIClass;
 

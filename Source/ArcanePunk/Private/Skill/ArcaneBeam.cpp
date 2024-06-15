@@ -161,7 +161,7 @@ void AArcaneBeam::OnChargingEnhance()
 void AArcaneBeam::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());  if(!OwnerCharacter.IsValid()) return;
+    if(!OwnerCharacter.IsValid()) return;
     
     for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
     {

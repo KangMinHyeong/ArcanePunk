@@ -69,4 +69,16 @@ void UUltSkillNumber_1::SkillEnd()
 
 void UUltSkillNumber_1::UpdateSkillData()
 {
+	Super::UpdateSkillData();
+	if(!OwnerCharacter.IsValid()) return;
+	
+	float Cool = SkillNameListData.CoolTime;
+	for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+		if(It.Key == 3) {
+			UpdatAbilityData(EEnHanceType::Gold, It.Key); 
+			OwnerCharacter->GetAPSkillAbility()->Coefficient_SubtractMultiple(Cool, AbilityData->Coefficient_X, It.Value); // 쿨타임 강화
+		} 
+	}
+	CurrentCoolTime = Cool;
 }

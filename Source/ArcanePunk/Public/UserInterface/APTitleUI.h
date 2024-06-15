@@ -25,6 +25,9 @@ protected:
 	UFUNCTION()
 	void Setting();
 
+	UFUNCTION()
+	void Exit();
+
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_NewGame;
@@ -34,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Setting;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_Exit;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAPSaveSlotUI> SelectSaveSlotClass;

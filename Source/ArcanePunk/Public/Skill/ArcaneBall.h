@@ -37,7 +37,7 @@ public:
 
 	void UpdateBallSpeed();
 	
-	FORCEINLINE float GetBallSpeed() const;
+	float GetBallSpeed() const;
 
 	virtual void SetDeadTime(float DeadTime) override;
 

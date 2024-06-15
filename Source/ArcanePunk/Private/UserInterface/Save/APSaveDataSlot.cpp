@@ -36,7 +36,7 @@ FReply UAPSaveDataSlot::NativeOnMouseButtonDoubleClick( const FGeometry& InGeome
 
 void UAPSaveDataSlot::SetSlotData(UAPSaveGame * SavedData)
 {
-    HasSavingData = true;
+    bSavingData = true;
     TEXT_SlotName->SetText(FText::FromString(SavedData->SaveInGameData.LevelName));
 
     int32 RealTime = round(SavedData->SaveInGameData.SaveRealTime);
@@ -78,13 +78,13 @@ void UAPSaveDataSlot::Save()
 
     OwnerCharacter->SaveStatus(PlayerSlotName);
     
-    auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); 
+    auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); 
     if(PC) PC->CloseSaveSlot();
 }
 
 void UAPSaveDataSlot::Load()
 {
-    if(!HasSavingData) return;
+    if(!bSavingData) return;
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
 
     GI->SetDefaultSlotName(PlayerSlotName);
@@ -100,10 +100,8 @@ void UAPSaveDataSlot::Load()
 
 void UAPSaveDataSlot::Delete()
 {
-    auto SaveGameData = NewObject<UAPSaveGame>();
+    UGameplayStatics::DeleteGameInSlot(PlayerSlotName, 0);
 
-	if (!UGameplayStatics::SaveGameToSlot(SaveGameData, PlayerSlotName, 0))
-	{
-		UE_LOG(LogTemp, Display, TEXT("Save Fail"));
-	}
+    auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); 
+    if(PC) PC->CloseSaveSlot();
 }

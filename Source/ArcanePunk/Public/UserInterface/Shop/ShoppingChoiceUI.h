@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UserInterface/Common/CheckingWidgetInterface.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Blueprint/UserWidget.h"
@@ -14,11 +15,13 @@ class UImage;
 class UButton;
 
 UCLASS()
-class ARCANEPUNK_API UShoppingChoiceUI : public UUserWidget
+class ARCANEPUNK_API UShoppingChoiceUI : public UUserWidget, public ICheckingWidgetInterface
 {
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
+
+	virtual void OnValidating(ECheckType UpdateCheckType) override;
 
 	void InitParent(UUserWidget* UpdateParentWidget, int32 UpdateChoiceNumber);
 	void InitInformation_Enhance(FShopGoodsData_Enhance ShopGoodsData_Enhance);

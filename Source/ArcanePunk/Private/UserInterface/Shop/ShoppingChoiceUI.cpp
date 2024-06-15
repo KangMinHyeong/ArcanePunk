@@ -11,6 +11,7 @@
 #include "Items/APItemBase.h"
 #include "ArcanePunk/Public/Components/APInventoryComponent.h"
 #include "GameInstance/APGameInstance.h"
+#include "UserInterface/Common/APCheckUI.h"
 
 void UShoppingChoiceUI::NativeConstruct()
 {
@@ -230,7 +231,8 @@ void UShoppingChoiceUI::SwitchingAddition_NewSkill(EEnHanceType EnHanceType)
     Text_Addition->SetText(FText::FromString(AdditionName));
 }
 
-void UShoppingChoiceUI::OnCheckPurchase()
+
+void UShoppingChoiceUI::OnValidating(ECheckType UpdateCheckType)
 {
     auto Shop = Cast<UAPShoppingUI>(ParentWidget); if(!Shop) return;
 
@@ -242,23 +244,40 @@ void UShoppingChoiceUI::OnCheckPurchase()
         auto APGI = Cast<UAPGameInstance>(GetGameInstance()); 
         if(APGI) APGI->OnGettingGold.Broadcast(-CurrentPrice);
     }
-    else
-    {
-        Shop->OnNotEnoughGold();
-        return;
-    }
-    
+
     if(bEnhanceUI)
     {
         CurrentAbilityData.Value++;
         OwnerCharacter->GetAPHUD()->DisplayEnhanceGauge(CurrentAbilityData.Value, MaxNum);
-        UE_LOG(LogTemp, Display, TEXT("Your %d, %d"), CurrentAbilityData.Value, MaxNum);
         Shop->PurchaseEnhance(ChoiceNumber, EnhanceData, CurrentAbilityData);
     }
     else
     {
         Shop->PurchaseSkill(ChoiceNumber, NewSkillData);
         RemoveFromParent();
+    }
+}
+
+void UShoppingChoiceUI::OnCheckPurchase()
+{
+    auto Shop = Cast<UAPShoppingUI>(ParentWidget); if(!Shop) return;
+
+    // 재화 체크  
+    auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")); if(!Item) {Shop->OnNotEnoughGold(); return;} // 골드 부족 UI
+    if(Item->Quantity >= CurrentPrice)
+    {
+        auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+
+        auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), GI->GetCheckUIClass());
+        if(CheckUI)
+        {
+            CheckUI->AddToViewport(1); 
+            CheckUI->SetCheckType(ECheckType::Purchase, this);
+        }
+    }
+    else
+    {
+        Shop->OnNotEnoughGold();
     }
 }
 

@@ -183,8 +183,6 @@ void AArcanePunkPlayerController::StartSaveUI()
     SaveUI = Cast<UUserWidget>(CreateWidget(this, SaveCompleteClass)); if(!SaveUI.IsValid()) return;
 
     SaveUI->AddToViewport();
-
-    GetWorldTimerManager().SetTimer(SaveTimerHandle, this, &AArcanePunkPlayerController::EndSaveUI, LoadingTime, false);
 }
 
 void AArcanePunkPlayerController::OpenStageSelectingUI(AActor* CameraActor)
@@ -271,11 +269,6 @@ void AArcanePunkPlayerController::CloseShoppingUI()
         MyCharacter->EnableInput(this);
         ShoppingUI->RemoveFromParent();
     } 
-}
-
-void AArcanePunkPlayerController::EndSaveUI()
-{
-    SaveUI->RemoveFromParent();
 }
 
 void AArcanePunkPlayerController::HitUI()

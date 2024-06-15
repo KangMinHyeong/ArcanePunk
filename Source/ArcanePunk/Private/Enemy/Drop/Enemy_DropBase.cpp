@@ -22,7 +22,6 @@ AEnemy_DropBase::AEnemy_DropBase()
 	DropMovement->InitialSpeed = DropSpeed;
 
 	DropMesh->SetSimulatePhysics(true);
-	DropMesh->SetMassOverrideInKg(NAME_None,1.0f, true);
 	DropMesh->BodyInstance.bLockXRotation = true;
 	DropMesh->BodyInstance.bLockYRotation = true;
 	DropMesh->SetPhysicsMaxAngularVelocityInDegrees(MaxAngularVelocity);
