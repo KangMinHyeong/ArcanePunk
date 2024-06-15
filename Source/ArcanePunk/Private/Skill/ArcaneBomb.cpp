@@ -16,7 +16,6 @@ AArcaneBomb::AArcaneBomb()
     BombTrigger->SetupAttachment(BombMesh);
 
     BombMesh->SetSimulatePhysics(true);
-	BombMesh->SetMassOverrideInKg(NAME_None,1.0f, true);
 	BombMesh->BodyInstance.bLockXRotation = true;
 	BombMesh->BodyInstance.bLockYRotation = true;
     BombMesh->BodyInstance.bLockZRotation = true;

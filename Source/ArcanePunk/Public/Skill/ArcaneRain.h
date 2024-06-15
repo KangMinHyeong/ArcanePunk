@@ -30,6 +30,10 @@ public:
 private:
 	virtual void DestroySKill() override;
 
+	virtual void CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+	virtual void CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum) override;
+
 private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* RainRoot;

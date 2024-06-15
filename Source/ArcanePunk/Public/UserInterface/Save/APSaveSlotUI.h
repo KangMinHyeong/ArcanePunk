@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UserInterface/Common/CheckingWidgetInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "APSaveSlotUI.generated.h"
 
@@ -12,7 +13,7 @@ class UAPSaveDataSlot;
 class UTextBlock;
 
 UCLASS()
-class ARCANEPUNK_API UAPSaveSlotUI : public UUserWidget
+class ARCANEPUNK_API UAPSaveSlotUI : public UUserWidget, public ICheckingWidgetInterface
 {
 	GENERATED_BODY()
 public:
@@ -20,6 +21,10 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)override;
 	virtual FReply NativeOnMouseButtonDoubleClick( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	virtual FReply NativeOnKeyDown( const FGeometry& InGeometry, const FKeyEvent& InKeyEvent ) override;
+	
+	virtual void OnValidating(ECheckType UpdateCheckType) override;
+	
 	void BindButton();
 	void BindSlot();
 
@@ -34,6 +39,8 @@ private:
 	void OnClickButton_Delete();
 	UFUNCTION()
 	void OnClickButton_Select();
+
+	void OpenCheckUI(ECheckType UpdateCheckType);
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	

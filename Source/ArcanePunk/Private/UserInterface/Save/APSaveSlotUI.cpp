@@ -11,6 +11,8 @@
 #include "Components/ScrollBox.h"
 #include "PlayerController/APTitlePlayerController.h"
 #include "Components/TextBlock.h"
+#include "UserInterface/Common/APCheckUI.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPSaveSlotUI::NativeConstruct()
 {
@@ -36,6 +38,40 @@ FReply UAPSaveSlotUI::NativeOnMouseWheel( const FGeometry& InGeometry, const FPo
 {
     FReply Reply = Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 	return Reply.Handled();
+}
+
+FReply UAPSaveSlotUI::NativeOnKeyDown(const FGeometry &InGeometry, const FKeyEvent &InKeyEvent)
+{
+    FReply Reply = Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+
+    if(InKeyEvent.GetKey() == EKeys::Escape)
+    {
+        RemoveFromParent();
+        return Reply.Handled();
+    }
+    
+	return Reply.Handled();
+}
+
+void UAPSaveSlotUI::OnValidating(ECheckType UpdateCheckType)
+{
+    UE_LOG(LogTemp, Display, TEXT("Your aa"));
+    if(!CurrentSaveSlot.IsValid()) return;
+    UE_LOG(LogTemp, Display, TEXT("Your bb"));
+    switch (UpdateCheckType)
+    {
+    case ECheckType::Delete:
+        CurrentSaveSlot->Delete();
+        break;
+    
+    case ECheckType::Save:
+        CurrentSaveSlot->Save();
+        break;
+
+    case ECheckType::Load:
+        CurrentSaveSlot->Load();
+        break;
+    }    
 }
 
 void UAPSaveSlotUI::BindButton()
@@ -102,14 +138,29 @@ void UAPSaveSlotUI::OnClickButton_Back()
 
 void UAPSaveSlotUI::OnClickButton_Delete()
 {
-    if(!CurrentSaveSlot.IsValid()) return;
-    CurrentSaveSlot->Delete();
+    OpenCheckUI(ECheckType::Delete);
 }
 
 void UAPSaveSlotUI::OnClickButton_Select()
 {
     if(!CurrentSaveSlot.IsValid()) return;
-
-    if(IsTitle) {CurrentSaveSlot->Load();}
-    else {CurrentSaveSlot->Save();}
+    if(IsTitle) 
+    {
+        if(!CurrentSaveSlot->HasSavingData()) return;
+        OpenCheckUI(ECheckType::Load);
+    }
+    else {OpenCheckUI(ECheckType::Save);}
 }
+
+void UAPSaveSlotUI::OpenCheckUI(ECheckType UpdateCheckType)
+{
+    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+
+    auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), GI->GetCheckUIClass());
+	if(CheckUI)
+    {
+        CheckUI->AddToViewport(1); 
+        CheckUI->SetCheckType(UpdateCheckType, this);
+    }
+}
+

@@ -11,16 +11,19 @@
 #include "UserInterface/Save/APSaveSlotUI.h"
 #include "PlayerController/APTitlePlayerController.h"
 #include "GameInstance/APGameInstance.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UAPTitleUI::NativeConstruct()
 {
     Super::NativeConstruct();
 
-	
+	SetIsFocusable(true);
+    SetKeyboardFocus();
 	
 	Button_NewGame->OnClicked.AddDynamic(this, &UAPTitleUI::NewGame);
 	Button_Continue->OnClicked.AddDynamic(this, &UAPTitleUI::Continue);
 	Button_Setting->OnClicked.AddDynamic(this, &UAPTitleUI::Setting);
+	Button_Exit->OnClicked.AddDynamic(this, &UAPTitleUI::Exit);
 }
 
 void UAPTitleUI::NewGame()
@@ -61,8 +64,7 @@ void UAPTitleUI::Continue()
 	SelectSlotUI->BindButton();
 	SelectSlotUI->BindSlot();
     SelectSlotUI->AddToViewport();
-	RemoveFromParent();
-    
+	// RemoveFromParent();
 }
 
 void UAPTitleUI::Setting()
@@ -70,4 +72,9 @@ void UAPTitleUI::Setting()
 	auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer()); if(!TitlePC) return;
 
 	TitlePC->OptionSetting();
+}
+
+void UAPTitleUI::Exit()
+{
+	UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, true);
 }

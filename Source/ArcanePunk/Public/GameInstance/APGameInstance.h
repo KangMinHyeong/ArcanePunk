@@ -76,6 +76,9 @@ public:
 
 	FORCEINLINE float GetSavedRealTime() const {return SavedRealTime;};
 	FORCEINLINE void SetSavedRealTime(float NewValue) {SavedRealTime = NewValue;};
+
+	FORCEINLINE TSubclassOf<UUserWidget> GetCheckUIClass() const {return CheckUIClass;};
+
 private:
 	UPROPERTY()
 	FString DefaultSlotName = "PlayerSlot_0";
@@ -127,6 +130,10 @@ private:
 
 	UPROPERTY()
 	float SavedRealTime = 0.0f;
+
+	// Check UI
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> CheckUIClass;
 
 public:
 	FOnSkillEnhanceDataUpdate OnSkillEnhanceDataUpdate;

@@ -45,8 +45,67 @@ void AArcaneRain::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USk
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;
+
+    for(auto It : SkillAbilityNestingData.SilverAbilityNestingNum)
+    {
+        CheckSilverEnhance(It.Key, It.Value);
+    }
+    for(auto It : SkillAbilityNestingData.GoldAbilityNestingNum)
+    {
+        CheckGoldEnhance(It.Key, It.Value);
+    }
+    for(auto It : SkillAbilityNestingData.PlatinumAbilityNestingNum)
+    {
+        CheckPlatinumEnhance(It.Key, It.Value);
+    }
+
     RainComp->SetVariableFloat(TEXT("Size"), RainSize);
     RainComp->SetVariableFloat(TEXT("RainSpawnRate"), RainSpawnRate);
 
+}
+
+void AArcaneRain::CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+	Super::CheckSilverEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 2: // Range Up
+        SkillAbilityComponent->Coefficient_AddMultiple(RainSize,AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
+}
+
+void AArcaneRain::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+    Super::CheckGoldEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient, AbilityData->Coefficient_X, NestingNum);
+        break;
+
+        case 2: // RainSpawnRate Up
+        SkillAbilityComponent->Coefficient_Add(RainSpawnRate, AbilityData->Coefficient_X, NestingNum);
+        break;
+
+    }
+}
+
+void AArcaneRain::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
+{
+    Super::CheckPlatinumEnhance(AbilityNum, NestingNum);
+
+    switch (AbilityNum)
+    {
+        case 1: // Damage Up
+        SkillAbilityComponent->Coefficient_Add(DamageCoefficient,AbilityData->Coefficient_X, NestingNum);
+        break;
+    }
 }
 

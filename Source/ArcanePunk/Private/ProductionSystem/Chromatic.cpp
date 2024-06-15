@@ -5,61 +5,61 @@
 
 AChromatic::AChromatic()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	// PrimaryActorTick.bCanEverTick = true;
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-	BoxComponent->SetRelativeScale3D(FVector(1, 1, 1));
-	BoxComponent->SetHiddenInGame(false);
+	// BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	// BoxComponent->SetRelativeScale3D(FVector(1, 1, 1));
+	// BoxComponent->SetHiddenInGame(false);
 
 
-	// ¸ÓÆ¼¸®¾ó º¯°æÇÒ Mesh »ý¼º ¹× ¼³Á¤
-	BoxMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoxMesh"));
-	BoxMesh->SetupAttachment(RootComponent);
-	BoxMesh->SetRelativeScale3D(FVector(1.5, 1.5, 1.5));
-	static ConstructorHelpers::FObjectFinder<UMaterial> MaterialFinder(TEXT("/Game/Material/ChromaticMaterial.ChromaticMaterial"));
+	// // ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Mesh ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// BoxMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoxMesh"));
+	// BoxMesh->SetupAttachment(RootComponent);
+	// BoxMesh->SetRelativeScale3D(FVector(1.5, 1.5, 1.5));
+	// static ConstructorHelpers::FObjectFinder<UMaterial> MaterialFinder(TEXT("/Game/Material/ChromaticMaterial.ChromaticMaterial"));
 
-	if (MaterialFinder.Succeeded())
-	{
-		YourDesiredMaterial = MaterialFinder.Object;
-	}
+	// if (MaterialFinder.Succeeded())
+	// {
+	// 	YourDesiredMaterial = MaterialFinder.Object;
+	// }
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> OriginalMaterialFinder(TEXT("/Game/Materials/M_Mesh.M_Mesh"));
+	// static ConstructorHelpers::FObjectFinder<UMaterial> OriginalMaterialFinder(TEXT("/Game/Materials/M_Mesh.M_Mesh"));
 
-	if (OriginalMaterialFinder.Succeeded())
-	{
-		OriginalMaterial = OriginalMaterialFinder.Object;
-	}
+	// if (OriginalMaterialFinder.Succeeded())
+	// {
+	// 	OriginalMaterial = OriginalMaterialFinder.Object;
+	// }
 }
 
 void AChromatic::BeginPlay()
 {
 	Super::BeginPlay();
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AChromatic::OnOverlapBegin);
-	BoxComponent->OnComponentEndOverlap.AddDynamic(this, &AChromatic::OnOverlapEnd);
+	// BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AChromatic::OnOverlapBegin);
+	// BoxComponent->OnComponentEndOverlap.AddDynamic(this, &AChromatic::OnOverlapEnd);
 }
 
 void AChromatic::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-   if (YourDesiredMaterial)
-   {
-       UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(YourDesiredMaterial, this);
+//    if (YourDesiredMaterial)
+//    {
+//        UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(YourDesiredMaterial, this);
 
-       if (DynamicMaterial)
-       {
-           BoxMesh->SetMaterial(0, DynamicMaterial);
-       }
-   }
+//        if (DynamicMaterial)
+//        {
+//            BoxMesh->SetMaterial(0, DynamicMaterial);
+//        }
+//    }
 }
 
 void AChromatic::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OriginalMaterial)
-	{
-		UMaterialInstanceDynamic* Origin = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
+	// if (OriginalMaterial)
+	// {
+	// 	UMaterialInstanceDynamic* Origin = UMaterialInstanceDynamic::Create(OriginalMaterial, this);
 
-		if (Origin)
-		{
-			BoxMesh->SetMaterial(0, Origin);
-		}
-	}
+	// 	if (Origin)
+	// 	{
+	// 		BoxMesh->SetMaterial(0, Origin);
+	// 	}
+	// }
 }

@@ -31,6 +31,8 @@ public:
 	void Save();
 	void Load();
 	void Delete();
+
+	FORCEINLINE bool HasSavingData() const {return bSavingData;};
 private:
 
 private:
@@ -73,5 +75,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	UTexture2D* TabImage_OFF;
 
-	bool HasSavingData = false;
+	bool bSavingData = false;
 };
