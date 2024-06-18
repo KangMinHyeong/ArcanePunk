@@ -11,7 +11,7 @@ AAPCharacterBase::AAPCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	CrowdControlComponent = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComponent"));
+	CrowdControlComp = CreateDefaultSubobject<UAPCrowdControlComponent>(TEXT("CrowdControlComp"));
 	MoveComponent = CreateDefaultSubobject<UAPMovementComponent>(TEXT("MoveComponent"));
 	AttackComponent = CreateDefaultSubobject<UAPAttackComponent>(TEXT("AttackComponent"));
 	HitPointComponent = CreateDefaultSubobject<UAPHitPointComponent>(TEXT("HitPointComponent"));
@@ -24,7 +24,7 @@ AAPCharacterBase::AAPCharacterBase()
 void AAPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	CrowdControlComponent->BindCrowdComp();
+	CrowdControlComp->BindCrowdComp();
 	MoveComponent->SetBind();
 }
 
@@ -34,6 +34,7 @@ bool AAPCharacterBase::IsDead()
 	if(MyPlayerTotalStatus.PlayerDynamicData.HP<=KINDA_SMALL_NUMBER)
 	{
 		bIsDead = true;
+		CrowdControlComp->PlayStateEffect(ECharacterState::Frozen, false);
 	}
     return bIsDead;
 }

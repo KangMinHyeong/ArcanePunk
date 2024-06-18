@@ -39,7 +39,7 @@ protected:
 
 public:	
 	FORCEINLINE UAPMovementComponent* GetAPMoveComponent() const {return MoveComponent;}; // MoveComp 반환
-	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComp() const { return CrowdControlComponent;};
+	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComp() const { return CrowdControlComp;};
 
 	FORCEINLINE UMaterialInterface* GetDefaultMaterial() const {return DefaultMaterial;}; // DefaultMaterial 반환
 
@@ -124,7 +124,7 @@ public:
 protected:
 	//Component
 	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPCrowdControlComponent* CrowdControlComponent;
+	UAPCrowdControlComponent* CrowdControlComp;
 	
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPMovementComponent* MoveComponent;

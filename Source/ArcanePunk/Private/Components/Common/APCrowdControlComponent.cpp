@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Skill/Sub/APFreezing.h"
 
 UAPCrowdControlComponent::UAPCrowdControlComponent()
 {
@@ -337,41 +338,41 @@ void UAPCrowdControlComponent::WeakEnd(FTimerHandle* WeakTimerHandle, float Weak
 
 void UAPCrowdControlComponent::OnCharacterState(ECharacterState UpdateState, bool IsStop)
 {
-	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
-	if(!OwnerCharater) return;
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
+	if(!OwnerCharacter) return;
 
 	// 우선순위 체크
-	if ((uint8)OwnerCharater->returnState() > (uint8)UpdateState || (uint8)OwnerCharater->returnState() == 0)
+	if ((uint8)OwnerCharacter->returnState() > (uint8)UpdateState || (uint8)OwnerCharacter->returnState() == 0)
 	{
-		OwnerCharater->SetState(UpdateState);
+		OwnerCharacter->SetState(UpdateState);
 		CC_Priority.Last((uint8)UpdateState) = true;
-		if(IsStop) OwnerCharater->StopState.Add(true);
-		if(OwnerCharater->ActorHasTag(TEXT("Enemy"))) OwnerCharater->OnCrowdControlCheck.Broadcast();
+		if(IsStop) OwnerCharacter->StopState.Add(true);
+		if(OwnerCharacter->ActorHasTag(TEXT("Enemy"))) OwnerCharacter->OnCrowdControlCheck.Broadcast();
 	}
 
 }
 
 void UAPCrowdControlComponent::ClearStopState()
 {
-	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
-	if(!OwnerCharater) return;
-	if(!OwnerCharater->StopState.IsEmpty()) OwnerCharater->StopState.Pop();
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
+	if(!OwnerCharacter) return;
+	if(!OwnerCharacter->StopState.IsEmpty()) OwnerCharacter->StopState.Pop();
 
-	if(OwnerCharater->ActorHasTag(TEXT("Enemy"))) OwnerCharater->OnCrowdControlCheck.Broadcast();
+	if(OwnerCharacter->ActorHasTag(TEXT("Enemy"))) OwnerCharacter->OnCrowdControlCheck.Broadcast();
 }
 
 void UAPCrowdControlComponent::SwitchingState(ECharacterState UpdateState)
 {
-	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
-	if(!OwnerCharater) return;
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
+	if(!OwnerCharacter) return;
 
-	OwnerCharater->SetState(UpdateState);
-	if(OwnerCharater->ActorHasTag(TEXT("Enemy"))) OwnerCharater->OnCrowdControlCheck.Broadcast();
+	OwnerCharacter->SetState(UpdateState);
+	if(OwnerCharacter->ActorHasTag(TEXT("Enemy"))) OwnerCharacter->OnCrowdControlCheck.Broadcast();
 }
 
 void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool IsPlay)
 {
-	auto OwnerCharater = Cast<AAPCharacterBase>(GetOwner());
+	auto OwnerCharacter = Cast<AAPCharacterBase>(GetOwner());
 
 	switch (UpdateState)
 	{
@@ -379,7 +380,7 @@ void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool
 		break;
 		
 		case ECharacterState::Stun:
-		if(OwnerCharater) {IsPlay ? OwnerCharater->GetStunEffect()->Activate() : OwnerCharater->GetStunEffect()->DeactivateImmediate(); }
+		if(OwnerCharacter) {IsPlay ? OwnerCharacter->GetStunEffect()->Activate() : OwnerCharacter->GetStunEffect()->DeactivateImmediate(); }
 		break;
 
 		case ECharacterState::Sleep:
@@ -389,7 +390,10 @@ void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool
 		break;
 
 		case ECharacterState::Frozen:
-		if(OwnerCharater) {IsPlay ? OwnerCharater->GetStunEffect()->Activate() : OwnerCharater->GetStunEffect()->DeactivateImmediate(); }
+		if(OwnerCharacter) {
+			if(IsPlay) {FrozenEffect = GetWorld()->SpawnActor<AAPFreezing>(FrozenEffectClass, OwnerCharacter->GetActorLocation() - FVector(0.0f,0.0f,20.0f), OwnerCharacter->GetActorRotation());}
+			else {if(FrozenEffect.IsValid()) FrozenEffect->Destroy();}
+		}
 		break;
 	}
 }

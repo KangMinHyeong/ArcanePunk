@@ -351,7 +351,7 @@ void AArcanePunkCharacter::SkillBase_R()
 void AArcanePunkCharacter::StartJog()
 {
 	if(!bCanJog || bJogging)  return;
-	CrowdControlComponent->FastState(1.0f, true);
+	CrowdControlComp->FastState(1.0f, true);
 	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2.0f;
 	GhostTrailSpawnComp->SetRunTrail(true);
 	bJogging = true;
@@ -361,7 +361,7 @@ void AArcanePunkCharacter::StartJog()
 void AArcanePunkCharacter::EndJog()
 {
 	if(!bCanJog || !bJogging) return; 
-	CrowdControlComponent->FastState(1.0f, false);
+	CrowdControlComp->FastState(1.0f, false);
 	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 0.5f;
 	bJogging = false;
 	GhostTrailSpawnComp->SetRunTrail(false);

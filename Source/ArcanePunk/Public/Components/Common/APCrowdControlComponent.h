@@ -17,6 +17,8 @@ enum class ECharacterState : uint8 // 추가할때마다 CC_priority 업데이�
 	Slow		= 5,
 };
 
+class AAPFreezing;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPCrowdControlComponent : public UActorComponent
 {
@@ -54,6 +56,9 @@ public:
 	void FastState(float FastCoefficient, bool Start);
 	void FastState(float FastCoefficient, float FastTime);
 
+	
+	void PlayStateEffect(ECharacterState UpdateState, bool IsPlay);
+
 private:
 	bool CalculateStateTime(ECharacterState UpdateState, FTimerHandle& StateTimerHandle,float StateTime);
 
@@ -83,8 +88,6 @@ private:
 	float GetDefaultATK();
 	void SetDefaultATK(float NewValue);
 	
-	void PlayStateEffect(ECharacterState UpdateState, bool IsPlay);
-
 private:
 	FTimerHandle KnockBackTimerHandle;
 
@@ -110,4 +113,8 @@ private:
 
 	float CurrentSlowCoefficient = 1.0f;
 	float CurrentFastCoefficient = 1.0f;
+
+	TWeakObjectPtr<AAPFreezing> FrozenEffect;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AAPFreezing> FrozenEffectClass;
 };
