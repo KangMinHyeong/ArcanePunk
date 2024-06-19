@@ -24,6 +24,8 @@ public:
 	FORCEINLINE uint8 GetRemainMonsterNumber() const {return RemainMonsterNumber;};
 	FORCEINLINE void SetRemainMonsterNumber(uint8 NewRemainMonsterNumber) {RemainMonsterNumber = NewRemainMonsterNumber;};
 
+	UFUNCTION()
+	void OnChangingBGMVolume(float Master, float BGM, float Effect);
 
 protected:
 	void SpawnMonster();
@@ -45,4 +47,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	uint8 RemainMonsterNumber = 0;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* BGM_Cue;
+	TWeakObjectPtr<UAudioComponent> GameMode_BGM;
 };

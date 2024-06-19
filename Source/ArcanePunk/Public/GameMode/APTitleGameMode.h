@@ -6,9 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "APTitleGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ARCANEPUNK_API AAPTitleGameMode : public AGameModeBase
 {
@@ -18,4 +15,14 @@ public:
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;	
 	
+	virtual void StartPlay() override;
+
+	UFUNCTION()
+	void OnChangingBGMVolume(float Master, float BGM, float Effect);
+	
+private:
+	UPROPERTY(EditAnywhere)
+	USoundBase* BGM_Cue;
+
+	TWeakObjectPtr<UAudioComponent> GameMode_BGM;
 };

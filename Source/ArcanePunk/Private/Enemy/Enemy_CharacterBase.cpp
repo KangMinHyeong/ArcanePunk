@@ -209,11 +209,11 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 {
     FRotator Rotation = GetActorRotation();
 
-	FVector Start = CustomStart;
+	FVector Start = CustomStart + FVector::UpVector* 15.0f ;
 	if(!Custom) Start = GetActorLocation();
 
-	FVector End = CustomEnd + FVector::UpVector* 25.0f ;
-	if(!Custom) End = GetActorLocation() + Rotation.Vector() * Monster_AttackRange + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+	FVector End = CustomEnd + FVector::UpVector* 15.0f ;
+	if(!Custom) End = GetActorLocation() + Rotation.Vector() * Monster_AttackRange + FVector::UpVector* 15.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
 
 	// 같은 아군은 타격 판정이 안되게 하는 코드
 	FCollisionQueryParams Params;
@@ -238,7 +238,25 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	if(!Custom) FinalRadius = Monster_AttackRadius;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(FinalRadius);
 
-	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);
+	bool bResult = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);
+	
+	FVector Center = (Start + End) / 2.0f;
+	float HalfHeight = Monster_AttackRange * 0.5f + Monster_AttackRadius;
+	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(),
+		Center,
+		HalfHeight,
+		Monster_AttackRadius,
+		CapsuleRot,
+		DrawColor,
+		false,
+		3.0f,
+		0,
+		5);
+
+	return bResult;
 }
 
 

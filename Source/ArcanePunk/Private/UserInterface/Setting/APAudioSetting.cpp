@@ -16,6 +16,13 @@ void UAPAudioSetting::NativeConstruct()
     BindButton();
 }
 
+void UAPAudioSetting::NativeDestruct()
+{
+    Super::NativeDestruct();
+
+    APGI->OnChangingSoundVolume.Broadcast(APGI->GetGameSoundVolume().MasterVolume, APGI->GetGameSoundVolume().BGMVolume, APGI->GetGameSoundVolume().EffectVolume);
+}
+
 FReply UAPAudioSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -30,10 +37,10 @@ FReply UAPAudioSetting::NativeOnMouseWheel(const FGeometry &InGeometry, const FP
 
 void UAPAudioSetting::InitSliders()
 {
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-    Master = GI->GetGameSoundVolume().MasterVolume;
-    BGM = GI->GetGameSoundVolume().BGMVolume;
-    Effect = GI->GetGameSoundVolume().EffectVolume;
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
+    Master = APGI->GetGameSoundVolume().MasterVolume;
+    BGM = APGI->GetGameSoundVolume().BGMVolume;
+    Effect = APGI->GetGameSoundVolume().EffectVolume;
 
     Slider_Master->SetValue(Master);
     Slider_BGM->SetValue(BGM);
@@ -63,23 +70,29 @@ void UAPAudioSetting::OnClickBack()
 
 void UAPAudioSetting::OnClickApply()
 {
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-    GI->SetGameMasterVolume(Master);
-    GI->SetGameBGMVolume(BGM);
-    GI->SetGameEffectVolume(Effect);
+    if(!APGI.IsValid()) return;
+    APGI->SetGameMasterVolume(Master);
+    APGI->SetGameBGMVolume(BGM);
+    APGI->SetGameEffectVolume(Effect);
 }
 
 void UAPAudioSetting::OnSlide_Master(float Value)
 {
     Master = Value;
+
+    if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
 }
 
 void UAPAudioSetting::OnSlide_BGM(float Value)
 {
     BGM = Value;
+
+    if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
 }
 
 void UAPAudioSetting::OnSlide_Effect(float Value)
 {
     Effect = Value;
+
+    if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
 }

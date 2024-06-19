@@ -62,7 +62,7 @@ struct FPlayerSkillLimit
 //
 
 USTRUCT(BlueprintType)
-struct FPlayerDynamicData
+struct FPlayerDynamicData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
