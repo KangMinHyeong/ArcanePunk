@@ -10,6 +10,7 @@
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSkillEnhanceDataUpdate, ESkillKey, FSkillAbilityNestingData);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillEnhanceDataClear, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGettingGold, int32);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnChangingSoundVolume, float, float, float) // MasterVolume, BGM, Effect
 
 class AEnemy_DropPackage;
 class UAPSaveGame;
@@ -139,4 +140,5 @@ public:
 	FOnSkillEnhanceDataUpdate OnSkillEnhanceDataUpdate;
 	FOnSkillEnhanceDataClear OnSkillEnhanceDataClear;
 	FOnGettingGold OnGettingGold;
+	FOnChangingSoundVolume OnChangingSoundVolume;
 };

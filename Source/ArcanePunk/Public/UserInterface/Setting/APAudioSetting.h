@@ -8,6 +8,7 @@
 
 class UButton;
 class USlider;
+class UAPGameInstance;
 
 UCLASS()
 class ARCANEPUNK_API UAPAudioSetting : public UUserWidget
@@ -16,6 +17,7 @@ class ARCANEPUNK_API UAPAudioSetting : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	virtual FReply NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)override;
 
@@ -51,4 +53,5 @@ private:
 	float BGM;
 	float Effect;
 
+	TWeakObjectPtr<UAPGameInstance> APGI;
 };

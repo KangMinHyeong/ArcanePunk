@@ -14,6 +14,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "DrawDebugHelpers.h"
 
 UAPAttackComponent::UAPAttackComponent()
 {
@@ -171,17 +172,36 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 	HitVector = -Rotation.Vector();
 
 	FCollisionShape Sphere;
+	float Rad = CustomRadius;
 	if(Custom)
 	{
-		Sphere= FCollisionShape::MakeSphere(CustomRadius);
+		Sphere= FCollisionShape::MakeSphere(Rad);
 	}
 	else
 	{
-		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(AttackRadius);}
-		else {Sphere = FCollisionShape::MakeSphere(AttackRadius*1.25);}
+		Rad = AttackRadius;
+		Sphere = FCollisionShape::MakeSphere(Rad);
 	}
 
-	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+	bool bResult = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+
+	FVector Center = (Start + End) / 2.0f;
+	float HalfHeight = MaxDistance * 0.5f + AttackRadius;
+	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(),
+		Center,
+		HalfHeight,
+		AttackRadius,
+		CapsuleRot,
+		DrawColor,
+		false,
+		3.0f,
+		0,
+		5);
+
+	return bResult;
 }
 
 bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
@@ -204,17 +224,36 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	HitVector = -Rotation.Vector();
 
 	FCollisionShape Sphere;
+	float Rad = CustomRadius;
 	if(Custom)
 	{
-		Sphere= FCollisionShape::MakeSphere(CustomRadius);
+		Sphere= FCollisionShape::MakeSphere(Rad);
 	}
 	else
 	{
-		if(CloseAttack) {Sphere = FCollisionShape::MakeSphere(AttackRadius);}
-		else {Sphere = FCollisionShape::MakeSphere(AttackRadius*1.25);}
+		Rad = AttackRadius;
+		Sphere = FCollisionShape::MakeSphere(Rad);
 	}
 
-	return GetWorld()->SweepMultiByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+	bool bResult = GetWorld()->SweepMultiByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+	
+	FVector Center = (Start + End) / 2.0f;
+	float HalfHeight = MaxDistance * 0.5f + Rad;
+	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(),
+		Center,
+		HalfHeight,
+		Rad,
+		CapsuleRot,
+		DrawColor,
+		false,
+		3.0f,
+		0,
+		5);
+
+	return bResult;
 }
 
 bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, FVector End, float Radius, bool ExceptPlayer)
@@ -243,8 +282,26 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	// return UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Start, End, Radius, TraceTypeQuery3, true, Actors, EDrawDebugTrace::Persistent, HitResult, true);
 	// ECollisionChannel
 	FCollisionObjectQueryParams ObjectQueryParam(FCollisionObjectQueryParams::InitType::AllDynamicObjects); 
-	return GetWorld()->SweepMultiByObjectType(HitResult, Start, End, FQuat::Identity, ObjectQueryParam, Sphere, Params);// 타격 판정 인자 Params 인자 추가
-	// 	return GetWorld()->SweepMultiByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params, FCollisionResponseParams(ECR_Block));// 타격 판정 인자 Params 인자 추가
+	
+	bool bResult = GetWorld()->SweepMultiByObjectType(HitResult, Start, End, FQuat::Identity, ObjectQueryParam, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+
+	FVector Center = (Start + End) / 2.0f;
+	float HalfHeight = MaxDistance * 0.5f + Radius;
+	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(),
+		Center,
+		HalfHeight,
+		Radius,
+		CapsuleRot,
+		DrawColor,
+		false,
+		3.0f,
+		0,
+		5);
+		
+	return bResult;
 }
 
 void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Multiple, bool bStun, float StunTime, bool Custom, float CustomRadius)

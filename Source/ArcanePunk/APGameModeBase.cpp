@@ -5,8 +5,8 @@
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "GameState/APGameState.h"
 #include "Kismet/GameplayStatics.h"
-
-
+#include "GameInstance/APGameInstance.h"
+#include "Components/AudioComponent.h"
 
 AAPGameModeBase::AAPGameModeBase()
 {
@@ -53,5 +53,20 @@ void AAPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	//GetWorldTimerManager().SetTimer(MonsterSpawnTimerHandle, this, &AAPGameModeBase::SpawnMonster, SpawnInterval, true);
+	auto APGI = Cast<UAPGameInstance>(GetWorld()->GetGameInstance()); if(!APGI) return;
+    APGI->OnChangingSoundVolume.RemoveAll(this);
+    APGI->OnChangingSoundVolume.AddUObject(this, &AAPGameModeBase::OnChangingBGMVolume);
+
+	if(BGM_Cue)
+    {
+        float SoundVolume = APGI->GetGameSoundVolume().MasterVolume * APGI->GetGameSoundVolume().BGMVolume;
+        GameMode_BGM = UGameplayStatics::SpawnSound2D(GetWorld(), BGM_Cue, SoundVolume);      
+    }
+}
+
+void AAPGameModeBase::OnChangingBGMVolume(float Master, float BGM, float Effect)
+{
+	if(!GameMode_BGM.IsValid()) return;
+    
+    GameMode_BGM->AdjustVolume(0.1f, Master*BGM);
 }
