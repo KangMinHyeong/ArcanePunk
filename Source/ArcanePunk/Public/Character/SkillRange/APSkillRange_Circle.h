@@ -18,6 +18,5 @@ public:
 
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
-private:
 
 };

@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.3",
+	"EngineAssociation": "5.4",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -29,10 +29,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "CascadeToNiagaraConverter",
-			"Enabled": true
-		},
-		{
 			"Name": "NiagaraUIRenderer",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/fd24d23ca57b4c59a4e4b7368da250bd",
@@ -43,6 +39,10 @@
 		},
 		{
 			"Name": "SkeletalMeshModelingTools",
+			"Enabled": true
+		},
+		{
+			"Name": "CascadeToNiagaraConverter",
 			"Enabled": true
 		}
 	]

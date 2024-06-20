@@ -79,7 +79,7 @@ void UAPAudioSetting::OnClickApply()
 void UAPAudioSetting::OnSlide_Master(float Value)
 {
     Master = Value;
-
+    UE_LOG(LogTemp, Display, TEXT("Master %f"), Master);
     if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
 }
 

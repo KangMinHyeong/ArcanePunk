@@ -11,7 +11,6 @@
 void UAPSkillSlot::NativeConstruct()
 {
     Super::NativeConstruct();
-    Text_SkillKey->SetText(FText::FromString(SkillKey));
 
 }
 

@@ -38,10 +38,7 @@ bool UAP_EnemyBaseAnimInstance::IsRun()
 	{
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
     return false;
 }
 

@@ -4,6 +4,7 @@
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -83,8 +84,8 @@ void AArcaneMine::Explosion()
     // OwnerCharacter->GetAttackComponent()->MultiAttack_Burn(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius, DOT, DOT_Time, DOT_InRate );
     // if(bSlow) OwnerCharacter->GetAttackComponent()->MultiAttack_Slow(GetActorLocation(), GetActorLocation() + OwnerCharacter->GetActorUpVector() * 25.0f, ExplosionRadius, SlowPercent, DOT_Time);
 
-    if(ExplosionEffect) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(), GetActorRotation(), ExplosionScale);
-    
+    // if(ExplosionEffect) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(), GetActorRotation(), ExplosionScale);
+    if(ExplosionEffect) UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(), GetActorRotation(), ExplosionScale);
     DestroySKill();
 }
 

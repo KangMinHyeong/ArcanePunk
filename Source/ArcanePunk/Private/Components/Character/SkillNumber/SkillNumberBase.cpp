@@ -266,7 +266,6 @@ bool USkillNumberBase::CheckSmartKey(ESkillKey WhichKey)
 		OwnerCharacter->SetHomingPoint(HitResult.Location);
 		return true;
 	}
-	else {return false;}
 
 	return false;
 }
@@ -348,7 +347,7 @@ void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, E
 	if(SkillRangeType == ESkillRangeType::Control_Circle)
 	{
 		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillRange_Target(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
-		SkillRange_Target->GetDecalComponent()->DecalSize = FVector(5.0f, Range_1, Range_2);
+		SkillRange_Target->SetScale(Range_1);
 	}
 	else if(SkillRangeType == ESkillRangeType::Arrow)
 	{

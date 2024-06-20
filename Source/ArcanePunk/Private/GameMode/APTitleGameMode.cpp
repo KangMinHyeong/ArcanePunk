@@ -45,6 +45,6 @@ void AAPTitleGameMode::StartPlay()
 void AAPTitleGameMode::OnChangingBGMVolume(float Master, float BGM, float Effect)
 {
     if(!GameMode_BGM.IsValid()) return;
-    
-    GameMode_BGM->AdjustVolume(0.1f, Master*BGM);
+
+    GameMode_BGM->AdjustVolume(0.1f, FMath::Max(0.001f,Master*BGM));
 }
