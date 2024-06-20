@@ -13,6 +13,7 @@ class UMaterialInterface;
 class AArcanePunkPlayerController;
 class AArcanePunkCharacter;
 class UDecalComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPSkillRange : public AActor, public ISkillInterface
@@ -34,6 +35,7 @@ public:
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetAngle(float AngleSize);
+	void SetScale(float Range);
 
 	FORCEINLINE float GetMaxDist() const {return MaxDistance;};
 	FORCEINLINE void SetMaxDist(float MaxDist) {MaxDistance = MaxDist;};
@@ -52,6 +54,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UDecalComponent* RangeDecal;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* RangeEffect;
 
 	float DefaultSize;
 

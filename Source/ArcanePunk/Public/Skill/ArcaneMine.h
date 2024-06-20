@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class ARCANEPUNK_API AArcaneMine : public AAPSkillActorBase
@@ -48,7 +49,7 @@ private:
 	UStaticMeshComponent* MineMesh;	
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* ExplosionEffect;
+	UNiagaraSystem* ExplosionEffect;
 
 	UPROPERTY(EditAnywhere)
 	UProjectileMovementComponent* MineMoveComp;

@@ -70,13 +70,13 @@ private:
 	UHorizontalBox* MPBar;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UAPSkillSlot* QSkillSlot;
+	UAPSkillSlot* Slot_QSkill;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UAPSkillSlot* ESkillSlot;
+	UAPSkillSlot* Slot_ESkill;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UAPUltSkillSlot* RSkillSlot;
+	UAPSkillSlot* Slot_RSkill;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPSkillChargingGauge* SkillChargingGauge;

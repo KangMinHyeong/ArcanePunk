@@ -82,9 +82,6 @@ void UAPSkillHubComponent::PlayBasicSkill()
 		// CastUltSkillNumber(OwnerCharacter->GetRSkill(), ESkillKey::R);
 		break;
 
-		case 4:
-		// Shift 공석
-		break;
 	}
 	LastSkill = SkillState;
 	SkillState = ESkillKey::None;

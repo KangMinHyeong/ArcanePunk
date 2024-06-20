@@ -155,15 +155,15 @@ void UAPStatusBar::UpdateSkillSlot(ESkillKey SkillKey, uint8 SkillNumber)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->UpdateSkillSlot(SkillKey, SkillNumber);
+        Slot_QSkill->UpdateSkillSlot(SkillKey, SkillNumber);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->UpdateSkillSlot(SkillKey, SkillNumber);
+        Slot_ESkill->UpdateSkillSlot(SkillKey, SkillNumber);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->UpdateSkillSlot(SkillKey, SkillNumber);
+        Slot_RSkill->UpdateSkillSlot(SkillKey, SkillNumber);
         break;
     }
 }
@@ -173,15 +173,15 @@ void UAPStatusBar::OperateSkillSlot(ESkillKey SkillKey)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->OnOperating();
+        Slot_QSkill->OnOperating();
         break;
     
         case ESkillKey::E:
-        ESkillSlot->OnOperating();
+        Slot_ESkill->OnOperating();
         break;
 
         case ESkillKey::R:
-        RSkillSlot->OnOperating();
+        Slot_RSkill->OnOperating();
         break;
     }
 }
@@ -191,15 +191,15 @@ void UAPStatusBar::StartCoolTimeSlot(ESkillKey SkillKey, float CoolTime)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->StartSkillCoolTime(SkillKey, CoolTime);
+        Slot_QSkill->StartSkillCoolTime(SkillKey, CoolTime);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->StartSkillCoolTime(SkillKey, CoolTime);
+        Slot_ESkill->StartSkillCoolTime(SkillKey, CoolTime);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->StartSkillCoolTime(SkillKey, CoolTime);
+        Slot_RSkill->StartSkillCoolTime(SkillKey, CoolTime);
         break;
     }
 }
@@ -209,15 +209,15 @@ void UAPStatusBar::CheckChargeTime(ESkillKey SkillKey)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->CheckChargeTime(SkillKey);
+        Slot_QSkill->CheckChargeTime(SkillKey);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->CheckChargeTime(SkillKey);
+        Slot_ESkill->CheckChargeTime(SkillKey);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->CheckChargeTime(SkillKey);
+        Slot_RSkill->CheckChargeTime(SkillKey);
         break;
     }
 }
@@ -227,15 +227,15 @@ void UAPStatusBar::ChangeCharginNum(ESkillKey SkillKey)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->SetChargeTimeText(SkillKey);
+        Slot_QSkill->SetChargeTimeText(SkillKey);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->SetChargeTimeText(SkillKey);
+        Slot_ESkill->SetChargeTimeText(SkillKey);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->SetChargeTimeText(SkillKey);
+        Slot_RSkill->SetChargeTimeText(SkillKey);
         break;
     }
 }
@@ -245,15 +245,15 @@ void UAPStatusBar::HightLightSkillSlot(ESkillKey SkillKey)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->OnHightLight();
+        Slot_QSkill->OnHightLight();
         break;
     
         case ESkillKey::E:
-        ESkillSlot->OnHightLight();
+        Slot_ESkill->OnHightLight();
         break;
 
         case ESkillKey::R:
-        RSkillSlot->OnHightLight();
+        Slot_RSkill->OnHightLight();
         break;
     }
 }
@@ -263,15 +263,15 @@ void UAPStatusBar::UsingSkillSlot(ESkillKey SkillKey, bool NewBool)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->SetUsingSkill(NewBool);
+        Slot_QSkill->SetUsingSkill(NewBool);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->SetUsingSkill(NewBool);
+        Slot_ESkill->SetUsingSkill(NewBool);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->SetUsingSkill(NewBool);
+        Slot_RSkill->SetUsingSkill(NewBool);
         break;
     }
 }
@@ -291,15 +291,15 @@ void UAPStatusBar::AddSkillCoolTime(ESkillKey SkillKey, float AddTime)
     switch (SkillKey)
     {
         case ESkillKey::Q:
-        QSkillSlot->AddSkillCoolTime(AddTime);
+        Slot_QSkill->AddSkillCoolTime(AddTime);
         break;
     
         case ESkillKey::E:
-        ESkillSlot->AddSkillCoolTime(AddTime);
+        Slot_ESkill->AddSkillCoolTime(AddTime);
         break;
 
         case ESkillKey::R:
-        RSkillSlot->AddSkillCoolTime(AddTime);
+        Slot_RSkill->AddSkillCoolTime(AddTime);
         break;
     }
 }

@@ -53,8 +53,8 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* SkillImage;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* Text_SkillKey;
+	// UPROPERTY(EditAnywhere, meta = (BindWidget))
+	// UTextBlock* Text_SkillKey;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* SkillUsingImage;
