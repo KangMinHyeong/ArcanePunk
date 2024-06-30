@@ -6,6 +6,9 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/SphereComponent.h"
 #include "GameInstance/APGameInstance.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {
@@ -62,23 +65,27 @@ void AEnemy_DropPackage::AddEnhance()
 
     float CurrentEnHanceType = FMath::RandRange(0.0f, PlatinumPercent);
 
+    if(DropTrailEffect) DropTrailEffect->Activate();
     if(CurrentEnHanceType >= 0.0f && CurrentEnHanceType <= SilverPercent)
     {
         EnHanceType = EEnHanceType::Silver;
 		DropMesh->SetCustomDepthStencilValue(80);
 		// To Do : 실버 이펙트 및 사운드
+        if(DropTrailEffect) DropTrailEffect->SetVariableLinearColor(TEXT("Color"), SilverColor);
     }
     else if(CurrentEnHanceType > SilverPercent && CurrentEnHanceType <= GoldPercent)
     {
         EnHanceType = EEnHanceType::Gold;
 		DropMesh->SetCustomDepthStencilValue(160);
 		// To Do : 골드 이펙트 및 사운드
+        if(DropTrailEffect) DropTrailEffect->SetVariableLinearColor(TEXT("Color"), GoldColor);
     }
     else if (CurrentEnHanceType > GoldPercent && CurrentEnHanceType <= PlatinumPercent)
     {
         EnHanceType = EEnHanceType::Platinum;
 		DropMesh->SetCustomDepthStencilValue(240);
 		// To Do : 플레 이펙트 및 사운드
+        if(DropTrailEffect) DropTrailEffect->SetVariableLinearColor(TEXT("Color"), PlatinumColor);
     }
 	DropMesh->SetRenderCustomDepth(true);
 	
@@ -152,4 +159,25 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 	auto PC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); 
 	if(PC) PC->CloseInteraction(this);
 	Destroy();
+}
+
+void AEnemy_DropPackage::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+{
+    Super::OnOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+    UNiagaraComponent* GroundComp = nullptr;
+    switch (EnHanceType)
+    {
+    case EEnHanceType::Silver:
+        GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Silver, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+        break;
+    
+    case EEnHanceType::Gold:
+        GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Gold, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+        break;
+    
+    case EEnHanceType::Platinum:
+        GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Platinum, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+        break;
+    }
 }

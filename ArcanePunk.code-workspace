@@ -14,7 +14,11 @@
 		"npm.autoDetect": "off",
 		"files.associations": {
 			"*.rh": "cpp",
-			"fft": "cpp"
+			"fft": "cpp",
+			"xutility": "cpp",
+			"complex": "cpp",
+			"valarray": "cpp",
+			"cmath": "cpp"
 		}
 	},
 	"extensions": {

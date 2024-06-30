@@ -25,6 +25,8 @@
 #include "Components/Character/APAttackComponent.h"
 #include "UserInterface/APHUD.h"
 #include "GameInstance/APGameInstance.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "NavigationSystem.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -67,6 +69,16 @@ void AEnemy_CharacterBase::BeginPlay()
 void AEnemy_CharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(IsDead())
+	{
+		Apperence = FMath::FInterpConstantTo(Apperence, 0.0f, DeltaTime, FadeOutSpeed);
+		for (auto Mat : SkinMesh)
+		{
+			Mat->SetScalarParameterValue(TEXT("Apperence"), Apperence);
+		}
+		if(Apperence <= 0.2f) EnemyDestroyed();
+	}
 }
 
 void AEnemy_CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -161,7 +173,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		StunEffectComp->DeactivateImmediate();
 		StunEffectComp->DestroyComponent();
 		TeleportMark->DeactivateImmediate();
-	 	GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AEnemy_CharacterBase::EnemyDestroyed, DeathLoadingTime, false);
+		EnemyAnim->PlayDeath_Montage();
 	}
 	else
 	{
@@ -198,6 +210,27 @@ AActor* AEnemy_CharacterBase::IsAggro()
 		}
 	}
 	return nullptr;
+}
+
+FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
+{
+	FVector PatrolLocation;
+
+	FNavLocation NavLoc;
+	const UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+	bool navResult = false;
+	while(!navResult)
+	{
+		PatrolLocation = Start;
+		float X = FMath::RandRange(-1.0f, 1.0f);
+		float Y = sqrt(1.0f - X*X);
+		int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
+
+		PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
+		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc);
+	}
+	
+	return PatrolLocation;
 }
 
 float AEnemy_CharacterBase::DamageMath(float Damage)
@@ -245,16 +278,19 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
-	DrawDebugCapsule(GetWorld(),
-		Center,
-		HalfHeight,
-		Monster_AttackRadius,
-		CapsuleRot,
-		DrawColor,
-		false,
-		3.0f,
-		0,
-		5);
+	if(bDebugDraw)
+	{
+		DrawDebugCapsule(GetWorld(),
+			Center,
+			HalfHeight,
+			Monster_AttackRadius,
+			CapsuleRot,
+			DrawColor,
+			false,
+			3.0f,
+			0,
+			5);
+	}
 
 	return bResult;
 }
@@ -307,8 +343,19 @@ void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float D
 
 void AEnemy_CharacterBase::InitMonster()
 {
+	// Status Init
 	MyPlayerTotalStatus.PlayerDynamicData.HP = MyPlayerTotalStatus.PlayerDynamicData.MaxHP;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	// Mesh Init
+	int32 i = 0;
+	for (auto Mat : GetMesh()->GetMaterials())
+	{
+		auto NewMesh = UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), Mat);
+		SkinMesh.Emplace(NewMesh); GetMesh()->SetMaterial(i, NewMesh);
+		i++;
+	}
+
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }
 
@@ -363,7 +410,6 @@ void AEnemy_CharacterBase::EnemyDestroyed()
 {
 	if(OnDrop) DropItemActor();
 
-	GetWorldTimerManager().ClearTimer(DeathTimerHandle);
 	Destroy();
 }
 
@@ -451,10 +497,22 @@ void AEnemy_CharacterBase::EnemyMontageEnded(UAnimMontage *Montage, bool bInterr
     if(!EnemyAnim.IsValid()) return;
 	
 	if(Montage == EnemyAnim->NormalAttack_Montage) OnNormalAttack_MontageEnded();
+	else if(Montage == EnemyAnim->Death_Montage) OnDeath_MontageEnded();
+	else if(Montage == EnemyAnim->Detect_Montage) OnDetect_MontageEnded();
 }
 
 void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 {
+}
+
+void AEnemy_CharacterBase::OnDeath_MontageEnded()
+{
+	SetActorTickEnabled(true);
+}
+
+void AEnemy_CharacterBase::OnDetect_MontageEnded()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor, float Dist, float Time)

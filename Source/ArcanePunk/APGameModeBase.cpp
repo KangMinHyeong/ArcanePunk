@@ -60,7 +60,7 @@ void AAPGameModeBase::StartPlay()
 	if(BGM_Cue)
     {
         float SoundVolume = APGI->GetGameSoundVolume().MasterVolume * APGI->GetGameSoundVolume().BGMVolume;
-        GameMode_BGM = UGameplayStatics::SpawnSound2D(GetWorld(), BGM_Cue, SoundVolume);      
+        GameMode_BGM = UGameplayStatics::SpawnSound2D(GetWorld(), BGM_Cue, SoundVolume, 1.0f, 0.0f, nullptr, false, false);      
     }
 }
 

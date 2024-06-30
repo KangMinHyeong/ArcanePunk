@@ -16,13 +16,16 @@ public:
 	UAP_EnemyBaseAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	FORCEINLINE void SetbBattleMode(float NewValue) {bBattleMode = NewValue;};
+	FORCEINLINE void SetbBattleMode(bool NewBool) {bBattleMode = NewBool;};
 
 	UFUNCTION(BlueprintPure)
 	bool IsRun();
 
-	// Play Skill Anim
+	// Play Anim
 	void PlayNormalAttack_Montage();
+	void PlayDeath_Montage();
+	void PlayDetect_Montage();
+	void PlayRandomIdle_Montage();
 
 	/* Notify */ 
 	UFUNCTION()
@@ -41,7 +44,7 @@ protected:
 	float CurrentPawnSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
-	float bBattleMode = 0.0f;
+	bool bBattleMode = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	bool IsDead;
@@ -54,4 +57,13 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* NormalAttack_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Death_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Detect_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Idle", Meta = (AllowPrivateAccess = true))
+	TArray<UAnimMontage*> Idle_Montages;
 };

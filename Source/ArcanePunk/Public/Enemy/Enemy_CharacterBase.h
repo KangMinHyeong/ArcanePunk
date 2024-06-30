@@ -88,6 +88,9 @@ public:
 	FORCEINLINE bool IsInDrainField() const {return InDrainField;}; // InDrainField 반환;
 	FORCEINLINE void AddInDrainField(bool NewBool) { InDrainField = NewBool;};
 
+	// 패트롤 위치
+	FVector GetPatrolLocation(FVector Start);
+
 protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
@@ -110,6 +113,8 @@ protected:
 	void BindMontageEnded();
 
 	void OnNormalAttack_MontageEnded();
+	void OnDeath_MontageEnded();
+	void OnDetect_MontageEnded();
 
 	// 몬스터 CC기 관련 함수
 	void OnPlayerKnockBack(AActor* Actor, float Dist, float Time);
@@ -144,11 +149,16 @@ protected:
 
 	bool bKnockBackAttack = false;
 
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> SkinMesh;
+	float Apperence = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float FadeOutSpeed = 1.0f;
+
 	// TimerHandle
 	FTimerHandle PresentDamageTimerHandle;
 	FTimerHandle TeleportTimerHandle;
 	FTimerHandle HitTimerHandle;
-	FTimerHandle DeathTimerHandle;
 	FTimerHandle StopTimerHandle;
 	FTimerHandle DamageMultipleTimerHandle;
 	FTimerHandle DamagedMarkTimerHandle;
@@ -162,10 +172,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool OnDrop = true;
-
-	// 몬스터 Dead 관련 변수
-	UPROPERTY(EditAnywhere, Category = "Dead")
-	float DeathLoadingTime = 3.0f;
 
 	TWeakObjectPtr<AActor> MarkActor;
 
@@ -218,6 +224,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* DefaultWeapon;
+
+	UPROPERTY(EditAnywhere)
+	float PatrolDist = 500.0f;
 
 public:
 	FOnHPChanged OnEnemyHPChanged;

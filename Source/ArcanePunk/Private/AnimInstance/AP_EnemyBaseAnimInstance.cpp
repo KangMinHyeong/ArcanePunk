@@ -16,8 +16,7 @@ void UAP_EnemyBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Enemy = Cast<AEnemy_CharacterBase>(TryGetPawnOwner());
 	if (!Enemy.IsValid()) return;
 
-	IsDead = Enemy->IsDead();
-	if (!IsDead)
+	if (!Enemy->IsDead())
 	{
 		CurrentPawnSpeed = Enemy->GetVelocity().Size();
 
@@ -47,6 +46,28 @@ void UAP_EnemyBaseAnimInstance::PlayNormalAttack_Montage()
 	if(IsDead || !Enemy.IsValid()) return;
     if(Enemy->IsHardCC()) return;
     Montage_Play(NormalAttack_Montage);
+}
+
+void UAP_EnemyBaseAnimInstance::PlayDeath_Montage()
+{
+    Montage_Play(Death_Montage);
+}
+
+void UAP_EnemyBaseAnimInstance::PlayDetect_Montage()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+    if(Enemy->IsHardCC()) return;
+    Montage_Play(Detect_Montage);
+}
+
+void UAP_EnemyBaseAnimInstance::PlayRandomIdle_Montage()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+    if(Enemy->IsHardCC()) return;
+    if(CurrentPawnSpeed >= 0.1f) return;
+
+	int32 Index = FMath::RandRange(0, Idle_Montages.Num()-1); Index = FMath::Max(0,Index);
+	Montage_Play(Idle_Montages[Index]);
 }
 
 void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()

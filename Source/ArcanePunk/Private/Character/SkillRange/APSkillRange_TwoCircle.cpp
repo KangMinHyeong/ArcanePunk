@@ -20,5 +20,6 @@ void AAPSkillRange_TwoCircle::SetSkill(FSkillAbilityNestingData SkillAbilityNest
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 
+    RangeDecal->SetHiddenInGame(false);
 
 }
