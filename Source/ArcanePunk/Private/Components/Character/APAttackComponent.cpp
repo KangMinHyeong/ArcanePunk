@@ -185,21 +185,25 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 
 	bool bResult = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
 
-	FVector Center = (Start + End) / 2.0f;
-	float HalfHeight = MaxDistance * 0.5f + AttackRadius;
-	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
-	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+	if(OwnerCharacter->bDebugDraw)
+	{
+		FVector Center = (Start + End) / 2.0f;
+		float HalfHeight = MaxDistance * 0.5f + AttackRadius;
+		FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+		FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
-	DrawDebugCapsule(GetWorld(),
-		Center,
-		HalfHeight,
-		AttackRadius,
-		CapsuleRot,
-		DrawColor,
-		false,
-		3.0f,
-		0,
-		5);
+		DrawDebugCapsule(GetWorld(),
+			Center,
+			HalfHeight,
+			AttackRadius,
+			CapsuleRot,
+			DrawColor,
+			false,
+			3.0f,
+			0,
+			5);
+	}
+	
 
 	return bResult;
 }
@@ -242,16 +246,19 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
-	DrawDebugCapsule(GetWorld(),
-		Center,
-		HalfHeight,
-		Rad,
-		CapsuleRot,
-		DrawColor,
-		false,
-		3.0f,
-		0,
-		5);
+	if(OwnerCharacter->bDebugDraw)
+	{
+		DrawDebugCapsule(GetWorld(),
+			Center,
+			HalfHeight,
+			Rad,
+			CapsuleRot,
+			DrawColor,
+			false,
+			3.0f,
+			0,
+			5);
+	}
 
 	return bResult;
 }
@@ -290,16 +297,19 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
-	DrawDebugCapsule(GetWorld(),
-		Center,
-		HalfHeight,
-		Radius,
-		CapsuleRot,
-		DrawColor,
-		false,
-		3.0f,
-		0,
-		5);
+	if(OwnerCharacter->bDebugDraw)
+	{
+		DrawDebugCapsule(GetWorld(),
+			Center,
+			HalfHeight,
+			Radius,
+			CapsuleRot,
+			DrawColor,
+			false,
+			3.0f,
+			0,
+			5);
+	}
 		
 	return bResult;
 }

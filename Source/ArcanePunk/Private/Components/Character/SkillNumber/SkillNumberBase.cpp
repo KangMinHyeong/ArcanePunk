@@ -371,8 +371,9 @@ void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, E
 	{
 		SkillRange_TWoCircle = GetWorld()->SpawnActor<AAPSkillRange_TwoCircle>(OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillRange_TWoCircle(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 		SkillRange_TWoCircle->GetDecalComponent()->DecalSize = FVector(5.0f, Range_1, Range_1);
-		SkillRange_TWoCircle->GetDecalComponent_2()->DecalSize = FVector(5.0f, Range_2, Range_2);
+		SkillRange_TWoCircle->GetDecalComponent_2()->SetHiddenInGame(true);
 		SkillRange_TWoCircle->SetOwner(OwnerCharacter.Get());
+		SkillRange_TWoCircle->SetScale(Range_2);
 		SkillRange_TWoCircle->SetSkillRangeType(SkillRangeType);
 	}
 	else if(SkillRangeType == ESkillRangeType::SectorCircle)

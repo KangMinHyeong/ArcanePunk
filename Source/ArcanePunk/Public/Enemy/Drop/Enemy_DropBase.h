@@ -10,6 +10,9 @@
 #include "Enemy_DropBase.generated.h"
 
 class UProjectileMovementComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
+class UBoxComponent;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_DropBase : public AActor
@@ -34,9 +37,17 @@ public:
 	
 	FORCEINLINE void SetDropOverlap(bool NewBool) {IsInit = NewBool;};
 
+	void OnDestinatingGround();
+	
+	UFUNCTION()
+	virtual void OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* DropMesh;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* GroundTrigger;
 
 	UPROPERTY(EditAnywhere)
 	UAPInteractionBoxComponent* InteractTrigger;
@@ -48,6 +59,9 @@ protected:
 	UProjectileMovementComponent* DropMovement;
 
 	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* DropTrailEffect;
+
+	UPROPERTY(EditAnywhere)
 	float DropSpeed = 0.0f;
 
 	UPROPERTY(EditAnywhere)
@@ -55,6 +69,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float GravityAccelerate = 100.0f;
+	float CurrentAccelerate = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float AccelerateSpeed = 300.0f;
 
 	// Inventory 관련 변수
 	UPROPERTY(VisibleAnywhere, Category = "Pickup | Item Reference")

@@ -43,34 +43,35 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
     if(TargetActor.IsValid())
     {
-            FVector TargetLocation = TargetActor->GetActorLocation();
+        FVector TargetLocation = TargetActor->GetActorLocation();
         float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
 
-        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && Distance < Monster->GetDetectLimit())
-        {
-            Anim->SetbBattleMode(1.0f);
-        }
-        else 
-        { 
-            OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
-            Anim->SetbBattleMode(0.0f);
-            return;
-        }
-        // Anim->SetbBattleMode(Current);
+        // if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && Distance < Monster->GetDetectLimit())
+        // {
+        //     Anim->SetbBattleMode(1.0f);
+        // }
+        // else 
+        // { 
+        //     OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+        //     Anim->SetbBattleMode(0.0f);
+        //     return;
+        // }    
 
         if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
+            Anim->SetbBattleMode(true);
         }
         else
         {
             OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+            Anim->SetbBattleMode(false);
         }
     }
     else
     {
         OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
-        Anim->SetbBattleMode(0.0f);
+        Anim->SetbBattleMode(false);
     }
 
 }

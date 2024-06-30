@@ -78,7 +78,7 @@ void AArcaneBeam::SetBeamEffect()
     float Size =  GetActorScale3D().Y / DefaultSize * ( 1.0f / OwnerCharacter->GetMesh()->GetComponentScale().Y);
     
     BeamComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), BeamEffect, OwnerCharacter->GetLeftBeamPoint()->GetComponentLocation(), OwnerCharacter->GetActorRotation());
-    // UNiagaraFunctionLibrary::SpawnSystemAttached(BeamEffect, OwnerCharacter->GetLeftBeamPoint(), TEXT("ArcaneBeam"), FVector(0,0,0), FRotator::ZeroRotator, Size * BeamScale,EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
+    // UNiagaraFunctionLibrary::SpawnSystemAttached(BeamEffect, OwnerCharacter->GetLeftBeamPoint(), TEXT("ArcaneBeam"), FVector(0,0,0), FRotator::ZeroRotator, Size * BeamScale, EAttachLocation::KeepRelativeOffset, true, ENCPoolMethod::None, true);
     if(!BeamComp.IsValid()) return; 
     BeamStart = OwnerCharacter->GetLeftBeamPoint()->GetComponentLocation();
     BeamEnd = FVector(OwnerCharacter->GetCapsuleComponent()->GetComponentLocation().X,OwnerCharacter->GetCapsuleComponent()->GetComponentLocation().Y,BeamStart.Z) + OwnerCharacter->GetActorForwardVector() * Distance * Size;

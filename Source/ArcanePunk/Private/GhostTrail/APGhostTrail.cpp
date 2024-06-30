@@ -29,9 +29,9 @@ void AAPGhostTrail::Tick(float DeltaTime)
 
 	if(bRunTrail)
 	{
+		Opacity = FMath::FInterpConstantTo(Opacity, -0.1f, DeltaTime, FadeOutSpeed);
 		for(auto Mat : Materials)
 		{
-			Opacity = FMath::FInterpConstantTo(Opacity, -0.1f, DeltaTime, FadeOutSpeed);
 			Mat->SetScalarParameterValue(TEXT("Opacity"), Opacity);
 		}
 		if(Opacity <= 0.0f) Destroy();

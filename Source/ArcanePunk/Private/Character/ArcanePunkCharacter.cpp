@@ -125,6 +125,7 @@ void AArcanePunkCharacter::BeginPlay()
 void AArcanePunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -510,10 +511,10 @@ void AArcanePunkCharacter::Alt_RightClick()
 
 void AArcanePunkCharacter::CurrentPlayerLocation() // 후에 사용할지 말지 결정, 현재는 필요없는듯?
 {
-	// if(MyPlayerTotalStatus.PlayerDynamicData.SaveOperation)
-	// {
-	// 	SetActorLocation(MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation);
-	// }
+	if(MyPlayerTotalStatus.PlayerDynamicData.SaveOperation)
+	{
+		SetActorLocation(MyPlayerTotalStatus.PlayerDynamicData.PlayerLocation);
+	}
 }
 
 FTransform AArcanePunkCharacter::ReturnCameraTransform()

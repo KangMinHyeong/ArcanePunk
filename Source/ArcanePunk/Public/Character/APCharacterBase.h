@@ -192,4 +192,8 @@ public:
 	FOnSkillRotationTrigger OnSkillRotationTrigger;
 
 	FOnUpdateOriginStatus OnUpdateOriginStatus;
+
+	// Test 디버그 드로우
+	UPROPERTY(EditAnywhere)
+	bool bDebugDraw = true;
 };

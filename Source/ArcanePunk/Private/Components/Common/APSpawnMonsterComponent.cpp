@@ -83,7 +83,7 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithoutLocationActor(TSubclassO
     while(SpawnMonsterNum != 0)
     {
         float Location_X =  FMath::RandRange(MinimumRange.X, MaximumRange.X); float Location_Y =  FMath::RandRange(MinimumRange.Y, MaximumRange.Y);
-        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, FVector(Location_X, Location_Y, 0.0f), GetOwner()->GetActorRotation(), SpawnParams);
+        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, FVector(Location_X, Location_Y, MaximumRange.Z), GetOwner()->GetActorRotation(), SpawnParams);
         if(SpawnMonster) PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
         if(SpawnMonster) SpawnMonsterNum--;
     }

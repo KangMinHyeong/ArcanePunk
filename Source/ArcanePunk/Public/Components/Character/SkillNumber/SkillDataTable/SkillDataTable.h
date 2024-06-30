@@ -193,9 +193,10 @@ enum class EEnhanceCategory : uint8 // 증강 타입 넘버
 UENUM(BlueprintType)
 enum class EEnHanceType : uint8
 {
-	Silver		 = 0,
-    Gold		 = 1,
-    Platinum     = 2,
+	None		 = 0,
+	Silver		 = 1,
+    Gold		 = 2,
+    Platinum     = 3,
 };
 
 USTRUCT()

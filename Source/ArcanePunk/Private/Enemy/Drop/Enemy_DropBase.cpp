@@ -4,6 +4,10 @@
 #include "Enemy/Drop/Enemy_DropBase.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AEnemy_DropBase::AEnemy_DropBase()
@@ -13,9 +17,13 @@ AEnemy_DropBase::AEnemy_DropBase()
 
 	InteractTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("InteractTrigger"));
 	DropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DropMesh"));
+	DropTrailEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DropTrailEffect"));
+	GroundTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("GroundTrigger"));
 
 	SetRootComponent(DropMesh);
 	InteractTrigger->SetupAttachment(DropMesh);
+	DropTrailEffect->SetupAttachment(DropMesh);
+	GroundTrigger->SetupAttachment(DropMesh);
 
 	DropMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("DropMovement"));
 	DropMovement->MaxSpeed = DropSpeed;
@@ -32,9 +40,10 @@ AEnemy_DropBase::AEnemy_DropBase()
 void AEnemy_DropBase::BeginPlay()
 {
 	Super::BeginPlay();
-	SetActorTickEnabled(false);
 
+	DropTrailEffect->DeactivateImmediate();
 	SpawnMovement();
+	GroundTrigger->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_DropBase::OnOverlap);
 }
 
 // Called every frame
@@ -42,6 +51,21 @@ void AEnemy_DropBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	CurrentAccelerate = FMath::FInterpConstantTo(CurrentAccelerate, GravityAccelerate, DeltaTime, AccelerateSpeed);
+	DropMesh->AddForce(-GetActorUpVector()*CurrentAccelerate, TEXT("DropMesh"), true);
+
+	if( GravityAccelerate - CurrentAccelerate <= KINDA_SMALL_NUMBER) OnDestinatingGround();
+}
+
+void AEnemy_DropBase::OnDestinatingGround()
+{
+	SetActorTickEnabled(false);
+	
+}
+
+void AEnemy_DropBase::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+{
+	DropTrailEffect->DeactivateImmediate();
 }
 
 void AEnemy_DropBase::SpawnMovement()
@@ -52,7 +76,6 @@ void AEnemy_DropBase::SpawnMovement()
 
 	DropMesh->AddImpulse(FVector(Impulse_X, Impulse_Y, Impulse_Z), TEXT("DropMesh"), true);
 	DropMesh->AddAngularImpulseInDegrees(FVector(Impulse_X, Impulse_Y, Impulse_Z), TEXT("DropMesh"), true);
-	DropMesh->AddImpulse(-GetActorUpVector()*GravityAccelerate, TEXT("DropMesh"), true);
 }
 
 void AEnemy_DropBase::InitializePickup(const TSubclassOf<UAPItemBase> BaseClass, const int32 Quantity)
