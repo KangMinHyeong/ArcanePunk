@@ -8,22 +8,43 @@
 UCLASS()
 class ARCANEPUNK_API AAPDron : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	AAPDron();
+    GENERATED_BODY()
+
+public:
+    AAPDron();
+
+    int32 GroupID;
+    bool IsClustered;
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-public:	
-	virtual void Tick(float DeltaTime) override;
+private:
+    void SetGroupID();
+    FVector CalculateCohesion();
+    FVector CalculateSeparation();
+    FVector SetDronDirection();
 
-	UPROPERTY(EditAnywhere, Category = "Dron")
-		float MovementSpeed;
+    UPROPERTY(EditAnywhere)
+        float NeighborRadius;
 
-	// Bandwidth parameter for Mean Shift
-	UPROPERTY(EditAnywhere, Category = "Dron")
-		float InfluenceRadius;
+    UPROPERTY(EditAnywhere)
+        float AlignmentWeight;
 
+    UPROPERTY(EditAnywhere)
+        float CohesionWeight;
+
+    UPROPERTY(EditAnywhere)
+        float SeparationWeight;
+
+    UPROPERTY(EditAnywhere)
+        float MoveSpeed;
+
+    UPROPERTY(EditAnywhere)
+        float SeparationScale;
+
+    FVector InitialLocation;
+
+public:
+    virtual void Tick(float DeltaTime) override;
 };
