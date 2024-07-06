@@ -233,6 +233,12 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 	return PatrolLocation;
 }
 
+void AEnemy_CharacterBase::SpawnDetectRender()
+{
+	auto DetectText = GetWorld()->SpawnActor<AActor>(DetectTextClass, DamagedMark->GetComponentLocation(), FRotator(0.0f, 180.0f, 0.0f)); if(!DetectText) return;
+	DetectText->SetOwner(this);
+}
+
 float AEnemy_CharacterBase::DamageMath(float Damage)
 {
     return Damage * Defense_constant * (1/(Defense_constant + MyPlayerTotalStatus.PlayerDynamicData.DEF));

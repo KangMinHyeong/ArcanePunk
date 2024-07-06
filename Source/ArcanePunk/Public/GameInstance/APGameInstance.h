@@ -80,6 +80,21 @@ public:
 
 	FORCEINLINE TSubclassOf<UUserWidget> GetCheckUIClass() const {return CheckUIClass;};
 
+	FORCEINLINE float GetSaturation() const {return Saturation;};
+	FORCEINLINE void SetSaturation(float Value) {Saturation = Value;};
+
+	FORCEINLINE float GetContrast() const {return Contrast;};
+    FORCEINLINE void SetContrast(float Value) {Contrast = Value;};
+
+	FORCEINLINE float GetGamma() const {return Gamma;};
+    FORCEINLINE void SetGamma(float Value) {Gamma = Value;};
+
+	FORCEINLINE float GetGain() const {return Gain;};
+    FORCEINLINE void SetGain(float Value) {Gain = Value;};
+
+	FORCEINLINE float GetOffset() const {return Offset;};
+    FORCEINLINE void SetOffset(float Value) {Offset = Value;};
+
 private:
 	UPROPERTY()
 	FString DefaultSlotName = "PlayerSlot_0";
@@ -135,6 +150,17 @@ private:
 	// Check UI
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> CheckUIClass;
+
+	UPROPERTY()
+	float Saturation = 0.5f;
+	UPROPERTY()
+	float Contrast = 0.5f;
+	UPROPERTY()
+	float Gamma = 0.5f;
+	UPROPERTY()
+	float Gain = 0.5f;
+	UPROPERTY()
+	float Offset = 0.5f;
 
 public:
 	FOnSkillEnhanceDataUpdate OnSkillEnhanceDataUpdate;

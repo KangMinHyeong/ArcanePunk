@@ -91,6 +91,9 @@ public:
 	// 패트롤 위치
 	FVector GetPatrolLocation(FVector Start);
 
+	// Detect Render 스폰
+	void SpawnDetectRender();
+
 protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
@@ -215,6 +218,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> DamageTextClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> DetectTextClass;
 
 	float DamageMultiple = 1.0f;
 

@@ -27,6 +27,7 @@ EBTNodeResult::Type UBTTask_Detect::ExecuteTask(UBehaviorTreeComponent &OwnerCom
     Anim->PlayDetect_Montage();
     Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
     Monster->GetCharacterMovement()->MaxWalkSpeed = Monster->GetDefaultSpeed_Origin();
-
+    Monster->SpawnDetectRender();
+    
     return EBTNodeResult::Succeeded;
 }
