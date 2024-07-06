@@ -30,6 +30,8 @@ public:
 	void OnClickButton_Audio();
 	UFUNCTION()
 	void OnClickButton_Key();
+	UFUNCTION()
+	void OnClickButton_Screen();
 
 	UFUNCTION()
 	void OnClickButton_Back();
@@ -49,6 +51,9 @@ private:
 	UButton* Button_Key;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_Screen;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Back;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
@@ -64,6 +69,9 @@ private:
 	UWidget* SmartKeySettingUI;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UWidget* ScreenSettingUI;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_Graphic;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
@@ -71,6 +79,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_SmartKey;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Screen;
 
 	UPROPERTY(EditAnywhere)
 	FLinearColor OnColor;

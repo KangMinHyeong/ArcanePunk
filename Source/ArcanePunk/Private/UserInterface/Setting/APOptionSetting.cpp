@@ -8,6 +8,7 @@
 #include "UserInterface/Setting/APAudioSetting.h"
 #include "UserInterface/Setting/APSmartKeySetting.h"
 #include "UserInterface/Setting/APGraphicsSetting.h"
+#include "UserInterface/Setting/APScreenSetting.h"
 
 void UAPOptionSetting::NativeConstruct()
 {
@@ -49,16 +50,18 @@ void UAPOptionSetting::BindButton()
     Button_Graphics->OnClicked.AddDynamic(this, &UAPOptionSetting::OnClickButton_Graphics);
     Button_Audio->OnClicked.AddDynamic(this, &UAPOptionSetting::OnClickButton_Audio);
     Button_Key->OnClicked.AddDynamic(this, &UAPOptionSetting::OnClickButton_Key);
+    Button_Screen->OnClicked.AddDynamic(this, &UAPOptionSetting::OnClickButton_Screen);
 
     Button_Back->OnClicked.AddDynamic(this, &UAPOptionSetting::OnClickButton_Back);
 }
 
 void UAPOptionSetting::OnClickButton_Graphics()
 {
-    Switcher_Option->SetActiveWidget(GraphicsSettingUI);
+    Switcher_Option->SetActiveWidget(SmartKeySettingUI);
     Text_Graphic->SetColorAndOpacity(OnColor);
     Text_Audio->SetColorAndOpacity(OffColor);
     Text_SmartKey->SetColorAndOpacity(OffColor);
+    Text_Screen->SetColorAndOpacity(OffColor);
 
     auto ButtonStyle = Button_Graphics->GetStyle(); 
     ButtonStyle.Normal.SetResourceObject(TabImage_ON);
@@ -66,6 +69,7 @@ void UAPOptionSetting::OnClickButton_Graphics()
     ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
     Button_Audio->SetStyle(ButtonStyle); 
     Button_Key->SetStyle(ButtonStyle); 
+    Button_Screen->SetStyle(ButtonStyle); 
 }
 
 void UAPOptionSetting::OnClickButton_Audio()
@@ -74,6 +78,7 @@ void UAPOptionSetting::OnClickButton_Audio()
     Text_Graphic->SetColorAndOpacity(OffColor);
     Text_Audio->SetColorAndOpacity(OnColor);
     Text_SmartKey->SetColorAndOpacity(OffColor);
+    Text_Screen->SetColorAndOpacity(OffColor);
 
     auto ButtonStyle = Button_Audio->GetStyle(); 
     ButtonStyle.Normal.SetResourceObject(TabImage_ON);
@@ -81,6 +86,7 @@ void UAPOptionSetting::OnClickButton_Audio()
     ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
     Button_Graphics->SetStyle(ButtonStyle); 
     Button_Key->SetStyle(ButtonStyle); 
+    Button_Screen->SetStyle(ButtonStyle); 
 }
 
 void UAPOptionSetting::OnClickButton_Key()
@@ -89,6 +95,7 @@ void UAPOptionSetting::OnClickButton_Key()
     Text_Graphic->SetColorAndOpacity(OffColor);
     Text_Audio->SetColorAndOpacity(OffColor);
     Text_SmartKey->SetColorAndOpacity(OnColor);
+    Text_Screen->SetColorAndOpacity(OffColor);
 
     auto ButtonStyle = Button_Key->GetStyle(); 
     ButtonStyle.Normal.SetResourceObject(TabImage_ON);
@@ -96,6 +103,24 @@ void UAPOptionSetting::OnClickButton_Key()
     ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
     Button_Graphics->SetStyle(ButtonStyle); 
     Button_Audio->SetStyle(ButtonStyle); 
+    Button_Screen->SetStyle(ButtonStyle); 
+}
+
+void UAPOptionSetting::OnClickButton_Screen()
+{
+    Switcher_Option->SetActiveWidget(ScreenSettingUI);
+    Text_Graphic->SetColorAndOpacity(OffColor);
+    Text_Audio->SetColorAndOpacity(OffColor);
+    Text_SmartKey->SetColorAndOpacity(OffColor);
+    Text_Screen->SetColorAndOpacity(OnColor);
+
+    auto ButtonStyle = Button_Key->GetStyle(); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_ON);
+    Button_Screen->SetStyle(ButtonStyle); 
+    ButtonStyle.Normal.SetResourceObject(TabImage_OFF);
+    Button_Graphics->SetStyle(ButtonStyle); 
+    Button_Audio->SetStyle(ButtonStyle); 
+    Button_Key->SetStyle(ButtonStyle); 
 }
 
 void UAPOptionSetting::OnClickButton_Back()
