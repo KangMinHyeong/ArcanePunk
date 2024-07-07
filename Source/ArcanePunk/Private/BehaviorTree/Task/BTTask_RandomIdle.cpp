@@ -26,5 +26,8 @@ EBTNodeResult::Type UBTTask_RandomIdle::ExecuteTask(UBehaviorTreeComponent &Owne
 
     Anim->PlayRandomIdle_Montage();
 
+    auto Current = OwnerComp.GetBlackboardComponent()->GetValueAsInt(GetSelectedBlackboardKey()) - 1;
+    OwnerComp.GetBlackboardComponent()->SetValueAsInt(GetSelectedBlackboardKey(), Current);
+
     return EBTNodeResult::Succeeded;
 }
