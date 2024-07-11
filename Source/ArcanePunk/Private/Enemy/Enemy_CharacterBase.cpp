@@ -27,12 +27,14 @@
 #include "GameInstance/APGameInstance.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "NavigationSystem.h"
+#include "Components/Common/APManaDropComponent.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidgetComp"));
+	ManaDropComp = CreateDefaultSubobject<UAPManaDropComponent>(TEXT("ManaDropComp"));
 
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
 
@@ -174,6 +176,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		StunEffectComp->DestroyComponent();
 		TeleportMark->DeactivateImmediate();
 		EnemyAnim->PlayDeath_Montage();
+		ManaDropComp->SpawnManaDrop(DamageCauser);
 	}
 	else
 	{
