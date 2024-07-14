@@ -20,6 +20,7 @@ class AEnemy_DropPackage;
 class UNiagaraSystem;
 class UAPMovementComponent;
 class USkillNumberBase;
+class UAPManaDropComponent;
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public AAPCharacterBase
@@ -56,7 +57,7 @@ public:
 
 	// 몬스터 Attack 관련 함수
 	virtual void PossessedBy(AController* NewController) override;
-	void NormalAttack();
+	virtual void NormalAttack();
 
 	FORCEINLINE float GetDistanceLimit()const {return Distance_Limit;}; 
 	FORCEINLINE float GetDetectLimit()const {return DetectLimit;}; 
@@ -131,6 +132,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
 	UWidgetComponent* HealthWidgetComp;
+
+	UPROPERTY(EditAnywhere, Category = "Status")
+	UAPManaDropComponent* ManaDropComp;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRange = 250.0f;
