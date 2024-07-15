@@ -36,6 +36,7 @@ void AAPSkillRange_Arrow::SetSkill(FSkillAbilityNestingData SkillAbilityNestingD
 void AAPSkillRange_Arrow::ObstacleCheck()
 {
     if(!OwnerCharacter.IsValid()) return; if(!OwnerPC.IsValid()) return;
+    
 	FHitResult HitResult;
 	OwnerPC->GetHitResultUnderCursor(ECC_GameTraceChannel3, false, HitResult);
     FVector HitPoint;

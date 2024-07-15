@@ -353,6 +353,7 @@ void USkillNumberBase::ActivateSkillRange_Target(float Range_1, float Range_2, E
 	{
 		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(OwnerCharacter->GetAPSkillHubComponent()->GetAPSkillRange_Arrow(), OwnerCharacter->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 		if(SkillRange_Target.IsValid()) SkillRange_Target->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+		SkillRange_Target->SetScale_Arrow(Range_1, Range_2);
 		SkillRange_Target->GetDecalComponent()->DecalSize = FVector(5.0f, Range_1, Range_2);
 	}
 	else if(SkillRangeType == ESkillRangeType::Around_Circle)

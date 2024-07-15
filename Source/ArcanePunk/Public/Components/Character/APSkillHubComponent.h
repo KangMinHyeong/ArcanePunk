@@ -177,14 +177,13 @@ public:
 	USkillNumberBase* GetSKillNumberComp(ESkillNumber SkillNumber);
 
 	void AutoRecoveryMP();
+	void RecoveryMP();
 
 	FORCEINLINE float GetRecoveryTime_MP() const {return RecoveryTime_MP;};
 	FORCEINLINE void SetRecoveryTime_MP(float NewValue) {RecoveryTime_MP = NewValue;};
 
 private:
 	void PlayBasicSkill();
-
-	void RecoveryMP();
 	
 private:
 	// 스킬 Base State
