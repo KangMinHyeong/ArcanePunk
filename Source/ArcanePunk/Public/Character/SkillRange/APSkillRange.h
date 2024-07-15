@@ -36,7 +36,8 @@ public:
 
 	void SetAngle(float AngleSize);
 	void SetScale(float Range);
-
+	void SetScale_Arrow(float Width, float Length);
+	
 	FORCEINLINE float GetMaxDist() const {return MaxDistance;};
 	FORCEINLINE void SetMaxDist(float MaxDist) {MaxDistance = MaxDist;};
 	FORCEINLINE float GetTargetDistance() const {return TargetDistance;};

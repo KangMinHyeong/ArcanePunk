@@ -51,3 +51,8 @@ void AAPSkillRange::SetScale(float Range)
 {
 	RangeEffect->SetVariableFloat(TEXT("Size"),  Range / 325.0f);
 }
+
+void AAPSkillRange::SetScale_Arrow(float Width, float Length) 
+{
+	RangeEffect->SetVariableVec2(TEXT("Size2D"),  FVector2D(Length / 500.0f, Width / 100.0f));
+}
