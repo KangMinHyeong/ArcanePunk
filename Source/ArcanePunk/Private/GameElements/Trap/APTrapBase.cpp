@@ -23,7 +23,7 @@ void AAPTrapBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	TrapMesh->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase::OnOverlap);
+	TrapTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase::OnOverlap);
 }
 
 void AAPTrapBase::Tick(float DeltaTime)
