@@ -60,7 +60,7 @@ void AAPManaEnergy::StartTracePlayer(float DeltaTime)
 {
 	if(!TraceActor.IsValid()) return;
 	CurrentHomingSpeed = FMath::FInterpConstantTo(CurrentHomingSpeed, HomingSpeed, DeltaTime, SpeedUp);
-	UE_LOG(LogTemp, Display, TEXT("CurrentHomingSpeed %f"), CurrentHomingSpeed);
+
 	FVector Current = GetActorLocation();
 	Current = FMath::VInterpConstantTo(Current, TraceActor->GetActorLocation(), DeltaTime, CurrentHomingSpeed);
 	SetActorLocation(Current);

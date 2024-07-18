@@ -38,7 +38,7 @@ void AEnemy_ScoutDog::Tick(float DeltaTime)
     
     if(IsDead()) return;
     CurrentLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, DeltaTime, InterpSpeed);
-    SetActorLocation(CurrentLocation);
+    SetActorLocation(CurrentLocation, true);
     if(abs(CurrentLocation.X - TargetLocation.X )< 1.0f && abs(CurrentLocation.Y - TargetLocation.Y) < 1.0f) 
     {
         AttackCondition(false);
