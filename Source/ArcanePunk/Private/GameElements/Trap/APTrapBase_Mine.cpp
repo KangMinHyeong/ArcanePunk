@@ -5,54 +5,59 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 AAPTrapBase_Mine::AAPTrapBase_Mine()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-	MineTopMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MineTopMesh"));
-    MineRangeDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("MineRangeDecal"));
-
-	MineTopMesh->SetupAttachment(TrapMesh);
-    MineRangeDecal->SetupAttachment(TrapMesh);
 }
 
 void AAPTrapBase_Mine::BeginPlay()
 {
     Super::BeginPlay();
 
-    MineRangeDecal->SetHiddenInGame(true);
-    MineRangeDecal->DecalSize = FVector(10.0f, TrapTrigger->GetUnscaledSphereRadius(), TrapTrigger->GetUnscaledSphereRadius());
+    RangeDecal->DecalSize = FVector(10.0f, TrapTrigger->GetUnscaledSphereRadius(), TrapTrigger->GetUnscaledSphereRadius());
 
     Player = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
-    OperationLocation = MineTopMesh->GetComponentLocation() - FVector(0.0f, 0.0f, 40.0f);
+    OperationLocation = RotateMesh->GetComponentLocation() - FVector(0.0f, 0.0f, 40.0f);
 }
 
-void AAPTrapBase_Mine::AutoRotating()
-{
-    FVector ToTarget = Player->GetActorLocation() - MineTopMesh->GetComponentLocation();
-	FRotator TargetRotation = FRotator(0, ToTarget.Rotation().Yaw - 90.0f, 0);
-
-	MineTopMesh->SetWorldRotation(FMath::RInterpTo(MineTopMesh->GetComponentRotation(), TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(this), RotateSpeed));
-}
 
 void AAPTrapBase_Mine::OperateExplosion(float DeltaTime)
 {
-    FVector Current = MineTopMesh->GetComponentLocation();
+    FVector Current = RotateMesh->GetComponentLocation();
     Current = FMath::VInterpConstantTo(Current, OperationLocation, DeltaTime, OperateSpeed);
-    MineTopMesh->SetWorldLocation(Current);
+    RotateMesh->SetWorldLocation(Current);
 
     if(abs(OperationLocation.Z - Current.Z) <= KINDA_SMALL_NUMBER)
     {
         SetActorTickEnabled(false);
         bOperation = false;
-        Explosion();
+        Explosion_Ready();
     }
+}
+
+void AAPTrapBase_Mine::Explosion_Ready()
+{
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPTrapBase_Mine::Explosion, TrapOperationTime, false);
 }
 
 void AAPTrapBase_Mine::Explosion()
 {
-    UE_LOG(LogTemp, Display, TEXT("Your message"));
+    TArray<AActor*> Actors;
+    GetOverlappingActors(Actors, AArcanePunkCharacter::StaticClass());
+
+    for(AActor* Actor : Actors)
+    {
+        UGameplayStatics::ApplyDamage(Actor, TrapDamage, nullptr, this, UDamageType::StaticClass());
+    }
+
+    auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TrapOverlapEffect, GetActorLocation(), GetActorRotation());
+    NC->SetVariableFloat(TEXT("Size"), 1.5f);
+    Destroy();
 }
 
 void AAPTrapBase_Mine::Tick(float DeltaTime)
@@ -69,5 +74,5 @@ void AAPTrapBase_Mine::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *Ot
 
     bRotating = false;
     bOperation = true;
-    MineRangeDecal->SetHiddenInGame(false);
+    RangeDecal->SetHiddenInGame(false);
 }
