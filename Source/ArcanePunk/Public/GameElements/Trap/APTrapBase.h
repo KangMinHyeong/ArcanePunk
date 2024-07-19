@@ -8,6 +8,8 @@
 
 class USphereComponent;
 class UNiagaraSystem;
+class AArcanePunkCharacter;
+class UDecalComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPTrapBase : public AActor
@@ -26,7 +28,10 @@ public:
 	UFUNCTION()
   	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void AutoRotating();
+
 protected:
+	// Component
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* TrapMesh;
 
@@ -34,6 +39,25 @@ protected:
 	USphereComponent* TrapTrigger;
 
 	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* RotateMesh;
+
+	UPROPERTY(EditAnywhere)
+	UDecalComponent* RangeDecal;
+
+	// Trap Operate Effect
+	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* TrapOverlapEffect;
 
+	// Damage
+	UPROPERTY(EditAnywhere)
+	float TrapDamage = 25.0f;
+
+	// Rotation
+	UPROPERTY(EditAnywhere)
+	float RotateSpeed = 500.0f;
+
+	bool bRotating = true;
+	
+	// Trap Overlapped Player
+	TWeakObjectPtr<AArcanePunkCharacter> Player;
 };

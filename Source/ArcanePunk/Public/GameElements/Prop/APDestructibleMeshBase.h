@@ -29,7 +29,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
-	void Explode();
+	void StartFadeOut();
+	void Explode(FVector HitLocation);
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -60,4 +61,21 @@ protected:
 	float FalloffCoefficient = 100.0f;
 	UPROPERTY(EditAnywhere)
 	float VectorCoefficient = 100.0f;
+
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> Materials;
+
+	float Opacity = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float FadeOutSpeed = 1.0f;
+	float CurrentFadeOutSpeed = 0.0f;
+
+	bool bFadeOut = false;
+
+	FTimerHandle TimerHandle;
+	UPROPERTY(EditAnywhere)
+	float FadeOutTime = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	bool bCenterExplosion = true;
 };
