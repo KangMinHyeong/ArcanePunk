@@ -112,7 +112,7 @@ void UUltSkillNumber_3::OnSkill()
             FVector Check = Hit.Location; Check.Z = OwnerCharacter->GetMesh()->GetComponentLocation().Z;
             if((Check - OwnerCharacter->GetMesh()->GetComponentLocation()).Size() < Ult3_CircleRange)
             {
-                OwnerCharacterPC->RemoveOtherClick(); OwnerCharacterPC->SetMouseCursor(); CursorImmediately();
+                OwnerCharacterPC->SetMouseCursor(); CursorImmediately();
                 if(SkillRange_Circle.IsValid()) SkillRange_Circle->SetActorHiddenInGame(true);
                 bActivate = true; SetComponentTickEnabled(false);
                 

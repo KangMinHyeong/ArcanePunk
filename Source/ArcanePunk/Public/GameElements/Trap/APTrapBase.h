@@ -56,8 +56,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float RotateSpeed = 500.0f;
 
-	bool bRotating = true;
+	UPROPERTY(EditAnywhere)
+	float RotatePlus = 0.0f;
 	
+	bool bRotating = true;
+
 	// Trap Overlapped Player
 	TWeakObjectPtr<AArcanePunkCharacter> Player;
 };

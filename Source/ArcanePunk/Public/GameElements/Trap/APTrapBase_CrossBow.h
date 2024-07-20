@@ -6,9 +6,9 @@
 #include "GameElements/Trap/APTrapBase.h"
 #include "APTrapBase_CrossBow.generated.h"
 
-/**
- * 
- */
+class UNiagaraComponent;
+class AAPProjectileBase;
+
 UCLASS()
 class ARCANEPUNK_API AAPTrapBase_CrossBow : public AAPTrapBase
 {
@@ -31,6 +31,12 @@ public:
 	
 
 protected:
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* RangeEffect;
+
+	UPROPERTY(EditAnywhere)
+	USceneComponent* ArrowSpawnComp;
+
 	// Trap Operate Timer
 	FTimerHandle TimerHandle;
 
@@ -42,4 +48,13 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float ShootDelayTime = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ArrowSpeed = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	FVector2D ShootRange = FVector2D(500.0f, 100.0f);
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AAPProjectileBase> ProjectileClass;
 };

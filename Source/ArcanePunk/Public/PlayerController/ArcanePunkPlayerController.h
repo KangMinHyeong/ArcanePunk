@@ -73,7 +73,6 @@ public:
 	void ReturnToDefault();
 	void PreventOtherClick(ESkillNumber SkillNumber, bool Loop = false);
 	void PreventOtherClick_Ult( bool Loop = false);
-	void RemoveOtherClick();
 	
 	// Arcane Tent
 	void SetHideUI(bool NewBool);

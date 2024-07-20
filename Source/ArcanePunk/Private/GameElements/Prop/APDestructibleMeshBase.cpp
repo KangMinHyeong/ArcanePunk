@@ -56,7 +56,7 @@ void AAPDestructibleMeshBase::Tick(float DeltaTime)
 			Mat->SetScalarParameterValue(TEXT("Apperence"), Opacity);
 		}
 
-		if(Opacity <= 0.5f) CurrentFadeOutSpeed = FadeOutSpeed * 5.0f;
+		if(Opacity <= 0.5f) CurrentFadeOutSpeed = FadeOutSpeed * 6.5f;
 		if(Opacity <= KINDA_SMALL_NUMBER) Destroy();
 	}
 }

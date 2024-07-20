@@ -685,6 +685,10 @@ float UAPAttackComponent::ApplyDamageToActor(AActor* DamagedActor, float Damage,
 {
 	if(!OwnerCharacter.IsValid()) return 0.0f;
 	if(bCriticalApply) Damage = Damage * OwnerCharacter->CriticalCalculate();
+
+	if(HitResult.ImpactPoint.X + HitResult.ImpactPoint.Y == KINDA_SMALL_NUMBER) 
+	HitResult.ImpactPoint = DamagedActor->GetActorLocation();
+
 	FPointDamageEvent myDamageEvent(Damage, HitResult, -GetOwner()->GetActorRotation().Vector(), nullptr); 
 	float DamageApplied = DamagedActor->TakeDamage(Damage, myDamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
 	return DamageApplied;
