@@ -167,6 +167,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	ESkillKey GetSkillState();
 
+	FORCEINLINE void SetSkillState(ESkillKey NewSkillKey) {SkillState = NewSkillKey;};
 
 	void UpdatingSkill_Q();
 	void UpdatingSkill_E();

@@ -319,11 +319,6 @@ void AArcanePunkPlayerController::PreventOtherClick_Ult(bool Loop)
     MouseClickUI->AddToViewport(); 
 }
 
-void AArcanePunkPlayerController::RemoveOtherClick()
-{
-    if(MouseClickUI.IsValid()) MouseClickUI->RemoveFromParent(); 
-}
-
 void AArcanePunkPlayerController::SetHideUI(bool NewBool)
 {
     if(NewBool)

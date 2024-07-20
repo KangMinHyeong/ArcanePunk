@@ -43,7 +43,7 @@ void AAPTrapBase::Tick(float DeltaTime)
 void AAPTrapBase::AutoRotating()
 {
     FVector ToTarget = Player->GetActorLocation() - RotateMesh->GetComponentLocation();
-	FRotator TargetRotation = FRotator(0, ToTarget.Rotation().Yaw - 90.0f, 0);
+	FRotator TargetRotation = FRotator(0, ToTarget.Rotation().Yaw + RotatePlus, 0);
 
 	RotateMesh->SetWorldRotation(FMath::RInterpTo(RotateMesh->GetComponentRotation(), TargetRotation, UGameplayStatics::GetWorldDeltaSeconds(this), RotateSpeed));
 }

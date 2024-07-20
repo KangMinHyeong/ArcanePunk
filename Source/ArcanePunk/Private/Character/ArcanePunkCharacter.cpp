@@ -250,7 +250,8 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 void AArcanePunkCharacter::Attack_typeB()
 {
 	if(!bCanMove || !StopState.IsEmpty()) return;
-	bDoing = true;
+
+	SkillHubComponent->LastSkill = ESkillKey::None;
 	AttackComponent->StartAttack_B(bCanMove);
 
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
@@ -653,7 +654,7 @@ void AArcanePunkCharacter::InitPlayerStatus()
 {
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
-	MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus; // 테스트용으로 빼놈, 이 줄 넣어야 세이브 스탯으로 초기화
+	if(MyPlayerState->PlayerTotalStatus.PlayerDynamicData.SaveOperation) MyPlayerTotalStatus_Origin = MyPlayerState->PlayerTotalStatus; // 테스트용으로 빼놈, 이 줄 넣어야 세이브 스탯으로 초기화
 	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
 
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;

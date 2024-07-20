@@ -64,7 +64,7 @@ ESkillKey UAPSkillHubComponent::GetSkillState()
 void UAPSkillHubComponent::PlayBasicSkill()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
-	OwnerCharacterPC->RemoveOtherClick();
+
 	switch(SkillState)
 	{
 		case ESkillKey::Q:
