@@ -221,17 +221,25 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 	FNavLocation NavLoc;
 	const UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 	bool navResult = false;
-	while(!navResult)
-	{
-		PatrolLocation = Start;
-		float X = FMath::RandRange(-1.0f, 1.0f);
-		float Y = sqrt(1.0f - X*X);
-		int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
+	// while(!navResult)
+	// {
+	// 	PatrolLocation = Start;
+	// 	float X = FMath::RandRange(-1.0f, 1.0f);
+	// 	float Y = sqrt(1.0f - X*X);
+	// 	int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
 
-		PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
-		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc);
-	}
+	// 	PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
+	// 	navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc);
+	// }
+
+	PatrolLocation = Start;
+	float X = FMath::RandRange(-1.0f, 1.0f);
+	float Y = sqrt(1.0f - X*X);
+	int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
+
+	PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, GetActorLocation().Z);
 	
+	UE_LOG(LogTemp, Display, TEXT("PatrolLocation.X : %f, PatrolLocation.Y : %f"), PatrolLocation.X, PatrolLocation.Y);
 	return PatrolLocation;
 }
 
