@@ -33,7 +33,6 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidgetComp"));
 	ManaDropComp = CreateDefaultSubobject<UAPManaDropComponent>(TEXT("ManaDropComp"));
 
 	Weapon->SetupAttachment(GetMesh(),FName("HandWeapon"));
@@ -64,7 +63,7 @@ void AEnemy_CharacterBase::BeginPlay()
 	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 	DefaultMaterial = GetMesh()->GetMaterial(0);
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
-	
+
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
 }
 
