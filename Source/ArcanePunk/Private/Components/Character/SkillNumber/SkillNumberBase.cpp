@@ -395,7 +395,9 @@ void USkillNumberBase::CharacterRotation()
 		
 	FVector Loc = SkillRange_Target->GetDecalComponent()->GetComponentLocation() - OwnerCharacter->GetMesh()->GetComponentLocation();
 
-	Loc.Z = 0.0f; FRotator Rotation = FRotationMatrix::MakeFromX(Loc).Rotator();
+	Loc.Z = 0.0f; 
+	
+	FRotator Rotation = FRotationMatrix::MakeFromX(Loc).Rotator();
 	
 	OwnerCharacter->GetAPMoveComponent()->SetAttackRotation(Rotation, RotSpeed);
 

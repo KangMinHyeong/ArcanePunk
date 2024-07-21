@@ -37,24 +37,42 @@ void UAPMovementComponent::PlayerMoveForward(float AxisValue)
 {
 	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
 
-	PlayerVec.X = AxisValue;
+	// X축 기준
+	PlayerVec.Y = -AxisValue;
 	if(PlayerVec.SizeSquared() != 0)
 	{
 		OwnerCharacter->GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		OwnerCharacter->AddMovementInput(PlayerVec);
-	}	
+	}
+
+	// Y축 기준
+	// PlayerVec.X = AxisValue;
+	// if(PlayerVec.SizeSquared() != 0)
+	// {
+	// 	OwnerCharacter->GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
+	// 	OwnerCharacter->AddMovementInput(PlayerVec);
+	// }	
 }
 
 void UAPMovementComponent::PlayerMoveRight(float AxisValue)
 {
 	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
 
-	PlayerVec.Y = AxisValue;
+	// X축 기준
+	PlayerVec.X = AxisValue;
 	if(PlayerVec.SizeSquared() != 0)
 	{
 		OwnerCharacter->GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
 		OwnerCharacter->AddMovementInput(PlayerVec);
 	}
+
+	// Y축 기준
+	// PlayerVec.Y = AxisValue;
+	// if(PlayerVec.SizeSquared() != 0)
+	// {
+	// 	OwnerCharacter->GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
+	// 	OwnerCharacter->AddMovementInput(PlayerVec);
+	// }
 }
 
 void UAPMovementComponent::TickCheck()

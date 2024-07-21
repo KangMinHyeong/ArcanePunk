@@ -194,7 +194,6 @@ void AArcanePunkCharacter::MoveForward(float AxisValue)
 		else if (PlayerVec.X < 0) HUD->UpdateTutorialWidget("PressDown");
 	}
 	if(StopState.IsEmpty()) MoveComponent->PlayerMoveForward(AxisValue);
-
 }
 
 void AArcanePunkCharacter::MoveRight(float AxisValue)
@@ -232,8 +231,14 @@ void AArcanePunkCharacter::SetAttackRotation()
 	if(PC.IsValid()) 
 	{
 		if(!GM.IsValid()) return; 
-		// if(GM->IsBattleStage())PC->SetControlRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
-		if(GM->IsBattleStage()) MoveComponent->SetAttackRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
+		// Y축 기준
+		// if(GM->IsBattleStage()) 
+		// MoveComponent->SetAttackRotation(FRotator(GetActorRotation().Pitch, PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
+
+		// X축 기준
+		if(GM->IsBattleStage()) 
+		MoveComponent->SetAttackRotation(FRotator(GetActorRotation().Pitch, -90.0f + PC.Get()->MousePositionAngle, GetActorRotation().Roll ));
+
 	}
 }
 

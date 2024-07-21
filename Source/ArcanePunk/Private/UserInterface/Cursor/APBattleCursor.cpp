@@ -23,7 +23,11 @@ void UAPBattleCursor::CheckCursorUnder()
     float X = 0.0f; float Y = 0.0f; float Angle = 0.0f;
     if(PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
     {
-        Y = HitResult.Location.X - Character->GetActorLocation().X; X = HitResult.Location.Y - Character->GetActorLocation().Y;
+        // X축 기준
+        X = HitResult.Location.X - Character->GetActorLocation().X; Y = HitResult.Location.Y - Character->GetActorLocation().Y;
+        
+        // Y축 기준
+        // Y = HitResult.Location.X - Character->GetActorLocation().X; X = HitResult.Location.Y - Character->GetActorLocation().Y;
     }
     else
     {
@@ -32,9 +36,16 @@ void UAPBattleCursor::CheckCursorUnder()
         X = X - ViewportSize.X/2; Y = ViewportSize.Y/2 - Y;
     }
 
-    if(X >= 0.0f &&  Y < 0.0f){ Angle = 90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Atan(Y/X));}
-    else if(X < 0.0f &&  Y < 0.0f){Angle = -90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Atan(Y/X));}
-    else{Angle = FMath::RadiansToDegrees(UKismetMathLibrary::Atan(X/Y));}
+    // Y축 기준
+    // if(X >= 0.0f &&  Y < 0.0f){ Angle = 90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Atan(Y/X));}
+    // else if(X < 0.0f &&  Y < 0.0f){Angle = -90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Atan(Y/X));}
+    // else{Angle = FMath::RadiansToDegrees(UKismetMathLibrary::Atan(X/Y));}
+
+    // X축 기준
+    if(X >= 0.0f &&  Y < 0.0f){ Angle = 90.0f + FMath::RadiansToDegrees(UKismetMathLibrary::Atan(Y/X));}
+    else if(X < 0.0f &&  Y < 0.0f){Angle = - 90.0f + FMath::RadiansToDegrees(UKismetMathLibrary::Atan(Y/X));}
+    else{Angle = 180.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Atan(X/Y));}
+    
 
     MainPanel->SetRenderTransformAngle(Angle);
     PC->MousePositionAngle = Angle;

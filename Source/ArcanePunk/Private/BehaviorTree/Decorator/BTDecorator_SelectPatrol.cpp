@@ -19,7 +19,11 @@ bool UBTDecorator_SelectPatrol::CalculateRawConditionValue(UBehaviorTreeComponen
     auto Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
 	if (!Monster) return false;
 
-    OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), Monster->GetPatrolLocation(OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("StartLocation"))));
+    FVector Start = OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("StartLocation"));
+    Start.Z = Monster->GetActorLocation().Z;
+    OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), Start);
+
+    OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), Monster->GetPatrolLocation(Start));
 
     Monster->GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
     
