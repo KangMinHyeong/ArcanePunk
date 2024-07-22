@@ -83,4 +83,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float CriticalAttackScale = 9.0f;
+
+	FTimerHandle StopTimerHandle;
 };

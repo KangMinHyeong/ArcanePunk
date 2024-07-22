@@ -152,6 +152,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if(IsDead()) return 0.0f;
+	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
+
 	float HP = MyPlayerTotalStatus.PlayerDynamicData.HP;
 	DamageApplied = DamageApplied * DamageMultiple;
 	DamageApplied = FMath::Min(HP, DamageApplied);
@@ -161,8 +163,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
-	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
-
+	
 	if(IsDead())
 	{
 	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
@@ -221,31 +222,28 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 	FNavLocation NavLoc;
 	const UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 	bool navResult = false;
-	// while(!navResult)
-	// {
-	// 	PatrolLocation = Start;
-	// 	float X = FMath::RandRange(-1.0f, 1.0f);
-	// 	float Y = sqrt(1.0f - X*X);
-	// 	int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
+	int32 Repeat = 0;
+	while(!navResult && Repeat < 50)
+	{
+		PatrolLocation = Start;
+		float X = FMath::RandRange(-1.0f, 1.0f);
+		float Y = sqrt(1.0f - X*X);
+		int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
 
-	// 	PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
-	// 	navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc);
-	// }
+		PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
+		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc, FVector(0.0f,0.0f,5000.0f));
+		Repeat++;
+	}
 
-	PatrolLocation = Start;
-	float X = FMath::RandRange(-1.0f, 1.0f);
-	float Y = sqrt(1.0f - X*X);
-	int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
+	UE_LOG(LogTemp, Display, TEXT("Repeat : %d"), Repeat);
 
-	PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, GetActorLocation().Z);
-	
-	UE_LOG(LogTemp, Display, TEXT("PatrolLocation.X : %f, PatrolLocation.Y : %f"), PatrolLocation.X, PatrolLocation.Y);
+
 	return PatrolLocation;
 }
 
 void AEnemy_CharacterBase::SpawnDetectRender()
 {
-	auto DetectText = GetWorld()->SpawnActor<AActor>(DetectTextClass, DamagedMark->GetComponentLocation(), FRotator(0.0f, 180.0f, 0.0f)); if(!DetectText) return;
+	auto DetectText = GetWorld()->SpawnActor<AActor>(DetectTextClass, DamagedMark->GetComponentLocation(), FRotator(0.0f, 90.0f, 0.0f)); if(!DetectText) return;
 	DetectText->SetOwner(this);
 }
 
@@ -346,7 +344,7 @@ void AEnemy_CharacterBase::ResetHitStiffness()
 
 void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation)
 {
-	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 180.0f, 0.0f));
+	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 90.0f, 0.0f));
 	if(!DamageText) return;
 
 	bool Check = false; 
