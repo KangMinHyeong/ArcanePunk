@@ -69,7 +69,7 @@ void ADamageText::TimeLineUpdateFunc2(FVector Output)
 
 void ADamageText::TimeLineUpdateFunc3(FLinearColor Output)
 {
-	MyTextRender->SetTextRenderColor(InitColor.WithAlpha(0));
+	MyTextRender->SetTextRenderColor(InitColor.WithAlpha(Output.A));
 }
 
 void ADamageText::TimeLineFinishFunc()
@@ -94,4 +94,5 @@ void ADamageText::StartTimeLine()
 		TimeLine.SetTimelineLength(MaxLength);
 	}
 	TimeLine.PlayFromStart();
+	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &ADamageText::TimeLineFinishFunc, MaxLength, false);
 }

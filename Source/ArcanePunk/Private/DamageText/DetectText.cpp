@@ -42,7 +42,7 @@ void ADetectText::TimeLineUpdateFunc2(FVector Output)
 
 void ADetectText::TimeLineUpdateFunc3(FLinearColor Output)
 {
-	MyTextRender->SetTextRenderColor(DetectColor.WithAlpha(0));
+	MyTextRender->SetTextRenderColor(DetectColor.WithAlpha(Output.A));
 }
 
 void ADetectText::TimeLineFinishFunc()

@@ -39,8 +39,8 @@ void AAPTrapBase_CrossBow::Tick(float DeltaTime)
 
 void AAPTrapBase_CrossBow::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-    if(Cast<AArcanePunkCharacter>(OtherActor)) Player = Cast<AArcanePunkCharacter>(OtherActor);
-    if(!Player.IsValid()) return;
+    if(!Cast<AArcanePunkCharacter>(OtherActor)) return;
+    Player = Cast<AArcanePunkCharacter>(OtherActor);
 
     bRotating = true;
 
@@ -58,9 +58,8 @@ void AAPTrapBase_CrossBow::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AAc
 
 void AAPTrapBase_CrossBow::ReadyToShoot()
 {
-    if(!TrapTrigger->IsOverlappingActor(Player.Get())) return;
-
     GetWorldTimerManager().ClearTimer(TimerHandle);
+    if(!TrapTrigger->IsOverlappingActor(Player.Get())) return;
 
     bRotating = false;
     
@@ -72,14 +71,14 @@ void AAPTrapBase_CrossBow::ReadyToShoot()
 
 void AAPTrapBase_CrossBow::ShootArrow()
 {
+    RangeEffect->DeactivateImmediate(); 
+
     auto Ammo = GetWorld()->SpawnActor<AAPProjectileBase>(ProjectileClass, ArrowSpawnComp->GetComponentLocation(), ArrowSpawnComp->GetComponentRotation());
     if(!Ammo) return;
     Ammo->SetDestroy(ShootRange.X / ArrowSpeed);
     Ammo->SetSpeed(ArrowSpeed);
     Ammo->SetDamage(TrapDamage);
     Ammo->SetRadius(ShootRange.Y * 0.5f);
-
-    RangeEffect->DeactivateImmediate(); 
 
     if(!TrapTrigger->IsOverlappingActor(Player.Get())) return;
 
