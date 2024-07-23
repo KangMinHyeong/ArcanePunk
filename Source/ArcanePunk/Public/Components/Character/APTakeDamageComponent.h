@@ -44,8 +44,6 @@ private:
 	bool CheckingDamaged();
 
 private:
-	FTimerHandle HittingTimerHandle;
-
 	float PlayerIsForward = 0.0f;
 	float PlayerIsRight = 0.0f;
 
@@ -57,12 +55,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	UNiagaraSystem* HitEffect_B;
-
-	UPROPERTY(EditAnywhere, Category = "Hit")
-	float HitMotionTime = 1.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Hit")
-	UMaterialInterface* HitMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "Death")
 	float DeathTime = 3.0f;

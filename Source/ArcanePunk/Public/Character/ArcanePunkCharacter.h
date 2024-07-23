@@ -138,7 +138,7 @@ public:
 	FORCEINLINE bool GetInArcaneTent() const {return InArcaneTent;};
 	FORCEINLINE bool GetHideMode() const {return bHideMode;};
 	FORCEINLINE void SetHideModeOnlyBool(bool NewBool) {bHideMode = NewBool;};
-	FORCEINLINE UMaterialInterface* GetHideMaterial() const {return HideMaterial;};
+
 	void HideClear();
 	FORCEINLINE bool IsEnhanceTent() const {return bEnhanceTent;};
 	FORCEINLINE void SetEnhanceTent(bool NewBool) {bEnhanceTent = NewBool;};
@@ -156,7 +156,7 @@ public:
 	FORCEINLINE void SetReflectMode(uint8 NewValue) {ReflectingModeGauge = NewValue;};
 
 	// Hit, Dead 관련 함수
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UAPTakeDamageComponent* GetTakeDamageComponent() const {return TakeDamageComp;}; // DamageComp 반환
@@ -349,8 +349,7 @@ private:
 	bool InArcaneTent = false;
 	bool bHideMode = false;
 	float ReturnToHideTime = 1.0f;
-	UPROPERTY(EditAnywhere, Category = "Skill")
-	UMaterialInterface* HideMaterial;
+
 	
 	bool OnQSkill = false;
 

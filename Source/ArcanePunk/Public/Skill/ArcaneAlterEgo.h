@@ -64,9 +64,6 @@ protected:
 	FTimerHandle DestroyTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "Hit")
-	float HitMotionTime = 0.6f;
-
-	UPROPERTY(EditAnywhere, Category = "Hit")
 	float DestroyTime = 20.0f;
 
 	UPROPERTY(EditAnywhere)
