@@ -40,6 +40,7 @@ void UEnhanceGauge::DisplayEnhanceGauge(int32 TargetNum, int32 MaxNum)
 
 void UEnhanceGauge::SetCustomTickEnable()
 {
+    GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
     bTickable = true;
 }
 
@@ -53,22 +54,12 @@ void UEnhanceGauge::DisplayCompleteText()
         // 증강 모두 도달 텍스트, 애니메이션 활성화
         OnCompleteDisplay();
     }
-}
-
-FReply UEnhanceGauge::NativeOnKeyDown( const FGeometry& InGeometry, const FKeyEvent& InKeyEvent ) // 전부 인벤토리로 (F키)
-{
-    FReply Reply = Super::NativeOnKeyDown(InGeometry, InKeyEvent);
-    if(InKeyEvent.GetKey() == EKeys::F || InKeyEvent.GetKey() == EKeys::SpaceBar)
+    else
     {
-        if(!bCloseOn) Reply.Handled();
-
-        RemoveFromParent();
-                
-        return Reply.Handled();
+        GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UEnhanceGauge::RemoveFromParent, Delay, false);
     }
-    
-	return Reply.Handled();
 }
+
 
 FReply UEnhanceGauge::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent) // 클릭 아이템 인벤토리로 (오른쪽 마우스)
 {

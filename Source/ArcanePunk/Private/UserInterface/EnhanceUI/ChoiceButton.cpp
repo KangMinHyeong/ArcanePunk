@@ -109,12 +109,14 @@ void UChoiceButton::BindButton()
 
 void UChoiceButton::OnClickChoice()
 {
+    Choice_Button->OnClicked.RemoveDynamic(this, &UChoiceButton::OnClickChoice);
     OnEnhanceChoice();
     if(ParentWidget.IsValid()) ParentWidget->OnBackGround_FadeOut();
 }
 
 void UChoiceButton::OnReroll()
 {
+    Reroll_Button->OnClicked.RemoveDynamic(this, &UChoiceButton::OnReroll);
     if(!ParentWidget.IsValid()) return;
     ParentWidget->OnReroll(ChoiceIndexNum);
     // SetChoiceButton();
