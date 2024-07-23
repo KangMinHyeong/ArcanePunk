@@ -41,10 +41,13 @@ public:
 	FORCEINLINE UAPMovementComponent* GetAPMoveComponent() const {return MoveComponent;}; // MoveComp 반환
 	FORCEINLINE UAPCrowdControlComponent* GetCrowdControlComp() const { return CrowdControlComp;};
 
-	FORCEINLINE UMaterialInterface* GetDefaultMaterial() const {return DefaultMaterial;}; // DefaultMaterial 반환
+	FORCEINLINE TArray<UMaterialInterface*> GetDefaultMaterial() const {return DefaultMaterial;}; // DefaultMaterial 반환
 
 	FORCEINLINE UAPHitPointComponent* GetHitPointComponent() const {return HitPointComponent;}; // HitPointComp 반환
 
+	// 머터리얼 관련 함수
+	void ResetDefaultMaterial();
+	
 	// 무적
 	FORCEINLINE bool IsBlockMode() const {return bBlockMode;};
 
@@ -121,6 +124,9 @@ public:
 	FORCEINLINE UAPAttackComponent* GetAttackComponent() const {return AttackComponent;};  // AttackComp 반환
 	virtual void SetAttackRotation();
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+	void OnHittingEnd();
+
 protected:
 	//Component
 	UPROPERTY(EditAnywhere, Category = "Component")
@@ -151,10 +157,13 @@ protected:
 	bool bBlockMode = false;
 
 	// 머터리얼
-	UMaterialInterface* DefaultMaterial;
+	UPROPERTY()
+	TArray<UMaterialInterface*> DefaultMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UMaterialInterface* HitMaterial;
 
 	// 캐릭터 상태 관련 변수
-	bool bHitting = false;
 	ECharacterState CurrentState = ECharacterState::None;
 	float DefaultSlip = 0.0f;
 	bool bDoing = false; // 공격 , 스킬 사용중인지 체크하는 변수 / true면 다른 행동 제약 
@@ -171,6 +180,14 @@ protected:
 	// 이동 관련 변수
 	bool bCanMove = true;
 	bool bCanJog = true;
+
+	// Hit 관련 변수
+	bool bHitting = false;
+	FTimerHandle HitTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	float HitMotionTime = 0.6f;
+	
 
 public:
 	TArray<bool> StopState;

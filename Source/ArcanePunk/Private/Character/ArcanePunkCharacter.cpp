@@ -105,8 +105,6 @@ void AArcanePunkCharacter::BeginPlay()
 	MaximumSpringArmLength = MySpringArm->TargetArmLength;
 	CurrentArmLength = MaximumSpringArmLength;
 
-	DefaultMaterial = GetMesh()->GetMaterial(0);
-	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
 	BuffComp->BindBuffComp();
 	
 	InitPlayerStatus();
@@ -547,14 +545,14 @@ void AArcanePunkCharacter::SetHideMode(bool NewBool)
 	if(bHideMode)
 	{
 		if(PC.IsValid()) PC->SetHideUI(true);
-		GetMesh()->SetMaterial(0,HideMaterial);
-		// HideUI 생성 및 캐릭터 머터리얼 변경
+		// GetMesh()->SetMaterial(0,HideMaterial);
+		// // HideUI 생성 및 캐릭터 머터리얼 변경
 	}
 	else
 	{
 		if(PC.IsValid()) PC->SetHideUI(false);
-		GetMesh()->SetMaterial(0,GetDefaultMaterial());
-		// HideUI 삭제 및 캐릭터 머터리얼 원상태
+		// GetMesh()->SetMaterial(0,GetDefaultMaterial());
+		// // HideUI 삭제 및 캐릭터 머터리얼 원상태
 	}
 }
 

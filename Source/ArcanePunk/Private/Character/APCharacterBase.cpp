@@ -5,6 +5,7 @@
 #include "Components/Character/APAttackComponent.h"
 #include "Components/Character/APHitPointComponent.h"
 #include "Components/Character/APAnimHubComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraComponent.h"
 
 AAPCharacterBase::AAPCharacterBase()
@@ -26,6 +27,15 @@ void AAPCharacterBase::BeginPlay()
 	Super::BeginPlay();
 	CrowdControlComp->BindCrowdComp();
 	MoveComponent->SetBind();
+	DefaultMaterial = GetMesh()->GetMaterials();
+	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
+}
+
+void AAPCharacterBase::ResetDefaultMaterial()
+{
+	int32 Index = 0;
+	for(auto Mat : DefaultMaterial)
+	{GetMesh()->SetMaterial(Index, Mat); Index++;}
 }
 
 bool AAPCharacterBase::IsDead()
@@ -45,6 +55,32 @@ void AAPCharacterBase::UpdateStatus()
 
 void AAPCharacterBase::SetAttackRotation()
 {
+}
+
+float AAPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
+{
+	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if(bBlockMode) return 0.0f;
+
+	bHitting = true;
+
+	int32 Index = 0;
+	for(auto Mat : DefaultMaterial)
+	{GetMesh()->SetMaterial(Index, HitMaterial); Index++;}
+
+	GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AAPCharacterBase::OnHittingEnd, HitMotionTime, false);
+
+    return DamageAmount;
+}
+
+void AAPCharacterBase::OnHittingEnd()
+{
+	bHitting = false;
+	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
+	ResetDefaultMaterial();
+
+	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
 float AAPCharacterBase::CriticalCalculate()

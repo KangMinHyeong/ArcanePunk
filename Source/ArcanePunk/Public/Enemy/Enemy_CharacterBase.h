@@ -41,7 +41,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintPure)
 	float GetForward();
@@ -98,7 +98,6 @@ public:
 protected:
 	float DamageMath(float Damage);
 	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
-	void ResetHitStiffness();
 	void SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation);
 
 	//Monster 세팅 초기화
@@ -165,7 +164,6 @@ protected:
 	// TimerHandle
 	FTimerHandle PresentDamageTimerHandle;
 	FTimerHandle TeleportTimerHandle;
-	FTimerHandle HitTimerHandle;
 	FTimerHandle StopTimerHandle;
 	FTimerHandle DamageMultipleTimerHandle;
 	FTimerHandle DamagedMarkTimerHandle;
@@ -183,9 +181,6 @@ protected:
 	TWeakObjectPtr<AActor> MarkActor;
 
 	// 몬스터 Hit 관련 변수
-	UPROPERTY(EditAnywhere, Category = "Hit")
-	float HitStiffnessTime = 0.75f;
-
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	bool IsAttackPush = true;
 

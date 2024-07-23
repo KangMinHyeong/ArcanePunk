@@ -105,7 +105,10 @@ void AEnemy_Boss::OnKnockBackAttack_MontageEnd()
     bKnockBackAttack = false;
     Monster_AttackRadius = Monster_AttackRadius * (1/KnockBackRangeCoefficient);
     Monster_AttackRange = Monster_AttackRange * (1/KnockBackRangeCoefficient);
-    GetMesh()->SetMaterial(0,DefaultMaterial);
+    
+    int32 Index = 0;
+	for(auto Mat : DefaultMaterial)
+	{GetMesh()->SetMaterial(Index, Mat); Index++;}
 }
 
 void AEnemy_Boss::OnStrongAttack_MontageEnd()
@@ -125,12 +128,12 @@ void AEnemy_Boss::OnDrainMonster_MontageEnd()
 
 void AEnemy_Boss::OnRangeAttack1_MontageEnd()
 {
-    GetMesh()->SetMaterial(0,DefaultMaterial);
+    ResetDefaultMaterial();
 }
 
 void AEnemy_Boss::OnRangeAttack2_MontageEnd()
 {
-    GetMesh()->SetMaterial(0,DefaultMaterial);
+    ResetDefaultMaterial();
 }
 
 void AEnemy_Boss::OnPillarAttackMontageEnd()
@@ -147,14 +150,14 @@ void AEnemy_Boss::RushAttackStart()
     GetWorldTimerManager().SetTimer(RushAttackTimerHandle, this, &AEnemy_Boss::RushAttackEnd, RushAttackTime, false);
     bRushAttack = true; SetActorTickEnabled(true);
     GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed*2.0f;
-    if(PatternMaterial.Num() >= 5) GetMesh()->SetMaterial(0,PatternMaterial.Last(4));
+    if(PatternMaterial.Num() >= 5) GetMesh()->SetMaterial(0,PatternMaterial.Last(4)); // 후에 수정
 }
 
 void AEnemy_Boss::RushAttackEnd()
 {
     bRushAttack = false; SetActorTickEnabled(false);
     GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
-    GetMesh()->SetMaterial(0,DefaultMaterial);
+    ResetDefaultMaterial();
 	RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetWorldTimerManager().ClearTimer(RushAttackTimerHandle);
 }
@@ -461,7 +464,7 @@ void AEnemy_Boss::OnHitPlayerMove(FVector MoveLocation)
 // Stop Func Start
 void AEnemy_Boss::StopEnd()
 {
-    GetMesh()->SetMaterial(0,DefaultMaterial);
+    ResetDefaultMaterial();
     GetWorldTimerManager().ClearTimer(StopTimerHandle);
 }
 // Stop Func End

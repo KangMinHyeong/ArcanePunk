@@ -44,8 +44,6 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 
 	DamageApplied = FMath::Min(PD.PlayerDynamicData.HP, DamageApplied);
 
-	GetWorld()->GetTimerManager().SetTimer(HittingTimerHandle, this, &UAPTakeDamageComponent::OnHitting, HitMotionTime, false);
-
 	if(DamageApplied >= PD.PlayerDynamicData.HP && OwnerCharacter->GetRageMode()) { PD.PlayerDynamicData.HP = 1.0f;}
 	else
 	{
@@ -100,17 +98,6 @@ float UAPTakeDamageComponent::GetRight()
     return PlayerIsRight;
 }
 
-void UAPTakeDamageComponent::OnHitting()
-{
-	if(!OwnerCharacter.IsValid()) return;
-
-	OwnerCharacter->SetHitting(false);
-	if(OwnerCharacter->GetHideMode()) { OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetHideMaterial()); }
-	else {OwnerCharacter->GetMesh()->SetMaterial(0,OwnerCharacter->GetDefaultMaterial());}
-	
-	GetWorld()->GetTimerManager().ClearTimer(HittingTimerHandle);
-}
-
 bool UAPTakeDamageComponent::CheckingDamaged()
 {
 	if(!OwnerCharacter.IsValid()) return false;
@@ -129,8 +116,6 @@ bool UAPTakeDamageComponent::CheckingDamaged()
 void UAPTakeDamageComponent::SetHitEffect(FVector HitLocation)
 {
 	if(!OwnerCharacter.IsValid()) return;
-
-	if(HitMaterial) OwnerCharacter->GetMesh()->SetMaterial(0, HitMaterial);
 
 	if(PlayerIsForward > 0)
 	{

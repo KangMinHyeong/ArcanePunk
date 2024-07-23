@@ -60,8 +60,6 @@ void AEnemy_CharacterBase::BeginPlay()
 	SetActorTickEnabled(false);
 	InitMonster();	
 	BindMontageEnded();
-	DefaultSlip = GetCharacterMovement()->BrakingFrictionFactor;
-	DefaultMaterial = GetMesh()->GetMaterial(0);
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
 
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
@@ -162,7 +160,6 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	MyPlayerTotalStatus.PlayerDynamicData.HP = HP;
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
-	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
 	
 	if(IsDead())
 	{
@@ -177,11 +174,6 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		TeleportMark->DeactivateImmediate();
 		EnemyAnim->PlayDeath_Montage();
 		ManaDropComp->SpawnManaDrop(DamageCauser);
-	}
-	else
-	{
-		bHitting = true;
-		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AEnemy_CharacterBase::ResetHitStiffness, HitStiffnessTime, false);
 	}
 
     return DamageApplied;
@@ -332,14 +324,6 @@ void AEnemy_CharacterBase::NormalAttack()
 void AEnemy_CharacterBase::PossessedBy(AController *NewController)
 {
 	Super::PossessedBy(NewController);
-}
-
-void AEnemy_CharacterBase::ResetHitStiffness()
-{
-	bHitting = false;
-	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
-	GetMesh()->SetMaterial(0,DefaultMaterial);
-	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
 void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation)
