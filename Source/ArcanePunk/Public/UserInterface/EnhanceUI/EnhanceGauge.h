@@ -23,7 +23,6 @@ public:
 
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	virtual FReply NativeOnKeyDown( const FGeometry& InGeometry, const FKeyEvent& InKeyEvent ) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent) override;
 private:
 	void DisplayCompleteText();
@@ -54,4 +53,5 @@ private:
 	int32 Max_Number = 1;
 	
 	FTimerHandle TimerHandle;
+
 };
