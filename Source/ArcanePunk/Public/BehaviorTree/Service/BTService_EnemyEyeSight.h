@@ -22,14 +22,8 @@ protected:
 	AActor* GetPlayerActor(AActor* AIOwner);
 
 private:
-	float Current = 0.0f;
-
 	UPROPERTY(EditAnywhere)
-	float Speed = 5.0f;
+	bool BattleLoopCondition = false;
 
-	bool first = true;
-
-	UPROPERTY(EditAnywhere)
-	float RotateSpeed = 450.0f;
-	
+	bool IsLoop = false;
 };
