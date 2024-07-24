@@ -227,9 +227,6 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 		Repeat++;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("Repeat : %d"), Repeat);
-
-
 	return PatrolLocation;
 }
 
