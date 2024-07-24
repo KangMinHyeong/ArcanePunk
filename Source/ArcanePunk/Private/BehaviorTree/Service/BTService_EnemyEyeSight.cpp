@@ -31,7 +31,7 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
      auto Anim = Cast<UAP_EnemyBaseAnimInstance>(Monster->GetMesh()->GetAnimInstance()); if(!Anim) return; 
 
     TWeakObjectPtr<AActor> TargetActor = Monster->IsAggro();
-    if(!Monster->IsAggro())
+    if(!TargetActor.IsValid())
     {
         TargetActor = GetPlayerActor(Monster);
         if(AArcanePunkCharacter* TargetPlayer = Cast<AArcanePunkCharacter>(TargetActor.Get())) 
@@ -61,11 +61,21 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
             Anim->SetbBattleMode(true);
+
+            if(BattleLoopCondition) IsLoop = true;
         }
         else
         {
-            OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
-            Anim->SetbBattleMode(false);
+            if(IsLoop)
+            {
+                OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
+                Anim->SetbBattleMode(true);
+            }
+            else
+            {
+                OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+                Anim->SetbBattleMode(false);
+            }
         }
     }
     else

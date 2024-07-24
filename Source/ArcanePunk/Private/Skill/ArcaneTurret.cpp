@@ -126,7 +126,7 @@ AActor* AArcaneTurret::FindEnemy()
 
 void AArcaneTurret::SpawnDamageText(AController *EventInstigator, float Damage)
 {
-    ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation(), FRotator(0.0f, 180.0f, 0.0f)); if(!DamageText) return;
+    ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation(), FRotator(0.0f, 90.0f, 0.0f)); if(!DamageText) return;
     DamageText->SetOwner(this);
 
     OwnerCharacter = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); 
