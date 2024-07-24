@@ -48,6 +48,8 @@ private:
 	float Speed = 100.0f;
 	UPROPERTY(EditAnywhere)
 	float Delay = 0.5f;
+	UPROPERTY(EditAnywhere)
+	float FadeoutDelay = 1.5f;
 
 	int32 Target_Number = 1;
 	int32 Max_Number = 1;

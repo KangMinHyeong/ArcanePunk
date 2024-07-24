@@ -56,7 +56,7 @@ void UEnhanceGauge::DisplayCompleteText()
     }
     else
     {
-        GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UEnhanceGauge::RemoveFromParent, Delay, false);
+        GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UEnhanceGauge::RemoveFromParent, FadeoutDelay, false);
     }
 }
 
