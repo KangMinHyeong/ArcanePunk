@@ -184,10 +184,12 @@ protected:
 	// Hit 관련 변수
 	bool bHitting = false;
 	FTimerHandle HitTimerHandle;
+	FTimerHandle HitMaterialTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	float HitMotionTime = 0.6f;
-	
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	float HitMaterailTime = 0.4f;
 
 public:
 	TArray<bool> StopState;

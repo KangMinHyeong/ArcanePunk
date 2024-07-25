@@ -37,6 +37,6 @@ private:
 	float OperateSpeed = 500.0f;
 
 	bool bOperation = false;
-
+	
 	FVector OperationLocation;
 };

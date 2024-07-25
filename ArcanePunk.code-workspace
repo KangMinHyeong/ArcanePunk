@@ -11,7 +11,14 @@
 	],
 	"settings": {
 		"typescript.tsc.autoDetect": "off",
-		"npm.autoDetect": "off"
+		"npm.autoDetect": "off",
+		"files.associations": {
+			"adolcforward": "cpp",
+			"complex": "cpp",
+			"valarray": "cpp",
+			"cstdlib": "cpp",
+			"*.rh": "cpp"
+		}
 	},
 	"extensions": {
 		"recommendations": [

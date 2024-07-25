@@ -25,6 +25,13 @@ void AAPTrapBase_Mine::BeginPlay()
     OperationLocation = RotateMesh->GetComponentLocation() - FVector(0.0f, 0.0f, 40.0f);
 }
 
+void AAPTrapBase_Mine::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if(Player.IsValid() && bRotating) AutoRotating();
+    if(Player.IsValid() && bOperation) OperateExplosion(DeltaTime);
+}
 
 void AAPTrapBase_Mine::OperateExplosion(float DeltaTime)
 {
@@ -32,16 +39,14 @@ void AAPTrapBase_Mine::OperateExplosion(float DeltaTime)
     Current = FMath::VInterpConstantTo(Current, OperationLocation, DeltaTime, OperateSpeed);
     RotateMesh->SetWorldLocation(Current);
 
-    if(abs(OperationLocation.Z - Current.Z) <= KINDA_SMALL_NUMBER)
-    {
-        SetActorTickEnabled(false);
-        bOperation = false;
-        Explosion_Ready();
-    }
+    if(abs(OperationLocation.Z - Current.Z) <= KINDA_SMALL_NUMBER) Explosion_Ready();
 }
 
 void AAPTrapBase_Mine::Explosion_Ready()
 {
+    bOperation = false; bCharging = true;
+    RangeDecal->SetHiddenInGame(false);
+
     GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPTrapBase_Mine::Explosion, TrapOperationTime, false);
 }
 
@@ -60,19 +65,10 @@ void AAPTrapBase_Mine::Explosion()
     Destroy();
 }
 
-void AAPTrapBase_Mine::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-
-    if(Player.IsValid() && bRotating) AutoRotating();
-    if(Player.IsValid() && bOperation) OperateExplosion(DeltaTime);
-}
-
 void AAPTrapBase_Mine::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
     auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
     bRotating = false;
     bOperation = true;
-    RangeDecal->SetHiddenInGame(false);
 }
