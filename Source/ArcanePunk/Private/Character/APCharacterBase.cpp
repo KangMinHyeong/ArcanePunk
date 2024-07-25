@@ -33,6 +33,8 @@ void AAPCharacterBase::BeginPlay()
 
 void AAPCharacterBase::ResetDefaultMaterial()
 {
+	GetWorldTimerManager().ClearTimer(HitMaterialTimerHandle);
+	
 	int32 Index = 0;
 	for(auto Mat : DefaultMaterial)
 	{GetMesh()->SetMaterial(Index, Mat); Index++;}
@@ -70,6 +72,7 @@ float AAPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &Damag
 	{GetMesh()->SetMaterial(Index, HitMaterial); Index++;}
 
 	GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AAPCharacterBase::OnHittingEnd, HitMotionTime, false);
+	GetWorldTimerManager().SetTimer(HitMaterialTimerHandle, this, &AAPCharacterBase::ResetDefaultMaterial, HitMaterailTime, false);
 
     return DamageAmount;
 }
@@ -78,8 +81,7 @@ void AAPCharacterBase::OnHittingEnd()
 {
 	bHitting = false;
 	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
-	ResetDefaultMaterial();
-
+	
 	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 

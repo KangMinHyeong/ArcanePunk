@@ -215,7 +215,7 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 	const UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
 	bool navResult = false;
 	int32 Repeat = 0;
-	while(!navResult && Repeat < 50)
+	while(!navResult && Repeat < 20)
 	{
 		PatrolLocation = Start;
 		float X = FMath::RandRange(-1.0f, 1.0f);

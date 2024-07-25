@@ -20,6 +20,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	bool CheckLimit(float X, float Y);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -30,15 +32,20 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex);
 	
 
+	FORCEINLINE void ResetInit() {X_Init = 0.0f; Y_Init = 0.0f;};
 
 private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* AreaTrigger;
 
+	float X_Init = 0.0f;
+	float Y_Init = 0.0f;
+	
+	float AreaAngle = 0.0f;
+	float AreaDegree = 0.0f;
+
 	UPROPERTY(EditAnywhere)
-	bool X_Limit = false;
-	UPROPERTY(EditAnywhere)
-	bool Y_Limit = false;
+	float InitSpeed = 200.0f;
 
 	FVector FixedSpringArmLocation;
 

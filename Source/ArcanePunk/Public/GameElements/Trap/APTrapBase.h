@@ -60,7 +60,8 @@ protected:
 	float RotatePlus = 0.0f;
 	
 	bool bRotating = true;
-
+	bool bCharging = false;
+	
 	// Trap Overlapped Player
 	TWeakObjectPtr<AArcanePunkCharacter> Player;
 };
