@@ -24,10 +24,14 @@ EBTNodeResult::Type UBTTask_Detect::ExecuteTask(UBehaviorTreeComponent &OwnerCom
     auto Anim = Cast<UAP_EnemyBaseAnimInstance>(Monster->GetMesh()->GetAnimInstance());
     if(!Anim) return EBTNodeResult::Failed;
 
-    Anim->PlayDetect_Montage();
-    Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-    Monster->GetCharacterMovement()->MaxWalkSpeed = Monster->GetDefaultSpeed_Origin();
-    Monster->SpawnDetectRender();
+    if(!Anim->IsBattleMode())
+    {
+        Anim->SetbBattleMode(true);
+        Anim->PlayDetect_Montage();
+        Monster->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+        Monster->GetCharacterMovement()->MaxWalkSpeed = Monster->GetDefaultSpeed_Origin();
+        Monster->SpawnDetectRender();
+    }
     
     return EBTNodeResult::Succeeded;
 }

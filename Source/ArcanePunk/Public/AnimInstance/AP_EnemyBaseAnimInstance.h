@@ -16,6 +16,7 @@ public:
 	UAP_EnemyBaseAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	FORCEINLINE bool IsBattleMode() {return bBattleMode;};
 	FORCEINLINE void SetbBattleMode(bool NewBool) {bBattleMode = NewBool;};
 
 	UFUNCTION(BlueprintPure)
