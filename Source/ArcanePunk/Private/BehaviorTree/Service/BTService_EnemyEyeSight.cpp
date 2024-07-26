@@ -46,22 +46,10 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
         FVector TargetLocation = TargetActor->GetActorLocation();
         float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
 
-        // if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && Distance < Monster->GetDetectLimit())
-        // {
-        //     Anim->SetbBattleMode(1.0f);
-        // }
-        // else 
-        // { 
-        //     OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
-        //     Anim->SetbBattleMode(0.0f);
-        //     return;
-        // }    
-
         if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
-            Anim->SetbBattleMode(true);
-
+            
             if(BattleLoopCondition) IsLoop = true;
         }
         else
@@ -69,7 +57,6 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
             if(IsLoop)
             {
                 OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
-                Anim->SetbBattleMode(true);
             }
             else
             {
