@@ -13,21 +13,20 @@ UBTTask_RandomIdle::UBTTask_RandomIdle()
 }
 
 EBTNodeResult::Type UBTTask_RandomIdle::ExecuteTask(UBehaviorTreeComponent &OwnerComp, uint8 *NodeMemory)
-{
-    Super::ExecuteTask(OwnerComp, NodeMemory);
+{   
+    SetAIOwner(OwnerComp);
+    if(!Enemy.IsValid()) return EBTNodeResult::Failed;
+	if(!EnemyAnim.IsValid()) return EBTNodeResult::Failed;  
+
+    auto Current = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BlackboardKey.SelectedKeyName) - 1;
+    OwnerComp.GetBlackboardComponent()->SetValueAsInt(BlackboardKey.SelectedKeyName, Current);
+
+    auto MT = EnemyAnim->PlayRandomIdle_Montage();
+    if(!MT) return EBTNodeResult::Failed;  
+
+    CalculateWaitTime_Montage(MT);
     
-    if(!OwnerComp.GetAIOwner()) return EBTNodeResult::Failed;
+    Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    AEnemy_CharacterBase* Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
-    if(!Monster) return EBTNodeResult::Failed;
-
-    auto Anim = Cast<UAP_EnemyBaseAnimInstance>(Monster->GetMesh()->GetAnimInstance());
-    if(!Anim) return EBTNodeResult::Failed;
-
-    Anim->PlayRandomIdle_Montage();
-
-    auto Current = OwnerComp.GetBlackboardComponent()->GetValueAsInt(GetSelectedBlackboardKey()) - 1;
-    OwnerComp.GetBlackboardComponent()->SetValueAsInt(GetSelectedBlackboardKey(), Current);
-
-    return EBTNodeResult::Succeeded;
+    return EBTNodeResult::InProgress;
 }

@@ -69,6 +69,9 @@ public:
 
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
+	virtual void SpawnAttackRange();
+	FORCEINLINE float GetAttackRangeTime()const {return AttackRangeTime;}; 
+	
 	// HitPoint 관련 함수
 	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
 
@@ -233,6 +236,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float PatrolDist = 500.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UNiagaraSystem* AttackTargetRange;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	float AttackRangeTime = 1.2f;
+	TWeakObjectPtr<UNiagaraComponent> AttackRange;
+	
 public:
 	FOnHPChanged OnEnemyHPChanged;
 

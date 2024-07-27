@@ -13,7 +13,7 @@ EBTNodeResult::Type UBTTask_RandomPlayNumber::ExecuteTask(UBehaviorTreeComponent
     Super::ExecuteTask(OwnerComp, NodeMemory);
     
     int32 Current = FMath::RandRange(0, MaxNumber);
-    OwnerComp.GetBlackboardComponent()->SetValueAsInt(GetSelectedBlackboardKey(), Current);
+    OwnerComp.GetBlackboardComponent()->SetValueAsInt(BlackboardKey.SelectedKeyName, Current);
 
-    return EBTNodeResult::Succeeded;
+    return EBTNodeResult::InProgress;
 }

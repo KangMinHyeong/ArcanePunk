@@ -3,14 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "BehaviorTree/Task/BTTask_InCludeWaitBase.h"
 #include "BTTask_Detect.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class ARCANEPUNK_API UBTTask_Detect : public UBTTask_BlackboardBase
+class ARCANEPUNK_API UBTTask_Detect : public UBTTask_InCludeWaitBase
 {
 	GENERATED_BODY()
 public:

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "BehaviorTree/Tasks/BTTask_Wait.h"
 #include "BTTask_RandomPlayNumber.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ARCANEPUNK_API UBTTask_RandomPlayNumber : public UBTTask_BlackboardBase
+class ARCANEPUNK_API UBTTask_RandomPlayNumber : public UBTTask_Wait
 {
 	GENERATED_BODY()
 public:
@@ -21,4 +21,7 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	uint8 MaxNumber = 2;	
+
+	UPROPERTY(EditAnywhere, Category=Blackboard)
+	struct FBlackboardKeySelector BlackboardKey;
 };

@@ -25,8 +25,8 @@ EBTNodeResult::Type UBTTask_AttackRotate::ExecuteTask(UBehaviorTreeComponent &Ow
         return EBTNodeResult::Failed;
     }
 
-    auto Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(GetSelectedBlackboardKey()));
+    auto Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
     if(Target) Monster->RotateTowardsTarget(Target, RotateSpeed);
 
-    return EBTNodeResult::Succeeded;
+    return EBTNodeResult::InProgress;
 }

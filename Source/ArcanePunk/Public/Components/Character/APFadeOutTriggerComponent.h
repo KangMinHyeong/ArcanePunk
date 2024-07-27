@@ -29,14 +29,5 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex);
 
 private:
-	UPROPERTY(EditAnywhere)
-	float FadeSpeed = 0.15f;
-	UPROPERTY(EditAnywhere)
-	float FadeOutLimit = 0.2f;
 
-	UPROPERTY()
-	TArray<AActor*> FadeOutActors;
-
-	UPROPERTY()
-	TArray<AActor*> FadeInActors;
 };

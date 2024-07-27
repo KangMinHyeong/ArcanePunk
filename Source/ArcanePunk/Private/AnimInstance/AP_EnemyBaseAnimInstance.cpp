@@ -60,14 +60,15 @@ void UAP_EnemyBaseAnimInstance::PlayDetect_Montage()
     Montage_Play(Detect_Montage);
 }
 
-void UAP_EnemyBaseAnimInstance::PlayRandomIdle_Montage()
+UAnimMontage* UAP_EnemyBaseAnimInstance::PlayRandomIdle_Montage()
 {
-	if(IsDead || !Enemy.IsValid()) return;
-    if(Enemy->IsHardCC()) return;
-    if(CurrentPawnSpeed >= 0.1f) return;
+	if(IsDead || !Enemy.IsValid()) return nullptr;
+    if(Enemy->IsHardCC()) return nullptr;
+    if(CurrentPawnSpeed >= 0.1f) return nullptr;
 
 	int32 Index = FMath::RandRange(0, Idle_Montages.Num()-1); Index = FMath::Max(0,Index);
 	Montage_Play(Idle_Montages[Index]);
+	return Idle_Montages[Index];
 }
 
 void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()

@@ -30,6 +30,7 @@ class AAPGameModeBase;
 class UAPGhostTrailSpawnComponent;
 class UAPSkillAbility;
 class UAPPassiveComponent;
+class UAPFadeOutTriggerComponent;
 
 // prodo
 class UAPItemBase;
@@ -73,6 +74,7 @@ public:
 
 	FTransform ReturnCameraTransform();
 	FORCEINLINE USpringArmComponent* GetMySpringArm() {return MySpringArm;};
+	FORCEINLINE UAPFadeOutTriggerComponent* GetFadeOutTrigger() {return FadeOutTigger;};
 
 	FORCEINLINE AAPHUD* GetAPHUD() const {return HUD;};
 
@@ -288,6 +290,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	UCameraComponent* MyCamera;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	UAPFadeOutTriggerComponent* FadeOutTigger;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float MinimumSpringArmLength = 150.0f;

@@ -8,6 +8,7 @@
 
 class UBoxComponent;
 class AArcanePunkCharacter;
+class UAPFadeOutTriggerComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPLimitCameraArea : public AActor
@@ -43,6 +44,15 @@ private:
 	
 	float AreaAngle = 0.0f;
 	float AreaDegree = 0.0f;
+
+	TWeakObjectPtr<UAPFadeOutTriggerComponent> FadeOutTrigger;
+	float InitCameraWidth = 0.0f;
+
+	float CameraHeight = 0.0f;
+	float CameraWidth = 0.0f;
+
+	FRotator SpringArmRot = FRotator::ZeroRotator;
+	FRotator FadeTriggerRot = FRotator::ZeroRotator;
 
 	UPROPERTY(EditAnywhere)
 	float InitSpeed = 200.0f;
