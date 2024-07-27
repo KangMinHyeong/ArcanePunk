@@ -26,7 +26,7 @@ public:
 	void PlayNormalAttack_Montage();
 	void PlayDeath_Montage();
 	void PlayDetect_Montage();
-	void PlayRandomIdle_Montage();
+	UAnimMontage* PlayRandomIdle_Montage();
 
 	/* Notify */ 
 	UFUNCTION()

@@ -26,10 +26,11 @@ void AEnemy_ScoutDog::BeginPlay()
     // GetWorld()->GetTimerManager().SetTimer(DamageTimerHandle, this, &AEnemy_ScoutDog::Test, 0.3f, true);
 }
 
-void AEnemy_ScoutDog::Test()
+void AEnemy_ScoutDog::SpawnAttackRange()
 {
-    UE_LOG(LogTemp, Display, TEXT("Monster_ATK %f"), DamageMultiple);
-    UE_LOG(LogTemp, Display, TEXT("Monster_Speed %f"), GetCharacterMovement()->MaxWalkSpeed);
+    Super::SpawnAttackRange();
+    if(!AttackRange.IsValid()) return;
+    AttackRange->SetVariableVec2(TEXT("Size2D"), FVector2D(LeapSpeed / 1000.0f, RushTrigger->GetScaledCapsuleRadius() / 100.0f));
 }
 
 void AEnemy_ScoutDog::Tick(float DeltaTime)

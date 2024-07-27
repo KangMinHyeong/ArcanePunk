@@ -529,5 +529,14 @@ void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
 
 	if(Speed < 0.0f) {MoveComponent->SetAttackRotation(Rotation);}
 	else {MoveComponent->SetAttackRotation(Rotation, Speed);}
-   	
+}
+
+void AEnemy_CharacterBase::SpawnAttackRange()
+{
+	// Base : Shape - Arrow
+	AttackRange = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackTargetRange, GetMesh()->GetComponentLocation(), GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f));
+	if(!AttackRange.IsValid()) return;
+	AttackRange->SetVariableFloat(TEXT("Lifetime"), AttackRangeTime);
+	
+	// FVector2D(ShootRange.X / 1000.0f, ShootRange.Y / 200.0f)
 }

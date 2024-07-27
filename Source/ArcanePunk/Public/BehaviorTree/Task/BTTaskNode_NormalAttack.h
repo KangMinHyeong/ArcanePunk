@@ -3,18 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "BehaviorTree/Task/BTTask_InCludeWaitBase.h"
 #include "BTTaskNode_NormalAttack.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class ARCANEPUNK_API UBTTaskNode_NormalAttack : public UBTTaskNode
+class ARCANEPUNK_API UBTTaskNode_NormalAttack : public UBTTask_InCludeWaitBase
 {
 	GENERATED_BODY()
 public:
 	UBTTaskNode_NormalAttack();
 
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
 };

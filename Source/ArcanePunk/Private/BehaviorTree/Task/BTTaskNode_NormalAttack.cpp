@@ -13,22 +13,16 @@ UBTTaskNode_NormalAttack::UBTTaskNode_NormalAttack()
 }
 
 EBTNodeResult::Type UBTTaskNode_NormalAttack::ExecuteTask(UBehaviorTreeComponent &OwnerComp, uint8 *NodeMemory)
-{
+{   
+    SetAIOwner(OwnerComp);
+    if(!Enemy.IsValid()) return EBTNodeResult::Failed;
+	if(!EnemyAnim.IsValid()) return EBTNodeResult::Failed;
+
+    CalculateWaitTime_Montage(EnemyAnim->NormalAttack_Montage);
+
     Super::ExecuteTask(OwnerComp, NodeMemory);
-    
-    if(!OwnerComp.GetAIOwner())
-    {
-        return EBTNodeResult::Failed;
-    }
 
-    AEnemy_CharacterBase* Monster = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
-    if(!Monster)
-    {   
-        return EBTNodeResult::Failed;
-    }
+    EnemyAnim->PlayNormalAttack_Montage();
 
-    auto EnemyAnim = Cast<UAP_EnemyBaseAnimInstance>(Monster->GetMesh()->GetAnimInstance());
-	if(EnemyAnim) EnemyAnim->PlayNormalAttack_Montage();
-
-    return EBTNodeResult::Succeeded;
+    return EBTNodeResult::InProgress;
 }

@@ -28,6 +28,7 @@
 #include "Components/SkillActor/APSkillAbility.h"
 #include "Components/Character/APPassiveComponent.h"
 #include "GameInstance/APGameInstance.h"
+#include "Components/Character/APFadeOutTriggerComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
@@ -52,6 +53,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
 	LeftBeamPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftBeamPoint"));
 	PlayerPanelAura = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerPanelAura"));
+	FadeOutTigger = CreateDefaultSubobject<UAPFadeOutTriggerComponent>(TEXT("FadeOutTigger"));
 
 	SkillHubComponent = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComponent"));
 	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
@@ -64,6 +66,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	MySpringArm->SetupAttachment(GetRootComponent());
 	PlayerPanelAura->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
+	FadeOutTigger->SetupAttachment(MySpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));

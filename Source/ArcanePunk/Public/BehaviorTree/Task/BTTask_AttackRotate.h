@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "BehaviorTree/Tasks/BTTask_Wait.h"
 #include "BTTask_AttackRotate.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ARCANEPUNK_API UBTTask_AttackRotate : public UBTTask_BlackboardBase
+class ARCANEPUNK_API UBTTask_AttackRotate : public UBTTask_Wait
 {
 	GENERATED_BODY()
 public:
@@ -21,4 +21,8 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	float RotateSpeed = 450.0f;
+
+	/** blackboard key selector */
+	UPROPERTY(EditAnywhere, Category=Blackboard)
+	struct FBlackboardKeySelector BlackboardKey;
 };
