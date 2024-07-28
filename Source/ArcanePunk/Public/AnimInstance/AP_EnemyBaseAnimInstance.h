@@ -25,6 +25,7 @@ public:
 	// Play Anim
 	void PlayNormalAttack_Montage();
 	void PlayDeath_Montage();
+	void PlayHit_Montage();
 	void PlayDetect_Montage();
 	UAnimMontage* PlayRandomIdle_Montage();
 
@@ -61,6 +62,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Death_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Hit_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Detect_Montage;

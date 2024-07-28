@@ -53,6 +53,13 @@ void UAP_EnemyBaseAnimInstance::PlayDeath_Montage()
     Montage_Play(Death_Montage);
 }
 
+void UAP_EnemyBaseAnimInstance::PlayHit_Montage()
+{
+	if (IsDead || !Enemy.IsValid()) return;
+	if (Enemy->IsHardCC()) return;
+	Montage_Play(Hit_Montage);
+}
+
 void UAP_EnemyBaseAnimInstance::PlayDetect_Montage()
 {
 	if(IsDead || !Enemy.IsValid()) return;

@@ -177,6 +177,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		ManaDropComp->SpawnManaDrop(DamageCauser);
 	}
 
+	EnemyAnim->PlayHit_Montage();
+
     return DamageApplied;
 }
 
