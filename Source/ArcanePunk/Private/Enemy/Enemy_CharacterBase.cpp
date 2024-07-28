@@ -73,9 +73,12 @@ void AEnemy_CharacterBase::Tick(float DeltaTime)
 	if(IsDead())
 	{
 		Apperence = FMath::FInterpConstantTo(Apperence, 0.0f, DeltaTime, FadeOutSpeed);
+		int32 index = 0;
 		for (auto Mat : SkinMesh)
 		{
 			Mat->SetScalarParameterValue(TEXT("Apperence"), Apperence);
+			GetMesh()->SetMaterial(index, Mat);
+			index++;
 		}
 		if(Apperence <= 0.2f) EnemyDestroyed();
 	}
@@ -176,8 +179,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		EnemyAnim->PlayDeath_Montage();
 		ManaDropComp->SpawnManaDrop(DamageCauser);
 	}
-
-	EnemyAnim->PlayHit_Montage();
+	else EnemyAnim->PlayHit_Montage();
+	
 
     return DamageApplied;
 }
@@ -497,6 +500,7 @@ void AEnemy_CharacterBase::EnemyMontageEnded(UAnimMontage *Montage, bool bInterr
 	if(Montage == EnemyAnim->NormalAttack_Montage) OnNormalAttack_MontageEnded();
 	else if(Montage == EnemyAnim->Death_Montage) OnDeath_MontageEnded();
 	else if(Montage == EnemyAnim->Detect_Montage) OnDetect_MontageEnded();
+	else if(Montage == EnemyAnim->Hit_Montage) OnHit_MontageEnded();
 }
 
 void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
@@ -510,6 +514,11 @@ void AEnemy_CharacterBase::OnDeath_MontageEnded()
 }
 
 void AEnemy_CharacterBase::OnDetect_MontageEnded()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AEnemy_CharacterBase::OnHit_MontageEnded()
 {
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }

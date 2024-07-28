@@ -121,6 +121,7 @@ protected:
 	void OnNormalAttack_MontageEnded();
 	void OnDeath_MontageEnded();
 	void OnDetect_MontageEnded();
+	void OnHit_MontageEnded();
 
 	// 몬스터 CC기 관련 함수
 	void OnPlayerKnockBack(AActor* Actor, float Dist, float Time);
