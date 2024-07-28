@@ -26,7 +26,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	void SetOwnerEnemy();
+	void SetOwnerEnemy(float Dist, float Radius);
 
 	UFUNCTION()
 	void OnHitting(UPrimitiveComponent * HitComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit);
@@ -47,7 +47,7 @@ private:
 	FTimerHandle DestroyTimerHandle;
 
 	UPROPERTY(EditAnywhere)
-	float DestroyTime = 3.0f;
+	float AmmoSpeed = 1200.0f;
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* DestroyEffect;

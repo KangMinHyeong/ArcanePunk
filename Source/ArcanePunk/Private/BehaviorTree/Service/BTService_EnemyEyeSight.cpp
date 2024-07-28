@@ -46,7 +46,7 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
         FVector TargetLocation = TargetActor->GetActorLocation();
         float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
 
-        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDistanceLimit() : true))
+        if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDetectDist() : true))
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
             

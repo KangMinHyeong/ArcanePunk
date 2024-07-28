@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBTTaskNode_NormalAttack::UBTTaskNode_NormalAttack()
 {
@@ -23,6 +24,7 @@ EBTNodeResult::Type UBTTaskNode_NormalAttack::ExecuteTask(UBehaviorTreeComponent
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     EnemyAnim->PlayNormalAttack_Montage();
+    Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
     return EBTNodeResult::InProgress;
 }

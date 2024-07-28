@@ -59,8 +59,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void NormalAttack();
 
-	FORCEINLINE float GetDistanceLimit()const {return Distance_Limit;}; 
-	FORCEINLINE float GetDetectLimit()const {return DetectLimit;}; 
+	FORCEINLINE float GetDetectDist()const {return DetectDist;}; 
 
 	void TeleportMarkActivate(float Time, AActor * MarkOwner, USkillNumberBase* SkillComp);
 	void TeleportMarkDeactivate();
@@ -71,7 +70,8 @@ public:
 
 	virtual void SpawnAttackRange();
 	FORCEINLINE float GetAttackRangeTime()const {return AttackRangeTime;}; 
-	
+	FORCEINLINE float GetMonsterAttackRange()const {return Monster_AttackRange;}; 
+
 	// HitPoint 관련 함수
 	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
 
@@ -139,16 +139,16 @@ protected:
 	UAPManaDropComponent* ManaDropComp;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
-	float Monster_AttackRange = 250.0f;
+	float Monster_AttackRange = 250.0f; // if equal, Trace Stop
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRadius = 80.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
-	float Distance_Limit = 800.0f;
+	float Monster_AttackRange_Plus = 100.0f; // AttackRange_Plus = AttackRange + AttackRange_Plus;
 
-	UPROPERTY(EditAnywhere, Category = "Status")
-	float DetectLimit = 2500.0f;
+	UPROPERTY(EditAnywhere, Category = "Status") 
+	float DetectDist = 150.0f; // Trace Dist
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* TeleportMark;

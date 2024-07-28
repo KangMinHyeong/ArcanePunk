@@ -61,6 +61,7 @@ void AEnemy_CharacterBase::BeginPlay()
 	InitMonster();	
 	BindMontageEnded();
 	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
+	Monster_AttackRange_Plus += Monster_AttackRange;
 
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
 }
@@ -190,12 +191,12 @@ bool AEnemy_CharacterBase::IsHardCC()
 
 AActor* AEnemy_CharacterBase::IsAggro()
 {
-	TArray<AActor*> Actors; float Dist = Distance_Limit;
+	TArray<AActor*> Actors; float Dist = DetectDist;
 	UGameplayStatics::GetAllActorsWithTag(this, TEXT("Aggro"), Actors);
 	AActor* AggroActor = UGameplayStatics::FindNearestActor(GetActorLocation(), Actors, Dist);
 	if(AggroActor)
 	{
-		if(Dist <= Distance_Limit)
+		if(Dist <= DetectDist)
 		{
 			return AggroActor;
 		}
@@ -249,7 +250,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	if(!Custom) Start = GetActorLocation();
 
 	FVector End = CustomEnd + FVector::UpVector* 15.0f ;
-	if(!Custom) End = GetActorLocation() + Rotation.Vector() * Monster_AttackRange + FVector::UpVector* 15.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+	if(!Custom) End = GetActorLocation() + Rotation.Vector() * Monster_AttackRange_Plus + FVector::UpVector* 15.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
 
 	// 같은 아군은 타격 판정이 안되게 하는 코드
 	FCollisionQueryParams Params;
@@ -277,7 +278,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	bool bResult = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);
 	
 	FVector Center = (Start + End) / 2.0f;
-	float HalfHeight = Monster_AttackRange * 0.5f + Monster_AttackRadius;
+	float HalfHeight = Monster_AttackRange_Plus * 0.5f + Monster_AttackRadius;
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
@@ -498,6 +499,7 @@ void AEnemy_CharacterBase::EnemyMontageEnded(UAnimMontage *Montage, bool bInterr
 
 void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 {
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void AEnemy_CharacterBase::OnDeath_MontageEnded()
@@ -537,6 +539,7 @@ void AEnemy_CharacterBase::SpawnAttackRange()
 	AttackRange = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackTargetRange, GetMesh()->GetComponentLocation(), GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f));
 	if(!AttackRange.IsValid()) return;
 	AttackRange->SetVariableFloat(TEXT("Lifetime"), AttackRangeTime);
-	
+    AttackRange->SetVariableVec2(TEXT("Size2D"), FVector2D((Monster_AttackRange_Plus+Monster_AttackRadius) / 1000.0f, Monster_AttackRadius / 100.0f));
+
 	// FVector2D(ShootRange.X / 1000.0f, ShootRange.Y / 200.0f)
 }
