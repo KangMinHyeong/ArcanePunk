@@ -14,5 +14,5 @@ void AEnemy_GunSoldier::NormalAttack()
 {
     auto Ammo = GetWorld()->SpawnActor<AAPEnemyAmmo>(AmmoClass, AmmoSpawnComponent->GetComponentLocation(), GetActorRotation());
     Ammo->SetOwner(this);
-    Ammo->SetOwnerEnemy();
+    Ammo->SetOwnerEnemy(Monster_AttackRange_Plus, Monster_AttackRadius);
 }

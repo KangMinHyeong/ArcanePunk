@@ -21,6 +21,8 @@ AAPEnemyAmmo::AAPEnemyAmmo()
 	SetRootComponent(AmmoRoot);
 	AmmoEffect->SetupAttachment(AmmoRoot);
 
+	AmmoMoveComp->InitialSpeed = AmmoSpeed;
+	AmmoMoveComp->MaxSpeed = AmmoSpeed;
 }
 
 void AAPEnemyAmmo::BeginPlay()
@@ -29,7 +31,6 @@ void AAPEnemyAmmo::BeginPlay()
 	
 	AmmoRoot->OnComponentHit.AddDynamic(this, &AAPEnemyAmmo::OnHitting);
 
-	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AAPEnemyAmmo::DestroyExplosion, DestroyTime, false);
 }
 
 void AAPEnemyAmmo::Tick(float DeltaTime)
@@ -38,9 +39,13 @@ void AAPEnemyAmmo::Tick(float DeltaTime)
 
 }
 
-void AAPEnemyAmmo::SetOwnerEnemy()
+void AAPEnemyAmmo::SetOwnerEnemy(float Dist, float Radius)
 {
 	OwnerEnemy = Cast<AEnemy_CharacterBase>(GetOwner());
+
+	AmmoRoot->SetSphereRadius(Radius, false);
+	float DestroyTime = Dist / AmmoSpeed;
+	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AAPEnemyAmmo::DestroyExplosion, DestroyTime, false);
 }
 
 void AAPEnemyAmmo::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)

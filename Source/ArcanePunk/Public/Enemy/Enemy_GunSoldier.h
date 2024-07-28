@@ -25,4 +25,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> AmmoClass;
+
 };

@@ -20,17 +20,11 @@ void AEnemy_ScoutDog::BeginPlay()
 {
     Super::BeginPlay();
 
+    RushTrigger->SetCapsuleRadius(Monster_AttackRadius, false);
     RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     RushTrigger->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_ScoutDog::OnOverlapping);
     FTimerHandle DamageTimerHandle;
     // GetWorld()->GetTimerManager().SetTimer(DamageTimerHandle, this, &AEnemy_ScoutDog::Test, 0.3f, true);
-}
-
-void AEnemy_ScoutDog::SpawnAttackRange()
-{
-    Super::SpawnAttackRange();
-    if(!AttackRange.IsValid()) return;
-    AttackRange->SetVariableVec2(TEXT("Size2D"), FVector2D(LeapSpeed / 1000.0f, RushTrigger->GetScaledCapsuleRadius() / 100.0f));
 }
 
 void AEnemy_ScoutDog::Tick(float DeltaTime)
@@ -49,7 +43,7 @@ void AEnemy_ScoutDog::Tick(float DeltaTime)
 void AEnemy_ScoutDog::LeapFoward()
 {
     CurrentLocation = GetActorLocation(); 
-    TargetLocation = CurrentLocation + LeapSpeed*GetActorForwardVector();
+    TargetLocation = CurrentLocation + (Monster_AttackRange_Plus + Monster_AttackRadius) * GetActorForwardVector();
     AttackCondition(true);
 }
 

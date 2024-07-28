@@ -27,14 +27,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void SpawnAttackRange() override;
-	
+
 private:
 	UPROPERTY(EditAnywhere)
 	UCapsuleComponent* RushTrigger;
-
-	UPROPERTY(EditAnywhere)
-	float LeapSpeed = 500.0f;
 
 	UPROPERTY(EditAnywhere)
 	float InterpSpeed = 5.0f;
