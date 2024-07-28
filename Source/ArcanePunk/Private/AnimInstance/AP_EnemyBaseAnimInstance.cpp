@@ -4,6 +4,7 @@
 #include "Animation/AnimSequence.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Enemy/Enemy_ScoutDog.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UAP_EnemyBaseAnimInstance::UAP_EnemyBaseAnimInstance()
 {
@@ -58,6 +59,7 @@ void UAP_EnemyBaseAnimInstance::PlayHit_Montage()
 	if (IsDead || !Enemy.IsValid()) return;
 	if (Enemy->IsHardCC()) return;
 	Montage_Play(Hit_Montage);
+	Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
 void UAP_EnemyBaseAnimInstance::PlayDetect_Montage()
