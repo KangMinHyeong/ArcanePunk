@@ -15,7 +15,12 @@
 		"files.associations": {
 			"*.rh": "cpp",
 			"variant": "cpp",
-			"chrono": "cpp"
+			"chrono": "cpp",
+			"complex": "cpp",
+			"valarray": "cpp",
+			"cmath": "cpp",
+			"adolcforward": "cpp",
+			"cstdlib": "cpp"
 		}
 	},
 	"extensions": {
