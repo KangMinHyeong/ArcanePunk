@@ -6,6 +6,7 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "UserInterface/Conversation/APConversationText.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPConversationUI::NativeOnInitialized()
 {
@@ -40,27 +41,24 @@ FReply UAPConversationUI::NativeOnKeyDown( const FGeometry& InGeometry, const FK
 	return Reply.Handled();
 }
 
-void UAPConversationUI::InitOrder(FName Name, uint8 State)
+void UAPConversationUI::InitOrder(FName Name) // FName Name, uint8 State
 {
-    auto DataTable = ConversationDataTable->FindRow<FConversationDataTable>(Name, Name.ToString()); if(!DataTable){RemoveFromParent(); return;}
-    TArray<FConversationData> ConversationOrder;
-    if(DataTable->ConversationPartnerPrompt.Num() > State) ConversationOrder = DataTable->ConversationPartnerPrompt[State].ConversationDataArray;
-    if(ConversationOrder.IsEmpty()) {RemoveFromParent(); return;}
-
-    Order = ConversationOrder;
-    SetOrder();
-    
-    // ConversationText->
-    // ConversationOrder[0].
+    RowName = Name; SetOrder();
 }
 
 void UAPConversationUI::SetOrder()
 {
-    if(Order.Num() > TextOrder) {ConversationText->SetConversation(Order[TextOrder]);}
-    else
+    if(RowName == "None")
     {
         auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer());
         if(PC) PC->CloseConversationUI();
+    }
+    else
+    {
+        auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+        auto DataTable = APGI->GetContentTextData()->FindRow<FContentTextDataTable>(RowName, RowName.ToString()); 
+        RowName = DataTable->NextRowName;
+        ConversationText->SetConversation(DataTable);
     }
 }
 
@@ -68,12 +66,10 @@ void UAPConversationUI::ConversationCompleteCheck()
 {
     if(ConversationText->bTextComplete)
     {
-        TextOrder++;
         SetOrder();
     }
     else
     {
-        ConversationText->SkipConversation(Order[TextOrder]);
-    }
-    
+        ConversationText->SkipConversation();
+    }    
 }

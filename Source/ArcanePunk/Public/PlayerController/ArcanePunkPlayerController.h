@@ -57,7 +57,7 @@ public:
 	void CloseStageSelectingUI();
 	
 	// Conversation UI
-	void OpenConversationUI(AActor* CameraActor, FName Name, uint8 State);
+	void OpenConversationUI(AActor* CameraActor, FName RowName);
 	void CloseConversationUI();
 
 	// Shopping UI
@@ -104,7 +104,7 @@ private:
 
 	//Interaction
 	void OnStageSelectingUI();
-	void OnConversationUI(FName Name, uint8 State);
+	void OnConversationUI(FName RowName);
 
 private:
 	bool bLookStatus = false;

@@ -25,6 +25,8 @@ EBTNodeResult::Type UBTTask_AttackRotate::ExecuteTask(UBehaviorTreeComponent &Ow
         return EBTNodeResult::Failed;
     }
 
+    Monster->GetMesh()->SetCanEverAffectNavigation(true);
+
     auto Target = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
     if(Target) Monster->RotateTowardsTarget(Target, RotateSpeed);
 

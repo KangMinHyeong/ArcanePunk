@@ -31,6 +31,6 @@ void AAPInteraction_Conversation::Interact(AArcanePunkCharacter *PlayerCharacter
 
     auto PC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!PC) return;
     // To Do : ConversationPartnerState Upadte <- GameInstance?
-    PC->OpenConversationUI(this, ConversationPartnerName, ConversationPartnerState);
+    PC->OpenConversationUI(this, ConversationRowName);
 
 }

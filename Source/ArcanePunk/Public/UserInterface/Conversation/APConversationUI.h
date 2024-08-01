@@ -19,7 +19,7 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;	
 	virtual FReply NativeOnKeyDown( const FGeometry& InGeometry, const FKeyEvent& InKeyEvent ) override;
 
-	void InitOrder(FName Name, uint8 State);
+	void InitOrder(FName Name);
 	
 private:
 	void ConversationCompleteCheck();
@@ -35,4 +35,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UDataTable* ConversationDataTable;
+
+	FName RowName;
 };
