@@ -18,13 +18,18 @@ EBTNodeResult::Type UBTTask_MoveToCheckDist::ExecuteTask(UBehaviorTreeComponent 
 
     auto Enemy = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
     if(!Enemy) return EBTNodeResult::Failed;
+
+    Enemy->GetMesh()->SetCanEverAffectNavigation(false);
+    // Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+    
     auto Player = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(GetSelectedBlackboardKey()));
-    if(!Player) return EBTNodeResult::Failed;
-
-    AcceptableRadius = Enemy->GetMonsterAttackRange();
-
-    if((Player->GetActorLocation() - Enemy->GetActorLocation()).Size() <= AcceptableRadius) 
-    return EBTNodeResult::Succeeded;
-
+    if(Player)
+    {
+        AcceptableRadius = Enemy->GetMonsterAttackRange();
+        
+        if((Player->GetActorLocation() - Enemy->GetActorLocation()).Size() <= AcceptableRadius) 
+        return EBTNodeResult::Succeeded;
+    }
+    
     return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

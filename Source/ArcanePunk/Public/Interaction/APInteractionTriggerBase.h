@@ -27,7 +27,7 @@ public:
 
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
-	FORCEINLINE void SetPartnerName(FName Name) {ConversationPartnerName = Name;};
+	FORCEINLINE void SetConversationRowName(FName Name) {ConversationRowName = Name;};
 	FORCEINLINE UAPInteractionBoxComponent* GetInteractionBox() {return InteractionTrigger;};
 
 protected:
@@ -38,7 +38,7 @@ protected:
 	UCameraComponent* InteractionCamera;
 
 	UPROPERTY(EditAnywhere)
-	FName ConversationPartnerName;
+	FName ConversationRowName; // Conversation Index
 
 	UPROPERTY(EditAnywhere)
 	float InteractFrequency = 0.1f;

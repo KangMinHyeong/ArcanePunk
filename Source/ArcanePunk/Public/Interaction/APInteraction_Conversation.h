@@ -17,6 +17,5 @@ public:
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 private:
-	UPROPERTY(EditAnywhere)
-	uint8 ConversationPartnerState;
+
 };

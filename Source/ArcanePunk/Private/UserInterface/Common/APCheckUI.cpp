@@ -3,37 +3,23 @@
 
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "GameInstance/APGameInstance.h"
+#include "Interfaces/InteractionInterface.h"
 
 void UAPCheckUI::SetCheckType(ECheckType UpdateCheckType, UUserWidget* Parent)
 {
     ParentWidget = Parent; CurrentCheckType = UpdateCheckType;
-    FString Message = TEXT(" ");
-    switch (UpdateCheckType)
-    {
-    case ECheckType::Save:
-        Message = TEXT("저장하시겠습니까?");
-        break;
-    
-    case ECheckType::Load:
-        Message = TEXT("이 파일로 시작하시겠습니까?");
-        break;
-
-    case ECheckType::Purchase:
-        Message = TEXT("구매하시겠습니까?");
-        break;
-
-    case ECheckType::Select:
-        Message = TEXT("선택하시겠습니까?");
-        break;
-
-    case ECheckType::Delete:
-        Message = TEXT("삭제하시겠습니까?");
-        break;
-    }
-    Text_Message->SetText(FText::FromString(Message));
 
     Button_Validation->OnClicked.AddDynamic(this, &UAPCheckUI::Validate);
     Button_Cancel->OnClicked.AddDynamic(this, &UAPCheckUI::Cancel);
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    const UEnum* CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ECheckType"), true); if(!CheckEnum) return;
+    FName Name = FName(*(CheckEnum->GetDisplayNameTextByValue((uint8)UpdateCheckType)).ToString());
+    auto DataTable = APGI->GetContentTextData()->FindRow<FContentTextDataTable>(Name, Name.ToString()); 
+
+    Text_Message->SetText(FText::FromString(DataTable->Content));
 }
 
 void UAPCheckUI::Validate()

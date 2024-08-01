@@ -65,6 +65,14 @@ enum class EInteractionType: uint8 // 상호작용 종류
 	ShopMesh		= 5 UMETA(DisplayName = "상점"), // 상점 상호작용
 };
 
+UENUM(BlueprintType)
+enum class ETextType: uint8 // 상호작용 종류
+{
+	None	 			= 0 UMETA(DisplayName = "None"),
+	System				= 1 UMETA(DisplayName = "시스템"),
+	Conversation		= 2 UMETA(DisplayName = "대화"), 
+};
+
 USTRUCT()
 struct FInteractData
 {
@@ -219,6 +227,32 @@ struct FShopListData
 
 	UPROPERTY(EditAnywhere)
 	TArray<FShopGoodsData_NewSkill> ShopGoodsList_NewSkill;
+};
+
+USTRUCT()
+struct FContentTextDataTable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	FContentTextDataTable() {}
+
+	UPROPERTY(EditAnywhere)
+	int32 TextIndex = 0;
+
+	UPROPERTY(EditAnywhere)
+	ETextType TextType;
+
+	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
+	FString TextOwnerName;
+
+	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
+	FString Content;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* Portrait;
+
+	UPROPERTY(EditAnywhere)
+	FName NextRowName;
 };
 
 

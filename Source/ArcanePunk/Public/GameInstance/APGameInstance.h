@@ -46,7 +46,8 @@ public:
 	FORCEINLINE UDataTable* GetGoldAbilityDataTable() const {return GoldAbilityDataTable;};
 	FORCEINLINE UDataTable* GetPlatinumAbilityDataTable() const {return PlatinumAbilityDataTable;};
 	FORCEINLINE UDataTable* GetEquipDataTable() const {return EquipDataTable;};
-
+	FORCEINLINE UDataTable* GetContentTextData() const {return ContentTextData;};
+	
 	FORCEINLINE FString GetDefaultSlotName() const {return DefaultSlotName;};
 	FORCEINLINE void SetDefaultSlotName(FString NewName) {DefaultSlotName = NewName;};
 	
@@ -70,6 +71,7 @@ public:
 	FORCEINLINE FSkillAbilityNestingData GetQSkillAbilityNestingData() const {return QSkillAbilityNestingData;};
 	FORCEINLINE FSkillAbilityNestingData GetESkillAbilityNestingData() const {return ESkillAbilityNestingData;};
 	FORCEINLINE FSkillAbilityNestingData GetRSkillAbilityNestingData() const {return RSkillAbilityNestingData;};
+
 
 	FORCEINLINE float GetGoldPlusPercent() const {return GoldPlusPercent;};
 	FORCEINLINE void SetGoldPlusPercent(float NewValue) {GoldPlusPercent = NewValue;};
@@ -134,6 +136,8 @@ private:
 	UDataTable* GoldAbilityDataTable;
 	UPROPERTY(EditAnywhere)
 	UDataTable* PlatinumAbilityDataTable;
+	UPROPERTY(EditAnywhere)
+	UDataTable* ContentTextData;
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	UDataTable* EquipDataTable;

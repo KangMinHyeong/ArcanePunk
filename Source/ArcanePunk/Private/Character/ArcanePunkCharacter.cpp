@@ -472,7 +472,7 @@ void AArcanePunkCharacter::SetRSkill(EUltSkillNumber NewSkill)
 void AArcanePunkCharacter::AddPassive(EPassiveNumber PassiveNum)
 {
 	if(PassiveSkills.Contains((uint8)PassiveNum)) return;
-	UE_LOG(LogTemp, Display, TEXT("PassiveNum %d"), (uint8)PassiveNum);
+	
 	FSkillAbilityNestingData SkillAbilityNestingData = {};
 	PassiveSkills.Emplace((uint8)PassiveNum, SkillAbilityNestingData);
 	PassiveComp->ApplyNewPassive(PassiveNum);

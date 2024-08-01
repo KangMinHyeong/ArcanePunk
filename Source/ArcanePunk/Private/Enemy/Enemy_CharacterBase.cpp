@@ -229,7 +229,7 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 		int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
 
 		PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
-		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc, FVector(0.0f,0.0f,5000.0f));
+		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc, FVector(0.0f, 0.0f, 5000.0f));
 		Repeat++;
 	}
 

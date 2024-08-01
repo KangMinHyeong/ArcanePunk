@@ -215,7 +215,7 @@ void AArcanePunkPlayerController::CloseStageSelectingUI()
     if(MyCharacter.IsValid()) {MyCharacter->SetActorHiddenInGame(false); SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); MyCharacter->EnableInput(this);} 
 }
 
-void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName Name, uint8 State)
+void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName RowName)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
@@ -223,18 +223,18 @@ void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName 
     MyCharacter->SetActorHiddenInGame(true); MyCharacter->DisableInput(this); 
     SetViewTargetWithBlend(CameraActor, BlendTime);
 
-	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, Name, State);
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, RowName);
 	GetWorld()->GetTimerManager().SetTimer(InteractionTimerHandle, TimerDelegate, BlendTime, false);
 }
 
-void AArcanePunkPlayerController::OnConversationUI(FName Name, uint8 State)
+void AArcanePunkPlayerController::OnConversationUI(FName RowName)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
     GetWorld()->GetTimerManager().ClearTimer(InteractionTimerHandle);
     ConversationUI = CreateWidget<UAPConversationUI>(GetWorld(), ConversationUIClass); if(!ConversationUI.IsValid()) return;
     ConversationUI->AddToViewport();
-    ConversationUI->InitOrder(Name, State);
+    ConversationUI->InitOrder(RowName);
 }
 
 void AArcanePunkPlayerController::CloseConversationUI()

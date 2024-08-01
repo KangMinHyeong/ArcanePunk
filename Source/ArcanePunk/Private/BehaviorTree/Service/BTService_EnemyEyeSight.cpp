@@ -56,7 +56,8 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
         {
             if(IsLoop)
             {
-                OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
+                return;
+                // OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
             }
             else
             {
