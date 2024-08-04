@@ -50,7 +50,7 @@ protected:
 	UBoxComponent* GroundTrigger;
 
 	UPROPERTY(EditAnywhere)
-	UAPInteractionBoxComponent* InteractTrigger;
+	UAPInteractionBoxComponent* InteractionTrigger;
 
 	UPROPERTY(EditAnywhere)
 	FVector SpawnImpulse = FVector(200.0f,200.0f,500.0f);

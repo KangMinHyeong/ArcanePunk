@@ -26,7 +26,7 @@ void AEnemy_DropEquipMent::BeginPlay()
 
 void AEnemy_DropEquipMent::OnDropEquip()
 {
-	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
 
     if(IsPendingKillPending() || !ItemReference) return;
 

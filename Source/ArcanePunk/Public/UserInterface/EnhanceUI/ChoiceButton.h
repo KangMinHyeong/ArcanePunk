@@ -72,6 +72,15 @@ private:
 	UTextBlock* Text_New;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Select;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_CurrnetNesting;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_Count;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	USizeBox* SizeBox_Nesting;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))

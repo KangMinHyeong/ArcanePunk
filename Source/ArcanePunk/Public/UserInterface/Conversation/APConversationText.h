@@ -7,10 +7,8 @@
 
 class UImage;
 class UTextBlock;
-struct FConversationData;
 class UWrapBox;
-struct FConversationDataTable;
-struct FContentTextDataTable;
+struct FSequenceStringDataTable;
 class UWidgetAnimation;
 
 UCLASS()
@@ -21,7 +19,7 @@ public:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
-	void SetConversation(FContentTextDataTable* ContentTextData);
+	void SetConversation(FSequenceStringDataTable* ContentTextData);
 	void SetTextFlow();
 
 	void SkipConversation();

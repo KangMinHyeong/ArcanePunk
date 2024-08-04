@@ -251,7 +251,7 @@ bool USkillNumberBase::CheckSkillCondition()
 {
 	if(!OwnerCharacter.IsValid()) return false;
 	if(OwnerCharacter->GetDoing()) return false;
-	if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP < MPConsumption || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return false;}
+	if(OwnerCharacter->GetPlayerStatus().StatusData.MP < MPConsumption || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return false;}
 	
     return true;
 }

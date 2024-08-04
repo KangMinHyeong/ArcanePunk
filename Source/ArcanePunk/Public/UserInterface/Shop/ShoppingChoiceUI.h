@@ -13,6 +13,7 @@ class UTextBlock;
 class UBorder;
 class UImage;
 class UButton;
+class UAPGameInstance;
 
 UCLASS()
 class ARCANEPUNK_API UShoppingChoiceUI : public UUserWidget, public ICheckingWidgetInterface
@@ -82,10 +83,21 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_Addition_Inform;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Addition_1;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_Addition_Inform_2;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_PlayerGold;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Type;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_TierName;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_PriceName;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_CurrentGold;
 	
 	UPROPERTY(EditAnywhere)
 	FLinearColor SilverColor;
@@ -111,11 +123,14 @@ private:
 	FName UltSkill = TEXT("UltSkill");
 	FName Passive = TEXT("Passive");
 
+	FString SpaceB = TEXT(" : ");
+
 	bool bEnhanceUI = true;
 
 	TPair<uint8, uint16> CurrentAbilityData;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<UAPGameInstance> APGI;
 
 	int32 MaxNum = 9;
 

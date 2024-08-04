@@ -50,6 +50,11 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Cancel;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Information;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_NoEnough;
+
 	UPROPERTY(EditAnywhere)
 	UDataTable* SkillAbilityRowNameData;
 

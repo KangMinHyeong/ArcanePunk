@@ -14,15 +14,6 @@ struct FPlayerStaticData
 	FPlayerStaticData() {}
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
-	int32 MyCharacterIndex = 0;
-
-	UPROPERTY(SaveGame, BlueprintReadWrite)
-	FName CharacterName = TEXT("Player");
-
-	UPROPERTY(SaveGame, BlueprintReadWrite)
-	uint8 CharacterGroup = 0;//0:OC / 1:NPC
-
-	UPROPERTY(SaveGame, BlueprintReadWrite)
 	uint8 Gender = 0;//0: Male / 1:Female;
 
 	UPROPERTY(SaveGame, BlueprintReadWrite)
@@ -62,14 +53,20 @@ struct FPlayerSkillLimit
 //
 
 USTRUCT(BlueprintType)
-struct FPlayerDynamicData : public FTableRowBase
+struct FStatusData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	FPlayerDynamicData() {}
+	FStatusData() {}
 
-	UPROPERTY(SaveGame, BlueprintReadWrite)
-	bool SaveOperation = false;
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
+	int32 CharacterIndex = 0;
+
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
+	uint8 CharacterGroup = 0;//0:OC / 1:NPC
+
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
+	FName CharacterName = TEXT("Player");
 
 	// Player Status
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
@@ -108,11 +105,41 @@ struct FPlayerDynamicData : public FTableRowBase
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	int32 CriticalStep = 1;
 
-	// Player Location
-	UPROPERTY(SaveGame, BlueprintReadWrite)
-	FVector PlayerLocation = FVector(0,0,0);
 
 	//
+};
+
+USTRUCT(BlueprintType)
+struct FNPCData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	FNPCData() {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 NPCIndex = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName NPCName = TEXT("");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DropArcaneEnergy_Percent = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 DropArcaneEnergy_Amount = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DropGold_Percent = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DropGold_Min = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DropGold_Max = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DropDice_Percent = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 DropDice_Min = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 DropDice_Max = 1;
 };
 
 USTRUCT(BlueprintType)
@@ -135,16 +162,20 @@ struct FPlayerTotalData
 	FPlayerTotalData() {}
 
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
-	FPlayerStaticData PlayerStaticData = {};
-
-	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
-	FPlayerDynamicData PlayerDynamicData = {};
+	FStatusData StatusData = {};
 
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	FPlayerGoodsData PlayerGoodsData = {};
 
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	FString SaveSlotName = TEXT("PlayerSlot_0");
+
+	// Player Location
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	FVector PlayerLocation = FVector(0,0,0);
+
+	UPROPERTY(SaveGame, BlueprintReadWrite)
+	bool SaveOperation = false;
 };
 
 UCLASS()

@@ -5,6 +5,7 @@
 
 #include "Save/APSaveGame.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "GameState/APGameState.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,13 +21,22 @@ void UAPTitleUI::NativeConstruct()
 	SetIsFocusable(true);
     SetKeyboardFocus();
 	
-	Button_NewGame->OnClicked.AddDynamic(this, &UAPTitleUI::NewGame);
-	Button_Continue->OnClicked.AddDynamic(this, &UAPTitleUI::Continue);
-	Button_Setting->OnClicked.AddDynamic(this, &UAPTitleUI::Setting);
-	Button_Exit->OnClicked.AddDynamic(this, &UAPTitleUI::Exit);
+	Button_NewGame->OnClicked.AddDynamic(this, &UAPTitleUI::OnNewGame);
+	Button_Continue->OnClicked.AddDynamic(this, &UAPTitleUI::OnContinue);
+	Button_Setting->OnClicked.AddDynamic(this, &UAPTitleUI::OnSetting);
+	Button_Exit->OnClicked.AddDynamic(this, &UAPTitleUI::OnExit);
+
+	auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+	APGI->SetTextBlock(TextBlock_NewGame, EStringRowName::NewGame);
+	APGI->SetTextBlock(TextBlock_Continue, EStringRowName::Continue);
+	APGI->SetTextBlock(TextBlock_GameSetting, EStringRowName::GameSetting);
+	APGI->SetTextBlock(TextBlock_GameExit, EStringRowName::GameExit);
+	APGI->SetTextBlock(TextBlock_MainTitle, EStringRowName::MainTitle);
+	APGI->SetTextBlock(TextBlock_SubTitle, EStringRowName::SubTitle);
 }
 
-void UAPTitleUI::NewGame()
+void UAPTitleUI::OnNewGame()
 {
 	UAPSaveGame* SaveGameData = NewObject<UAPSaveGame>();
 	if(SaveGameData == nullptr) 
@@ -58,7 +68,7 @@ void UAPTitleUI::NewGame()
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Intro"));
 }
 
-void UAPTitleUI::Continue()
+void UAPTitleUI::OnContinue()
 {
 	auto SelectSlotUI =  Cast<UAPSaveSlotUI>(CreateWidget(this, SelectSaveSlotClass)); if(!SelectSlotUI) return;
 	SelectSlotUI->BindButton();
@@ -67,14 +77,14 @@ void UAPTitleUI::Continue()
 	// RemoveFromParent();
 }
 
-void UAPTitleUI::Setting()
+void UAPTitleUI::OnSetting()
 {
 	auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer()); if(!TitlePC) return;
 
 	TitlePC->OptionSetting();
 }
 
-void UAPTitleUI::Exit()
+void UAPTitleUI::OnExit()
 {
 	UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, true);
 }

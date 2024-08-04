@@ -3,6 +3,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Interfaces/InteractionInterface.h"
+#include "GameInstance/APGameInstance.h"
 
 void UInteractionWidget::NativeOnInitialized()
 {
@@ -18,8 +19,13 @@ void UInteractionWidget::NativeConstruct()
 
 void UInteractionWidget::UpdateWidget(FInteractData InteractData)
 {
+	auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    const UEnum* CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EInteractionType"), true); if(!CheckEnum) return;
+    FName Name = FName(*(CheckEnum->GetDisplayNameTextByValue((uint8)InteractData.InteractionType)).ToString());
+    
 	KeyPressText->SetText(FText::FromString(InteractData.InteractionKeyName));
-	NameText->SetText(FText::FromString(InteractData.InteractionTypeName));
+	APGI->SetTextBlock_Name(NameText, Name);
 	FSlateFontInfo SlateFontInfo = NameText->GetFont(); SlateFontInfo.Size = InteractData.TypeNameSize;
 	NameText->SetFont(SlateFontInfo);
 	

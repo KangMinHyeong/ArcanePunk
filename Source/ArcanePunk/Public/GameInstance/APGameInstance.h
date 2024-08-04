@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/InteractionInterface.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Engine/GameInstance.h"
 #include "APGameInstance.generated.h"
@@ -14,6 +15,7 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnChangingSoundVolume, float, float, flo
 
 class AEnemy_DropPackage;
 class UAPSaveGame;
+class UTextBlock;
 
 USTRUCT(BlueprintType)
 struct FGameSoundVolume
@@ -29,6 +31,9 @@ struct FGameSoundVolume
 	UPROPERTY()
 	float EffectVolume = 1.0f;
 };
+
+
+	
 
 UCLASS()
 class ARCANEPUNK_API UAPGameInstance : public UGameInstance
@@ -46,7 +51,10 @@ public:
 	FORCEINLINE UDataTable* GetGoldAbilityDataTable() const {return GoldAbilityDataTable;};
 	FORCEINLINE UDataTable* GetPlatinumAbilityDataTable() const {return PlatinumAbilityDataTable;};
 	FORCEINLINE UDataTable* GetEquipDataTable() const {return EquipDataTable;};
-	FORCEINLINE UDataTable* GetContentTextData() const {return ContentTextData;};
+	FORCEINLINE UDataTable* GetStringData() const {return StringData;};
+	FORCEINLINE UDataTable* GetSequenceStringData() const {return SequenceStringData;};
+	FORCEINLINE UDataTable* GetStatusData() const {return StatusData;};
+	FORCEINLINE UDataTable* GetNPCData() const {return NPCData;};
 	
 	FORCEINLINE FString GetDefaultSlotName() const {return DefaultSlotName;};
 	FORCEINLINE void SetDefaultSlotName(FString NewName) {DefaultSlotName = NewName;};
@@ -97,6 +105,10 @@ public:
 	FORCEINLINE float GetOffset() const {return Offset;};
     FORCEINLINE void SetOffset(float Value) {Offset = Value;};
 
+	void SetTextBlock(UTextBlock* TextBlock, EStringRowName RowName);
+	void SetTextBlock_Name(UTextBlock* TextBlock, FName RowName);
+	FString GetStringContent(EStringRowName RowName);
+	
 private:
 	UPROPERTY()
 	FString DefaultSlotName = "PlayerSlot_0";
@@ -137,7 +149,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	UDataTable* PlatinumAbilityDataTable;
 	UPROPERTY(EditAnywhere)
-	UDataTable* ContentTextData;
+	UDataTable* StringData;
+	UPROPERTY(EditAnywhere)
+	UDataTable* SequenceStringData;
+	UPROPERTY(EditAnywhere)
+	UDataTable* StatusData;
+	UPROPERTY(EditAnywhere)
+	UDataTable* NPCData;
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	UDataTable* EquipDataTable;
@@ -166,6 +184,7 @@ private:
 	UPROPERTY()
 	float Offset = 0.5f;
 
+	TWeakObjectPtr<UEnum> CheckEnum;
 public:
 	FOnSkillEnhanceDataUpdate OnSkillEnhanceDataUpdate;
 	FOnSkillEnhanceDataClear OnSkillEnhanceDataClear;

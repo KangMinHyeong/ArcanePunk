@@ -42,7 +42,7 @@ void AArcanePunkPlayerState::InitPlayerData()
 void AArcanePunkPlayerState::UpdatePlayerData(FPlayerTotalData &PS)
 {
     PlayerTotalStatus = PS;
-    PlayerTotalStatus.PlayerDynamicData.SaveOperation = true;
+    PlayerTotalStatus.SaveOperation = true;
 
     SavePlayerData();
 }

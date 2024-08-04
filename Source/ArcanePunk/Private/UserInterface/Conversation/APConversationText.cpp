@@ -29,10 +29,10 @@ void UAPConversationText::NativeTick(const FGeometry &MyGeometry, float InDeltaT
     } 
 }
 
-void UAPConversationText::SetConversation(FContentTextDataTable* ContentTextData)
+void UAPConversationText::SetConversation(FSequenceStringDataTable* ContentTextData)
 {
     ConversationPortrait->SetBrushFromTexture(ContentTextData->Portrait);
-    ConversationActorName->SetText(FText::FromString(ContentTextData->TextOwnerName));
+    ConversationActorName->SetText(FText::FromString(ContentTextData->SequenceCharacterName));
 
     ConversationCompleteTriangle->SetVisibility(ESlateVisibility::Collapsed);
     // EmphasizeFontSize = ConversationData.EmphasizeFontSize;

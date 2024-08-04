@@ -78,6 +78,12 @@ private:
 	UTextBlock* EnHanceCategory_Text;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_CurrentReroll;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_Count;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Cancel_Button;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -99,20 +105,10 @@ private:
 
 	TArray<uint8> NewSkills;
 	TArray<uint8> NewPassives;
-
-	// ESkillAbility SkillAbility = ESkillAbility::Ability_None;
-
-	// TArray<ESkillAbility> EnableSkillAbilityList;
-
-	// TArray<ESkillAbility> OriginSkillAbilityList;
 	
 	uint8 Choice1;
 	uint8 Choice2;
 	uint8 Choice3;
-
-	FName TEXT_Silver = TEXT("실버");
-	FName TEXT_Gold = TEXT("골드");
-	FName TEXT_Platinum = TEXT("플레티넘");
 
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
 	USizeBox* ChoiceBox_1;
@@ -155,10 +151,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	FLinearColor PlatinumColor;
 
-	FString QSkillText = TEXT("Q 스킬");
-	FString ESkillText = TEXT("E 스킬");
-	FString RSkillText = TEXT("R 스킬");
-	FString PassiveSkillText = TEXT("패시브 스킬");
-
 	uint8 ChoiceNumb = 0;
+
 };

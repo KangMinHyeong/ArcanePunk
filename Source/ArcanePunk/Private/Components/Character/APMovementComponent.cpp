@@ -83,7 +83,7 @@ void UAPMovementComponent::TickCheck()
 void UAPMovementComponent::TickRotate(float DeltaTime)
 {
 	if(!OwnerCharacter.IsValid()) return;
-	Current = FMath::RInterpConstantTo(Current, TargetRot, DeltaTime, RotSpeed  * OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed );
+	Current = FMath::RInterpConstantTo(Current, TargetRot, DeltaTime, RotSpeed  * OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed );
 	GetOwner()->SetActorRotation(Current);
 	
 	if(abs(Current.Yaw - TargetRot.Yaw) < 0.01f) 
@@ -97,7 +97,7 @@ void UAPMovementComponent::TickMove(float DeltaTime)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	FVector Location = GetOwner()->GetActorLocation();
-	Location = FMath::VInterpConstantTo(Location, TargetLocation, DeltaTime, LocSpeed * OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed );
+	Location = FMath::VInterpConstantTo(Location, TargetLocation, DeltaTime, LocSpeed * OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed );
 	GetOwner()->SetActorLocation(Location, true);
 	if(abs(Location.X - TargetLocation.X) < 0.01f && abs(Location.Y - TargetLocation.Y) < 0.01f) 
 	{

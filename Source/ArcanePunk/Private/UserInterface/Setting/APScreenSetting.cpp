@@ -18,6 +18,15 @@ void UAPScreenSetting::NativeConstruct() {
     BindButtonAndSlider();
     InitSlider();
     InitUIMaterials();
+
+    APGI->SetTextBlock(TextBlock_Saturation, EStringRowName::Grading_Saturation);
+    APGI->SetTextBlock(TextBlock_Contrast, EStringRowName::Grading_Contrast);
+    APGI->SetTextBlock(TextBlock_Gamma, EStringRowName::Grading_Gamma);
+    APGI->SetTextBlock(TextBlock_Gain, EStringRowName::Grading_Gain);
+    APGI->SetTextBlock(TextBlock_Offset, EStringRowName::Grading_Offset);
+
+    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
+    APGI->SetTextBlock(TextBlock_Apply, EStringRowName::Apply);
 }
 
 void UAPScreenSetting::BindButtonAndSlider()

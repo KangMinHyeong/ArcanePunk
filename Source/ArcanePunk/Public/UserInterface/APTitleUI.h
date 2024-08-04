@@ -8,6 +8,7 @@
 
 class UAPSaveSlotUI;
 class UButton;
+class UTextBlock;
 
 UCLASS()
 class ARCANEPUNK_API UAPTitleUI : public UUserWidget
@@ -17,16 +18,16 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void NewGame();
+	void OnNewGame();
 
 	UFUNCTION()
-	void Continue();
+	void OnContinue();
 
 	UFUNCTION()
-	void Setting();
+	void OnSetting();
 
 	UFUNCTION()
-	void Exit();
+	void OnExit();
 
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
@@ -40,6 +41,20 @@ public:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Exit;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_NewGame;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Continue;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_GameSetting;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_GameExit;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_MainTitle;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_SubTitle;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAPSaveSlotUI> SelectSaveSlotClass;

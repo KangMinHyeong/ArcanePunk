@@ -22,6 +22,11 @@ void UAPShoppingUI::NativeConstruct()
 
     Button_Cancel->OnClicked.AddDynamic(this, &UAPShoppingUI::OnExit);
     
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    APGI->SetTextBlock(TextBlock_Information, EStringRowName::Information);
+    APGI->SetTextBlock(TextBlock_NoEnough, EStringRowName::NoEnoughGold);
+
 }
 
 void UAPShoppingUI::InitShopData(AActor* ShopActor, FShopListData UpdateShopListData)

@@ -490,7 +490,7 @@ void UAPSkillHubComponent::RecoveryMP()
 {
 	if(!OwnerCharacter.IsValid()) return; const auto PD = OwnerCharacter->GetPlayerStatus();
 	
-	if(PD.PlayerDynamicData.MaxMP == PD.PlayerDynamicData.MP)
+	if(PD.StatusData.MaxMP == PD.StatusData.MP)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RecoveryMPTimerHandle);
 		Proceeding = false;
@@ -498,7 +498,7 @@ void UAPSkillHubComponent::RecoveryMP()
 	else
 	{
 		OwnerCharacter->GetAPHUD()->OnUpdateMPBar.Broadcast(1, false);
-		if(OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MaxMP == OwnerCharacter->GetPlayerStatus().PlayerDynamicData.MP)
+		if(OwnerCharacter->GetPlayerStatus().StatusData.MaxMP == OwnerCharacter->GetPlayerStatus().StatusData.MP)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(RecoveryMPTimerHandle);
 			Proceeding = false;

@@ -15,7 +15,7 @@ void AEnemy_DropArcaneEnergy::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    TWeakObjectPtr<AArcanePunkCharacter> PlayerCharacter = InteractTrigger->Character; if(!PlayerCharacter.IsValid()) return;
+    TWeakObjectPtr<AArcanePunkCharacter> PlayerCharacter = InteractionTrigger->Character; if(!PlayerCharacter.IsValid()) return;
 
     // 후에 수정 델리게이트로
 

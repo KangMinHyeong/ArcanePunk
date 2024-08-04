@@ -26,15 +26,8 @@ private:
 	void SetOrder();
 
 private:
-	uint8 TextOrder = 0;
-
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
 	UAPConversationText* ConversationText;
-
-	TArray<FConversationData> Order;
-
-	UPROPERTY(EditAnywhere)
-	UDataTable* ConversationDataTable;
 
 	FName RowName;
 };

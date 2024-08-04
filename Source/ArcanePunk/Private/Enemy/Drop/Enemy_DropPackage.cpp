@@ -126,7 +126,7 @@ EEnhanceCategory AEnemy_DropPackage::GetRandCategory()
 
 void AEnemy_DropPackage::BeginFocus()
 {
-	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
 	Character->ActivateInteractionSweep();
 
 	GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &AEnemy_DropPackage::BeginFocus, InteractFrequency, true);
@@ -139,7 +139,7 @@ void AEnemy_DropPackage::EndFocus()
 
 FInteractData AEnemy_DropPackage::GetInteractData()
 {
-    return InteractTrigger->GetInteractionData();
+    return InteractionTrigger->GetInteractionData();
 }
 
 void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)

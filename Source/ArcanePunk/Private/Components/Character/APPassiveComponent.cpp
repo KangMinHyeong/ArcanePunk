@@ -91,11 +91,11 @@ void UAPPassiveComponent::RecoveryHP(int32 AddNum)
 	float Check = FMath::RandRange(0.0f, 100.0f);
 	if(Check <= HPRecoveryPercent)
 	{
-		auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
-		float HP = PDD.PlayerDynamicData.HP + PDD.PlayerDynamicData.MaxHP * HPRecoveryAmount; // 최대체력 비례
-		PDD.PlayerDynamicData.HP = FMath::Min(PDD.PlayerDynamicData.MaxHP, HP);
+		auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.StatusData.HP;
+		float HP = PDD.StatusData.HP + PDD.StatusData.MaxHP * HPRecoveryAmount; // 최대체력 비례
+		PDD.StatusData.HP = FMath::Min(PDD.StatusData.MaxHP, HP);
 
-		OwnerCharacter->SetDefaultHP(PDD.PlayerDynamicData.HP); 
+		OwnerCharacter->SetDefaultHP(PDD.StatusData.HP); 
 		OwnerCharacter->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 	}
 }
@@ -150,7 +150,7 @@ void UAPPassiveComponent::ApplyNewPassive(EPassiveNumber PassiveNum)
 
 void UAPPassiveComponent::UpdateMaxHP()
 {
-	auto MaxHP = Status_Init.PlayerDynamicData.MaxHP;
+	auto MaxHP = Status_Init.StatusData.MaxHP;
 
 	float HPPlus = 20.0f;
 	float HPCoeff = 0.1f; 	// 기본 증가 // 하드코딩
@@ -221,7 +221,7 @@ void UAPPassiveComponent::UpdateMaxHP()
 
 void UAPPassiveComponent::UpdateATK()
 {
-	auto ATK = Status_Init.PlayerDynamicData.ATK;
+	auto ATK = Status_Init.StatusData.ATK;
 
 	float ATKPlus = 5.0f;
 	float ATKCoeff = 0.05f; 	// 기본 증가 // 하드코딩
@@ -304,7 +304,7 @@ void UAPPassiveComponent::UpdateATK()
 
 void UAPPassiveComponent::UpdateATKSpeed()
 {
-	auto ATKSpeed = Status_Init.PlayerDynamicData.ATKSpeed;
+	auto ATKSpeed = Status_Init.StatusData.ATKSpeed;
 
 	float ATKSpeedCoeff = 0.07f; 	// 기본 증가 // 하드코딩
 	
@@ -358,7 +358,7 @@ void UAPPassiveComponent::UpdateATKSpeed()
 
 void UAPPassiveComponent::UpdateMoveSpeed()
 {
-	auto MoveSpeed = Status_Init.PlayerDynamicData.MoveSpeed;
+	auto MoveSpeed = Status_Init.StatusData.MoveSpeed;
 
 	float MoveSpeedPlus = 0.0f;
 	float MoveSpeedCoeff = 0.05f; 	// 기본 증가 // 하드코딩
@@ -488,8 +488,8 @@ void UAPPassiveComponent::UpdateMaxMP()
 
 void UAPPassiveComponent::UpdateCriticalPercent()
 {
-	auto CriticalPercent = Status_Init.PlayerDynamicData.CriticalPercent;
-	auto CriticalDamageCoefficient = Status_Init.PlayerDynamicData.CriticalDamageCoefficient;
+	auto CriticalPercent = Status_Init.StatusData.CriticalPercent;
+	auto CriticalDamageCoefficient = Status_Init.StatusData.CriticalDamageCoefficient;
 
 	float CriticalPercentPlus = 2.0f; 	// 기본 증가 // 하드코딩
 	float CriticalDamagePlus = 0.0f;
@@ -555,7 +555,7 @@ void UAPPassiveComponent::UpdateCriticalPercent()
 
 void UAPPassiveComponent::UpdateDEF()
 {
-	auto DEF = Status_Init.PlayerDynamicData.DEF;
+	auto DEF = Status_Init.StatusData.DEF;
 
 	float DEFPlus = 5.0f; // 기본 증가 // 하드코딩
 	float DEFCoeff = 0.0f;
