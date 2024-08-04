@@ -14,6 +14,7 @@ class ARCANEPUNK_API AArcanePunkPlayerState : public APlayerState
 	GENERATED_BODY()
 public:
 	AArcanePunkPlayerState();
+
 	void SavePlayerData();
 	void InitPlayerData();
 	void UpdatePlayerData(FPlayerTotalData& PS);
@@ -22,5 +23,5 @@ public:
 public:
 	UPROPERTY(Transient, BlueprintReadWrite)
 	FPlayerTotalData PlayerTotalStatus = {};
-	
+
 };

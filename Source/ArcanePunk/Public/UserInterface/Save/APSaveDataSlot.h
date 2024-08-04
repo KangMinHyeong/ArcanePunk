@@ -63,7 +63,16 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TEXT_Minutes;
 
-	FString SlotName = "No Data";
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Slot;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_PlayTime;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Hour;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Minute;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Second;
 
 	FString PlayerSlotName = TEXT("PlayerSlot_1");
 	FString DefaultPlayerSlot = TEXT("PlayerSlot_0");
@@ -76,4 +85,5 @@ private:
 	UTexture2D* TabImage_OFF;
 
 	bool bSavingData = false;
+
 };

@@ -24,6 +24,9 @@ void UAPEnhanceChoice::NativeConstruct()
     // InitSuffle();
     SetPauseGame();
 
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
+    APGI->SetTextBlock(Text_CurrentReroll, EStringRowName::CurrentReroll); 
+    APGI->SetTextBlock(Text_Count, EStringRowName::Count); 
 }
 
 void UAPEnhanceChoice::SetPauseGame()
@@ -89,17 +92,17 @@ void UAPEnhanceChoice::InitTypeSetting()
     
     if(EnHanceType == EEnHanceType::Silver) 
     {
-        EnHanceType_Text->SetText(FText::FromName(TEXT_Silver));
+        APGI->SetTextBlock(EnHanceType_Text, EStringRowName::Tier_3);
         ChoiceBorder->SetBrushColor(SilverColor);
     }
     else if(EnHanceType == EEnHanceType::Gold) 
     {
-        EnHanceType_Text->SetText(FText::FromName(TEXT_Gold));
+        APGI->SetTextBlock(EnHanceType_Text, EStringRowName::Tier_2);
         ChoiceBorder->SetBrushColor(GoldColor);
     }
     else 
     {
-        EnHanceType_Text->SetText(FText::FromName(TEXT_Platinum));
+        APGI->SetTextBlock(EnHanceType_Text, EStringRowName::Tier_1);
         ChoiceBorder->SetBrushColor(PlatinumColor);
     }
     
@@ -116,41 +119,25 @@ void UAPEnhanceChoice::SetAbility()
     {
         case EEnhanceCategory::Enhance_Q:
         SkillNumber = (uint8)OwnerCharacter->GetQSkill();
-        EnHanceCategory_Text->SetText(FText::FromString(QSkillText));
         SkillAbilityNestingData = OwnerCharacter->GetQSkillNumber()->GetSkillAbilityNestingData();
         break;
 
         case EEnhanceCategory::Enhance_E:
         SkillNumber = (uint8)OwnerCharacter->GetESkill();
-        // OriginSkillAbilityList = OwnerCharacter->GetAbilitySkillE();
-        EnHanceCategory_Text->SetText(FText::FromString(ESkillText));
         SkillAbilityNestingData = OwnerCharacter->GetESkillNumber()->GetSkillAbilityNestingData();
 
         break;
         case EEnhanceCategory::Enhance_R:
         SkillNumber = (uint8)OwnerCharacter->GetRSkill();
-        EnHanceCategory_Text->SetText(FText::FromString(RSkillText));
-        // SkillAbilityNestingData = OwnerCharacter->GetRSkillNumber()->SkillAbilityNestingData;
         SkillAbilityNestingData = OwnerCharacter->GetRSkillNumber()->GetSkillAbilityNestingData();
         break;
 
         case EEnhanceCategory::Enhance_Passive:
-        EnHanceCategory_Text->SetText(FText::FromString(PassiveSkillText));
         PassiveNestingData = OwnerCharacter->GetPassiveSkills();
         break;
-
-        // case EEnhanceCategory::Enhance_Dash:
-        // EnHanceCategory_Text->SetText(FText::FromString("Dash Skill Enhance"));
-        // break;
-
-        // case EEnhanceCategory::Enhance_LeftMouse:
-        // EnHanceCategory_Text->SetText(FText::FromString("LeftMouse Attack Enhance"));
-        // break;
-
-        // case EEnhanceCategory::Enhance_RightMouse:
-        // EnHanceCategory_Text->SetText(FText::FromString("RightMouse Attack Enhance"));
-        // break;
     }
+
+    APGI->SetTextBlock(EnHanceCategory_Text, EStringRowName::Message_EnhanceChoice);
     EnhanceListing();
 }
 

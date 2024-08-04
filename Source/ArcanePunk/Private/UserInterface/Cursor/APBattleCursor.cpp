@@ -47,6 +47,6 @@ void UAPBattleCursor::CheckCursorUnder()
     else{Angle = 180.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Atan(X/Y));}
     
 
-    MainPanel->SetRenderTransformAngle(Angle);
+    // MainPanel->SetRenderTransformAngle(Angle);
     PC->MousePositionAngle = Angle;
 }

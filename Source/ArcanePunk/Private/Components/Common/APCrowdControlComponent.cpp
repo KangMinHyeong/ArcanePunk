@@ -35,9 +35,9 @@ void UAPCrowdControlComponent::UpdateStatus()
 {
 	auto Owner = Cast<AAPCharacterBase>(GetOwner()); if(!Owner) return;
 	auto PD = Owner->GetPlayerStatus_Origin(); 
-	PD.PlayerDynamicData.MoveSpeed = PD.PlayerDynamicData.MoveSpeed * CurrentSlowCoefficient * CurrentFastCoefficient;
-	Owner->GetCharacterMovement()->MaxWalkSpeed = PD.PlayerDynamicData.MoveSpeed;
-	Owner->SetDefaultSpeed(PD.PlayerDynamicData.MoveSpeed);
+	PD.StatusData.MoveSpeed = PD.StatusData.MoveSpeed * CurrentSlowCoefficient * CurrentFastCoefficient;
+	Owner->GetCharacterMovement()->MaxWalkSpeed = PD.StatusData.MoveSpeed;
+	Owner->SetDefaultSpeed(PD.StatusData.MoveSpeed);
 	Owner->UpdateStatus();
 }
 

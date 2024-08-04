@@ -140,7 +140,7 @@ void AEnemy_Boss::OnPillarAttackMontageEnd()
 {
     Monster_AttackRadius /= PillarRangeCoefficient;
     Monster_AttackRange /= PillarRangeCoefficient;
-    MyPlayerTotalStatus.PlayerDynamicData.ATK /= 1.5f;
+    TotalStatus.StatusData.ATK /= 1.5f;
 }
 // Montage Bind Func End
 
@@ -149,14 +149,14 @@ void AEnemy_Boss::RushAttackStart()
 {
     GetWorldTimerManager().SetTimer(RushAttackTimerHandle, this, &AEnemy_Boss::RushAttackEnd, RushAttackTime, false);
     bRushAttack = true; SetActorTickEnabled(true);
-    GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed*2.0f;
+    GetCharacterMovement()->MaxWalkSpeed = TotalStatus.StatusData.MoveSpeed*2.0f;
     if(PatternMaterial.Num() >= 5) GetMesh()->SetMaterial(0,PatternMaterial.Last(4)); // 후에 수정
 }
 
 void AEnemy_Boss::RushAttackEnd()
 {
     bRushAttack = false; SetActorTickEnabled(false);
-    GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
+    GetCharacterMovement()->MaxWalkSpeed = TotalStatus.StatusData.MoveSpeed;
     ResetDefaultMaterial();
 	RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetWorldTimerManager().ClearTimer(RushAttackTimerHandle);
@@ -186,7 +186,7 @@ void AEnemy_Boss::ActiveRushTrigger(UPrimitiveComponent *OverlappedComp, AActor 
 	if (OtherActor && OtherActor != this)
 	{
         DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
-		UGameplayStatics::ApplyDamage(OtherActor, MyPlayerTotalStatus.PlayerDynamicData.ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
+		UGameplayStatics::ApplyDamage(OtherActor, TotalStatus.StatusData.ATK * RushCoefficient, MyOwnerInstigator, this, DamageTypeClass);
         OnPlayerKnockBack(OtherActor, KnockBackDist, RushKnockBackTime);
 	}
     RushAttackEnd();
@@ -247,8 +247,8 @@ void AEnemy_Boss::DrainMonster()
         if(!MonsterArr.Top()->IsDead())
         {
             MonsterArr.Top()->Destroy();
-            MyPlayerTotalStatus.PlayerDynamicData.HP = FMath::Min(MyPlayerTotalStatus.PlayerDynamicData.MaxHP, MyPlayerTotalStatus.PlayerDynamicData.HP+100.0f);
-            UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), MyPlayerTotalStatus.PlayerDynamicData.HP);
+            TotalStatus.StatusData.HP = FMath::Min(TotalStatus.StatusData.MaxHP, TotalStatus.StatusData.HP+100.0f);
+            UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), TotalStatus.StatusData.HP);
             OnEnemyHPChanged.Broadcast();
         }
         MonsterArr.Pop();
@@ -304,7 +304,7 @@ void AEnemy_Boss::SpawnRangeAttack_1()
         {
             if(AActor* Actor = HitResult.GetActor())
             {
-                float Damage= MyPlayerTotalStatus.PlayerDynamicData.ATK * RangeAttack_1_Coefficient;
+                float Damage= TotalStatus.StatusData.ATK * RangeAttack_1_Coefficient;
                 FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
                 AController* MyController = Cast<AController>(GetController());
                 if(MyController == nullptr) return;
@@ -378,7 +378,7 @@ void AEnemy_Boss::OnPillarWeapon()
 
 void AEnemy_Boss::OnPillarCombo()
 {
-    MyPlayerTotalStatus.PlayerDynamicData.ATK *= 1.5f;
+    TotalStatus.StatusData.ATK *= 1.5f;
     Monster_AttackRadius *= PillarRangeCoefficient;
     Monster_AttackRange *= PillarRangeCoefficient;
     if(!OwnerAnim.IsValid()) return;

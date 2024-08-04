@@ -37,8 +37,8 @@ void ATerminator::ATKSpeedBuff(float DeltaTime)
     if(!OwnerCharacter.IsValid()) return;
     CurrentATKSpeedCoefficient = FMath::FInterpConstantTo(CurrentATKSpeedCoefficient, 1.0f, DeltaTime, BuffEndSpeed);
     auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
-	PD.PlayerDynamicData.ATKSpeed = PD.PlayerDynamicData.ATKSpeed * OwnerCharacter->GetBuffComp()->GetCurrentATKSpeedCoefficient() * CurrentATKSpeedCoefficient;
-    OwnerCharacter->SetDefaultATKSpeed(PD.PlayerDynamicData.ATKSpeed);
+	PD.StatusData.ATKSpeed = PD.StatusData.ATKSpeed * OwnerCharacter->GetBuffComp()->GetCurrentATKSpeedCoefficient() * CurrentATKSpeedCoefficient;
+    OwnerCharacter->SetDefaultATKSpeed(PD.StatusData.ATKSpeed);
 
     if(abs(CurrentATKSpeedCoefficient - 1.0f) <= KINDA_SMALL_NUMBER) {bComplete = true;}
     else {bComplete = false;}
@@ -49,8 +49,8 @@ void ATerminator::ATKBuff(float DeltaTime)
     if(!OwnerCharacter.IsValid()) return;
     CurrentATKCoefficient = FMath::FInterpConstantTo(CurrentATKCoefficient, 1.0f, DeltaTime, BuffEndSpeed);
     auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
-	PD.PlayerDynamicData.ATK = PD.PlayerDynamicData.ATK * OwnerCharacter->GetBuffComp()->GetCurrentATKCoefficient() * CurrentATKCoefficient;
-    OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK);
+	PD.StatusData.ATK = PD.StatusData.ATK * OwnerCharacter->GetBuffComp()->GetCurrentATKCoefficient() * CurrentATKCoefficient;
+    OwnerCharacter->SetDefaultATK(PD.StatusData.ATK);
 
     if(abs(CurrentATKCoefficient - 1.0f) <= KINDA_SMALL_NUMBER)  {bComplete = true;}
     else {bComplete = false;}
@@ -93,11 +93,11 @@ void ATerminator::SetTerminatorMode()
 void ATerminator::ResettTerminatorMode()
 {
     auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
-	PD.PlayerDynamicData.ATKSpeed = PD.PlayerDynamicData.ATKSpeed * OwnerCharacter->GetBuffComp()->GetCurrentATKSpeedCoefficient();
-    OwnerCharacter->SetDefaultATKSpeed(PD.PlayerDynamicData.ATKSpeed);
+	PD.StatusData.ATKSpeed = PD.StatusData.ATKSpeed * OwnerCharacter->GetBuffComp()->GetCurrentATKSpeedCoefficient();
+    OwnerCharacter->SetDefaultATKSpeed(PD.StatusData.ATKSpeed);
 
-    PD.PlayerDynamicData.ATK = PD.PlayerDynamicData.ATK * OwnerCharacter->GetBuffComp()->GetCurrentATKCoefficient();
-    OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK);
+    PD.StatusData.ATK = PD.StatusData.ATK * OwnerCharacter->GetBuffComp()->GetCurrentATKCoefficient();
+    OwnerCharacter->SetDefaultATK(PD.StatusData.ATK);
 
     OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = OwnerCharacter->GetDefaultSpeed_Origin() * OwnerCharacter->GetCrowdControlComp()->GetCurrentSlowCoefficient() * OwnerCharacter->GetCrowdControlComp()->GetCurrentFastCoefficient();
     OwnerCharacter->SetDefaultSpeed( OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed );

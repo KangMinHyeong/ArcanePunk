@@ -13,7 +13,9 @@
 		"typescript.tsc.autoDetect": "off",
 		"npm.autoDetect": "off",
 		"files.associations": {
-			"*.rh": "cpp"
+			"*.rh": "cpp",
+			"xiosbase": "cpp",
+			"cmath": "cpp"
 		}
 	},
 	"extensions": {

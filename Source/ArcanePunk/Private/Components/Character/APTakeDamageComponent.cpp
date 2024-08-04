@@ -42,15 +42,15 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 
 	auto PD = OwnerCharacter->GetPlayerStatus();
 
-	DamageApplied = FMath::Min(PD.PlayerDynamicData.HP, DamageApplied);
+	DamageApplied = FMath::Min(PD.StatusData.HP, DamageApplied);
 
-	if(DamageApplied >= PD.PlayerDynamicData.HP && OwnerCharacter->GetRageMode()) { PD.PlayerDynamicData.HP = 1.0f;}
+	if(DamageApplied >= PD.StatusData.HP && OwnerCharacter->GetRageMode()) { PD.StatusData.HP = 1.0f;}
 	else
 	{
-		PD.PlayerDynamicData.HP = PD.PlayerDynamicData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.PlayerDynamicData.DEF)));
+		PD.StatusData.HP = PD.StatusData.HP - (DamageApplied * Defense_constant * (1/(Defense_constant + PD.StatusData.DEF)));
 	}
-	OwnerCharacter->SetDefaultHP(PD.PlayerDynamicData.HP); 
-	OwnerCharacter->SetDefaultHP_Origin(PD.PlayerDynamicData.HP); 
+	OwnerCharacter->SetDefaultHP(PD.StatusData.HP); 
+	OwnerCharacter->SetDefaultHP_Origin(PD.StatusData.HP); 
 
 	if(OwnerCharacter->IsDead())
 	{
@@ -72,7 +72,7 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 		OwnerCharacter->SetHitting(true);
 		AArcanePunkPlayerController* MyController = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
 		if(MyController) MyController->HitUI();
-		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.HP);
+		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), OwnerCharacter->GetPlayerStatus().StatusData.HP);
 	}
 }
 

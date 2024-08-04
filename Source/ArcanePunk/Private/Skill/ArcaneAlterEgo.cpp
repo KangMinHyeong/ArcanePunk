@@ -67,11 +67,11 @@ float AArcaneAlterEgo::TakeDamage(float DamageAmount, FDamageEvent const &Damage
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if(IsDead()) return 0.0f;
-	float HP = MyPlayerTotalStatus.PlayerDynamicData.HP;
+	float HP = TotalStatus.StatusData.HP;
 	DamageApplied = FMath::Min(HP, DamageApplied);
 	
-	HP = HP - DamageApplied * Defense_constant * (1/(Defense_constant + MyPlayerTotalStatus.PlayerDynamicData.DEF));
-	MyPlayerTotalStatus.PlayerDynamicData.HP = HP;
+	HP = HP - DamageApplied * Defense_constant * (1/(Defense_constant + TotalStatus.StatusData.DEF));
+	TotalStatus.StatusData.HP = HP;
 	UE_LOG(LogTemp, Display, TEXT("Ego HP : %f"), HP);
 	OnEgoHPChanged.Broadcast();
 	//GetWorldTimerManager().SetTimer(HitTimerHandle, this, &ABossMonster_Stage1::CanBeDamagedInit, bGodModeTime, false);
@@ -94,7 +94,7 @@ float AArcaneAlterEgo::TakeDamage(float DamageAmount, FDamageEvent const &Damage
 	}
 
 	
-	if(HPUI.IsValid()) HPUI->UpdatingMaxHPAndHP(MyPlayerTotalStatus.PlayerDynamicData.MaxHP, MyPlayerTotalStatus.PlayerDynamicData.HP);
+	if(HPUI.IsValid()) HPUI->UpdatingMaxHPAndHP(TotalStatus.StatusData.MaxHP, TotalStatus.StatusData.HP);
 
 	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DamagedEffect, GetActorLocation() + GetActorUpVector() * 20.0f, GetActorRotation(), DamagedScale);
 
@@ -129,10 +129,10 @@ void AArcaneAlterEgo::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData,
 	OwnerCharacter->OnAltRightMouseClick.AddDynamic(this, &AArcaneAlterEgo::MoveToMouseClick);
 	OwnerCharacter->OnComboAttackStart.AddDynamic(this, &AArcaneAlterEgo::CopyAttack);
 
-	MyPlayerTotalStatus = OwnerCharacter->GetPlayerStatus(); // 후에 조정
+	TotalStatus = OwnerCharacter->GetPlayerStatus(); // 후에 조정
 
 	HPUI = Cast<UAPHPWidgetComponent>(HealthWidgetComp->GetUserWidgetObject());
-	if(HPUI.IsValid()) HPUI->InitMaxHPAndHP(MyPlayerTotalStatus.PlayerDynamicData.MaxHP, MyPlayerTotalStatus.PlayerDynamicData.HP);
+	if(HPUI.IsValid()) HPUI->InitMaxHPAndHP(TotalStatus.StatusData.MaxHP, TotalStatus.StatusData.HP);
 	
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &AArcaneAlterEgo::StunExplosion, DestroyTime, false);
 }

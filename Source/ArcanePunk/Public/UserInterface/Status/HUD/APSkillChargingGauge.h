@@ -7,6 +7,7 @@
 #include "APSkillChargingGauge.generated.h"
 
 class UProgressBar;
+class UTextBlock;
 
 UCLASS()
 class ARCANEPUNK_API UAPSkillChargingGauge : public UUserWidget
@@ -21,4 +22,10 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UProgressBar* ChargingGauge;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_Charging;
+
+	UPROPERTY(EditAnywhere)
+	FName Charging = TEXT("Charging");
+	
 };

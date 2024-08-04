@@ -83,6 +83,9 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_Screen;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_SettingTitle;
+
 	UPROPERTY(EditAnywhere)
 	FLinearColor OnColor;
 	UPROPERTY(EditAnywhere)

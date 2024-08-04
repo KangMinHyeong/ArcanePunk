@@ -13,7 +13,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAltRightMouseClick, FVector, Clic
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboAttackStart, uint8, ComboStack);
 
 //Minhyeong
-class UDataTable;
 class UParticleSystem;
 class UAPSkillHubComponent;
 class UAPTakeDamageComponent;

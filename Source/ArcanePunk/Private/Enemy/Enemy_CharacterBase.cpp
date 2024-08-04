@@ -56,11 +56,11 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
+	TotalStatus = TotalStatus_Origin;
 	SetActorTickEnabled(false);
 	InitMonster();	
 	BindMontageEnded();
-	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = TotalStatus.StatusData.MoveSpeed;
 	Monster_AttackRange_Plus += Monster_AttackRange;
 
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
@@ -156,12 +156,12 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	if(IsDead()) return 0.0f;
 	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
 
-	float HP = MyPlayerTotalStatus.PlayerDynamicData.HP;
+	float HP = TotalStatus.StatusData.HP;
 	DamageApplied = DamageApplied * DamageMultiple;
 	DamageApplied = FMath::Min(HP, DamageApplied);
 	
 	HP = HP - DamageMath(DamageApplied);
-	MyPlayerTotalStatus.PlayerDynamicData.HP = HP;
+	TotalStatus.StatusData.HP = HP;
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
 	
@@ -244,7 +244,7 @@ void AEnemy_CharacterBase::SpawnDetectRender()
 
 float AEnemy_CharacterBase::DamageMath(float Damage)
 {
-    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerTotalStatus.PlayerDynamicData.DEF));
+    return Damage * Defense_constant * (1/(Defense_constant + TotalStatus.StatusData.DEF));
 }
 
 bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom, float Radius, FVector CustomStart, FVector CustomEnd)
@@ -307,7 +307,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 
 void AEnemy_CharacterBase::NormalAttack()
 {
-	float Damage = MyPlayerTotalStatus.PlayerDynamicData.ATK * CriticalCalculate();
+	float Damage = TotalStatus.StatusData.ATK * CriticalCalculate();
 	FHitResult HitResult;
 	FVector HitVector;
 	if(AttackTrace(HitResult, HitVector))
@@ -345,7 +345,7 @@ void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float D
 void AEnemy_CharacterBase::InitMonster()
 {
 	// Status Init
-	MyPlayerTotalStatus.PlayerDynamicData.HP = MyPlayerTotalStatus.PlayerDynamicData.MaxHP;
+	TotalStatus.StatusData.HP = TotalStatus.StatusData.MaxHP;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	// Mesh Init
@@ -356,6 +356,10 @@ void AEnemy_CharacterBase::InitMonster()
 		SkinMesh.Emplace(NewMesh); GetMesh()->SetMaterial(i, NewMesh);
 		i++;
 	}
+
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    auto DataTable = GI->GetNPCData()->FindRow<FNPCData>(CharacterName, CharacterName.ToString()); 
+    if(DataTable) NPCData = * DataTable; 
 
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }

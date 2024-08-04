@@ -14,6 +14,7 @@ class ARCANEPUNK_API UEnhanceGauge : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeConstruct() override;
 	void DisplayEnhanceGauge(int32 TargetNum, int32 MaxNum);
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -37,6 +38,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* Max_Text;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_MaxEnhance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bTickable = false;

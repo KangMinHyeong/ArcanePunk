@@ -41,7 +41,7 @@ FReply UAPConversationUI::NativeOnKeyDown( const FGeometry& InGeometry, const FK
 	return Reply.Handled();
 }
 
-void UAPConversationUI::InitOrder(FName Name) // FName Name, uint8 State
+void UAPConversationUI::InitOrder(FName Name)
 {
     RowName = Name; SetOrder();
 }
@@ -56,7 +56,7 @@ void UAPConversationUI::SetOrder()
     else
     {
         auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-        auto DataTable = APGI->GetContentTextData()->FindRow<FContentTextDataTable>(RowName, RowName.ToString()); 
+        auto DataTable = APGI->GetSequenceStringData()->FindRow<FSequenceStringDataTable>(RowName, RowName.ToString()); if(!DataTable) return;
         RowName = DataTable->NextRowName;
         ConversationText->SetConversation(DataTable);
     }

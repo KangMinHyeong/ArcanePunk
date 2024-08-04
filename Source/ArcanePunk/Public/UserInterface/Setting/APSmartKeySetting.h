@@ -71,6 +71,16 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* SmartKeyR_Text_Off;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Q;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_E;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_R;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Init; 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Apply; 
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Apply_Button;

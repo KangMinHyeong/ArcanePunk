@@ -89,6 +89,21 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* Image_ColorSymbol;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Saturation;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Contrast;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Gamma;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Gain;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Offset;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Init;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* TextBlock_Apply;
+
 	float Saturation = 0.5f;
 	float Contrast = 0.5f;
 	float Gamma = 0.5f;

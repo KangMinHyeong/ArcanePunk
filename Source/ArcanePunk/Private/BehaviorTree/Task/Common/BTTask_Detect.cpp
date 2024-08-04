@@ -30,6 +30,7 @@ EBTNodeResult::Type UBTTask_Detect::ExecuteTask(UBehaviorTreeComponent &OwnerCom
         CalculateWaitTime_Montage(EnemyAnim->Detect_Montage);
     }
     
+    Enemy->GetMesh()->SetCanEverAffectNavigation(false);
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     return EBTNodeResult::InProgress;

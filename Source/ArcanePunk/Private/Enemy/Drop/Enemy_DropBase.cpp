@@ -15,13 +15,13 @@ AEnemy_DropBase::AEnemy_DropBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	InteractTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("InteractTrigger"));
+	InteractionTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("InteractionTrigger"));
 	DropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DropMesh"));
 	DropTrailEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DropTrailEffect"));
 	GroundTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("GroundTrigger"));
 
 	SetRootComponent(DropMesh);
-	InteractTrigger->SetupAttachment(DropMesh);
+	InteractionTrigger->SetupAttachment(DropMesh);
 	DropTrailEffect->SetupAttachment(DropMesh);
 	GroundTrigger->SetupAttachment(DropMesh);
 

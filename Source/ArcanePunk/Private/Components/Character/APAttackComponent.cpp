@@ -148,7 +148,7 @@ void UAPAttackComponent::SpawnSwordTrail(uint8 ComboStack)
 	}
 	FVector PlusLoc = SwordTrailHeight.X * OwnerCharacter->GetActorForwardVector() + OwnerCharacter->GetActorUpVector()*SwordTrailHeight.Z;
 	auto SwordTrail = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SwordTrailEffect, OwnerCharacter->GetActorLocation() + PlusLoc, OwnerCharacter->GetActorRotation() + PlusRot);
-	SwordTrail->SetVariableFloat(TEXT("AttackSpeed"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+	SwordTrail->SetVariableFloat(TEXT("AttackSpeed"), OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
 }
 
 //AttackTrace 코드 시작
@@ -702,17 +702,17 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 
 	float DrainCoeff = Coeff;
 
-	auto PDD = OwnerPlayer->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
+	auto PDD = OwnerPlayer->GetPlayerStatus(); float OriginHP = PDD.StatusData.HP;
     
 	if(Enemy->IsInDrainField() && OwnerPlayer->GetInArcaneTent())
 	{
 		DrainCoeff = DrainCoeff + FieldDrainCoefficient;
 	}
 
-	float HP = PDD.PlayerDynamicData.HP + DamageApplied * DrainCoeff; 
-    PDD.PlayerDynamicData.HP = FMath::Min(PDD.PlayerDynamicData.MaxHP, HP);
+	float HP = PDD.StatusData.HP + DamageApplied * DrainCoeff; 
+    PDD.StatusData.HP = FMath::Min(PDD.StatusData.MaxHP, HP);
 	
-	OwnerPlayer->SetDefaultHP(PDD.PlayerDynamicData.HP); 
+	OwnerPlayer->SetDefaultHP(PDD.StatusData.HP); 
 	OwnerPlayer->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 
 }

@@ -134,6 +134,9 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
+	FNPCData NPCData;
+
+	UPROPERTY(EditAnywhere, Category = "Status")
 	UWidgetComponent* HealthWidgetComp;
 
 	UPROPERTY(EditAnywhere, Category = "Status")

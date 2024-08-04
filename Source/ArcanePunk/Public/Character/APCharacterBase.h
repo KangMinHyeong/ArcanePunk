@@ -33,6 +33,7 @@ class ARCANEPUNK_API AAPCharacterBase : public ACharacter
 
 public:
 	AAPCharacterBase();
+	virtual void PostInitializeComponents() override; 
 
 protected:
 	virtual void BeginPlay() override;
@@ -70,44 +71,44 @@ public:
 	FORCEINLINE bool GetDoing() const {return bDoing;}; // bDoing 반환
 
 	//플레이어 스테이터스 관련 함수
-	FORCEINLINE FPlayerTotalData GetPlayerStatus_Origin() const {return MyPlayerTotalStatus_Origin;}; // MyPlayerTotalStatus 반환
-	FORCEINLINE void SetPlayerStatus_Origin(FPlayerTotalData NewPlayerData) {MyPlayerTotalStatus_Origin = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
-	FORCEINLINE FPlayerTotalData GetPlayerStatus() const {return MyPlayerTotalStatus;}; // MyPlayerTotalStatus 반환
-	FORCEINLINE void SetPlayerStatus(FPlayerTotalData NewPlayerData) {MyPlayerTotalStatus = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
+	FORCEINLINE FPlayerTotalData GetPlayerStatus_Origin() const {return TotalStatus_Origin;}; // MyPlayerTotalStatus 반환
+	FORCEINLINE void SetPlayerStatus_Origin(FPlayerTotalData NewPlayerData) {TotalStatus_Origin = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
+	FORCEINLINE FPlayerTotalData GetPlayerStatus() const {return TotalStatus;}; // MyPlayerTotalStatus 반환
+	FORCEINLINE void SetPlayerStatus(FPlayerTotalData NewPlayerData) {TotalStatus = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
 
-	FORCEINLINE float GetDefaultMaxHP_Origin() const {return MyPlayerTotalStatus_Origin.PlayerDynamicData.MaxHP;}; // DefaultSpeed 반환;
-	FORCEINLINE float GetDefaultHP_Origin() const {return MyPlayerTotalStatus_Origin.PlayerDynamicData.HP;}; // DefaultSpeed 반환;
-	FORCEINLINE float GetDefaultSpeed_Origin() const {return MyPlayerTotalStatus_Origin.PlayerDynamicData.MoveSpeed;}; // DefaultSpeed 반환;
-	FORCEINLINE float GetDefaultATK_Origin() const {return MyPlayerTotalStatus_Origin.PlayerDynamicData.ATK;};
+	FORCEINLINE float GetDefaultMaxHP_Origin() const {return TotalStatus_Origin.StatusData.MaxHP;}; // DefaultSpeed 반환;
+	FORCEINLINE float GetDefaultHP_Origin() const {return TotalStatus_Origin.StatusData.HP;}; // DefaultSpeed 반환;
+	FORCEINLINE float GetDefaultSpeed_Origin() const {return TotalStatus_Origin.StatusData.MoveSpeed;}; // DefaultSpeed 반환;
+	FORCEINLINE float GetDefaultATK_Origin() const {return TotalStatus_Origin.StatusData.ATK;};
 
-	FORCEINLINE float GetDefaultMaxHP() const {return MyPlayerTotalStatus.PlayerDynamicData.MaxHP;}; // DefaultSpeed 반환;
-	FORCEINLINE float GetDefaultHP() const {return MyPlayerTotalStatus.PlayerDynamicData.HP;}; // DefaultSpeed 반환;
-	FORCEINLINE float GetDefaultATK()  const {return MyPlayerTotalStatus.PlayerDynamicData.ATK;}; // DefaultATK 반환
-	FORCEINLINE int32 GetDefaultMP()  const {return MyPlayerTotalStatus.PlayerDynamicData.MP;}; // DefaultATK 반환
-	FORCEINLINE int32 GetDefaultMaxMP()  const {return MyPlayerTotalStatus.PlayerDynamicData.MaxMP;}; // DefaultATK 반환
-	virtual float GetCurrentATK() const {return MyPlayerTotalStatus.PlayerDynamicData.ATK;};
+	FORCEINLINE float GetDefaultMaxHP() const {return TotalStatus.StatusData.MaxHP;}; // DefaultSpeed 반환;
+	FORCEINLINE float GetDefaultHP() const {return TotalStatus.StatusData.HP;}; // DefaultSpeed 반환;
+	FORCEINLINE float GetDefaultATK()  const {return TotalStatus.StatusData.ATK;}; // DefaultATK 반환
+	FORCEINLINE int32 GetDefaultMP()  const {return TotalStatus.StatusData.MP;}; // DefaultATK 반환
+	FORCEINLINE int32 GetDefaultMaxMP()  const {return TotalStatus.StatusData.MaxMP;}; // DefaultATK 반환
+	virtual float GetCurrentATK() const {return TotalStatus.StatusData.ATK;};
 
-	FORCEINLINE void SetDefaultATK(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.ATK = NewValue; UpdateStatus();}; // DefaultATK 설정
-	FORCEINLINE void SetDefaultSpeed(float Speed) {MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed = Speed; UpdateStatus();}; // DefaultSpeed 설정;
-	FORCEINLINE void SetDefaultATKSpeed(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.ATKSpeed = NewValue; UpdateStatus();}; // DefaultATKSpeed 설정
-	FORCEINLINE void SetDefaultHP(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.HP = NewValue; UpdateStatus();}; // DefaultHP 설정
-	FORCEINLINE void SetDefaultMaxHP(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.MaxHP = NewValue; UpdateStatus();}; // DefaultMaxHP 설정
-	FORCEINLINE void SetDefaultMP(uint8 NewValue) {MyPlayerTotalStatus.PlayerDynamicData.MP = NewValue; UpdateStatus();}; // DefaultMP 설정
-	FORCEINLINE void SetDefaultCriticalPercent(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent = NewValue; UpdateStatus();}; // CriticalPercent 설정
-	FORCEINLINE void SetDefaultCriticalDamage(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.CriticalDamageCoefficient = NewValue; UpdateStatus();}; // CriticalDamageCoefficient 설정
-	FORCEINLINE void SetDefaultDEF(float NewValue) {MyPlayerTotalStatus.PlayerDynamicData.DEF = NewValue; UpdateStatus();}; // DefaultDEF 설정
+	FORCEINLINE void SetDefaultATK(float NewValue) {TotalStatus.StatusData.ATK = NewValue; UpdateStatus();}; // DefaultATK 설정
+	FORCEINLINE void SetDefaultSpeed(float Speed) {TotalStatus.StatusData.MoveSpeed = Speed; UpdateStatus();}; // DefaultSpeed 설정;
+	FORCEINLINE void SetDefaultATKSpeed(float NewValue) {TotalStatus.StatusData.ATKSpeed = NewValue; UpdateStatus();}; // DefaultATKSpeed 설정
+	FORCEINLINE void SetDefaultHP(float NewValue) {TotalStatus.StatusData.HP = NewValue; UpdateStatus();}; // DefaultHP 설정
+	FORCEINLINE void SetDefaultMaxHP(float NewValue) {TotalStatus.StatusData.MaxHP = NewValue; UpdateStatus();}; // DefaultMaxHP 설정
+	FORCEINLINE void SetDefaultMP(uint8 NewValue) {TotalStatus.StatusData.MP = NewValue; UpdateStatus();}; // DefaultMP 설정
+	FORCEINLINE void SetDefaultCriticalPercent(float NewValue) {TotalStatus.StatusData.CriticalPercent = NewValue; UpdateStatus();}; // CriticalPercent 설정
+	FORCEINLINE void SetDefaultCriticalDamage(float NewValue) {TotalStatus.StatusData.CriticalDamageCoefficient = NewValue; UpdateStatus();}; // CriticalDamageCoefficient 설정
+	FORCEINLINE void SetDefaultDEF(float NewValue) {TotalStatus.StatusData.DEF = NewValue; UpdateStatus();}; // DefaultDEF 설정
 	// FORCEINLINE void SetDefaultMaxMP(uint8 NewValue) {MyPlayerTotalStatus.PlayerDynamicData.MaxMP = NewValue; UpdateStatus();}; // DefaultMaxMP 설정
 
-	FORCEINLINE void SetDefaultATK_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.ATK = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultATK 설정
-	FORCEINLINE void SetDefaultSpeed_Origin(float Speed) {MyPlayerTotalStatus_Origin.PlayerDynamicData.MoveSpeed = Speed; OnUpdateOriginStatus.Broadcast();}; // DefaultSpeed 설정;
-	FORCEINLINE void SetDefaultATKSpeed_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.ATKSpeed = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultATKSpeed 설정
-	FORCEINLINE void SetDefaultHP_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.HP = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultHP 설정
-	FORCEINLINE void SetDefaultMaxHP_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.MaxHP = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultMaxHP 설정
-	FORCEINLINE void SetDefaultMP_Origin(uint8 NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.MP = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultMP 설정
-	FORCEINLINE void SetDefaultMaxMP_Origin(uint8 NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.MaxMP = NewValue;  UpdateStatus();}; // DefaultMaxMP 설정
-	FORCEINLINE void SetDefaultCriticalPercent_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.CriticalPercent = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultCriticalPercent 설정
-	FORCEINLINE void SetDefaultCriticalDamage_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.CriticalDamageCoefficient = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultCriticalDamageCoefficient 설정
-	FORCEINLINE void SetDefaultDEF_Origin(float NewValue) {MyPlayerTotalStatus_Origin.PlayerDynamicData.DEF = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultDEF 설정
+	FORCEINLINE void SetDefaultATK_Origin(float NewValue) {TotalStatus_Origin.StatusData.ATK = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultATK 설정
+	FORCEINLINE void SetDefaultSpeed_Origin(float Speed) {TotalStatus_Origin.StatusData.MoveSpeed = Speed; OnUpdateOriginStatus.Broadcast();}; // DefaultSpeed 설정;
+	FORCEINLINE void SetDefaultATKSpeed_Origin(float NewValue) {TotalStatus_Origin.StatusData.ATKSpeed = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultATKSpeed 설정
+	FORCEINLINE void SetDefaultHP_Origin(float NewValue) {TotalStatus_Origin.StatusData.HP = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultHP 설정
+	FORCEINLINE void SetDefaultMaxHP_Origin(float NewValue) {TotalStatus_Origin.StatusData.MaxHP = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultMaxHP 설정
+	FORCEINLINE void SetDefaultMP_Origin(uint8 NewValue) {TotalStatus_Origin.StatusData.MP = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultMP 설정
+	FORCEINLINE void SetDefaultMaxMP_Origin(uint8 NewValue) {TotalStatus_Origin.StatusData.MaxMP = NewValue;  UpdateStatus();}; // DefaultMaxMP 설정
+	FORCEINLINE void SetDefaultCriticalPercent_Origin(float NewValue) {TotalStatus_Origin.StatusData.CriticalPercent = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultCriticalPercent 설정
+	FORCEINLINE void SetDefaultCriticalDamage_Origin(float NewValue) {TotalStatus_Origin.StatusData.CriticalDamageCoefficient = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultCriticalDamageCoefficient 설정
+	FORCEINLINE void SetDefaultDEF_Origin(float NewValue) {TotalStatus_Origin.StatusData.DEF = NewValue; OnUpdateOriginStatus.Broadcast();}; // DefaultDEF 설정
 
 	virtual void UpdateStatus();
 
@@ -128,6 +129,9 @@ public:
 	void OnHittingEnd();
 
 protected:
+	UPROPERTY(EditAnywhere)
+	FName CharacterName = "";
+
 	//Component
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPCrowdControlComponent* CrowdControlComp;
@@ -169,9 +173,9 @@ protected:
 	bool bDoing = false; // 공격 , 스킬 사용중인지 체크하는 변수 / true면 다른 행동 제약 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FPlayerTotalData MyPlayerTotalStatus_Origin; // 오리지널 스테이터스 (영구적 증가)
+	FPlayerTotalData TotalStatus_Origin; // 오리지널 스테이터스 (영구적 증가)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FPlayerTotalData MyPlayerTotalStatus; // 현재 스테이터스 (일시적 증가) [ex - 장비, 버프 등] // 플레이아 캐릭터만 업데이트해서 사용
+	FPlayerTotalData TotalStatus; // 현재 스테이터스 (일시적 증가) [ex - 장비, 버프 등] // 플레이아 캐릭터만 업데이트해서 사용
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FGameData MyGameStatus;
 	
@@ -190,6 +194,8 @@ protected:
 	float HitMotionTime = 0.6f;
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	float HitMaterailTime = 0.4f;
+
+	
 
 public:
 	TArray<bool> StopState;

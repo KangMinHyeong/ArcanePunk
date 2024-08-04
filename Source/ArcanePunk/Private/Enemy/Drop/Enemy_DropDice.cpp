@@ -21,7 +21,7 @@ void AEnemy_DropDice::Tick(float DeltaTime)
 
 void AEnemy_DropDice::OnDropDice()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+    TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
 
     if(IsPendingKillPending() || !ItemReference) return;
 

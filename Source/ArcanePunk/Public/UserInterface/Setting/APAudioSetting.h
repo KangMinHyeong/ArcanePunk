@@ -9,6 +9,7 @@
 class UButton;
 class USlider;
 class UAPGameInstance;
+class UTextBlock;
 
 UCLASS()
 class ARCANEPUNK_API UAPAudioSetting : public UUserWidget
@@ -48,6 +49,18 @@ private:
 	USlider* Slider_BGM;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	USlider* Slider_Effect;
+
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Master;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_BGM;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Effect;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Init;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Apply;
 
 	float Master;
 	float BGM;

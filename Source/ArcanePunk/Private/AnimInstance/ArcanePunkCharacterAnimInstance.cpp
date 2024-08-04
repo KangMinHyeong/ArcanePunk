@@ -49,13 +49,13 @@ void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetAttackRotation();
-    Montage_Play(Attack_A_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+    Montage_Play(Attack_A_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Attack_B_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+    Montage_Play(Attack_B_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
 }
 
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
@@ -69,11 +69,11 @@ void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
     switch (NewSection)
     {
         case 2:
-        Montage_Play(Combo_2_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+        Montage_Play(Combo_2_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
         break;
 
         case 3:
-        Montage_Play(Combo_3_Montage, OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+        Montage_Play(Combo_3_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
         break;
     }
 	// Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);

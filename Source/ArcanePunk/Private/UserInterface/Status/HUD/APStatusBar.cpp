@@ -45,7 +45,7 @@ void UAPStatusBar::InitStatusBar()
     //     FSlateChildSize SlateChildSize = Slots->GetSize(); // SlateChildSize.SizeRule = ESlateSizeRule::Fill;
     //     Slots->SetSize(SlateChildSize);
     // }
-    AddMaxMP(PD.PlayerDynamicData.MaxMP);
+    AddMaxMP(PD.StatusData.MaxMP);
     // MPBar->SetPercent(PD.PlayerDynamicData.MP / PD.PlayerDynamicData.MaxMP);
 
     HUD->OnUpdateMaxHPBar.AddUObject(this, &UAPStatusBar::SetMaxHP);
@@ -115,7 +115,7 @@ void UAPStatusBar::UpdateMPBar(uint8 Number, bool bUse)
     {
         for(int32 i = 0; i<Number; i++)
         {
-            if(PD.PlayerDynamicData.MP > 0) {PD.PlayerDynamicData.MP--;}
+            if(PD.StatusData.MP > 0) {PD.StatusData.MP--;}
             else{break;}
 
             Remain_MPBars.Top()->FadeOut();
@@ -127,14 +127,14 @@ void UAPStatusBar::UpdateMPBar(uint8 Number, bool bUse)
     {
         for(int32 i = 0; i<Number; i++)
         {
-            if(PD.PlayerDynamicData.MP ==  PD.PlayerDynamicData.MaxMP) {break;}
-            else {PD.PlayerDynamicData.MP++;}
+            if(PD.StatusData.MP ==  PD.StatusData.MaxMP) {break;}
+            else {PD.StatusData.MP++;}
 
             Remain_MPBars.Add(MPSpaces[Remain_MPBars.Num()]);
             Remain_MPBars.Top()->FadeIn();
         }
     }
-    OwnerCharacter->SetDefaultMP(PD.PlayerDynamicData.MP);
+    OwnerCharacter->SetDefaultMP(PD.StatusData.MP);
 }
 
 void UAPStatusBar::IncreaseMaxMP(uint8 Number)
