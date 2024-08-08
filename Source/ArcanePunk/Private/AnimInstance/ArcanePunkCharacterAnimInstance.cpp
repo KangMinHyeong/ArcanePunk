@@ -7,7 +7,7 @@
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
 #include "Character/SkillRange/APSkillRange.h"
-#include "ArcanePunk/APGameModeBase.h"
+#include "GameMode/APGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
@@ -49,13 +49,22 @@ void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetAttackRotation();
-    Montage_Play(Attack_A_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+    // Montage_Play(Attack_A_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+    Montage_Play(Combo_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
 {
     if(IsDead) return;
     Montage_Play(Attack_B_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+}
+
+void UArcanePunkCharacterAnimInstance::StopComboAttack()
+{
+    if(IsDead) return;
+    if(!OwnerCharacter.IsValid()) return;
+    
+    Montage_Stop(0.1f, Combo_Montage);
 }
 
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
@@ -66,16 +75,16 @@ void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
     if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetAttackRotation();
 
-    switch (NewSection)
-    {
-        case 2:
-        Montage_Play(Combo_2_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
-        break;
+    // switch (NewSection)
+    // {
+    //     case 2:
+    //     Montage_Play(Combo_2_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+    //     break;
 
-        case 3:
-        Montage_Play(Combo_3_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
-        break;
-    }
+    //     case 3:
+    //     Montage_Play(Combo_3_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+    //     break;
+    // }
 	// Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
 }
 

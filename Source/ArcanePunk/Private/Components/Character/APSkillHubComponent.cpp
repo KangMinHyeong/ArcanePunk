@@ -1,7 +1,7 @@
 #include "Components/Character/APSkillHubComponent.h"
 
 #include "Character/ArcanePunkCharacter.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 
 UAPSkillHubComponent::UAPSkillHubComponent()

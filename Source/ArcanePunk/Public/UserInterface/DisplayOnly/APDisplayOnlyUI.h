@@ -15,6 +15,11 @@ class ARCANEPUNK_API UAPDisplayOnlyUI : public UUserWidget
 public:
 	virtual void NativeOnInitialized() override;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnEndedUIAnim();
+
+	virtual void OnEndedUIAnim_Implementation();
+
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_1;

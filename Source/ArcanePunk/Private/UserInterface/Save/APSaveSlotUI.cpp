@@ -20,6 +20,9 @@ void UAPSaveSlotUI::NativeConstruct()
 
     SetIsFocusable(true);
     SetKeyboardFocus();
+
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
+    if(GI) GI->PlayUIOpenSound();
 }
 
 FReply UAPSaveSlotUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)

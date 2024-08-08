@@ -101,6 +101,7 @@ private:
 
 	int32 CurrentCombo = 0;
 	int32 MaxCombo = 3;
+
 	int32 HitNum = 1;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")

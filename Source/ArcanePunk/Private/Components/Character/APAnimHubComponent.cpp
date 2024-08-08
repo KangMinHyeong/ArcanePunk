@@ -54,6 +54,7 @@ void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterr
 	if(Montage == OwnerAnim->Attack_A_Montage) OnAttack_A_MontageEnded();
 	else if(Montage == OwnerAnim->Combo_2_Montage) OnAttack_A_MontageEnded();
 	else if(Montage == OwnerAnim->Combo_3_Montage) OnAttack_A_MontageEnded();
+	else if(Montage == OwnerAnim->Combo_Montage) OnAttack_A_MontageEnded();
 	else if(Montage == OwnerAnim->Attack_B_Montage) OnAttack_B_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_1_Montage) OnSkill_1_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_2_Montage) OnSkill_2_MontageEnded();
@@ -94,7 +95,7 @@ void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
-	if(!OwnerAnim->CheckComboEnd()) return;
+	// if(!OwnerAnim->CheckComboEnd()) return;
 	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
 	OwnerCharacter->GetAttackComponent()->ComboAttackEnd();
 	OwnerCharacter->SetCanMove(true);

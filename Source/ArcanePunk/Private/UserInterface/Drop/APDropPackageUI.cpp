@@ -6,7 +6,7 @@
 #include "Components/Overlay.h"
 #include "Components/WrapBox.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "Components/Button.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 

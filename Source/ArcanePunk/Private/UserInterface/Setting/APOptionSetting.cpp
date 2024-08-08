@@ -26,6 +26,7 @@ void UAPOptionSetting::NativeConstruct()
     APGI->SetTextBlock(Text_Audio, EStringRowName::Setting_Audio);
     APGI->SetTextBlock(Text_SmartKey, EStringRowName::Setting_SmartKey);
     APGI->SetTextBlock(Text_Screen, EStringRowName::Setting_Screen);
+    APGI->PlayUIOpenSound();
 }
 
 FReply UAPOptionSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)

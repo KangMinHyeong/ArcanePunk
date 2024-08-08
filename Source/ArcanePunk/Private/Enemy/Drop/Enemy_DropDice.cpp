@@ -9,7 +9,7 @@ void AEnemy_DropDice::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
+	// InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
 }
 
 void AEnemy_DropDice::Tick(float DeltaTime)

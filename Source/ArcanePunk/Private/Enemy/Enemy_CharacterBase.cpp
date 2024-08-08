@@ -10,20 +10,20 @@
 #include "Components/TextRenderComponent.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "DamageText/DamageText.h"
+#include "GameElements/DamageText/DamageText.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameMode/APGameModeBattleStage.h"
-#include "Enemy/Drop/Enemy_DropPackage.h"
+#include "Enemy/Drop/Enemy_DropBase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "NavigationSystem.h"
@@ -177,7 +177,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		StunEffectComp->DestroyComponent();
 		TeleportMark->DeactivateImmediate();
 		EnemyAnim->PlayDeath_Montage();
-		ManaDropComp->SpawnManaDrop(DamageCauser);
+		DropChecking(DamageCauser);
 	}
 	else EnemyAnim->PlayHit_Montage();
 	
@@ -358,8 +358,9 @@ void AEnemy_CharacterBase::InitMonster()
 	}
 
 	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    auto DataTable = GI->GetNPCData()->FindRow<FNPCData>(CharacterName, CharacterName.ToString()); 
-    if(DataTable) NPCData = * DataTable; 
+    auto DataTable = GI->GetNPCData()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
+    if(DataTable) DropData = * DataTable; 
+	SetManaDrop();
 
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }
@@ -370,51 +371,36 @@ void AEnemy_CharacterBase::StopClear()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
-void AEnemy_CharacterBase::DropItemActor() 
+void AEnemy_CharacterBase::SetManaDrop()
+{
+	ManaDropComp->SetDropPercent(DropData.DropArcaneEnergy_Percent);
+	ManaDropComp->SetManaAmount(FMath::RandRange(DropData.DropArcaneEnergy_Min, DropData.DropArcaneEnergy_Max));
+}
+
+void AEnemy_CharacterBase::DropChecking(AActor *DamageCauser) 
 {
 	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-	auto PackageDrops = GI->GetPackageDropMap();
 
-	for(TPair<FName, float>& DropClass : PackageDrops)
+	float DropPercent = FMath::RandRange(0.0f, 100.0f);
+	if(DropPercent < DropData.DropGold_Percent)
 	{
-		float DropPercent = FMath::RandRange(0.0f,  100.0f);
-		if(DropClass.Key == "Enhance")
-		{
-			if(DropPercent <= DropClass.Value)
-			{
-				if(DropPackage.IsValid())
-				{
-					DropPackage->AddEnhance();
-				}
-				else
-				{
-					DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(GI->GetDropPackageClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-					DropPackage->AddEnhance();
-				}	
-			}
-			continue;
-		}
-
-		if(DropPercent <= DropClass.Value)
-		{
-			if(DropPackage.IsValid())
-			{
-				DropPackage->AddItem(DropClass.Key);
-			}
-			else
-			{
-				DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(GI->GetDropPackageClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-				DropPackage->AddItem(DropClass.Key);
-			}	
-		}
+		int32 Quantity = FMath::RandRange(DropData.DropGold_Min, DropData.DropGold_Max);
+		auto DropGold = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropGoldClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+		if(DropGold) DropGold->InitializePickup(DamageCauser, Quantity, true);
 	}
-	if(DropPackage.IsValid()) DropPackage->SetDropOverlap(true);
+
+	ManaDropComp->SpawnManaDrop(DamageCauser);
+	// DropPercent = FMath::RandRange(0.0f, 100.0f);
+	// if(DropPercent < DropData.DropDice_Percent)
+	// {
+	// 	int32 Quantity = FMath::RandRange(DropData.DropDice_Min, DropData.DropDice_Max);
+	// 	auto DropDice = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropDiceClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+	// 	DropDice->InitializePickup(UAPItemBase::StaticClass(), Quantity);
+	// }
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
-	if(OnDrop) DropItemActor();
-
 	Destroy();
 }
 

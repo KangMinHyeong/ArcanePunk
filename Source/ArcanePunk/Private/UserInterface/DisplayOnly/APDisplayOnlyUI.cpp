@@ -12,3 +12,7 @@ void UAPDisplayOnlyUI::NativeOnInitialized()
 
     APGI->SetTextBlock_Name(TextBlock_1, Text_1);
 }
+
+void UAPDisplayOnlyUI::OnEndedUIAnim_Implementation()
+{
+}

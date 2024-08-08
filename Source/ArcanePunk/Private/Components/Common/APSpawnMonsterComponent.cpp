@@ -1,7 +1,7 @@
 
 #include "Components/Common/APSpawnMonsterComponent.h"
 
-#include "SpawnPoint/APSpawnPointBase.h"
+#include "GameElements/SpawnPoint/APSpawnPointBase.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"

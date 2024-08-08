@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ArcanePunk/APGameModeBase.h"
+#include "GameMode/APGameModeBase.h"
 #include "APGameModeBattleStage.generated.h"
 
 class UDataTable;

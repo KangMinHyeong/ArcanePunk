@@ -2,7 +2,7 @@
 #include "Components/Character/SkillNumber/SkillNumber3.h"
 
 #include "Character/ArcanePunkCharacter.h"
-#include "SpawnPoint/APSpawnPointBase.h"
+#include "GameElements/SpawnPoint/APSpawnPointBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"

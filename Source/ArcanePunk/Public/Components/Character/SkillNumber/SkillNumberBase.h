@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Components/ActorComponent.h"
 #include "SkillNumberBase.generated.h"
@@ -45,7 +45,7 @@ public:
 	virtual void PlaySkill();
 	UFUNCTION()
 	virtual void Remove_Skill();	
-	
+	virtual void Remove_SkillRange();
 	virtual void RemoveEffect();
 
 	UFUNCTION()

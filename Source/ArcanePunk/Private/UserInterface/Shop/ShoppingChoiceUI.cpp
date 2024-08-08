@@ -7,9 +7,9 @@
 #include "Components/Button.h"
 #include "UserInterface/Shop/APShoppingUI.h"
 #include "Components/Character/APSkillHubComponent.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "Items/APItemBase.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Common/APCheckUI.h"
 
@@ -247,6 +247,7 @@ void UShoppingChoiceUI::OnValidating(ECheckType UpdateCheckType)
     auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")); if(!Item) {Shop->OnNotEnoughGold(); return;} // 골드 부족 UI
     if(Item->Quantity >= CurrentPrice)
     {
+        APGI->PlayChoiceSound();
         OwnerCharacter->GetInventory()->RemoveAmountOfItem(Item, CurrentPrice);
         if(APGI.IsValid()) APGI->OnGettingGold.Broadcast(-CurrentPrice);
     }

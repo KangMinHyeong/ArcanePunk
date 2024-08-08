@@ -33,7 +33,7 @@ void UUltSkillNumber_19::PlaySkill()
 
 	if(Skilling)
 	{
-		Remove_Skill();
+		Remove_SkillRange();
 	}
 	else
 	{

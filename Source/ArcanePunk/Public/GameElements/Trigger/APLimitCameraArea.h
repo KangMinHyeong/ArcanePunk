@@ -49,10 +49,10 @@ public:
 
 	FORCEINLINE void ResetInit() {X_Init = 0.0f; Y_Init = 0.0f;};
 
-private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* AreaTrigger;
-
+	
+private:
 	float X_Init = 0.0f;
 	float Y_Init = 0.0f;
 	

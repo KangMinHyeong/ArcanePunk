@@ -33,7 +33,7 @@ enum class EPenetrateType : uint8 // 관통 종류
 
 class AEnemy_CharacterBase;
 class USkillNumberBase;
-
+class USoundBase;
 UCLASS()
 class ARCANEPUNK_API AAPSkillActorBase : public AActor, public ISkillInterface
 {
@@ -68,6 +68,8 @@ public:
 	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	virtual void OnCharging();
 
+	void PlaySkillSound();
+
 	FORCEINLINE void SetbStun(bool NewBool) {bStun = NewBool;};
 	FORCEINLINE bool IsSkillTypeMaterial(ESkillTypeState SkillType) const {return SkillTypeMaterial.Contains(SkillType);};
 	FORCEINLINE UMaterial* GetSkillTypeMaterial(ESkillTypeState SkillType) const {return SkillTypeMaterial[SkillType];};
@@ -87,17 +89,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 5.0f;
 
-	// UPROPERTY()
-	// UAPSkillType* SkillTypeComp;
-
 	UPROPERTY(EditAnywhere)
 	UAPSkillAbility* SkillAbilityComponent;
 
 	UPROPERTY()
 	UAPHitPointComponent* HitPointComp;
 
-	// UPROPERTY()
-	// UAPGameInstance* APGI;
 	UPROPERTY(EditAnywhere)
 	int32 SlowPercent = 0;
 	
@@ -171,6 +168,13 @@ protected:
 	bool bPenetrate = false;
 	EPenetrateType PenetrateType = EPenetrateType::None;
 	
+	// Skill Sound
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* SkillSound;
+	
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	float StartTime = 0.0f;
+
 public:
 	float DefaultSize = 1.0f;
 };
