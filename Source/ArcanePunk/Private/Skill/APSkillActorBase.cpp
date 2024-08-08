@@ -24,7 +24,6 @@ void AAPSkillActorBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// APGI = Cast<UAPGameInstance>(GetGameInstance()); 
 	SetActorTickEnabled(false);
 	DefaultSize = GetActorScale3D().Y; 
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AAPSkillActorBase::DestroySKill, DestroyTime, false);
@@ -36,6 +35,13 @@ void AAPSkillActorBase::OnCharging()
     bCharging = true;
     SetActorTickEnabled(true);
     OwnerCharacter->GetAPHUD()->OnChargingEnd.Broadcast(true);
+}
+
+void AAPSkillActorBase::PlaySkillSound()
+{
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
+    if(SkillSound) UGameplayStatics::SpawnSoundAttached(SkillSound, GetRootComponent(), TEXT("SkillSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume, 1.0f, StartTime);
 }
 
 void AAPSkillActorBase::Tick(float DeltaTime)

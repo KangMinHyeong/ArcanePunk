@@ -21,7 +21,6 @@ void AEnemy_DropEquipMent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
 }
 
 void AEnemy_DropEquipMent::OnDropEquip()

@@ -2,7 +2,7 @@
 #include "Components/Common/APGhostTrailSpawnComponent.h"
 
 #include "Components/TimelineComponent.h"
-#include "GhostTrail/APGhostTrail.h"
+#include "GameElements/GhostTrail/APGhostTrail.h"
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"

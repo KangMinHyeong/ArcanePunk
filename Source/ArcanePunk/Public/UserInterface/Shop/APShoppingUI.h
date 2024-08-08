@@ -31,8 +31,9 @@ public:
 	void PurchaseEnhance(int32 ChoiceNumber, FShopGoodsData_Enhance EnhanceData, TPair<uint8, uint16> AbilityNestingNum);
 	void PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill NewSkillData);
 	
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnNotEnoughGold();
+	virtual void OnNotEnoughGold_Implementation();
 
 private:
 	void InitShoppingList();

@@ -161,6 +161,17 @@ void USkillNumberBase::Remove_Skill()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
 	
+	Remove_SkillRange();
+
+	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
+	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumberBase::Enhance);
+	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumberBase::DoubleEnhance);
+}
+
+void USkillNumberBase::Remove_SkillRange()
+{
+	if(!OwnerCharacter.IsValid()) return; if(!OwnerCharacterPC.IsValid()) return;
+	
 	SetComponentTickEnabled(false);
 
 	if(SkillRange_Target.IsValid()) SkillRange_Target->Destroy();
@@ -171,9 +182,6 @@ void USkillNumberBase::Remove_Skill()
 	CursorImmediately();
 	Skilling = false;
 
-	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &USkillNumberBase::Activate_Skill);
-	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &USkillNumberBase::Enhance);
-	OwnerCharacter->OnSkillEnhanceTrigger.RemoveDynamic(this, &USkillNumberBase::DoubleEnhance);
 	OwnerCharacter->OnLeftMouseClick.RemoveDynamic(this, &USkillNumberBase::OnSkill);
 }
 
@@ -249,11 +257,19 @@ void USkillNumberBase::OnCoolDown()
 
 bool USkillNumberBase::CheckSkillCondition()
 {
-	if(!OwnerCharacter.IsValid()) return false;
-	if(OwnerCharacter->GetDoing()) return false;
-	if(OwnerCharacter->GetPlayerStatus().StatusData.MP < MPConsumption || !CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return false;}
+	bool Check = true;
+	if(!OwnerCharacter.IsValid()) Check = false;
+	if(OwnerCharacter->GetDoing()) Check = false;
+	if(OwnerCharacter->GetPlayerStatus().StatusData.MP < MPConsumption || !CheckSkillCool(SkillKey)) {Check = false;}
 	
-    return true;
+	if(!Check)
+	{
+		OwnerCharacterPC->DisplayNotEnoughMPUI();
+		auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance());  
+    	if(APGI) APGI->PlayRejectSound();
+	}
+	
+    return Check;
 }
 
 bool USkillNumberBase::CheckSmartKey(ESkillKey WhichKey)

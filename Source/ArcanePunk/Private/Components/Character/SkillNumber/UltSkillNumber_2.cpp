@@ -6,7 +6,7 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/Common/APGhostTrailSpawnComponent.h"
-#include "GhostTrail/APGhostTrail.h"
+#include "GameElements/GhostTrail/APGhostTrail.h"
 #include "Character/SkillRange/APSkillRange.h"
 #include "Skill/TimeRewinder.h"
 #include "Components/Character/APSkillHubComponent.h"

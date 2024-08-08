@@ -18,6 +18,9 @@ void UAPConversationUI::NativeConstruct()
     Super::NativeConstruct();
     SetIsFocusable(true);
     SetKeyboardFocus();
+
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
+    if(GI) GI->PlayUIOpenSound();
 }
 
 FReply UAPConversationUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent) // 클릭 아이템 인벤토리로 (오른쪽 마우스)

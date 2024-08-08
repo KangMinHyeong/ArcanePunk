@@ -84,6 +84,7 @@ void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkil
         CheckPlatinumEnhance(It.Key, It.Value);
     }
 
+    PlaySkillSound();
     SetShoutingEffect();
     SetShoutingAttack();
 }

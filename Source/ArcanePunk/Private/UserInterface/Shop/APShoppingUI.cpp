@@ -9,7 +9,7 @@
 #include "Components/Button.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "GameInstance/APGameInstance.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "Interaction/APInteraction_Shop.h"
 #include "Components/Character/APPassiveComponent.h"
 #include "Components/TextBlock.h"
@@ -26,7 +26,7 @@ void UAPShoppingUI::NativeConstruct()
 
     APGI->SetTextBlock(TextBlock_Information, EStringRowName::Information);
     APGI->SetTextBlock(TextBlock_NoEnough, EStringRowName::NoEnoughGold);
-
+    APGI->PlayUIOpenSound();
 }
 
 void UAPShoppingUI::InitShopData(AActor* ShopActor, FShopListData UpdateShopListData)
@@ -218,4 +218,10 @@ void UAPShoppingUI::PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill Ne
     {
         OwnerCharacter->GetAPHUD()->DisplayEnhanceChoice(NewSkillData.GoodsCategory, EEnHanceType::Gold, true, CurrentSkillNum);
     }
+}
+
+void UAPShoppingUI::OnNotEnoughGold_Implementation()
+{
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    APGI->PlayRejectSound();
 }

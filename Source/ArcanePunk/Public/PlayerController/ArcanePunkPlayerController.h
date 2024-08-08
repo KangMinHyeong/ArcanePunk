@@ -20,8 +20,10 @@ struct FConversationData;
 class UAPConversationUI;
 class UAPShoppingUI;
 class UAPSkillWindow;
+class ULoadingFade;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndedFadeOut);
 
 UENUM()
 enum class ECursorType : uint8
@@ -37,8 +39,8 @@ class ARCANEPUNK_API AArcanePunkPlayerController : public APlayerController
 public:
 	AArcanePunkPlayerController();
 
-	void StartFadeIn();
-	void StartFadeOut();
+	void StartFadeIn(float MultipleSpeed = 1.0f, bool bEntrance = true);
+	void StartFadeOut(float MultipleSpeed = 1.0f, bool bEntrance = true);
 	void StartLoading();	
 
 	void SetMouseCursor();
@@ -114,6 +116,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> FadeLoadingWidgetClass;
+
+	TWeakObjectPtr<ULoadingFade> FadeLoadingWidget;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> EntranceUIClass;
@@ -219,6 +223,7 @@ private:
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;
+	FOnEndedFadeOut OnEndedFadeOut;
 
 	UPROPERTY()
 	TArray<bool> SmartKeyArr; // QER 스마트키

@@ -21,6 +21,9 @@ FReply UAPSaveDataSlot::NativeOnMouseButtonDown(const FGeometry &InGeometry, con
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
+    if(GI) GI->PlayClickSound();
+
     if(ParentWidget.IsValid()) ParentWidget->ChangingCurrentSaveSlot(this);
     TurnOnSlot();
 

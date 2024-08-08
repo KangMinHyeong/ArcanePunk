@@ -2,6 +2,7 @@
 #include "Components/Common/APManaDropComponent.h"
 
 #include "GameElements/Drop/APManaEnergy.h"
+#include "GameInstance/APGameInstance.h"
 
 UAPManaDropComponent::UAPManaDropComponent()
 {
@@ -23,10 +24,17 @@ void UAPManaDropComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UAPManaDropComponent::SpawnManaDrop(AActor* ManaOwner)
 {
 	float Check = FMath::RandRange(0.0f, 100.0f);
-	if(Check > DropPercent) return;
+	if(Check >= DropPercent) return;
 
-	auto ManaDrop = GetWorld()->SpawnActor<AAPManaEnergy>(ManaDropClass, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
-	if(!ManaDrop) return;
-	ManaDrop->SetOwner(GetOwner());
-	ManaDrop->SetEnergyMoveComp(ManaOwner);
+	auto GI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!GI) return;
+
+	uint8 Amount = ManaAmount;
+	while(Amount >= 1)
+	{
+		Amount--;
+		auto ManaDrop = GetWorld()->SpawnActor<AAPManaEnergy>(GI->GetManaEnergyClass(), GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+		if(!ManaDrop) continue;;
+		ManaDrop->SetOwner(GetOwner());
+		ManaDrop->SetEnergyMoveComp(ManaOwner);
+	}
 }

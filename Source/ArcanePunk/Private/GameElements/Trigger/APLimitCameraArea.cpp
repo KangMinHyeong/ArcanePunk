@@ -218,15 +218,15 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 		// X_Init = FMath::FInterpConstantTo(X_Init, 0.0f, DeltaTime, InitSpeed);
 		// Y_Init = FMath::FInterpConstantTo(Y_Init, 0.0f, DeltaTime, InitSpeed);
 
-		// float Len = (Player->GetActorLocation() - FadeOutTrigger->GetComponentLocation()).Size();
-		// FadeOutTrigger->SetBoxExtent(FVector(Len, 32.0f, 32.0f)); 
+		float Len = (Player->GetActorLocation() - FadeOutTrigger->GetComponentLocation()).Size();
+		FadeOutTrigger->SetBoxExtent(FVector(Len, 32.0f, 32.0f)); 
 
-		// CameraWidth = InitCameraWidth + Player->GetMySpringArm()->TargetOffset.Y;
-		// FadeTriggerRot.Pitch = FMath::RadiansToDegrees(UKismetMathLibrary::Atan(CameraWidth/CameraHeight)) + SpringArmRot.Pitch;
+		CameraWidth = InitCameraWidth + Player->GetMySpringArm()->TargetOffset.Y;
+		FadeTriggerRot.Pitch = FMath::RadiansToDegrees(UKismetMathLibrary::Atan(CameraWidth/CameraHeight)) + SpringArmRot.Pitch;
 		
-		// float aba = (90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Acos(Player->GetMySpringArm()->TargetOffset.X/Len)));
-		// FadeTriggerRot.Yaw = -(aba + SpringArmRot.Yaw);
-		// FadeOutTrigger->SetRelativeRotation(FadeTriggerRot);
+		float aba = (90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Acos(Player->GetMySpringArm()->TargetOffset.X/Len)));
+		FadeTriggerRot.Yaw = -(aba + SpringArmRot.Yaw);
+		FadeOutTrigger->SetRelativeRotation(FadeTriggerRot);
 	}
 }
 
@@ -235,18 +235,14 @@ void AAPLimitCameraArea::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *
 	if(Cast<AArcanePunkCharacter>(OtherActor))
 	{
 		Player = Cast<AArcanePunkCharacter>(OtherActor);
-		// auto SA = Player->GetMySpringArm();
-		// X_Init = SA->TargetOffset.X;
-		// Y_Init = SA->TargetOffset.Y;
 
-		// FadeOutTrigger = Player->GetFadeOutTrigger();
-		// FadeTriggerRot = FadeOutTrigger->GetRelativeRotation();
+		FadeOutTrigger = Player->GetFadeOutTrigger();
+		FadeOutTrigger->SetRelativeRotation(FRotator::ZeroRotator);
+		FadeOutTrigger->SetBoxExtent(FVector(Player->GetMySpringArm()->TargetArmLength, 32.0f, 32.0f)); 
 
-		// SpringArmRot.Pitch = SA->GetComponentRotation().Pitch;
-		// CameraHeight = SA->TargetArmLength * FMath::Cos(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
-		// CameraWidth = SA->TargetArmLength * FMath::Sin(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
-		// InitCameraWidth = CameraWidth;
-		UE_LOG(LogTemp, Display, TEXT("Your In"));
+		if(!AreaTrigger->OnComponentEndOverlap.IsBound())
+		AreaTrigger->OnComponentEndOverlap.AddDynamic(this, &AAPLimitCameraArea::OnOverlapEnd);
+		
 		bEnd = true;
 	}
 }
@@ -262,9 +258,15 @@ void AAPLimitCameraArea::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActo
 		// Player->GetMySpringArm()->TargetOffset.X = 0.0f;
 		// Player->GetMySpringArm()->TargetOffset.Y = 0.0f;
 		
-		// FadeOutTrigger = Player->GetFadeOutTrigger();
-		// FadeOutTrigger->SetRelativeRotation(FRotator::ZeroRotator);
-		// FadeOutTrigger->SetBoxExtent(FVector(Player->GetMySpringArm()->TargetArmLength, 32.0f, 32.0f)); 
+		auto SA = Player->GetMySpringArm();
+		
+		FadeOutTrigger = Player->GetFadeOutTrigger();
+		FadeTriggerRot = FadeOutTrigger->GetRelativeRotation();
+
+		SpringArmRot.Pitch = SA->GetComponentRotation().Pitch;
+		CameraHeight = SA->TargetArmLength * FMath::Cos(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
+		CameraWidth = SA->TargetArmLength * FMath::Sin(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
+		InitCameraWidth = CameraWidth;
 
 		// Player = nullptr;
 		// TArray<AActor*> OverlappingActors

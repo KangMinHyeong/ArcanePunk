@@ -25,6 +25,8 @@ protected:
 	void SetStartImpulse();
 	void StartTracePlayer(float DeltaTime);
 
+	void PlayEnergySound(bool Start);
+
 	FORCEINLINE void StartHoming() {bHoming = true;};
 	
 public:	
@@ -79,4 +81,12 @@ private:
 
 	FVector SpawnImpulse;
 	
+	// Sound
+	// Sound
+	UPROPERTY(EditAnywhere)
+	USoundBase* ManaSound_Start;
+	UPROPERTY(EditAnywhere)
+	USoundBase* ManaSound_Overlap;
+	UPROPERTY(EditAnywhere)
+	float ManaSoundVolume = 1.0f;
 };

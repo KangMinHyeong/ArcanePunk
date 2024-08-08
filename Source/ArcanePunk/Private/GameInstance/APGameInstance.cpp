@@ -3,6 +3,7 @@
 
 #include "Save/APSaveGame.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 
 void UAPGameInstance::Init()
 {
@@ -49,6 +50,26 @@ void UAPGameInstance::ClearSkillEnhanceData(ESkillKey UpdateSkillKey)
         RSkillAbilityNestingData = {};
         break;
     }
+}
+
+void UAPGameInstance::PlayClickSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), ClickSound, UISoundVolume);
+}
+
+void UAPGameInstance::PlayUIOpenSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), UIOpenSound, UISoundVolume);
+}
+
+void UAPGameInstance::PlayChoiceSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), ChoiceSound, UISoundVolume);
+}
+
+void UAPGameInstance::PlayRejectSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), RejectSound, UISoundVolume);
 }
 
 int32 UAPGameInstance::CheckGoldAmount()

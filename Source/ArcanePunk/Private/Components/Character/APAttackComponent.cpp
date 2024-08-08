@@ -10,7 +10,7 @@
 #include "Components/Character/APHitPointComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Enemy/Enemy_CharacterBase.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -56,7 +56,6 @@ void UAPAttackComponent::StartAttack_A(bool & bCanMove)
 	{
 		ComboAttackStart();
 		OwnerAnim->PlayAttack_A_Montage();
-		// OwnerAnim->JumpToComboSection(CurrentCombo);
 		bAttack_A = true;
 		bCanMove = false;
 	}
@@ -117,12 +116,16 @@ void UAPAttackComponent::ComboAttackEnd()
 void UAPAttackComponent::ComboCheck()
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
-
+	
 	CanCombo = false;
 	if (IsComboInputOn)
 	{
 		ComboAttackStart();
 		OwnerAnim->JumpToComboSection(CurrentCombo);
+	}
+	else
+	{
+		OwnerAnim->StopComboAttack();
 	}
 }
 

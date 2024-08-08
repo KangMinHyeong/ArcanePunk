@@ -9,7 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 
 AArcaneRage::AArcaneRage()
 {

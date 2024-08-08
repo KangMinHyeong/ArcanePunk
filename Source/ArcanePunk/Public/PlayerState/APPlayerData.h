@@ -110,11 +110,11 @@ struct FStatusData : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct FNPCData : public FTableRowBase
+struct FDropData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	FNPCData() {}
+	FDropData() {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 NPCIndex = 0;
@@ -125,7 +125,9 @@ struct FNPCData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DropArcaneEnergy_Percent = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 DropArcaneEnergy_Amount = 1;
+	uint8 DropArcaneEnergy_Min = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 DropArcaneEnergy_Max = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DropGold_Percent = 0.0f;

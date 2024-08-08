@@ -10,7 +10,7 @@
 class UAPDropPackageUI;
 
 UCLASS()
-class ARCANEPUNK_API AEnemy_DropPackage : public AEnemy_DropBase, public IInteractionInterface
+class ARCANEPUNK_API AEnemy_DropPackage : public AEnemy_DropBase
 {
 	GENERATED_BODY()
 public:
@@ -26,7 +26,6 @@ public:
 	virtual FInteractData GetInteractData() override;
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
-	virtual void OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult) override;
 protected:
 	virtual void BeginPlay() override;
 	EEnhanceCategory GetRandCategory();
@@ -64,4 +63,6 @@ private:
 	FLinearColor GoldColor;
 	UPROPERTY(EditAnywhere)
 	FLinearColor PlatinumColor;
+
+	bool IsInit = false;
 };

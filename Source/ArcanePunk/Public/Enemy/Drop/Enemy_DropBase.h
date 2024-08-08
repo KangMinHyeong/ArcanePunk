@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Items/APItemBase.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "Components/Common/APInteractionBoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "Enemy_DropBase.generated.h"
@@ -15,7 +15,7 @@ class UNiagaraSystem;
 class UBoxComponent;
 
 UCLASS()
-class ARCANEPUNK_API AEnemy_DropBase : public AActor
+class ARCANEPUNK_API AEnemy_DropBase : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -29,25 +29,18 @@ protected:
 
 	void SpawnMovement();
 
-	virtual void InitializePickup(const TSubclassOf<UAPItemBase> BaseClass, const int32 Quantity); 
-
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	FORCEINLINE void SetDropOverlap(bool NewBool) {IsInit = NewBool;};
-
 	void OnDestinatingGround();
 	
-	UFUNCTION()
-	virtual void OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+	virtual void BeginFocus() override;
+
+	virtual void InitializePickup(AActor *DamageCauser, const int32 Quantity, bool RootingImmediate = false); 
 
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* DropMesh;
-
-	UPROPERTY(EditAnywhere)
-	UBoxComponent* GroundTrigger;
 
 	UPROPERTY(EditAnywhere)
 	UAPInteractionBoxComponent* InteractionTrigger;
@@ -56,13 +49,7 @@ protected:
 	FVector SpawnImpulse = FVector(200.0f,200.0f,500.0f);
 
 	UPROPERTY(EditAnywhere)
-	UProjectileMovementComponent* DropMovement;
-
-	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* DropTrailEffect;
-
-	UPROPERTY(EditAnywhere)
-	float DropSpeed = 0.0f;
 
 	UPROPERTY(EditAnywhere)
 	float MaxAngularVelocity = 180.0f;
@@ -86,5 +73,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Pickup | Item Initialization")
 	int32 ItemQuantity;
 
-	bool IsInit = true;
+	// Sound
+	UPROPERTY(EditAnywhere)
+	USoundBase* DropSound;
+	UPROPERTY(EditAnywhere)
+	float DropSoundVolume = 1.0f;
 };

@@ -6,12 +6,12 @@
 #include "Components/TextBlock.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Items/APItemBase.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/HorizontalBox.h"
 #include "Components/SizeBox.h"
 #include "UserInterface/EnhanceUI/ChoiceButton.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
 #include "Components/HorizontalBoxSlot.h"
 
@@ -27,6 +27,7 @@ void UAPEnhanceChoice::NativeConstruct()
     APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
     APGI->SetTextBlock(Text_CurrentReroll, EStringRowName::CurrentReroll); 
     APGI->SetTextBlock(Text_Count, EStringRowName::Count); 
+    APGI->PlayUIOpenSound();
 }
 
 void UAPEnhanceChoice::SetPauseGame()

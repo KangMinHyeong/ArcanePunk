@@ -14,8 +14,7 @@
 		"npm.autoDetect": "off",
 		"files.associations": {
 			"*.rh": "cpp",
-			"xiosbase": "cpp",
-			"cmath": "cpp"
+			"xiosbase": "cpp"
 		}
 	},
 	"extensions": {

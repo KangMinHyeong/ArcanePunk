@@ -7,8 +7,9 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 AAPManaEnergy::AAPManaEnergy()
 {
@@ -25,6 +26,7 @@ void AAPManaEnergy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PlayEnergySound(true);
 	SetStartImpulse();
 	SetActorTickEnabled(false);
 	EnergyTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPManaEnergy::OnOverlap);
@@ -64,6 +66,21 @@ void AAPManaEnergy::StartTracePlayer(float DeltaTime)
 	FVector Current = GetActorLocation();
 	Current = FMath::VInterpConstantTo(Current, TraceActor->GetActorLocation(), DeltaTime, CurrentHomingSpeed);
 	SetActorLocation(Current);
+}
+
+void AAPManaEnergy::PlayEnergySound(bool Start)
+{
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    float Multiple = GI->GetGameSoundVolume().EffectVolume;
+
+	if(Start)
+	{
+		UGameplayStatics::SpawnSoundAttached(ManaSound_Start, GetRootComponent(), TEXT("ManaSound_Start"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, ManaSoundVolume*Multiple);
+	}
+	else
+	{
+		UGameplayStatics::SpawnSound2D(GetWorld(), ManaSound_Overlap, ManaSoundVolume*Multiple);
+	}
 }
 
 void AAPManaEnergy::SetEnergyMoveComp(AActor* ManaOwner)
@@ -116,5 +133,7 @@ void AAPManaEnergy::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *Other
 	Destroy();
 
 	Character->GetAPSkillHubComponent()->RecoveryMP();
+		
+	PlayEnergySound(false);
 	// Mana 회복
 }

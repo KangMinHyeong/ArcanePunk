@@ -93,6 +93,7 @@ void AArcaneBeam::SetBeamEffect()
     BeamComp->SetVariableVec3(TEXT("Size3D"),  FVector(Width, Length, 1.0f));
     BeamComp->SetVariableVec3(TEXT("AddVector"),  FVector((Distance - InitDist) * 0.5f, 0.0f, 0.0f));
 
+    PlaySkillSound();
     SetBeamAttack();
 }
 

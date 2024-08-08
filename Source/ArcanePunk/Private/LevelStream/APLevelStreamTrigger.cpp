@@ -34,10 +34,10 @@ void AAPLevelStreamTrigger::LevelLoad(UPrimitiveComponent *OverlappedComp, AActo
 	auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
 	// FString levelName = TEXT("/Script/Engine.World'/Game/Maps/TestMap1_Sub/TestMap1_Stream2.TestMap1_Stream2'");
-	FString levelName = TEXT("/Game/Maps/TestMap1_Sub/TestMap1_Stream2");
+	FString levelName = TEXT("/Game/Maps/TestMap1_Sub/TestMap1_Stream");
 
 	FLatentActionInfo LatentInfo;
-	UGameplayStatics::LoadStreamLevel(this, *levelName, true, true, LatentInfo);
+	UGameplayStatics::LoadStreamLevel(this, LoadLevelName, true, false, LatentInfo);
 	IsLevelLoad = true;
 }
 
@@ -46,9 +46,9 @@ void AAPLevelStreamTrigger::LeveUnlLoad(UPrimitiveComponent* OverlappedComp, AAc
 	if(!IsLevelLoad) return;
 	auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
-	FString levelName = TEXT("/Game/Maps/TestMap1_Sub/TestMap1_Stream2");
+	FString levelName = TEXT("/Game/Maps/TestMap1_Sub/TestMap1_Stream1");
 
 	FLatentActionInfo LatentInfo;
-	UGameplayStatics::UnloadStreamLevel(this, *levelName, LatentInfo, false);
+	UGameplayStatics::UnloadStreamLevel(this, LoadLevelName, LatentInfo, false);
 	IsLevelLoad = false;
 }

@@ -22,24 +22,25 @@
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
-#include "ArcanePunk/APGameModeBase.h"
+#include "GameMode/APGameModeBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Common/APGhostTrailSpawnComponent.h"
 #include "Components/SkillActor/APSkillAbility.h"
 #include "Components/Character/APPassiveComponent.h"
 #include "GameInstance/APGameInstance.h"
 #include "Components/Character/APFadeOutTriggerComponent.h"
+#include "Components/Character/APCharacterAuraComponent.h"
 
 // prodo
 #include "DrawDebugHelpers.h"
 #include "kismet/KismetSystemLibrary.h"
 #include "Items/APItemBase.h"
-#include "UserInterface/APHUD.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "UserInterface/HUD/APHUD.h"
+#include "Components/Character/APInventoryComponent.h"
 #include "Engine/TextRenderActor.h"
 #include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
-#include "UserInterface/APTuTorialUserWidget.h"
+#include "UserInterface/Tutorial/APTuTorialUserWidget.h"
 
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -52,7 +53,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
 	LeftBeamPoint = CreateDefaultSubobject<USceneComponent>(TEXT("LeftBeamPoint"));
-	PlayerPanelAura = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerPanelAura"));
 	FadeOutTigger = CreateDefaultSubobject<UAPFadeOutTriggerComponent>(TEXT("FadeOutTigger"));
 
 	SkillHubComponent = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComponent"));
@@ -62,9 +62,9 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	SkillAbility = CreateDefaultSubobject<UAPSkillAbility>(TEXT("SkillAbility"));
 	GhostTrailSpawnComp = CreateDefaultSubobject<UAPGhostTrailSpawnComponent>(TEXT("GhostTrailSpawnComp"));
 	PassiveComp = CreateDefaultSubobject<UAPPassiveComponent>(TEXT("PassiveComp"));
+	CharacterAura = CreateDefaultSubobject<UAPCharacterAuraComponent>(TEXT("CharacterAura"));
 
 	MySpringArm->SetupAttachment(GetRootComponent());
-	PlayerPanelAura->SetupAttachment(GetRootComponent());
 	MyCamera->SetupAttachment(MySpringArm);
 	FadeOutTigger->SetupAttachment(MySpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
@@ -660,7 +660,7 @@ void AArcanePunkCharacter::InitPlayerStatus()
 {
 	MyPlayerState = Cast<AArcanePunkPlayerState>(GetPlayerState());
 	if(!MyPlayerState) return;
-	// if(MyPlayerState->PlayerTotalStatus.SaveOperation)
+	if(MyPlayerState->PlayerTotalStatus.SaveOperation)
 	TotalStatus_Origin = MyPlayerState->PlayerTotalStatus; // 테스트용으로 빼놈, 이 줄 넣어야 세이브 스탯으로 초기화
 	TotalStatus = TotalStatus_Origin;
 

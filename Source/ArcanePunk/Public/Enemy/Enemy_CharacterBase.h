@@ -43,6 +43,8 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	FORCEINLINE FDropData GetDropData() const {return DropData;};
+
 	UFUNCTION(BlueprintPure)
 	float GetForward();
 
@@ -108,13 +110,13 @@ protected:
 	void StopClear();
 
 	//드롭 관련 함수
-	void DropItemActor();
+	void SetManaDrop();
+	void DropChecking(AActor *DamageCauser);
 
 	// 몬스터 Dead 관련 함수
 	virtual void EnemyDestroyed();
 	void CheckAllEnemyKilled();
 	
-
 	// 몬스터 Anim Ended 관련 함수
 	void BindMontageEnded();
 
@@ -134,7 +136,7 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
-	FNPCData NPCData;
+	FDropData DropData;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	UWidgetComponent* HealthWidgetComp;
@@ -181,9 +183,6 @@ protected:
 	// TMap<TSubclassOf<AEnemy_DropBase>, float> DropMap; // Drop Class , Drop 확률 (따로 드랍)
 
 	TWeakObjectPtr<AEnemy_DropPackage> DropPackage;
-
-	UPROPERTY(EditAnywhere)
-	bool OnDrop = true;
 
 	TWeakObjectPtr<AActor> MarkActor;
 
