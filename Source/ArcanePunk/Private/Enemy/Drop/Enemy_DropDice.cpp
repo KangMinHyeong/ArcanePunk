@@ -9,7 +9,7 @@ void AEnemy_DropDice::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
+	// InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
 }
 
 void AEnemy_DropDice::Tick(float DeltaTime)
@@ -21,7 +21,7 @@ void AEnemy_DropDice::Tick(float DeltaTime)
 
 void AEnemy_DropDice::OnDropDice()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+    TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
 
     if(IsPendingKillPending() || !ItemReference) return;
 

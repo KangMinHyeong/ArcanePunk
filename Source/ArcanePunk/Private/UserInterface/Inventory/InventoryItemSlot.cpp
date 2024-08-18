@@ -7,11 +7,10 @@
 
 // Minhyeong
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
-#include "Components/APInventoryComponent.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "Components/Character/APInventoryComponent.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "GameFramework/Controller.h"
-#include "UserInterface/Status/APStatusUI.h"
+#include "UserInterface/HUD/Status/APStatusUI.h"
 
 void UInventoryItemSlot::NativeOnInitialized()
 {

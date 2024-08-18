@@ -3,40 +3,26 @@
 
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPCheckUI::SetCheckType(ECheckType UpdateCheckType, UUserWidget* Parent)
 {
     ParentWidget = Parent; CurrentCheckType = UpdateCheckType;
-    FString Message = TEXT(" ");
-    switch (UpdateCheckType)
-    {
-    case ECheckType::Save:
-        Message = TEXT("저장하시겠습니까?");
-        break;
+
+    Button_Validation->OnClicked.AddDynamic(this, &UAPCheckUI::OnValidate);
+    Button_Cancel->OnClicked.AddDynamic(this, &UAPCheckUI::OnCancel);
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    const UEnum* CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.ECheckType"), true); if(!CheckEnum) return;
+    FName Name = FName(*(CheckEnum->GetDisplayNameTextByValue((uint8)UpdateCheckType)).ToString());
     
-    case ECheckType::Load:
-        Message = TEXT("이 파일로 시작하시겠습니까?");
-        break;
-
-    case ECheckType::Purchase:
-        Message = TEXT("구매하시겠습니까?");
-        break;
-
-    case ECheckType::Select:
-        Message = TEXT("선택하시겠습니까?");
-        break;
-
-    case ECheckType::Delete:
-        Message = TEXT("삭제하시겠습니까?");
-        break;
-    }
-    Text_Message->SetText(FText::FromString(Message));
-
-    Button_Validation->OnClicked.AddDynamic(this, &UAPCheckUI::Validate);
-    Button_Cancel->OnClicked.AddDynamic(this, &UAPCheckUI::Cancel);
+    APGI->SetTextBlock_Name(Text_Message, Name);
+    APGI->SetTextBlock(Text_Validation, EStringRowName::Validation);
+    APGI->SetTextBlock(Text_Cancel, EStringRowName::Cancel);
 }
 
-void UAPCheckUI::Validate()
+void UAPCheckUI::OnValidate()
 {
     auto Interface = Cast<ICheckingWidgetInterface>(ParentWidget.Get()); if(!Interface) return;
     Interface->OnValidating(CurrentCheckType);
@@ -44,7 +30,7 @@ void UAPCheckUI::Validate()
     RemoveFromParent();
 }
 
-void UAPCheckUI::Cancel()
+void UAPCheckUI::OnCancel()
 {
     RemoveFromParent();
 }

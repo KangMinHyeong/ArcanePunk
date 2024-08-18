@@ -21,6 +21,9 @@ FReply UAPSaveDataSlot::NativeOnMouseButtonDown(const FGeometry &InGeometry, con
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
+    if(GI) GI->PlayClickSound();
+
     if(ParentWidget.IsValid()) ParentWidget->ChangingCurrentSaveSlot(this);
     TurnOnSlot();
 
@@ -37,8 +40,7 @@ FReply UAPSaveDataSlot::NativeOnMouseButtonDoubleClick( const FGeometry& InGeome
 void UAPSaveDataSlot::SetSlotData(UAPSaveGame * SavedData)
 {
     bSavingData = true;
-    TEXT_SlotName->SetText(FText::FromString(SavedData->SaveInGameData.LevelName));
-
+    
     int32 RealTime = round(SavedData->SaveInGameData.SaveRealTime);
     TEXT_PlayTime_Hours->SetText(FText::FromString(FString::FromInt(RealTime / 3600))); RealTime = RealTime % 3600;
     TEXT_PlayTime_Minutes->SetText(FText::FromString(FString::FromInt(RealTime / 60))); RealTime = RealTime % 60;
@@ -49,6 +51,18 @@ void UAPSaveDataSlot::SetSlotData(UAPSaveGame * SavedData)
     TEXT_Day->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetDay())));
     TEXT_Hours->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetHour()))); 
     TEXT_Minutes->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetMinute()))); 
+    
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    auto Name = SavedData->SaveInGameData.LevelName;
+
+    APGI->SetTextBlock(TEXT_SlotName, EStringRowName::NoData);
+    APGI->SetTextBlock_Name(TEXT_SlotName, FName(*Name));
+    
+    APGI->SetTextBlock(Text_Slot, EStringRowName::Slot);
+    APGI->SetTextBlock(Text_PlayTime, EStringRowName::PlayTime);
+    APGI->SetTextBlock(Text_Hour, EStringRowName::Hour);
+    APGI->SetTextBlock(Text_Minute, EStringRowName::Minute);
+    APGI->SetTextBlock(Text_Second, EStringRowName::Second);
 }
 
 void UAPSaveDataSlot::SetSlotName(FString PlayerSlot, UUserWidget* Parent)

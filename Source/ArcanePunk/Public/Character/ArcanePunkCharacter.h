@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/APCharacterBase.h"
+#include "Components/Character/APCharacterAuraComponent.h"
 #include "Components/Common/APBuffComponent.h"
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
@@ -13,7 +14,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAltRightMouseClick, FVector, Clic
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboAttackStart, uint8, ComboStack);
 
 //Minhyeong
-class UDataTable;
 class UParticleSystem;
 class UAPSkillHubComponent;
 class UAPTakeDamageComponent;
@@ -31,6 +31,7 @@ class UAPGhostTrailSpawnComponent;
 class UAPSkillAbility;
 class UAPPassiveComponent;
 class UAPFadeOutTriggerComponent;
+class UAPCharacterAuraComponent;
 
 // prodo
 class UAPItemBase;
@@ -169,7 +170,7 @@ public:
 
 	//FootPrint 관련 함수
 	FORCEINLINE UAPSpawnFootPrintComponent* GetSpawnFootPrintComponent() const {return APSpawnStepComp;}; // HitMotionTime 반환	
-	FORCEINLINE UStaticMeshComponent* GetPlayerPanelAura() {return PlayerPanelAura;}; // PlayerPanel 반환
+	FORCEINLINE UNiagaraComponent* GetPlayerPanelAura() {return CharacterAura->GetAuraEffect();}; // PlayerPanel 반환
 	FTransform GetFootTransform(bool Left);	
 	
 	// 장비 관련 함수
@@ -376,7 +377,7 @@ private:
 	UStaticMeshComponent* FootPrint_R;
 
 	UPROPERTY(EditAnywhere, Category = "Foot Print")
-	UStaticMeshComponent* PlayerPanelAura;
+	UAPCharacterAuraComponent* CharacterAura;
 
 	bool bJogging = false;
 

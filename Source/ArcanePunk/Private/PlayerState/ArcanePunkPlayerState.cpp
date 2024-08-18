@@ -3,7 +3,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Save/APSaveGame.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "GameInstance/APGameInstance.h"
 
 AArcanePunkPlayerState::AArcanePunkPlayerState()
@@ -42,7 +42,7 @@ void AArcanePunkPlayerState::InitPlayerData()
 void AArcanePunkPlayerState::UpdatePlayerData(FPlayerTotalData &PS)
 {
     PlayerTotalStatus = PS;
-    PlayerTotalStatus.PlayerDynamicData.SaveOperation = true;
+    PlayerTotalStatus.SaveOperation = true;
 
     SavePlayerData();
 }

@@ -9,7 +9,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 
 AArcaneRage::AArcaneRage()
 {
@@ -54,11 +54,11 @@ void AArcaneRage::ApplyRecovery()
 {
     if(!OwnerCharacter.IsValid()) return;
 
-    auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
-    float HP = PDD.PlayerDynamicData.HP + (PDD.PlayerDynamicData.MaxHP - PDD.PlayerDynamicData.HP)*HPRecoveryPercent; 
-    PDD.PlayerDynamicData.HP = FMath::Min(PDD.PlayerDynamicData.MaxHP, HP);
+    auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.StatusData.HP;
+    float HP = PDD.StatusData.HP + (PDD.StatusData.MaxHP - PDD.StatusData.HP)*HPRecoveryPercent; 
+    PDD.StatusData.HP = FMath::Min(PDD.StatusData.MaxHP, HP);
 
-    OwnerCharacter->SetDefaultHP(PDD.PlayerDynamicData.HP); 
+    OwnerCharacter->SetDefaultHP(PDD.StatusData.HP); 
     OwnerCharacter->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 }
 

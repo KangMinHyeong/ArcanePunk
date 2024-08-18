@@ -7,9 +7,8 @@
 
 class UImage;
 class UTextBlock;
-struct FConversationData;
 class UWrapBox;
-struct FConversationDataTable;
+struct FSequenceStringDataTable;
 class UWidgetAnimation;
 
 UCLASS()
@@ -19,10 +18,11 @@ class ARCANEPUNK_API UAPConversationText : public UUserWidget
 public:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	void SetConversation(FConversationData ConversationData);
+	
+	void SetConversation(FSequenceStringDataTable* ContentTextData);
 	void SetTextFlow();
 
-	void SkipConversation(FConversationData ConversationData);
+	void SkipConversation();
 	
 private:
 	void InitValue();

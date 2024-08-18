@@ -3,7 +3,7 @@
 #include "UserInterface/Inventory/InventoryPanel.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "UserInterface/Inventory/InventoryItemSlot.h"
-#include "Components/APInventoryComponent.h"
+#include "Components/Character/APInventoryComponent.h"
 #include "Components/Button.h"
 #include "Items/APItemBase.h"
 #include "UserInterface/Inventory/ItemDragDropOperation.h"

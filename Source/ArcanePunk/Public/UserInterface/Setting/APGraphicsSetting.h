@@ -8,6 +8,7 @@
 
 class UButton;
 class UComboBoxString;
+class UTextBlock;
 
 UENUM(BlueprintType)
 enum class EGraphicsSetting : uint8 // 그래픽 설정
@@ -23,6 +24,7 @@ class ARCANEPUNK_API UAPGraphicsSetting : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)override;
@@ -365,4 +367,48 @@ private:
 	UPROPERTY(EditAnywhere)
 	FLinearColor DefaultButtonColor;
 //
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Window;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_AspectRatio;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_MaxFPS;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_OverAll;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Texture;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_AntiAliasing;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_PostProcessing;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Shadow;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Effect;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Foliage;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Shading;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_Reflection;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_ViewDistance;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_GlobalIllumination;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_ResolutionScale;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_NoLimit;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Init;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Optimization;
+
+	TArray<UButton*> Btn_Low;
+	TArray<UButton*> Btn_Middle;
+	TArray<UButton*> Btn_High;
+	TArray<UButton*> Btn_Epic;
 };

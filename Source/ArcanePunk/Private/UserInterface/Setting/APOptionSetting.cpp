@@ -9,6 +9,7 @@
 #include "UserInterface/Setting/APSmartKeySetting.h"
 #include "UserInterface/Setting/APGraphicsSetting.h"
 #include "UserInterface/Setting/APScreenSetting.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPOptionSetting::NativeConstruct()
 {
@@ -17,6 +18,15 @@ void UAPOptionSetting::NativeConstruct()
     SetIsFocusable(true);
     SetKeyboardFocus();
     BindButton();
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    APGI->SetTextBlock(TextBlock_SettingTitle, EStringRowName::GameSetting);
+    APGI->SetTextBlock(Text_Graphic, EStringRowName::Setting_Graphic);
+    APGI->SetTextBlock(Text_Audio, EStringRowName::Setting_Audio);
+    APGI->SetTextBlock(Text_SmartKey, EStringRowName::Setting_SmartKey);
+    APGI->SetTextBlock(Text_Screen, EStringRowName::Setting_Screen);
+    APGI->PlayUIOpenSound();
 }
 
 FReply UAPOptionSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
@@ -57,7 +67,7 @@ void UAPOptionSetting::BindButton()
 
 void UAPOptionSetting::OnClickButton_Graphics()
 {
-    Switcher_Option->SetActiveWidget(SmartKeySettingUI);
+    Switcher_Option->SetActiveWidget(GraphicsSettingUI);
     Text_Graphic->SetColorAndOpacity(OnColor);
     Text_Audio->SetColorAndOpacity(OffColor);
     Text_SmartKey->SetColorAndOpacity(OffColor);

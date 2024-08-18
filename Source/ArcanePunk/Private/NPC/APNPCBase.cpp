@@ -41,7 +41,7 @@ void AAPNPCBase::SpawnInteractionTrigger()
 	Interaction = GetWorld()->SpawnActor<AAPInteractionTriggerBase>(InteractionTrigger, GetActorTransform());
 	if(!Interaction.IsValid()) return;
 	Interaction->SetOwner(this);
-	Interaction->SetPartnerName(NPCName);
+	Interaction->SetConversationRowName(NPCName);
 	Interaction->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 }
 

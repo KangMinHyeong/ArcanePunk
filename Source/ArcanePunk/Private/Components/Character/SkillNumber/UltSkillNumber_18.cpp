@@ -35,7 +35,7 @@ void UUltSkillNumber_18::PlaySkill()
 	Skilling = true;
 	OnSkill();
 
-    MinumumRate = 0.5f / OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed;
+    MinumumRate = 0.5f / OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed;
 }
 
 void UUltSkillNumber_18::OnSkill()

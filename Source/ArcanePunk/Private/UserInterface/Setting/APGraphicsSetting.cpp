@@ -1,12 +1,15 @@
 
 #include "UserInterface/Setting/APGraphicsSetting.h"
 
+#include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/ComboBoxString.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameInstance/APGameInstance.h"
+#include "Interfaces/InteractionInterface.h"
 
 void UAPGraphicsSetting::InitGraphicsSetting()
 {
@@ -34,16 +37,14 @@ void UAPGraphicsSetting::InitWindowSetting()
     ScreenResolution->SetSelectedOption(Str);
 
     EWindowMode::Type SelectWindowMode =  UGameUserSettings::GetGameUserSettings()->GetFullscreenMode();
-    FString Items;
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
     if(SelectWindowMode == EWindowMode::Windowed)
     {
-        Items = TEXT("Window Screen Mode");
-        WindowMode->SetSelectedOption(Items);
+        WindowMode->SetSelectedOption(APGI->GetStringContent(EStringRowName::ScreenMode_Window));
     }
-    else if(SelectWindowMode == EWindowMode::Fullscreen)
+    else // if(SelectWindowMode == EWindowMode::Fullscreen)
     {
-        Items = TEXT("Full Screen Mode");
-        WindowMode->SetSelectedOption(Items);
+        WindowMode->SetSelectedOption(APGI->GetStringContent(EStringRowName::ScreenMode_Full));
     }  
 
     UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
@@ -91,76 +92,76 @@ void UAPGraphicsSetting::BindButton()
     Button_Unlimited->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickButton_Unlimited);
 
     //  OverAll Scalability
-    OS_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_Low);
-    OS_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_Middle);
-    OS_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_High);
-    OS_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_Epic);
+    OS_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_Low); Btn_Low.Emplace(OS_Low);
+    OS_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_Middle); Btn_Middle.Emplace(OS_Middle);
+    OS_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_High); Btn_High.Emplace(OS_High);
+    OS_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickOS_Epic); Btn_Epic.Emplace(OS_Epic);
 
     //  Post Process
-    PP_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_Low);
-    PP_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_Middle);
-    PP_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_High);
-    PP_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_Epic);
+    PP_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_Low); Btn_Low.Emplace(PP_Low);
+    PP_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_Middle); Btn_Middle.Emplace(PP_Middle);
+    PP_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_High); Btn_High.Emplace(PP_High);
+    PP_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickPP_Epic); Btn_Epic.Emplace(PP_Epic);
 
     //  Texture Quality
-    TQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_Low);
-    TQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_Middle);
-    TQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_High);
-    TQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_Epic);
+    TQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_Low); Btn_Low.Emplace(TQ_Low);
+    TQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_Middle); Btn_Middle.Emplace(TQ_Middle);
+    TQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_High); Btn_High.Emplace(TQ_High);
+    TQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickTQ_Epic); Btn_Epic.Emplace(TQ_Epic);
 
     //  Anti Aliasing
-    AA_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_Low);
-    AA_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_Middle);
-    AA_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_High);
-    AA_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_Epic);
+    AA_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_Low); Btn_Low.Emplace(AA_Low);
+    AA_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_Middle); Btn_Middle.Emplace(AA_Middle);
+    AA_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_High); Btn_High.Emplace(AA_High);
+    AA_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickAA_Epic); Btn_Epic.Emplace(AA_Epic);
 
     //  Shadow Quality
-    SQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_Low);
-    SQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_Middle);
-    SQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_High);
-    SQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_Epic);
+    SQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_Low); Btn_Low.Emplace(SQ_Low);
+    SQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_Middle); Btn_Middle.Emplace(SQ_Middle);
+    SQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_High); Btn_High.Emplace(SQ_High);
+    SQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickSQ_Epic); Btn_Epic.Emplace(SQ_Epic);
 
     //  Effect Quality
-    EQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_Low);
-    EQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_Middle);
-    EQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_High);
-    EQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_Epic);
+    EQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_Low); Btn_Low.Emplace(EQ_Low);
+    EQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_Middle); Btn_Middle.Emplace(EQ_Middle);
+    EQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_High); Btn_High.Emplace(EQ_High);
+    EQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickEQ_Epic); Btn_Epic.Emplace(EQ_Epic);
 
     //  Foliage Quality
-    FQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_Low);
-    FQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_Middle);
-    FQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_High);
-    FQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_Epic);
+    FQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_Low); Btn_Low.Emplace(FQ_Low);
+    FQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_Middle); Btn_Middle.Emplace(FQ_Middle);
+    FQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_High); Btn_High.Emplace(FQ_High);
+    FQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickFQ_Epic); Btn_Epic.Emplace(EQ_Epic);
 
     //  Shading Quality
-    Shading_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_Low);
-    Shading_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_Middle);
-    Shading_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_High);
-    Shading_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_Epic);
+    Shading_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_Low); Btn_Low.Emplace(Shading_Low);
+    Shading_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_Middle); Btn_Middle.Emplace(Shading_Middle);
+    Shading_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_High); Btn_High.Emplace(Shading_High);
+    Shading_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickShading_Epic); Btn_Epic.Emplace(Shading_Epic);
 
     //  Reflection Quality
-    RQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_Low);
-    RQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_Middle);
-    RQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_High);
-    RQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_Epic);
+    RQ_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_Low); Btn_Low.Emplace(RQ_Low);
+    RQ_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_Middle); Btn_Middle.Emplace(RQ_Middle);
+    RQ_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_High); Btn_High.Emplace(RQ_High);
+    RQ_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRQ_Epic); Btn_Epic.Emplace(RQ_Epic);
     
     //  View Distance
-    VD_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_Low);
-    VD_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_Middle);
-    VD_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_High);
-    VD_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_Epic);
+    VD_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_Low); Btn_Low.Emplace(VD_Low);
+    VD_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_Middle); Btn_Middle.Emplace(VD_Middle);
+    VD_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_High); Btn_High.Emplace(VD_High);
+    VD_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickVD_Epic); Btn_Epic.Emplace(VD_Epic);
 
     //  Global Illumination Quality
-    GI_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_Low);
-    GI_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_Middle);
-    GI_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_High);
-    GI_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_Epic);
+    GI_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_Low); Btn_Low.Emplace(GI_Low);
+    GI_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_Middle); Btn_Middle.Emplace(GI_Middle);
+    GI_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_High); Btn_High.Emplace(GI_High);
+    GI_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickGI_Epic); Btn_Epic.Emplace(GI_Epic);
 
     //  Resolution Scale 
-    RS_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_Low);
-    RS_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_Middle);
-    RS_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_High);
-    RS_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_Epic);
+    RS_Low->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_Low); Btn_Low.Emplace(RS_Low);
+    RS_Middle->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_Middle); Btn_Middle.Emplace(RS_Middle);
+    RS_High->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_High); Btn_High.Emplace(RS_High);
+    RS_Epic->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickRS_Epic); Btn_Epic.Emplace(RS_Epic);
 
     //  Back to the Option Setting
     Button_Back->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickButton_Back); 
@@ -168,23 +169,51 @@ void UAPGraphicsSetting::BindButton()
     // Button_Save->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickButton_Save);
     //  Optimal Setting
     Button_OptimalSetting->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickButton_OptimalSetting);
+
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    
+    for(auto btn : Btn_Low)
+    {
+        auto TextBlock = Cast<UTextBlock>(btn->GetContent());
+        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_Low);
+    }
+    for(auto btn : Btn_Middle)
+    {
+        auto TextBlock = Cast<UTextBlock>(btn->GetContent());
+        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_Middle);
+    }
+    for(auto btn : Btn_High)
+    {
+        auto TextBlock = Cast<UTextBlock>(btn->GetContent());
+        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_High);
+    }
+    for(auto btn : Btn_Epic)
+    {
+        auto TextBlock = Cast<UTextBlock>(btn->GetContent());
+        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_Ultra);
+    }
+
+    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
+    APGI->SetTextBlock(TextBlock_Optimization, EStringRowName::Optimization);
 }
 
 //  Window Mode Select
 void UAPGraphicsSetting::OnSelectChange_WindowMode(FString Items, ESelectInfo::Type type)
 {
     EWindowMode::Type SelectWindowMode;
-    if(Items == TEXT("Window Screen Mode"))
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    if(Items == APGI->GetStringContent(EStringRowName::ScreenMode_Window))
     {
         SelectWindowMode = EWindowMode::Windowed;
-        UGameUserSettings::GetGameUserSettings()->SetFullscreenMode(SelectWindowMode);
     }
     else
     {
         SelectWindowMode = EWindowMode::Fullscreen;
-        UGameUserSettings::GetGameUserSettings()->SetFullscreenMode(SelectWindowMode);
     }
-    
+
+    UGameUserSettings::GetGameUserSettings()->SetFullscreenMode(SelectWindowMode);
     UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
     UGameUserSettings::GetGameUserSettings()->SaveSettings();
 }
@@ -836,6 +865,36 @@ void UAPGraphicsSetting::OnClickButton_OptimalSetting()
     UGameUserSettings::GetGameUserSettings()->RunHardwareBenchmark();
     UGameUserSettings::GetGameUserSettings()->ApplyHardwareBenchmarkResults();
     InitGraphicsSetting();
+}
+
+void UAPGraphicsSetting::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    
+    WindowMode->ClearOptions();
+    
+    WindowMode->AddOption(APGI->GetStringContent(EStringRowName::ScreenMode_Full));
+    WindowMode->AddOption(APGI->GetStringContent(EStringRowName::ScreenMode_Window));  
+
+    APGI->SetTextBlock(TextBlock_Window, EStringRowName::Select_WindowMode);
+    APGI->SetTextBlock(TextBlock_AspectRatio, EStringRowName::Select_AspectRatio);
+    APGI->SetTextBlock(TextBlock_MaxFPS, EStringRowName::Select_MaxFPS);
+    APGI->SetTextBlock(TextBlock_OverAll, EStringRowName::Select_OverAll);
+    APGI->SetTextBlock(Text_Texture, EStringRowName::Select_Texture);
+    APGI->SetTextBlock(Text_AntiAliasing, EStringRowName::Select_AntiAliasing);
+    APGI->SetTextBlock(Text_PostProcessing, EStringRowName::Select_PostProcessing);
+    APGI->SetTextBlock(Text_Shadow, EStringRowName::Select_Shadow);
+    APGI->SetTextBlock(Text_Effect, EStringRowName::Select_Effect);
+    APGI->SetTextBlock(Text_Foliage, EStringRowName::Select_Foliage);
+    APGI->SetTextBlock(Text_Shading, EStringRowName::Select_Shading);
+    APGI->SetTextBlock(Text_Reflection, EStringRowName::Select_Reflection);
+    APGI->SetTextBlock(Text_ViewDistance, EStringRowName::Select_ViewDistance);
+    APGI->SetTextBlock(Text_GlobalIllumination, EStringRowName::Select_GlobalIllumination);
+    APGI->SetTextBlock(Text_ResolutionScale, EStringRowName::Select_ResolutionScale);
+
+    APGI->SetTextBlock(TextBlock_NoLimit, EStringRowName::NoLimit);
 }
 
 void UAPGraphicsSetting::NativeConstruct()

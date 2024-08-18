@@ -5,7 +5,7 @@
 #include "EngineUtils.h"
 #include "ArcanePunk/Public/Enemy/Enemy_CharacterBase.h"
 #include "GameState/APGameState.h"
-#include "Portal/Portal_Base.h"
+#include "GameElements/Portal/Portal_Base.h"
 #include "GameFramework/Controller.h"
 #include "AIController.h"
 

@@ -58,6 +58,12 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_Select;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_Delete;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_SaveSlot;
+
 	UPROPERTY(EditAnywhere)	
 	TSubclassOf<UAPSaveDataSlot> SaveDataSlotClass;
 
@@ -70,4 +76,5 @@ private:
 	TArray<FString> SlotNames;
 
 	bool IsTitle = false;
+
 };

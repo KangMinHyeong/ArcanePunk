@@ -105,6 +105,15 @@ void UChoiceButton::BindButton()
 
     Reroll_Button->OnHovered.AddDynamic(this, &UChoiceButton::OnRerollButton_Hovered);
     Reroll_Button->OnUnhovered.AddDynamic(this, &UChoiceButton::OnRerollButton_UnHovered);
+
+    
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+
+    APGI->SetTextBlock(Text_New, EStringRowName::NewSkill);
+    APGI->SetTextBlock(TextBlock_Select, EStringRowName::Select);
+    APGI->SetTextBlock(Text_CurrnetNesting, EStringRowName::CurrentNesting);
+    APGI->SetTextBlock(Text_Count, EStringRowName::Count);
+    
 }
 
 void UChoiceButton::OnClickChoice()

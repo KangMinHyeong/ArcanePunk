@@ -32,13 +32,13 @@ void UAPBuffComponent::UpdateStatus()
 	if(!OwnerCharacter.IsValid()) return;
 	auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
 
-	OwnerCharacter->SetDefaultATKSpeed(PD.PlayerDynamicData.ATKSpeed * CurrentATKSpeedCoefficient); 
-	OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK * CurrentATKCoefficient); 
-	OwnerCharacter->SetDefaultMaxHP(PD.PlayerDynamicData.MaxHP * CurrentMaxHPCoefficient); 
+	OwnerCharacter->SetDefaultATKSpeed(PD.StatusData.ATKSpeed * CurrentATKSpeedCoefficient); 
+	OwnerCharacter->SetDefaultATK(PD.StatusData.ATK * CurrentATKCoefficient); 
+	OwnerCharacter->SetDefaultMaxHP(PD.StatusData.MaxHP * CurrentMaxHPCoefficient); 
 	OwnerCharacter->SetDefaultHP(OwnerCharacter->GetDefaultHP() * CurrentMaxHPCoefficient); 
-	OwnerCharacter->SetDefaultCriticalPercent(PD.PlayerDynamicData.CriticalPercent * CurrentCriticalPercentCoefficient); 
-	OwnerCharacter->SetDefaultCriticalDamage(PD.PlayerDynamicData.CriticalDamageCoefficient * CurrentCriticalDamageCoefficient); 
-	OwnerCharacter->SetDefaultDEF(PD.PlayerDynamicData.DEF * CurrentDEFCoefficient); 
+	OwnerCharacter->SetDefaultCriticalPercent(PD.StatusData.CriticalPercent * CurrentCriticalPercentCoefficient); 
+	OwnerCharacter->SetDefaultCriticalDamage(PD.StatusData.CriticalDamageCoefficient * CurrentCriticalDamageCoefficient); 
+	OwnerCharacter->SetDefaultDEF(PD.StatusData.DEF * CurrentDEFCoefficient); 
 	OwnerCharacter->UpdateStatus();
 }
 
@@ -51,9 +51,9 @@ void UAPBuffComponent::ATKSpeedUp(float ATKSpeedCoefficient, bool Start)
 	if(Start) {CurrentATKSpeedCoefficient = CurrentATKSpeedCoefficient + ATKSpeedCoefficient;}
 	else {CurrentATKSpeedCoefficient = CurrentATKSpeedCoefficient - ATKSpeedCoefficient;}
 
-	PD.PlayerDynamicData.ATKSpeed = PD.PlayerDynamicData.ATKSpeed * CurrentATKSpeedCoefficient;
+	PD.StatusData.ATKSpeed = PD.StatusData.ATKSpeed * CurrentATKSpeedCoefficient;
 
-	OwnerCharacter->SetDefaultATKSpeed(PD.PlayerDynamicData.ATKSpeed); 
+	OwnerCharacter->SetDefaultATKSpeed(PD.StatusData.ATKSpeed); 
 }
 
 void UAPBuffComponent::ATKSpeedUp(float ATKSpeedCoefficient, float Time)
@@ -63,9 +63,9 @@ void UAPBuffComponent::ATKSpeedUp(float ATKSpeedCoefficient, float Time)
 	auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
 
 	CurrentATKSpeedCoefficient = CurrentATKSpeedCoefficient + ATKSpeedCoefficient;
-	PD.PlayerDynamicData.ATKSpeed = PD.PlayerDynamicData.ATKSpeed * CurrentATKSpeedCoefficient;
+	PD.StatusData.ATKSpeed = PD.StatusData.ATKSpeed * CurrentATKSpeedCoefficient;
 
-	OwnerCharacter->SetDefaultATKSpeed(PD.PlayerDynamicData.ATKSpeed); 
+	OwnerCharacter->SetDefaultATKSpeed(PD.StatusData.ATKSpeed); 
 	FTimerHandle TimerHandle;
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UAPBuffComponent::ATKSpeedUpEnd, &TimerHandle, ATKSpeedCoefficient);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, Time, false);
@@ -78,8 +78,8 @@ void UAPBuffComponent::ATKSpeedUpEnd(FTimerHandle *TimerHandle, float ATKSpeedCo
 	auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
 
 	CurrentATKSpeedCoefficient = CurrentATKSpeedCoefficient - ATKSpeedCoefficient;
-	PD.PlayerDynamicData.ATKSpeed = PD.PlayerDynamicData.ATKSpeed * CurrentATKSpeedCoefficient;
-	OwnerCharacter->SetDefaultATKSpeed(PD.PlayerDynamicData.ATKSpeed); 
+	PD.StatusData.ATKSpeed = PD.StatusData.ATKSpeed * CurrentATKSpeedCoefficient;
+	OwnerCharacter->SetDefaultATKSpeed(PD.StatusData.ATKSpeed); 
 
 	GetWorld()->GetTimerManager().ClearTimer(*TimerHandle);
 }
@@ -93,9 +93,9 @@ void UAPBuffComponent::ATKUp(float ATKCoefficient, bool Start)
 	if(Start) {CurrentATKCoefficient = CurrentATKCoefficient + ATKCoefficient;}
 	else {CurrentATKCoefficient = CurrentATKCoefficient - ATKCoefficient;}
 	
-	PD.PlayerDynamicData.ATK = PD.PlayerDynamicData.ATK * CurrentATKCoefficient;
+	PD.StatusData.ATK = PD.StatusData.ATK * CurrentATKCoefficient;
 
-	OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK); 
+	OwnerCharacter->SetDefaultATK(PD.StatusData.ATK); 
 }
 
 void UAPBuffComponent::ATKUp(float ATKCoefficient, float Time)
@@ -105,9 +105,9 @@ void UAPBuffComponent::ATKUp(float ATKCoefficient, float Time)
 	auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
 
 	CurrentATKCoefficient = CurrentATKCoefficient + ATKCoefficient;
-	PD.PlayerDynamicData.ATK = PD.PlayerDynamicData.ATK * CurrentATKCoefficient;
+	PD.StatusData.ATK = PD.StatusData.ATK * CurrentATKCoefficient;
 
-	OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK); 
+	OwnerCharacter->SetDefaultATK(PD.StatusData.ATK); 
 	FTimerHandle TimerHandle;
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UAPBuffComponent::ATKUpEnd, &TimerHandle, ATKCoefficient);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, Time, false);
@@ -120,9 +120,9 @@ void UAPBuffComponent::ATKUpEnd(FTimerHandle *TimerHandle, float ATKCoefficient)
 	auto PD = OwnerCharacter->GetPlayerStatus_Origin(); 
 
 	CurrentATKCoefficient = CurrentATKCoefficient - ATKCoefficient;
-	PD.PlayerDynamicData.ATK = PD.PlayerDynamicData.ATK * CurrentATKCoefficient;
+	PD.StatusData.ATK = PD.StatusData.ATK * CurrentATKCoefficient;
 	
-	OwnerCharacter->SetDefaultATK(PD.PlayerDynamicData.ATK); 
+	OwnerCharacter->SetDefaultATK(PD.StatusData.ATK); 
 
 	GetWorld()->GetTimerManager().ClearTimer(*TimerHandle);
 }

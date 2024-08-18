@@ -57,7 +57,7 @@ private:
 	UPROPERTY()
 	float MPRecoveryTime_Init = 10.0f;
 	UPROPERTY()
-	float GoldPercent_Init = 0.0f;
+	float GoldPercent_Init = 1.0f;
 
 	float Previous_MaxHPCoeff = 0.0f;
 	float Previous_ATKCoeff = 0.0f;

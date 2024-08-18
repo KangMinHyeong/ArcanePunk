@@ -7,6 +7,7 @@
 #include "Components/Character/APAnimHubComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 AAPCharacterBase::AAPCharacterBase()
 {
@@ -20,6 +21,15 @@ AAPCharacterBase::AAPCharacterBase()
 	StunEffectComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffectComp"));
 
 	StunEffectComp->SetupAttachment(GetMesh());
+}
+
+void AAPCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    auto DataTable = GI->GetStatusData()->FindRow<FStatusData>(CharacterName, CharacterName.ToString()); 
+    if(DataTable) TotalStatus_Origin.StatusData = * DataTable;  
 }
 
 void AAPCharacterBase::BeginPlay()
@@ -40,10 +50,12 @@ void AAPCharacterBase::ResetDefaultMaterial()
 	{GetMesh()->SetMaterial(Index, Mat); Index++;}
 }
 
+
+
 bool AAPCharacterBase::IsDead()
 {
 	bool bIsDead = false;
-	if(MyPlayerTotalStatus.PlayerDynamicData.HP<=KINDA_SMALL_NUMBER)
+	if(TotalStatus.StatusData.HP<=KINDA_SMALL_NUMBER)
 	{
 		bIsDead = true;
 		CrowdControlComp->PlayStateEffect(ECharacterState::Frozen, false);
@@ -88,10 +100,10 @@ void AAPCharacterBase::OnHittingEnd()
 float AAPCharacterBase::CriticalCalculate()
 {
 	float Percent = FMath::RandRange(0.0f, 100.0f);
-	if(Percent <= MyPlayerTotalStatus.PlayerDynamicData.CriticalPercent)
+	if(Percent <= TotalStatus.StatusData.CriticalPercent)
 	{
 		bCriticalAttack = true;
-		return MyPlayerTotalStatus.PlayerDynamicData.CriticalStep * (MyPlayerTotalStatus.PlayerDynamicData.CriticalDamageCoefficient);
+		return TotalStatus.StatusData.CriticalStep * (TotalStatus.StatusData.CriticalDamageCoefficient);
 	}
 	else {bCriticalAttack= false;}
     return 1.0f;

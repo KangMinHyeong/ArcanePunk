@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "GameInstance/APGameInstance.h"
 
 void UAPSmartKeySetting::NativeConstruct()
 {
@@ -12,6 +13,22 @@ void UAPSmartKeySetting::NativeConstruct()
 
     InitSmartKey();
     BindSmartKeyButton();
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+
+    APGI->SetTextBlock(TextBlock_Q, EStringRowName::SmartKey_Q);
+    APGI->SetTextBlock(TextBlock_E, EStringRowName::SmartKey_E);
+    APGI->SetTextBlock(TextBlock_R, EStringRowName::SmartKey_R);
+
+    APGI->SetTextBlock(SmartKeyQ_Text_On, EStringRowName::Button_On);
+    APGI->SetTextBlock(SmartKeyE_Text_On, EStringRowName::Button_On);
+    APGI->SetTextBlock(SmartKeyR_Text_On, EStringRowName::Button_On);
+    APGI->SetTextBlock(SmartKeyQ_Text_Off, EStringRowName::Button_Off);
+    APGI->SetTextBlock(SmartKeyE_Text_Off, EStringRowName::Button_Off);
+    APGI->SetTextBlock(SmartKeyR_Text_Off, EStringRowName::Button_Off);
+
+    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
+    APGI->SetTextBlock(TextBlock_Apply, EStringRowName::Apply);
 }
 
 FReply UAPSmartKeySetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)

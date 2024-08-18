@@ -4,6 +4,15 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "GameInstance/APGameInstance.h"
+
+void UEnhanceGauge::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    APGI->SetTextBlock(TextBlock_MaxEnhance, EStringRowName::Message_MaxEnhance);
+}
 
 void UEnhanceGauge::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
 {

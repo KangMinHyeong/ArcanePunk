@@ -14,8 +14,7 @@
 		"npm.autoDetect": "off",
 		"files.associations": {
 			"*.rh": "cpp",
-			"variant": "cpp",
-			"chrono": "cpp"
+			"xiosbase": "cpp"
 		}
 	},
 	"extensions": {

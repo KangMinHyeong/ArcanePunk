@@ -3,7 +3,7 @@
 
 #include "Items/APItemBase.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 
 UAPItemBase::UAPItemBase() : bIsCopy(false), bIsPickup(false)
 {

@@ -5,7 +5,7 @@
 #include "Components/Common/APSpawnMonsterComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Enemy/Enemy_CharacterBase.h"
-#include "SpawnPoint/APSpawnPointBase.h"
+#include "GameElements/SpawnPoint/APSpawnPointBase.h"
 #include "GameState/APGameState.h"
 #include "GameMode/APGameModeBattleStage.h"
 #include "Kismet/GameplayStatics.h"

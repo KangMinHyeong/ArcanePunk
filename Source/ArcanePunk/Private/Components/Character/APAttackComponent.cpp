@@ -10,7 +10,7 @@
 #include "Components/Character/APHitPointComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Enemy/Enemy_CharacterBase.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -56,7 +56,6 @@ void UAPAttackComponent::StartAttack_A(bool & bCanMove)
 	{
 		ComboAttackStart();
 		OwnerAnim->PlayAttack_A_Montage();
-		// OwnerAnim->JumpToComboSection(CurrentCombo);
 		bAttack_A = true;
 		bCanMove = false;
 	}
@@ -117,12 +116,16 @@ void UAPAttackComponent::ComboAttackEnd()
 void UAPAttackComponent::ComboCheck()
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
-
+	
 	CanCombo = false;
 	if (IsComboInputOn)
 	{
 		ComboAttackStart();
 		OwnerAnim->JumpToComboSection(CurrentCombo);
+	}
+	else
+	{
+		OwnerAnim->StopComboAttack();
 	}
 }
 
@@ -148,7 +151,7 @@ void UAPAttackComponent::SpawnSwordTrail(uint8 ComboStack)
 	}
 	FVector PlusLoc = SwordTrailHeight.X * OwnerCharacter->GetActorForwardVector() + OwnerCharacter->GetActorUpVector()*SwordTrailHeight.Z;
 	auto SwordTrail = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SwordTrailEffect, OwnerCharacter->GetActorLocation() + PlusLoc, OwnerCharacter->GetActorRotation() + PlusRot);
-	SwordTrail->SetVariableFloat(TEXT("AttackSpeed"), OwnerCharacter->GetPlayerStatus().PlayerDynamicData.ATKSpeed);
+	SwordTrail->SetVariableFloat(TEXT("AttackSpeed"), OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
 }
 
 //AttackTrace 코드 시작
@@ -702,17 +705,17 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 
 	float DrainCoeff = Coeff;
 
-	auto PDD = OwnerPlayer->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
+	auto PDD = OwnerPlayer->GetPlayerStatus(); float OriginHP = PDD.StatusData.HP;
     
 	if(Enemy->IsInDrainField() && OwnerPlayer->GetInArcaneTent())
 	{
 		DrainCoeff = DrainCoeff + FieldDrainCoefficient;
 	}
 
-	float HP = PDD.PlayerDynamicData.HP + DamageApplied * DrainCoeff; 
-    PDD.PlayerDynamicData.HP = FMath::Min(PDD.PlayerDynamicData.MaxHP, HP);
+	float HP = PDD.StatusData.HP + DamageApplied * DrainCoeff; 
+    PDD.StatusData.HP = FMath::Min(PDD.StatusData.MaxHP, HP);
 	
-	OwnerPlayer->SetDefaultHP(PDD.PlayerDynamicData.HP); 
+	OwnerPlayer->SetDefaultHP(PDD.StatusData.HP); 
 	OwnerPlayer->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 
 }

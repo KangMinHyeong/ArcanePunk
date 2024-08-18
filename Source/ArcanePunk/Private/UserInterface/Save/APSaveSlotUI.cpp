@@ -20,6 +20,9 @@ void UAPSaveSlotUI::NativeConstruct()
 
     SetIsFocusable(true);
     SetKeyboardFocus();
+
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
+    if(GI) GI->PlayUIOpenSound();
 }
 
 FReply UAPSaveSlotUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
@@ -87,12 +90,20 @@ void UAPSaveSlotUI::BindButton()
 
 void UAPSaveSlotUI::BindSlot()
 {
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return; 
+
     if(IsTitle)
     {
-        FString LoadText = TEXT("불러오기");
-        TextBlock_Select->SetText(FText::FromString(LoadText));
+        APGI->SetTextBlock(TextBlock_Select, EStringRowName::Load);
+    }
+    else
+    {
+        APGI->SetTextBlock(TextBlock_Select, EStringRowName::Save);
     }
     
+    APGI->SetTextBlock(TextBlock_Delete, EStringRowName::Delete);
+    APGI->SetTextBlock(TextBlock_SaveSlot, EStringRowName::SaveSlotName);
+
     OnSlot();
 }
 

@@ -2,11 +2,14 @@
 #include "GameInstance/APGameInstance.h"
 
 #include "Save/APSaveGame.h"
+#include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 
 void UAPGameInstance::Init()
 {
     Super::Init();
 
+    CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"), true);
     APSaveGameData = NewObject<UAPSaveGame>();
 
     OnSkillEnhanceDataUpdate.AddUObject(this, &UAPGameInstance::UpdateSkillEnhanceData);
@@ -49,6 +52,26 @@ void UAPGameInstance::ClearSkillEnhanceData(ESkillKey UpdateSkillKey)
     }
 }
 
+void UAPGameInstance::PlayClickSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), ClickSound, UISoundVolume);
+}
+
+void UAPGameInstance::PlayUIOpenSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), UIOpenSound, UISoundVolume);
+}
+
+void UAPGameInstance::PlayChoiceSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), ChoiceSound, UISoundVolume);
+}
+
+void UAPGameInstance::PlayRejectSound()
+{
+    UGameplayStatics::SpawnSound2D(GetWorld(), RejectSound, UISoundVolume);
+}
+
 int32 UAPGameInstance::CheckGoldAmount()
 {
     int32 Amount = 1;
@@ -57,4 +80,28 @@ int32 UAPGameInstance::CheckGoldAmount()
     OnGettingGold.Broadcast(Amount);
 
     return Amount;
+}
+
+void UAPGameInstance::SetTextBlock(UTextBlock *TextBlock, EStringRowName RowName)
+{
+    if(!CheckEnum.IsValid()) return;
+    FString Name = CheckEnum->GetNameStringByValue((uint8)RowName);
+
+    auto DataTable = StringData->FindRow<FStringDataTable>(FName(*Name), Name); 
+    if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));    
+}
+
+void UAPGameInstance::SetTextBlock_Name(UTextBlock *TextBlock, FName RowName)
+{
+    auto DataTable = StringData->FindRow<FStringDataTable>(RowName, RowName.ToString()); 
+    if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));  
+}
+
+FString UAPGameInstance::GetStringContent(EStringRowName RowName)
+{
+    if(!CheckEnum.IsValid()) return "";
+    FString Name = CheckEnum->GetNameStringByValue((uint8)RowName);
+
+    auto DataTable = StringData->FindRow<FStringDataTable>(FName(*Name), Name); 
+    return DataTable->Content;
 }

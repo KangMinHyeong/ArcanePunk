@@ -3,6 +3,7 @@
 
 #include "Components/Button.h"
 #include "Components/Slider.h"
+#include "Components/TextBlock.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "UserInterface/Setting/APOptionSetting.h"
 #include "Kismet/GameplayStatics.h"
@@ -14,6 +15,13 @@ void UAPAudioSetting::NativeConstruct()
     
     InitSliders();
     BindButton();
+
+    if(!APGI.IsValid()) return;
+    APGI->SetTextBlock(TextBlock_Master, EStringRowName::Volume_Master);
+    APGI->SetTextBlock(TextBlock_BGM, EStringRowName::Volume_BGM);
+    APGI->SetTextBlock(TextBlock_Effect, EStringRowName::Volume_Effect);
+    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
+    APGI->SetTextBlock(TextBlock_Apply, EStringRowName::Apply);
 }
 
 void UAPAudioSetting::NativeDestruct()

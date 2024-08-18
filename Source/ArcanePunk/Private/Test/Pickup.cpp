@@ -3,7 +3,7 @@
 
 #include "Test/Pickup.h"
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "Items/APItemBase.h"
 
 // Sets default values

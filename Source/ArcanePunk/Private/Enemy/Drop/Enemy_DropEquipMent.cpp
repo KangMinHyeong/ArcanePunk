@@ -21,12 +21,11 @@ void AEnemy_DropEquipMent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializePickup(UAPItemBase::StaticClass(), ItemQuantity);
 }
 
 void AEnemy_DropEquipMent::OnDropEquip()
 {
-	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
 
     if(IsPendingKillPending() || !ItemReference) return;
 

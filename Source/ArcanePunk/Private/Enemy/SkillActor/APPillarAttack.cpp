@@ -2,7 +2,7 @@
 #include "Enemy/SkillActor/APPillarAttack.h"
 
 #include "Enemy/Enemy_Boss.h"
-#include "DamageText/DamageText.h"
+#include "GameElements/DamageText/DamageText.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"

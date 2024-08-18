@@ -28,7 +28,7 @@ void UUltSkillNumber_12::PlaySkill()
 
 	if(Skilling)
 	{
-		Remove_Skill();
+		Remove_SkillRange();
 	}
 	else
 	{

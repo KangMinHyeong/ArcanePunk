@@ -29,22 +29,23 @@ void UAPConversationText::NativeTick(const FGeometry &MyGeometry, float InDeltaT
     } 
 }
 
-void UAPConversationText::SetConversation(FConversationData ConversationData)
+void UAPConversationText::SetConversation(FSequenceStringDataTable* ContentTextData)
 {
-    ConversationPortrait->SetBrushFromTexture(ConversationData.ConversationPortrait);
-    ConversationActorName->SetText(FText::FromString(ConversationData.ConversationActorName));
+    ConversationPortrait->SetBrushFromTexture(ContentTextData->Portrait);
+    ConversationActorName->SetText(FText::FromString(ContentTextData->SequenceCharacterName));
 
     ConversationCompleteTriangle->SetVisibility(ESlateVisibility::Collapsed);
-    EmphasizeFontSize = ConversationData.EmphasizeFontSize;
-    EmphasizeColor = ConversationData.EmphasizeColor;
-    EmphasizeLetterIndex = ConversationData.EmphasizeLetterIndex;
+    // EmphasizeFontSize = ConversationData.EmphasizeFontSize;
+    // EmphasizeColor = ConversationData.EmphasizeColor;
+    // EmphasizeLetterIndex = ConversationData.EmphasizeLetterIndex;
 
     InitValue(); 
-    ConversationLetters = UKismetStringLibrary::GetCharacterArrayFromString(ConversationData.ConversationText);
+    ConversationLetters = UKismetStringLibrary::GetCharacterArrayFromString(ContentTextData->Content);
     if(ConversationLetters.IsEmpty()) {bTextComplete = true;}
     InitText();
 
     GetWorld()->GetTimerManager().SetTimer(TextFlowTimerHandle, this, &UAPConversationText::SetTextFlow, TextFlowSpeed, true);
+
 }
 
 void UAPConversationText::SetTextFlow()
@@ -70,7 +71,7 @@ void UAPConversationText::SetTextFlow()
     }
 }
 
-void UAPConversationText::SkipConversation(FConversationData ConversationData)
+void UAPConversationText::SkipConversation()
 {
     GetWorld()->GetTimerManager().ClearTimer(TextFlowTimerHandle);
     for(auto Letter : TextLetters)

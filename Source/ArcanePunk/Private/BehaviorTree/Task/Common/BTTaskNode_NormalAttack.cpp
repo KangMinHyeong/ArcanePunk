@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -18,7 +19,7 @@ EBTNodeResult::Type UBTTaskNode_NormalAttack::ExecuteTask(UBehaviorTreeComponent
     SetAIOwner(OwnerComp);
     if(!Enemy.IsValid()) return EBTNodeResult::Failed;
 	if(!EnemyAnim.IsValid()) return EBTNodeResult::Failed;
-
+    
     CalculateWaitTime_Montage(EnemyAnim->NormalAttack_Montage);
 
     Super::ExecuteTask(OwnerComp, NodeMemory);

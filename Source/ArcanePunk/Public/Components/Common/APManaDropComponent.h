@@ -23,13 +23,14 @@ public:
 
 	void SpawnManaDrop(AActor* ManaOwner);
 
-private:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> ManaDropClass;
+	FORCEINLINE void SetDropPercent(float Percent) {DropPercent = Percent;};
+	FORCEINLINE void SetManaAmount(uint8 Amount) {ManaAmount = Amount;};
 
+private:
 	UPROPERTY(EditAnywhere)
 	float DropPercent = 0.0f;  // 0.0f ~ 100.0f
 
-
+	UPROPERTY(EditAnywhere)
+	uint8 ManaAmount = 1;
 		
 };

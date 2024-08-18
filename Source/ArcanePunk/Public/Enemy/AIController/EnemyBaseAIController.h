@@ -4,14 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "EnvironmentQuery/EnvQueryTypes.h"
 #include "EnemyBaseAIController.generated.h"
 
 class UBehaviorTree;
+class UCrowdFollowingComponent;
+struct FEnvQueryResult;
 
 UCLASS()
 class ARCANEPUNK_API AEnemyBaseAIController : public AAIController
 {
 	GENERATED_BODY()
+public:
+	AEnemyBaseAIController(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -31,4 +37,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool DistanceTrace = true;
+
+	UPROPERTY(EditAnywhere)
+	UCrowdFollowingComponent* CrowdFollowComp;
+
 };

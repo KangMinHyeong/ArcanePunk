@@ -2,7 +2,7 @@
 
 
 #include "Save/APSaveGame.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 
 UAPSaveGame::UAPSaveGame()
 {

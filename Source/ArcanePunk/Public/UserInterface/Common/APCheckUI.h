@@ -20,10 +20,10 @@ public:
 
 private:
 	UFUNCTION()
-	void Validate();
+	void OnValidate();
 
 	UFUNCTION()
-	void Cancel();
+	void OnCancel();
 
 private:
 	TWeakObjectPtr<UUserWidget> ParentWidget;
@@ -32,10 +32,16 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Button_Validation;
-
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* Button_Cancel;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_Validation;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* Text_Cancel;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* Text_Message;
+
+
 };

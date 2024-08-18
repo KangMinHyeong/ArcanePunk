@@ -7,9 +7,9 @@
 #include "Components/Button.h"
 #include "UserInterface/Shop/APShoppingUI.h"
 #include "Components/Character/APSkillHubComponent.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "Items/APItemBase.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Common/APCheckUI.h"
 
@@ -18,6 +18,16 @@ void UShoppingChoiceUI::NativeConstruct()
     Super::NativeConstruct();
     
     Button_Purchase->OnClicked.AddDynamic(this, &UShoppingChoiceUI::OnCheckPurchase);
+
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;  
+
+    APGI->SetTextBlock(Text_New, EStringRowName::NewSkill);
+    APGI->SetTextBlock(Text_Type, EStringRowName::TypeName);
+    APGI->SetTextBlock(Text_TierName, EStringRowName::TierName);
+    APGI->SetTextBlock(Text_PriceName, EStringRowName::Price);
+    APGI->SetTextBlock(Text_CurrentGold, EStringRowName::CurrentGold);
+    APGI->SetTextBlock(Text_Purchase, EStringRowName::Purchase);
+    
 }
 
 void UShoppingChoiceUI::InitParent(UUserWidget * UpdateParentWidget, int32 UpdateChoiceNumber)
@@ -37,8 +47,7 @@ void UShoppingChoiceUI::InitInformation_Enhance(FShopGoodsData_Enhance ShopGoods
     SwitchingAddition_Enhance(EnhanceData.GoodsCategory, EnhanceData.GoodsType, EnhanceData.EnhanceNumber);
     UpdatePlayerGold(EnhanceData.GoodsPrice);
 
-    FString GoodsType = TEXT("스킬 강화 - ");
-    Text_GoodsType->SetText(FText::FromString(GoodsType));
+    APGI->SetTextBlock(Text_GoodsType, EStringRowName::EnhanceSkill);
     Text_Price->SetText(FText::FromString(FString::FromInt(ShopGoodsData_Enhance.GoodsPrice)));
 
     bEnhanceUI = true;
@@ -53,8 +62,7 @@ void UShoppingChoiceUI::InitInformation_NewSkill(FShopGoodsData_NewSkill ShopGoo
     UpdatePlayerGold(NewSkillData.GoodsPrice);
     Text_New->SetVisibility(ESlateVisibility::Visible);
 
-    FString GoodsType = TEXT("스킬 이름 : ");
-    Text_GoodsType->SetText(FText::FromString(GoodsType));
+    APGI->SetTextBlock(Text_GoodsType, EStringRowName::SkillName);
     Text_Price->SetText(FText::FromString(FString::FromInt(ShopGoodsData_NewSkill.GoodsPrice)));
 
     auto DataTable = SkillNameListData->FindRow<FSkillNameList>(NewSkillData.NewSkillName, NewSkillData.NewSkillName.ToString()); if(!DataTable) return;
@@ -67,16 +75,16 @@ void UShoppingChoiceUI::InitInformation_NewSkill(FShopGoodsData_NewSkill ShopGoo
 
 void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
 {
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;  
     auto TierFont = Text_Tier->GetFont();
     auto CategoryFont = Text_Category->GetFont();
     auto GoodsTypeFont = Text_GoodsType->GetFont();
     auto GoodsNameFont = Text_GoodsName->GetFont();
-
-    FString ColorName;
+    
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        ColorName = TEXT("티어 : 실버");
+        APGI->SetTextBlock(Text_Type, EStringRowName::Tier_3);
         Border_Background->SetBrushColor(SilverColor);
         TierFont.OutlineSettings.OutlineColor = SilverColor;
         CategoryFont.OutlineSettings.OutlineColor = SilverColor;
@@ -84,7 +92,7 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
         GoodsNameFont.OutlineSettings.OutlineColor = SilverColor;
     break;
         case EEnHanceType::Gold:
-        ColorName = TEXT("티어 : 골드");
+        APGI->SetTextBlock(Text_Type, EStringRowName::Tier_2);
         Border_Background->SetBrushColor(GoldColor);
         TierFont.OutlineSettings.OutlineColor = GoldColor;
         CategoryFont.OutlineSettings.OutlineColor = GoldColor;
@@ -92,7 +100,7 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
         GoodsNameFont.OutlineSettings.OutlineColor = GoldColor;
     break;
         case EEnHanceType::Platinum:
-        ColorName = TEXT("티어 : 플레티넘");
+        APGI->SetTextBlock(Text_Type, EStringRowName::Tier_1);
         Border_Background->SetBrushColor(PlatinumColor);
         TierFont.OutlineSettings.OutlineColor = PlatinumColor;
         CategoryFont.OutlineSettings.OutlineColor = PlatinumColor;
@@ -100,7 +108,7 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
         GoodsNameFont.OutlineSettings.OutlineColor = PlatinumColor;
     break;
     }
-    Text_Tier->SetText(FText::FromString(ColorName));
+
     Text_Tier->SetFont(TierFont);
     Text_Category->SetFont(CategoryFont);
     Text_GoodsType->SetFont(GoodsTypeFont);
@@ -109,23 +117,23 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
 
 void UShoppingChoiceUI::SwitchingSkillType(EEnhanceCategory EnhanceCategory)
 {
-    FString SkillCategoryName;
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;  
+
     switch (EnhanceCategory)
     {
         case EEnhanceCategory::Enhance_Q:
-        SkillCategoryName = TEXT("타입 : Q스킬");
+        APGI->SetTextBlock(Text_Category, EStringRowName::Skill_Q);
     break;
         case EEnhanceCategory::Enhance_E:
-        SkillCategoryName = TEXT("타입 : E스킬");
+        APGI->SetTextBlock(Text_Category, EStringRowName::Skill_E);
     break;
         case EEnhanceCategory::Enhance_R:
-        SkillCategoryName = TEXT("타입 : R스킬");
+        APGI->SetTextBlock(Text_Category, EStringRowName::Skill_R);
     break;
         case EEnhanceCategory::Enhance_Passive:
-        SkillCategoryName = TEXT("타입 : 패시브");
+        APGI->SetTextBlock(Text_Category, EStringRowName::Passive);
     break;
     }
-    Text_Category->SetText(FText::FromString(SkillCategoryName));
 }
 
 void UShoppingChoiceUI::SwitchingAbility(EEnHanceType EnHanceType, FName AbilityName)
@@ -154,8 +162,6 @@ void UShoppingChoiceUI::SwitchingAbility(EEnHanceType EnHanceType, FName Ability
 void UShoppingChoiceUI::SwitchingAddition_Enhance(EEnhanceCategory EnhanceCategory, EEnHanceType EnHanceType, uint8 EnhanceNum)
 {
     if(!OwnerCharacter.IsValid()) return;
-    FString AdditionName = TEXT("현재 중첩 : ");
-    FString Addition_Inform_2 = TEXT(" 회");
     
     FSkillAbilityNestingData SkillAbilityNestingData;
     switch (EnhanceCategory)
@@ -205,32 +211,33 @@ void UShoppingChoiceUI::SwitchingAddition_Enhance(EEnhanceCategory EnhanceCatego
     CurrentAbilityData.Key = EnhanceNum;
     CurrentAbilityData.Value = NestingNum;
 
-    Text_Addition->SetText(FText::FromString(AdditionName));
+    
     Text_Addition_Inform->SetText(FText::FromString(FString::FromInt(NestingNum)));
-    Text_Addition_Inform_2->SetText(FText::FromString(Addition_Inform_2));
+
+    APGI->SetTextBlock(Text_Addition, EStringRowName::CurrentNesting);
+    APGI->SetTextBlock(Text_Addition_Inform_2, EStringRowName::Count);
 }
 
 void UShoppingChoiceUI::SwitchingAddition_NewSkill(EEnHanceType EnHanceType)
 {
-    FString AdditionName;
+    APGI->SetTextBlock(Text_Addition, EStringRowName::AdditionEnhance);
+        
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        AdditionName = TEXT("추가 증강 : X");
+        Text_Addition_1->SetText(FText::FromString(SpaceB));
         Border_Background->SetBrushColor(SilverColor);
     break;
         case EEnHanceType::Gold:
-        AdditionName = TEXT("추가 증강 : 실버");
+        APGI->SetTextBlock(Text_Addition_Inform_2, EStringRowName::Tier_3);
         Border_Background->SetBrushColor(GoldColor);
     break;
         case EEnHanceType::Platinum:
-        AdditionName = TEXT("추가 증강 : 골드");
+        APGI->SetTextBlock(Text_Addition_Inform_2, EStringRowName::Tier_2);
         Border_Background->SetBrushColor(PlatinumColor);
     break;
     }
-    Text_Addition->SetText(FText::FromString(AdditionName));
 }
-
 
 void UShoppingChoiceUI::OnValidating(ECheckType UpdateCheckType)
 {
@@ -240,9 +247,9 @@ void UShoppingChoiceUI::OnValidating(ECheckType UpdateCheckType)
     auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")); if(!Item) {Shop->OnNotEnoughGold(); return;} // 골드 부족 UI
     if(Item->Quantity >= CurrentPrice)
     {
+        APGI->PlayChoiceSound();
         OwnerCharacter->GetInventory()->RemoveAmountOfItem(Item, CurrentPrice);
-        auto APGI = Cast<UAPGameInstance>(GetGameInstance()); 
-        if(APGI) APGI->OnGettingGold.Broadcast(-CurrentPrice);
+        if(APGI.IsValid()) APGI->OnGettingGold.Broadcast(-CurrentPrice);
     }
 
     if(bEnhanceUI)
@@ -266,9 +273,9 @@ void UShoppingChoiceUI::OnCheckPurchase()
     auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")); if(!Item) {Shop->OnNotEnoughGold(); return;} // 골드 부족 UI
     if(Item->Quantity >= CurrentPrice)
     {
-        auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+        if(!APGI.IsValid()) return;
 
-        auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), GI->GetCheckUIClass());
+        auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), APGI->GetCheckUIClass());
         if(CheckUI)
         {
             CheckUI->AddToViewport(1); 

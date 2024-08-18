@@ -126,7 +126,7 @@ EEnhanceCategory AEnemy_DropPackage::GetRandCategory()
 
 void AEnemy_DropPackage::BeginFocus()
 {
-	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractTrigger->Character; if(!Character.IsValid()) return;
+	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
 	Character->ActivateInteractionSweep();
 
 	GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &AEnemy_DropPackage::BeginFocus, InteractFrequency, true);
@@ -139,7 +139,7 @@ void AEnemy_DropPackage::EndFocus()
 
 FInteractData AEnemy_DropPackage::GetInteractData()
 {
-    return InteractTrigger->GetInteractionData();
+    return InteractionTrigger->GetInteractionData();
 }
 
 void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
@@ -161,23 +161,23 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 	Destroy();
 }
 
-void AEnemy_DropPackage::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
-{
-    Super::OnOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+// void AEnemy_DropPackage::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+// {
+//     Super::OnOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-    UNiagaraComponent* GroundComp = nullptr;
-    switch (EnHanceType)
-    {
-    case EEnHanceType::Silver:
-        GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Silver, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
-        break;
+//     UNiagaraComponent* GroundComp = nullptr;
+//     switch (EnHanceType)
+//     {
+//     case EEnHanceType::Silver:
+//         GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Silver, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+//         break;
     
-    case EEnHanceType::Gold:
-        GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Gold, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
-        break;
+//     case EEnHanceType::Gold:
+//         GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Gold, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+//         break;
     
-    case EEnHanceType::Platinum:
-        GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Platinum, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
-        break;
-    }
-}
+//     case EEnHanceType::Platinum:
+//         GroundComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GroundEffect_Platinum, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+//         break;
+//     }
+// }

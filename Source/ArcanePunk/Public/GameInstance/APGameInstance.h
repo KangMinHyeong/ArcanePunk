@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/InteractionInterface.h"
 #include "Components/Character/SkillNumber/SkillDataTable/SkillDataTable.h"
 #include "Engine/GameInstance.h"
 #include "APGameInstance.generated.h"
@@ -12,8 +13,10 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillEnhanceDataClear, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGettingGold, int32);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnChangingSoundVolume, float, float, float) // MasterVolume, BGM, Effect
 
-class AEnemy_DropPackage;
+class AEnemy_DropBase;
 class UAPSaveGame;
+class UTextBlock;
+class AAPManaEnergy;
 
 USTRUCT(BlueprintType)
 struct FGameSoundVolume
@@ -30,6 +33,7 @@ struct FGameSoundVolume
 	float EffectVolume = 1.0f;
 };
 
+
 UCLASS()
 class ARCANEPUNK_API UAPGameInstance : public UGameInstance
 {
@@ -39,6 +43,16 @@ public:
 	void UpdateSkillEnhanceData(ESkillKey UpdateSkillKey, FSkillAbilityNestingData UpdateSkillAbilityNestingData);
 	void ClearSkillEnhanceData(ESkillKey UpdateSkillKey);
 
+	// Play Sound
+	void PlayClickSound();
+	void PlayUIOpenSound();
+	void PlayChoiceSound();
+	void PlayRejectSound();
+
+	void SetTextBlock(UTextBlock* TextBlock, EStringRowName RowName);
+	void SetTextBlock_Name(UTextBlock* TextBlock, FName RowName);
+	FString GetStringContent(EStringRowName RowName);
+
 	// DataTable
 	FORCEINLINE UDataTable* GetSkillNameList() const {return SkillNameList;};
 	FORCEINLINE UDataTable* GetSkillAbilityRowData() const {return SkillAbilityRowData;};
@@ -46,7 +60,11 @@ public:
 	FORCEINLINE UDataTable* GetGoldAbilityDataTable() const {return GoldAbilityDataTable;};
 	FORCEINLINE UDataTable* GetPlatinumAbilityDataTable() const {return PlatinumAbilityDataTable;};
 	FORCEINLINE UDataTable* GetEquipDataTable() const {return EquipDataTable;};
-
+	FORCEINLINE UDataTable* GetStringData() const {return StringData;};
+	FORCEINLINE UDataTable* GetSequenceStringData() const {return SequenceStringData;};
+	FORCEINLINE UDataTable* GetStatusData() const {return StatusData;};
+	FORCEINLINE UDataTable* GetNPCData() const {return NPCData;};
+	
 	FORCEINLINE FString GetDefaultSlotName() const {return DefaultSlotName;};
 	FORCEINLINE void SetDefaultSlotName(FString NewName) {DefaultSlotName = NewName;};
 	
@@ -57,19 +75,21 @@ public:
 	FORCEINLINE void SetGameMasterVolume(float NewValue) {GameSoundVolume.MasterVolume = NewValue;};
 	FORCEINLINE void SetGameBGMVolume(float NewValue) {GameSoundVolume.BGMVolume = NewValue;};
 	FORCEINLINE void SetGameEffectVolume(float NewValue) {GameSoundVolume.EffectVolume = NewValue;};
-
+	
 	FORCEINLINE TMap<FName, bool> GetCanEnterStage() const {return CanEnterStage;};
 	FORCEINLINE void SetCanEnterStage(FName KeyName, bool NewBool) {CanEnterStage[KeyName] = NewBool;};
 
 	FORCEINLINE bool IsNewGame() const {return bNewGame;};
 	FORCEINLINE void SetNewGame(bool NewBool) {bNewGame = NewBool;};
 
-	FORCEINLINE TMap<FName , float> GetPackageDropMap() const {return PackageDropMap;};
-	FORCEINLINE TSubclassOf<AEnemy_DropPackage> GetDropPackageClass() const {return DropPackageClass;};
-	
+	FORCEINLINE TSubclassOf<AAPManaEnergy> GetManaEnergyClass() const {return ManaEnergyClass;};
+	FORCEINLINE TSubclassOf<AEnemy_DropBase> GetDropGoldClass() const {return DropGoldClass;};
+	FORCEINLINE TSubclassOf<AEnemy_DropBase> GetDropDiceClass() const {return DropDiceClass;};
+
 	FORCEINLINE FSkillAbilityNestingData GetQSkillAbilityNestingData() const {return QSkillAbilityNestingData;};
 	FORCEINLINE FSkillAbilityNestingData GetESkillAbilityNestingData() const {return ESkillAbilityNestingData;};
 	FORCEINLINE FSkillAbilityNestingData GetRSkillAbilityNestingData() const {return RSkillAbilityNestingData;};
+
 
 	FORCEINLINE float GetGoldPlusPercent() const {return GoldPlusPercent;};
 	FORCEINLINE void SetGoldPlusPercent(float NewValue) {GoldPlusPercent = NewValue;};
@@ -95,6 +115,7 @@ public:
 	FORCEINLINE float GetOffset() const {return Offset;};
     FORCEINLINE void SetOffset(float Value) {Offset = Value;};
 
+	
 private:
 	UPROPERTY()
 	FString DefaultSlotName = "PlayerSlot_0";
@@ -108,14 +129,28 @@ private:
 	UPROPERTY(EditAnywhere)
 	TMap<FName, bool> CanEnterStage; // Stage이름, 입장가능여부
 
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TMap<FName , float> PackageDropMap; // Item ID , Drop 확률 (보따리 드랍)
-	
+
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AEnemy_DropPackage> DropPackageClass;
+	TSubclassOf<AAPManaEnergy> ManaEnergyClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemy_DropBase> DropGoldClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemy_DropBase> DropDiceClass;
 
 	UPROPERTY()
 	FGameSoundVolume GameSoundVolume;
+
+	// UI Sound
+	UPROPERTY(EditAnywhere)
+	USoundBase* ClickSound;
+	UPROPERTY(EditAnywhere)
+	USoundBase* UIOpenSound;
+	UPROPERTY(EditAnywhere)
+	USoundBase* ChoiceSound;
+	UPROPERTY(EditAnywhere)
+	USoundBase* RejectSound;
+	UPROPERTY(EditAnywhere)
+	float UISoundVolume = 1.0f;
 
 	UPROPERTY() // Q스킬 증강 정보 (종류 및 중첩 상태)
 	FSkillAbilityNestingData QSkillAbilityNestingData;
@@ -134,6 +169,14 @@ private:
 	UDataTable* GoldAbilityDataTable;
 	UPROPERTY(EditAnywhere)
 	UDataTable* PlatinumAbilityDataTable;
+	UPROPERTY(EditAnywhere)
+	UDataTable* StringData;
+	UPROPERTY(EditAnywhere)
+	UDataTable* SequenceStringData;
+	UPROPERTY(EditAnywhere)
+	UDataTable* StatusData;
+	UPROPERTY(EditAnywhere)
+	UDataTable* NPCData;
 
 	UPROPERTY(EditAnywhere, Category = "Equipment")
 	UDataTable* EquipDataTable;
@@ -162,6 +205,7 @@ private:
 	UPROPERTY()
 	float Offset = 0.5f;
 
+	TWeakObjectPtr<UEnum> CheckEnum;
 public:
 	FOnSkillEnhanceDataUpdate OnSkillEnhanceDataUpdate;
 	FOnSkillEnhanceDataClear OnSkillEnhanceDataClear;

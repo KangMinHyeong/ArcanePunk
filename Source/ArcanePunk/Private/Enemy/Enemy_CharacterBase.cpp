@@ -10,20 +10,20 @@
 #include "Components/TextRenderComponent.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "DamageText/DamageText.h"
+#include "GameElements/DamageText/DamageText.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APTakeDamageComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameMode/APGameModeBattleStage.h"
-#include "Enemy/Drop/Enemy_DropPackage.h"
+#include "Enemy/Drop/Enemy_DropBase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "NavigationSystem.h"
@@ -56,11 +56,11 @@ void AEnemy_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MyPlayerTotalStatus = MyPlayerTotalStatus_Origin;
+	TotalStatus = TotalStatus_Origin;
 	SetActorTickEnabled(false);
 	InitMonster();	
 	BindMontageEnded();
-	GetCharacterMovement()->MaxWalkSpeed = MyPlayerTotalStatus.PlayerDynamicData.MoveSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = TotalStatus.StatusData.MoveSpeed;
 	Monster_AttackRange_Plus += Monster_AttackRange;
 
 	OnCrowdControlCheck.AddUObject(this, &AEnemy_CharacterBase::CrowdControlCheck);
@@ -156,12 +156,12 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	if(IsDead()) return 0.0f;
 	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
 
-	float HP = MyPlayerTotalStatus.PlayerDynamicData.HP;
+	float HP = TotalStatus.StatusData.HP;
 	DamageApplied = DamageApplied * DamageMultiple;
 	DamageApplied = FMath::Min(HP, DamageApplied);
 	
 	HP = HP - DamageMath(DamageApplied);
-	MyPlayerTotalStatus.PlayerDynamicData.HP = HP;
+	TotalStatus.StatusData.HP = HP;
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 	OnEnemyHPChanged.Broadcast();
 	
@@ -177,7 +177,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		StunEffectComp->DestroyComponent();
 		TeleportMark->DeactivateImmediate();
 		EnemyAnim->PlayDeath_Montage();
-		ManaDropComp->SpawnManaDrop(DamageCauser);
+		DropChecking(DamageCauser);
 	}
 	else EnemyAnim->PlayHit_Montage();
 	
@@ -229,7 +229,7 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 		int32 minus = FMath::RandRange(0,1); if(minus == 0) Y = -Y;
 
 		PatrolLocation += FVector( PatrolDist * X,  PatrolDist * Y, 0.0f);
-		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc, FVector(0.0f,0.0f,5000.0f));
+		navResult = navSystem->ProjectPointToNavigation(PatrolLocation, NavLoc, FVector(0.0f, 0.0f, 5000.0f));
 		Repeat++;
 	}
 
@@ -244,7 +244,7 @@ void AEnemy_CharacterBase::SpawnDetectRender()
 
 float AEnemy_CharacterBase::DamageMath(float Damage)
 {
-    return Damage * Defense_constant * (1/(Defense_constant + MyPlayerTotalStatus.PlayerDynamicData.DEF));
+    return Damage * Defense_constant * (1/(Defense_constant + TotalStatus.StatusData.DEF));
 }
 
 bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom, float Radius, FVector CustomStart, FVector CustomEnd)
@@ -307,7 +307,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 
 void AEnemy_CharacterBase::NormalAttack()
 {
-	float Damage = MyPlayerTotalStatus.PlayerDynamicData.ATK * CriticalCalculate();
+	float Damage = TotalStatus.StatusData.ATK * CriticalCalculate();
 	FHitResult HitResult;
 	FVector HitVector;
 	if(AttackTrace(HitResult, HitVector))
@@ -345,7 +345,7 @@ void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float D
 void AEnemy_CharacterBase::InitMonster()
 {
 	// Status Init
-	MyPlayerTotalStatus.PlayerDynamicData.HP = MyPlayerTotalStatus.PlayerDynamicData.MaxHP;
+	TotalStatus.StatusData.HP = TotalStatus.StatusData.MaxHP;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	// Mesh Init
@@ -357,6 +357,11 @@ void AEnemy_CharacterBase::InitMonster()
 		i++;
 	}
 
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    auto DataTable = GI->GetNPCData()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
+    if(DataTable) DropData = * DataTable; 
+	SetManaDrop();
+
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }
 
@@ -366,51 +371,36 @@ void AEnemy_CharacterBase::StopClear()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
-void AEnemy_CharacterBase::DropItemActor() 
+void AEnemy_CharacterBase::SetManaDrop()
+{
+	ManaDropComp->SetDropPercent(DropData.DropArcaneEnergy_Percent);
+	ManaDropComp->SetManaAmount(FMath::RandRange(DropData.DropArcaneEnergy_Min, DropData.DropArcaneEnergy_Max));
+}
+
+void AEnemy_CharacterBase::DropChecking(AActor *DamageCauser) 
 {
 	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-	auto PackageDrops = GI->GetPackageDropMap();
 
-	for(TPair<FName, float>& DropClass : PackageDrops)
+	float DropPercent = FMath::RandRange(0.0f, 100.0f);
+	if(DropPercent < DropData.DropGold_Percent)
 	{
-		float DropPercent = FMath::RandRange(0.0f,  100.0f);
-		if(DropClass.Key == "Enhance")
-		{
-			if(DropPercent <= DropClass.Value)
-			{
-				if(DropPackage.IsValid())
-				{
-					DropPackage->AddEnhance();
-				}
-				else
-				{
-					DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(GI->GetDropPackageClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-					DropPackage->AddEnhance();
-				}	
-			}
-			continue;
-		}
-
-		if(DropPercent <= DropClass.Value)
-		{
-			if(DropPackage.IsValid())
-			{
-				DropPackage->AddItem(DropClass.Key);
-			}
-			else
-			{
-				DropPackage = GetWorld()->SpawnActor<AEnemy_DropPackage>(GI->GetDropPackageClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
-				DropPackage->AddItem(DropClass.Key);
-			}	
-		}
+		int32 Quantity = FMath::RandRange(DropData.DropGold_Min, DropData.DropGold_Max);
+		auto DropGold = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropGoldClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+		if(DropGold) DropGold->InitializePickup(DamageCauser, Quantity, true);
 	}
-	if(DropPackage.IsValid()) DropPackage->SetDropOverlap(true);
+
+	ManaDropComp->SpawnManaDrop(DamageCauser);
+	// DropPercent = FMath::RandRange(0.0f, 100.0f);
+	// if(DropPercent < DropData.DropDice_Percent)
+	// {
+	// 	int32 Quantity = FMath::RandRange(DropData.DropDice_Min, DropData.DropDice_Max);
+	// 	auto DropDice = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropDiceClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+	// 	DropDice->InitializePickup(UAPItemBase::StaticClass(), Quantity);
+	// }
 }
 
 void AEnemy_CharacterBase::EnemyDestroyed()
 {
-	if(OnDrop) DropItemActor();
-
 	Destroy();
 }
 

@@ -169,6 +169,7 @@ void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, U
         CutterEffectComp->Activate();
 	}
 	
+    PlaySkillSound();
 	BintHit();
 	SetActorTickEnabled(true);
 }

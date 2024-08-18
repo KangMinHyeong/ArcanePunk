@@ -3,9 +3,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
-#include "UserInterface/LoadingFade.h"
+#include "UserInterface/Loading/LoadingFade.h"
 #include "UserInterface/Fade/HitFade.h"
-#include "UserInterface/Status/APStatusUI.h"
+#include "UserInterface/HUD/Status/APStatusUI.h"
 #include "UserInterface/Skill/HomingTargetUI.h"
 #include "UserInterface/Skill/APMouseClickBase.h"
 #include "UserInterface/Setting/APOptionSetting.h"
@@ -15,9 +15,9 @@
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "Interfaces/InteractionInterface.h"
 #include "UserInterface/Conversation/APConversationUI.h"
-#include "ArcanePunk/APGameModeBase.h"
+#include "GameMode/APGameModeBase.h"
 #include "UserInterface/Shop/APShoppingUI.h"
-#include "UserInterface/Inform/APSkillWindow.h"
+#include "UserInterface/Inform/Skill/APSkillWindow.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -122,26 +122,37 @@ void AArcanePunkPlayerController::OptionSetting()
     OptionSettingUI->AddToViewport();
 }
 
-void AArcanePunkPlayerController::StartFadeIn()
+void AArcanePunkPlayerController::StartFadeIn(float MultipleSpeed, bool bEntrance)
 {
-    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget) return;
-    
-    FadeLoadingWidget->AddToViewport();
-    FadeLoadingWidget->FadeIn();
+    if(!FadeLoadingWidget.IsValid())
+    {
+        FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget.IsValid()) return;
+    }
 
-    if(!LoadingWidget.IsValid()) return;
-    LoadingWidget->RemoveFromParent();
-    GetWorldTimerManager().ClearTimer(LoadTimerHandle);
-    
-    CreateEntranceUI();
+    if(!FadeLoadingWidget->IsInViewport()) FadeLoadingWidget->AddToViewport();
+
+    FadeLoadingWidget->FadeIn(MultipleSpeed);
+
+    if(bEntrance)
+    {
+        if(!LoadingWidget.IsValid()) return;
+        LoadingWidget->RemoveFromParent();
+        GetWorldTimerManager().ClearTimer(LoadTimerHandle);
+        
+        CreateEntranceUI();
+    }
 }
 
-void AArcanePunkPlayerController::StartFadeOut()
+void AArcanePunkPlayerController::StartFadeOut(float MultipleSpeed, bool bEntrance)
 {
-    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget) return;
-    
+    if(!FadeLoadingWidget.IsValid())
+    {
+        FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget.IsValid()) return;
+    }
+
     FadeLoadingWidget->AddToViewport();
-    FadeLoadingWidget->FadeOut();
+    
+    if(FadeLoadingWidget.IsValid()) FadeLoadingWidget->FadeOut(MultipleSpeed, bEntrance);
 }
 
 void AArcanePunkPlayerController::StartLoading()
@@ -150,7 +161,8 @@ void AArcanePunkPlayerController::StartLoading()
     
     LoadingWidget->AddToViewport();
 
-    GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &AArcanePunkPlayerController::StartFadeIn, LoadingTime, false);
+    FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::StartFadeIn, 1.0f, true);
+	GetWorld()->GetTimerManager().SetTimer(LoadTimerHandle, TimerDelegate, LoadingTime, false);
 }
 
 void AArcanePunkPlayerController::CreateEntranceUI()
@@ -215,7 +227,7 @@ void AArcanePunkPlayerController::CloseStageSelectingUI()
     if(MyCharacter.IsValid()) {MyCharacter->SetActorHiddenInGame(false); SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); MyCharacter->EnableInput(this);} 
 }
 
-void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName Name, uint8 State)
+void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName RowName)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
@@ -223,18 +235,18 @@ void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName 
     MyCharacter->SetActorHiddenInGame(true); MyCharacter->DisableInput(this); 
     SetViewTargetWithBlend(CameraActor, BlendTime);
 
-	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, Name, State);
+	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, RowName);
 	GetWorld()->GetTimerManager().SetTimer(InteractionTimerHandle, TimerDelegate, BlendTime, false);
 }
 
-void AArcanePunkPlayerController::OnConversationUI(FName Name, uint8 State)
+void AArcanePunkPlayerController::OnConversationUI(FName RowName)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
     GetWorld()->GetTimerManager().ClearTimer(InteractionTimerHandle);
     ConversationUI = CreateWidget<UAPConversationUI>(GetWorld(), ConversationUIClass); if(!ConversationUI.IsValid()) return;
     ConversationUI->AddToViewport();
-    ConversationUI->InitOrder(Name, State);
+    ConversationUI->InitOrder(RowName);
 }
 
 void AArcanePunkPlayerController::CloseConversationUI()

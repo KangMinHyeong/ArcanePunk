@@ -4,11 +4,11 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/SkillActor/APSkillAbility.h"
-#include "UserInterface/APHUD.h"
+#include "UserInterface/HUD/APHUD.h"
 #include "Components/Common/APBuffComponent.h"
 #include "Components/Common/APCrowdControlComponent.h"
 #include "GameInstance/APGameInstance.h"
-#include "ArcanePunk/Public/Components/APInventoryComponent.h"
+#include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "Items/APItemBase.h"
 #include "Components/Character/APAttackComponent.h"
 
@@ -42,10 +42,6 @@ void UAPPassiveComponent::UpdateFromGameInstance()
 {
 	APGI = Cast<UAPGameInstance>(OwnerCharacter->GetGameInstance()); if(!APGI.IsValid()) return;
 
-	if(APGI->GetPackageDropMap().Contains(TEXT_Gold))
-	{
-		GoldPercent_Init = APGI->GetPackageDropMap()[TEXT_Gold];
-	}
 
 	APGI->OnGettingGold.AddUObject(this, &UAPPassiveComponent::ApplyMoneyPower);
 	APGI->OnGettingGold.AddUObject(this, &UAPPassiveComponent::RecoveryHP);
@@ -91,11 +87,11 @@ void UAPPassiveComponent::RecoveryHP(int32 AddNum)
 	float Check = FMath::RandRange(0.0f, 100.0f);
 	if(Check <= HPRecoveryPercent)
 	{
-		auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.PlayerDynamicData.HP;
-		float HP = PDD.PlayerDynamicData.HP + PDD.PlayerDynamicData.MaxHP * HPRecoveryAmount; // 최대체력 비례
-		PDD.PlayerDynamicData.HP = FMath::Min(PDD.PlayerDynamicData.MaxHP, HP);
+		auto PDD = OwnerCharacter->GetPlayerStatus(); float OriginHP = PDD.StatusData.HP;
+		float HP = PDD.StatusData.HP + PDD.StatusData.MaxHP * HPRecoveryAmount; // 최대체력 비례
+		PDD.StatusData.HP = FMath::Min(PDD.StatusData.MaxHP, HP);
 
-		OwnerCharacter->SetDefaultHP(PDD.PlayerDynamicData.HP); 
+		OwnerCharacter->SetDefaultHP(PDD.StatusData.HP); 
 		OwnerCharacter->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
 	}
 }
@@ -150,7 +146,7 @@ void UAPPassiveComponent::ApplyNewPassive(EPassiveNumber PassiveNum)
 
 void UAPPassiveComponent::UpdateMaxHP()
 {
-	auto MaxHP = Status_Init.PlayerDynamicData.MaxHP;
+	auto MaxHP = Status_Init.StatusData.MaxHP;
 
 	float HPPlus = 20.0f;
 	float HPCoeff = 0.1f; 	// 기본 증가 // 하드코딩
@@ -221,7 +217,7 @@ void UAPPassiveComponent::UpdateMaxHP()
 
 void UAPPassiveComponent::UpdateATK()
 {
-	auto ATK = Status_Init.PlayerDynamicData.ATK;
+	auto ATK = Status_Init.StatusData.ATK;
 
 	float ATKPlus = 5.0f;
 	float ATKCoeff = 0.05f; 	// 기본 증가 // 하드코딩
@@ -304,7 +300,7 @@ void UAPPassiveComponent::UpdateATK()
 
 void UAPPassiveComponent::UpdateATKSpeed()
 {
-	auto ATKSpeed = Status_Init.PlayerDynamicData.ATKSpeed;
+	auto ATKSpeed = Status_Init.StatusData.ATKSpeed;
 
 	float ATKSpeedCoeff = 0.07f; 	// 기본 증가 // 하드코딩
 	
@@ -358,7 +354,7 @@ void UAPPassiveComponent::UpdateATKSpeed()
 
 void UAPPassiveComponent::UpdateMoveSpeed()
 {
-	auto MoveSpeed = Status_Init.PlayerDynamicData.MoveSpeed;
+	auto MoveSpeed = Status_Init.StatusData.MoveSpeed;
 
 	float MoveSpeedPlus = 0.0f;
 	float MoveSpeedCoeff = 0.05f; 	// 기본 증가 // 하드코딩
@@ -488,8 +484,8 @@ void UAPPassiveComponent::UpdateMaxMP()
 
 void UAPPassiveComponent::UpdateCriticalPercent()
 {
-	auto CriticalPercent = Status_Init.PlayerDynamicData.CriticalPercent;
-	auto CriticalDamageCoefficient = Status_Init.PlayerDynamicData.CriticalDamageCoefficient;
+	auto CriticalPercent = Status_Init.StatusData.CriticalPercent;
+	auto CriticalDamageCoefficient = Status_Init.StatusData.CriticalDamageCoefficient;
 
 	float CriticalPercentPlus = 2.0f; 	// 기본 증가 // 하드코딩
 	float CriticalDamagePlus = 0.0f;
@@ -555,7 +551,7 @@ void UAPPassiveComponent::UpdateCriticalPercent()
 
 void UAPPassiveComponent::UpdateDEF()
 {
-	auto DEF = Status_Init.PlayerDynamicData.DEF;
+	auto DEF = Status_Init.StatusData.DEF;
 
 	float DEFPlus = 5.0f; // 기본 증가 // 하드코딩
 	float DEFCoeff = 0.0f;
@@ -620,87 +616,87 @@ void UAPPassiveComponent::UpdateDEF()
 
 void UAPPassiveComponent::UpdateGoldPercent()
 {
-	auto GoldPercent = GoldPercent_Init;
+	// auto GoldPercent = GoldPercent_Init;
 
-	float GoldPlus = 0.05f; // 기본 증가 // 하드코딩
-	float DoubleGoldPercent = 0.0f;
-	HPRecoveryPercent = 0.0f;
-	HPRecoveryAmount = 0.0f;
+	// float GoldPlus = 0.05f; // 기본 증가 // 하드코딩
+	// float DoubleGoldPercent = 0.0f;
+	// HPRecoveryPercent = 0.0f;
+	// HPRecoveryAmount = 0.0f;
 
-	// 증강 증가
-	FName PassiveName = TEXT("Passive_8");
-	auto RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(PassiveName, PassiveName.ToString());
-	auto PassiveNestingData = OwnerCharacter->GetPassiveSkills()[(uint8)EPassiveNumber::Passive_8];
+	// // 증강 증가
+	// FName PassiveName = TEXT("Passive_8");
+	// auto RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(PassiveName, PassiveName.ToString());
+	// auto PassiveNestingData = OwnerCharacter->GetPassiveSkills()[(uint8)EPassiveNumber::Passive_8];
 
-	auto RowName = RowDataTable->SilverRowName;
-	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
-    {
-		auto SilverData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
-		if(!SilverData) return;
-		switch (It.Key)
-		{
-			case 1: // Gold 획득률 증가 , 합연산
-			GoldPlus = GoldPlus + SilverData->Coefficient_X * It.Value;
-			break;
+	// auto RowName = RowDataTable->SilverRowName;
+	// for(auto It : PassiveNestingData.SilverAbilityNestingNum)
+    // {
+	// 	auto SilverData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+	// 	if(!SilverData) return;
+	// 	switch (It.Key)
+	// 	{
+	// 		case 1: // Gold 획득률 증가 , 합연산
+	// 		GoldPlus = GoldPlus + SilverData->Coefficient_X * It.Value;
+	// 		break;
 
-			case 2: // 두배 Gold 획득률 증가 , 합연산
-			DoubleGoldPercent = DoubleGoldPercent + SilverData->Coefficient_X * It.Value * 100.0f;
-			break;
-		}
-    }
-	RowName = RowDataTable->GoldRowName;
-    for(auto It : PassiveNestingData.GoldAbilityNestingNum)
-    {
-		auto GoldData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
-        if(!GoldData) return;
-		switch (It.Key)
-		{
-			case 1: // Gold 획득률 증가 , 합연산
-			GoldPlus = GoldPlus + GoldData->Coefficient_X * It.Value;
-			break;
+	// 		case 2: // 두배 Gold 획득률 증가 , 합연산
+	// 		DoubleGoldPercent = DoubleGoldPercent + SilverData->Coefficient_X * It.Value * 100.0f;
+	// 		break;
+	// 	}
+    // }
+	// RowName = RowDataTable->GoldRowName;
+    // for(auto It : PassiveNestingData.GoldAbilityNestingNum)
+    // {
+	// 	auto GoldData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+    //     if(!GoldData) return;
+	// 	switch (It.Key)
+	// 	{
+	// 		case 1: // Gold 획득률 증가 , 합연산
+	// 		GoldPlus = GoldPlus + GoldData->Coefficient_X * It.Value;
+	// 		break;
 
-			case 2: // 두배 Gold 획득률 증가 , 합연산
-			DoubleGoldPercent = DoubleGoldPercent + GoldData->Coefficient_X * It.Value * 100.0f;
-			break;
+	// 		case 2: // 두배 Gold 획득률 증가 , 합연산
+	// 		DoubleGoldPercent = DoubleGoldPercent + GoldData->Coefficient_X * It.Value * 100.0f;
+	// 		break;
 
-			case 3: // 골드 획득 시 체력 회복
-			MoneyRecovery = true;
-			HPRecoveryPercent = HPRecoveryPercent + GoldData->Coefficient_X * It.Value * 100.0f;
-			HPRecoveryAmount = GoldData->Coefficient_Y; // 중첩 X?
-			break;
-		}
-    }
-	RowName = RowDataTable->PlatinumRowName;
-    for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
-    {
-		auto PlatinumData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
-        if(!PlatinumData) return;
-		switch (It.Key)
-		{
-			case 1: // Gold 획득률 증가 , 합연산
-			GoldPlus = GoldPlus + PlatinumData->Coefficient_X * It.Value;
-			break;
+	// 		case 3: // 골드 획득 시 체력 회복
+	// 		MoneyRecovery = true;
+	// 		HPRecoveryPercent = HPRecoveryPercent + GoldData->Coefficient_X * It.Value * 100.0f;
+	// 		HPRecoveryAmount = GoldData->Coefficient_Y; // 중첩 X?
+	// 		break;
+	// 	}
+    // }
+	// RowName = RowDataTable->PlatinumRowName;
+    // for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
+    // {
+	// 	auto PlatinumData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+    //     if(!PlatinumData) return;
+	// 	switch (It.Key)
+	// 	{
+	// 		case 1: // Gold 획득률 증가 , 합연산
+	// 		GoldPlus = GoldPlus + PlatinumData->Coefficient_X * It.Value;
+	// 		break;
 
-			case 2: // 두배 Gold 획득률 증가 , 합연산
-			DoubleGoldPercent = DoubleGoldPercent + PlatinumData->Coefficient_X * It.Value * 100.0f;
-			break;
+	// 		case 2: // 두배 Gold 획득률 증가 , 합연산
+	// 		DoubleGoldPercent = DoubleGoldPercent + PlatinumData->Coefficient_X * It.Value * 100.0f;
+	// 		break;
 
-			case 3: // 머니 파워
-			if(MoneyPower) break;
-			MoneyPower = true;
-			MoneyPowerPercent = PlatinumData->Coefficient_X * It.Value ;
-			if(OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")))
-			{
-				ApplyMoneyPower(OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold"))->Quantity);
-			}
-			break;
-		}
-    }
+	// 		case 3: // 머니 파워
+	// 		if(MoneyPower) break;
+	// 		MoneyPower = true;
+	// 		MoneyPowerPercent = PlatinumData->Coefficient_X * It.Value ;
+	// 		if(OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")))
+	// 		{
+	// 			ApplyMoneyPower(OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold"))->Quantity);
+	// 		}
+	// 		break;
+	// 	}
+    // }
 
-	GoldPercent = GoldPercent + GoldPlus;
-	if(!APGI.IsValid()) return;
-	APGI->GetPackageDropMap()[TEXT_Gold] = GoldPercent * 100.0f;
-	APGI->SetGoldPlusPercent(DoubleGoldPercent);
+	// GoldPercent = GoldPercent + GoldPlus;
+	// if(!APGI.IsValid()) return;
+	// APGI->GetPackageDropMap()[TEXT_Gold] = GoldPercent * 100.0f;
+	// APGI->SetGoldPlusPercent(DoubleGoldPercent);
 }
 
 void UAPPassiveComponent::UpdateDamaged()
