@@ -28,6 +28,8 @@
 #include "Kismet/KismetMaterialLibrary.h"
 #include "NavigationSystem.h"
 #include "Components/Common/APManaDropComponent.h"
+#include "Enemy/SkillActor/APEnemyAttackRange.h"
+#include "GameElements/Trigger/BattleSection/APBattleSectionBase.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -99,7 +101,7 @@ void AEnemy_CharacterBase::CrowdControlCheck()
 {
 	if(StopState.IsEmpty())
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 	}
 	else
 	{
@@ -126,6 +128,11 @@ void AEnemy_CharacterBase::TeleportMarkDeactivate()
 		SkillComponent->MarkErase();
 	} 
 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
+}
+
+void AEnemy_CharacterBase::SetOwnerSection(AActor * BattleSection)
+{
+	OwnerSection = BattleSection;
 }
 
 float AEnemy_CharacterBase::GetForward()
@@ -167,17 +174,23 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	
 	if(IsDead())
 	{
-	// 	UGameplayStatics::SpawnSoundAttached(DeadSound, GetMesh(), TEXT("DeadSound"));
+		// UnPossess
 		DetachFromControllerPendingDestroy();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		// Deactivate Effect
 		TeleportMarkDeactivate();
-		CheckAllEnemyKilled();
 		StunEffectComp->DeactivateImmediate();
 		StunEffectComp->DestroyComponent();
 		TeleportMark->DeactivateImmediate();
 		EnemyAnim->PlayDeath_Montage();
+
+		// Drop
 		DropChecking(DamageCauser);
+
+		// Checking Section End
+		CheckAllEnemyKilled();
 	}
 	else EnemyAnim->PlayHit_Montage();
 	
@@ -187,6 +200,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 
 bool AEnemy_CharacterBase::IsHardCC()
 {
+	if(IsDead()) return false;
+	
 	if(CurrentState == ECharacterState::KnockBack) {return true;}
 	else if(CurrentState == ECharacterState::Stun) {return true;}
 	else if(CurrentState == ECharacterState::Sleep) {return true;}
@@ -275,7 +290,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	
 	HitVector = -Rotation.Vector();
 
-	//DrawDebugSphere(GetWorld(), End, AttackRadius, 10, FColor::Green, false, 5);
+	
 	float FinalRadius = Radius;
 	if(!Custom) FinalRadius = Monster_AttackRadius;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(FinalRadius);
@@ -368,7 +383,7 @@ void AEnemy_CharacterBase::InitMonster()
 void AEnemy_CharacterBase::StopClear()
 {
 	GetWorldTimerManager().ClearTimer(StopTimerHandle);
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
 
 void AEnemy_CharacterBase::SetManaDrop()
@@ -408,7 +423,7 @@ void AEnemy_CharacterBase::CheckAllEnemyKilled()
 {
 	auto GameMode = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
 	if(!GameMode) return;
-	GameMode->MonsterKilled();
+	GameMode->MonsterKilled(OwnerSection.Get());
 }
 
 void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActor)
@@ -495,7 +510,7 @@ void AEnemy_CharacterBase::EnemyMontageEnded(UAnimMontage *Montage, bool bInterr
 
 void AEnemy_CharacterBase::OnNormalAttack_MontageEnded()
 {
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
 
 void AEnemy_CharacterBase::OnDeath_MontageEnded()
@@ -505,12 +520,12 @@ void AEnemy_CharacterBase::OnDeath_MontageEnded()
 
 void AEnemy_CharacterBase::OnDetect_MontageEnded()
 {
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
 
 void AEnemy_CharacterBase::OnHit_MontageEnded()
 {
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
 
 void AEnemy_CharacterBase::OnPlayerKnockBack(AActor* Actor, float Dist, float Time)
@@ -536,11 +551,12 @@ void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
 
 void AEnemy_CharacterBase::SpawnAttackRange()
 {
-	// Base : Shape - Arrow
-	AttackRange = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackTargetRange, GetMesh()->GetComponentLocation(), GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f));
-	if(!AttackRange.IsValid()) return;
-	AttackRange->SetVariableFloat(TEXT("Lifetime"), AttackRangeTime);
-    AttackRange->SetVariableVec2(TEXT("Size2D"), FVector2D((Monster_AttackRange_Plus+Monster_AttackRadius) / 1000.0f, Monster_AttackRadius / 100.0f));
+	// AttackRange = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackTargetRange, GetMesh()->GetComponentLocation(), GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f));
+	// if(!AttackRange.IsValid()) return;
+	// AttackRange->SetVariableFloat(TEXT("Lifetime"), AttackRangeTime);
+    // AttackRange->SetVariableVec2(TEXT("Size2D"), FVector2D((Monster_AttackRange_Plus+Monster_AttackRadius) / 1000.0f, Monster_AttackRadius / 100.0f));
 
+	auto AttackRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(AttackRangeClass, GetMesh()->GetComponentLocation(), GetActorRotation()); if(!AttackRange) return;
+	AttackRange->SetDecalSize(Monster_AttackRadius, Monster_AttackRange_Plus+Monster_AttackRadius, AttackRangeTime);
 	// FVector2D(ShootRange.X / 1000.0f, ShootRange.Y / 200.0f)
 }

@@ -41,7 +41,4 @@ public:
 	UPROPERTY(Transient, BlueprintReadWrite)
 	FGameData GameData;
 
-	UPROPERTY()
-	TMap<FName, bool> SubStageClearMap; // 세이브 X , 인스턴스 던전 안의 Stage
-
 };

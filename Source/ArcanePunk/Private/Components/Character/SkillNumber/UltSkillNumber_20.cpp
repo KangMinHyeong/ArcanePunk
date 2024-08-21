@@ -7,7 +7,7 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Skill/Imitator.h"
-#include "BattleSection/APBattleSectionBase.h"
+#include "GameElements/Trigger/BattleSection/APBattleSectionBase.h"
 #include "EngineUtils.h"
 
 UUltSkillNumber_20::UUltSkillNumber_20()
@@ -103,24 +103,25 @@ void UUltSkillNumber_20::SkillEnd()
 
 void UUltSkillNumber_20::SetImitatorLocation()
 {
-	TArray<AAPBattleSectionBase*> BattleSections;
-	for(auto BattleSection : TActorRange<AAPBattleSectionBase>(GetWorld()))
-	{
-		BattleSections.Add(BattleSection);
-	}
+	// TArray<AAPBattleSectionBase*> BattleSections;
+	// for(auto BattleSection : TActorRange<AAPBattleSectionBase>(GetWorld()))
+	// {
+	// 	BattleSections.Add(BattleSection);
+	// }
 
-	if(BattleSections.IsEmpty()) return;
-	if(BattleSections.Num() >= 2)
-	{
-		BattleSections.Sort([this](AActor& A, AActor& B) 
-		{
-			return (A.GetActorLocation() - GetOwner()->GetActorLocation()).Size() > (B.GetActorLocation() - GetOwner()->GetActorLocation()).Size();
-		});
-	}
-	FVector Spawn_1 = BattleSections.Top()->GetSpawnRoot()->GetComponentLocation();
-	FVector Spawn_2 = BattleSections.Top()->GetSpawnRoot2()->GetComponentLocation();
+	// if(BattleSections.IsEmpty()) return;
+	// if(BattleSections.Num() >= 2)
+	// {
+	// 	BattleSections.Sort([this](AActor& A, AActor& B) 
+	// 	{
+	// 		return (A.GetActorLocation() - GetOwner()->GetActorLocation()).Size() > (B.GetActorLocation() - GetOwner()->GetActorLocation()).Size();
+	// 	});
+	// }
+	// FVector Spawn_1 = BattleSections.Top()->GetSpawnRoot()->GetComponentLocation();
+	// FVector Spawn_2 = BattleSections.Top()->GetSpawnRoot2()->GetComponentLocation();
 	
-	SpawnLocation = FVector(FMath::RandRange(Spawn_1.X, Spawn_2.X), FMath::RandRange(Spawn_1.Y, Spawn_2.Y), OwnerCharacter->GetMesh()->GetComponentLocation().Z);
+	// SpawnLocation = FVector(FMath::RandRange(Spawn_1.X, Spawn_2.X), FMath::RandRange(Spawn_1.Y, Spawn_2.Y), OwnerCharacter->GetMesh()->GetComponentLocation().Z);
+
 }
 
 void UUltSkillNumber_20::SetCopySkill(ESkillNumber CopySkillNum)

@@ -78,15 +78,18 @@ void UAPSpawnMonsterComponent::SpawnMonsterFromLocation(TSubclassOf<AEnemy_Chara
     }
 }
 
-void UAPSpawnMonsterComponent::SpawnMonsterRandomWithoutLocationActor(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector MinimumRange, FVector MaximumRange)
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3)
 {
-    UE_LOG(LogTemp, Display, TEXT("Your message"));
     while(SpawnMonsterNum > 0)
     {
-        float Location_X =  FMath::RandRange(MinimumRange.X, MaximumRange.X); float Location_Y =  FMath::RandRange(MinimumRange.Y, MaximumRange.Y);
-        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, FVector(Location_X, Location_Y, MaximumRange.Z), GetOwner()->GetActorRotation(), SpawnParams);
-        if(SpawnMonster) PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
-        SpawnMonsterNum--;
+        auto Location = GetRandomLocation(V_1, V_2, V_3);
+        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, Location, GetOwner()->GetActorRotation(), SpawnParams);
+        if(SpawnMonster) 
+        {
+            PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
+            SpawnMonsterNum--;
+            SpawnMonster->SetOwnerSection(GetOwner());
+        }
     }
 }
 
@@ -101,4 +104,25 @@ void UAPSpawnMonsterComponent::PlaySpawnEffect(FVector Location)
     UGameplayStatics::SpawnSoundAtLocation(GetWorld(), GM->GetSpawnSound(), Location, FRotator::ZeroRotator, SpawnSoundVolume, 1.0f, Sink);
 }
 
+FVector UAPSpawnMonsterComponent::GetRandomLocation(FVector V_1, FVector V_2, FVector V_3)
+{
+    float r1 = FMath::RandRange(0.0f, 1.0f);
+    float r2 = FMath::RandRange(0.0f, 1.0f);
+
+    if (r1 + r2 > 1.0f)
+    {
+        r1 = 1.0f - r1;
+        r2 = 1.0f - r2;
+    }
+
+    float A = 1.0f - r1 - r2;
+    float B = r1;
+    float C = r2;
+
+    return FVector(
+        A * V_1.X + B * V_2.X + C * V_3.X,
+        A * V_1.Y + B * V_2.Y + C * V_3.Y,
+        V_1.Z
+    );
+}
 // TArray 없이 스폰

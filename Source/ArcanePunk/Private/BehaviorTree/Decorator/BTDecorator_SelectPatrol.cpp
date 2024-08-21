@@ -26,6 +26,7 @@ bool UBTDecorator_SelectPatrol::CalculateRawConditionValue(UBehaviorTreeComponen
     OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), Monster->GetPatrolLocation(Start));
 
     Monster->GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
-    
+    Monster->GetCharacterMovement()->MaxFlySpeed = PatrolSpeed;
+
 	return true;
 }

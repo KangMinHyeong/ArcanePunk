@@ -11,6 +11,7 @@ class AArcanePunkCharacter;
 class UAPInteractionBoxComponent;
 class UNiagaraSystem;
 class USoundBase;
+class UNiagaraComponent;
 
 UCLASS()
 class ARCANEPUNK_API APortal_Base : public AActor, public IInteractionInterface
@@ -31,6 +32,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PortalMesh;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* PortalEffectComp;
 	
 	UPROPERTY(EditAnywhere)
 	UAPInteractionBoxComponent* PortalInteractionTrigger;

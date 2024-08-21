@@ -14,10 +14,10 @@ UBTTask_MoveToCheckDist::UBTTask_MoveToCheckDist()
 
 EBTNodeResult::Type UBTTask_MoveToCheckDist::ExecuteTask(UBehaviorTreeComponent &OwnerComp, uint8 *NodeMemory)
 {    
-    if(!OwnerComp.GetAIOwner()) return EBTNodeResult::Failed;
+    if(!OwnerComp.GetAIOwner()) {return EBTNodeResult::Failed;}
 
     auto Enemy = Cast<AEnemy_CharacterBase>(OwnerComp.GetAIOwner()->GetPawn());
-    if(!Enemy) return EBTNodeResult::Failed;
+    if(!Enemy) {return EBTNodeResult::Failed;}
 
     Enemy->GetMesh()->SetCanEverAffectNavigation(false);
     // Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
@@ -31,5 +31,6 @@ EBTNodeResult::Type UBTTask_MoveToCheckDist::ExecuteTask(UBehaviorTreeComponent 
         return EBTNodeResult::Succeeded;
     }
     
+   
     return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

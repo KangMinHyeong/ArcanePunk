@@ -261,6 +261,9 @@ int32 UAPInventoryComponent::HandleStackableItems(UAPItemBase* ItemIn, int32 Req
 
 FItemAddResult UAPInventoryComponent::HandleAddItem(UAPItemBase* InputItem)
 {
+	if(!InputItem) 
+	return FItemAddResult::AddedNone(FText::Format(FText::FromString("TryAddItem {0} error. GetWoner() check somehow fail."), InputItem->ItemTextData.Name));
+	
 	if (GetOwner())
 	{
 		const int32 InitialRequestedAddAmount = InputItem->Quantity;

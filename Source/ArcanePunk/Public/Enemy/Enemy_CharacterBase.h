@@ -21,6 +21,16 @@ class UNiagaraSystem;
 class UAPMovementComponent;
 class USkillNumberBase;
 class UAPManaDropComponent;
+class AAPEnemyAttackRange;
+
+UENUM(BlueprintType)
+enum class EBossPhase : uint8 // E스킬
+{
+	None 			 = 0 UMETA(DisplayName = "None"),
+	Phase_1			 = 1 UMETA(DisplayName = "Phase_1"),
+	Phase_2			 = 2 UMETA(DisplayName = "Phase_2"),
+	Phase_3			 = 3 UMETA(DisplayName = "Phase_3"),
+};
 
 UCLASS()
 class ARCANEPUNK_API AEnemy_CharacterBase : public AAPCharacterBase
@@ -44,6 +54,8 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	FORCEINLINE FDropData GetDropData() const {return DropData;};
+
+	void SetOwnerSection(AActor* BattleSection);
 
 	UFUNCTION(BlueprintPure)
 	float GetForward();
@@ -120,9 +132,13 @@ protected:
 	// 몬스터 Anim Ended 관련 함수
 	void BindMontageEnded();
 
+	UFUNCTION()
 	void OnNormalAttack_MontageEnded();
-	void OnDeath_MontageEnded();
+	UFUNCTION()
+	virtual void OnDeath_MontageEnded();
+	UFUNCTION()
 	void OnDetect_MontageEnded();
+	UFUNCTION()
 	void OnHit_MontageEnded();
 
 	// 몬스터 CC기 관련 함수
@@ -208,6 +224,9 @@ protected:
 	// 몬스터 Anim 관련 변수
 	TWeakObjectPtr<UAP_EnemyBaseAnimInstance> EnemyAnim;
 
+	UPROPERTY(EditAnywhere, Category = "Move")
+	TEnumAsByte<enum EMovementMode> Basic_MOVE = EMovementMode::MOVE_Walking;
+
 	// 몬스터 CC기 관련 변수
 	UPROPERTY(EditAnywhere, Category = "CC")
 	float KnockBackTime = 1.0f;
@@ -239,13 +258,17 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float PatrolDist = 500.0f;
 
+	// UPROPERTY(EditAnywhere, Category = "Attack")
+	// UNiagaraSystem* AttackTargetRange;
+	// TWeakObjectPtr<UNiagaraComponent> AttackRange;
+	
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	UNiagaraSystem* AttackTargetRange;
+	TSubclassOf<AAPEnemyAttackRange> AttackRangeClass;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackRangeTime = 1.2f;
-	TWeakObjectPtr<UNiagaraComponent> AttackRange;
-	
+
 public:
 	FOnHPChanged OnEnemyHPChanged;
 
+	TWeakObjectPtr<AActor> OwnerSection;
 };

@@ -23,6 +23,9 @@ APortal_Base::APortal_Base()
 	PortalMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PortalMesh"));
 	SetRootComponent(PortalMesh);
 
+	PortalEffectComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PortalEffectComp"));
+	PortalEffectComp->SetupAttachment(PortalMesh); 
+
 	PortalInteractionTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("PortalInteractionTrigger"));
 	PortalInteractionTrigger->SetupAttachment(PortalMesh); 
 
@@ -57,7 +60,7 @@ void APortal_Base::StartTeleport(AArcanePunkCharacter* Character, FVector Telepo
 	Character->SetActorLocation(TeleportPoint);
 	Character->SetCanMove(true);
 	Character->GetPlayerPanelAura()->SetHiddenInGame(false);
-	UE_LOG(LogTemp, Display, TEXT("SetActorEnableCollision"));
+
 	Character->SetActorEnableCollision(true);
 
 	GetWorldTimerManager().ClearTimer(Delay_TimerHandle);

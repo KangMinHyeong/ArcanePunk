@@ -147,6 +147,9 @@ enum class EStringRowName : uint8 // String RowName
 
 	CurrentReroll = 86 UMETA(DisplayName = "CurrentReroll"),
 	Message_MaxEnhance = 87 UMETA(DisplayName = "Message_MaxEnhance"),
+
+	RemainWave = 88 UMETA(DisplayName = "RemainWave"),
+	RemainWaveTime = 89 UMETA(DisplayName = "RemainWaveTime"),
 };
 
 USTRUCT()

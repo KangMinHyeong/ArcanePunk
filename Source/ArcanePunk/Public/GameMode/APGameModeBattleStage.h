@@ -6,11 +6,8 @@
 #include "GameMode/APGameModeBase.h"
 #include "APGameModeBattleStage.generated.h"
 
-class UDataTable;
 class UNiagaraSystem;
 class USoundBase;
-
-DECLARE_MULTICAST_DELEGATE(FOnMonsterKilled);
 
 UCLASS()
 class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
@@ -18,9 +15,8 @@ class ARCANEPUNK_API AAPGameModeBattleStage : public AAPGameModeBase
 	GENERATED_BODY()
 
 public:
-	void MonsterKilled();
+	void MonsterKilled(AActor* BattleSection);
 	void PlayerKilled();
-	FORCEINLINE UDataTable* GetBattleStageDataTable() const {return BattleStageDataTable;};
 	FORCEINLINE UNiagaraSystem* GetSpawnEffect() const {return SpawnEffect;}; 
 	FORCEINLINE USoundBase* GetSpawnSound() const {return SpawnSound;}; 
 	FORCEINLINE float GetSpawnSoundVolume() const {return SpawnSoundVolume;}; 
@@ -29,17 +25,11 @@ protected:
 	virtual void StartPlay() override;
 
 private:
-	void EndBattleSection();
-	void PortalSpawn();
+	void CheckBattleSection(AActor* BattleSection);
+	void PortalSpawn(FName CurrentClearStage);
 
 private:
 	FTimerHandle PortalSpawnTimerHandle;
-
-	UPROPERTY()
-	FName CurrentClearStage;
-
-	UPROPERTY(EditAnywhere)
-	UDataTable* BattleStageDataTable;
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* SpawnEffect;
@@ -50,6 +40,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	float SpawnSoundVolume = 2.5f;
 
-public:
-	FOnMonsterKilled OnMonsterKilled;
 };

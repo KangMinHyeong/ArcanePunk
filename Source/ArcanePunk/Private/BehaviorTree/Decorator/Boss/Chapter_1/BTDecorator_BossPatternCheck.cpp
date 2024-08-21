@@ -3,7 +3,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-#include "Enemy/Enemy_Boss.h"
+#include "Enemy/Enemy_BossBase.h"
 
 UBTDecorator_BossPatternCheck::UBTDecorator_BossPatternCheck()
 {
@@ -14,7 +14,7 @@ bool UBTDecorator_BossPatternCheck::CalculateRawConditionValue(UBehaviorTreeComp
 {
 	bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
-	auto Boss = Cast<AEnemy_Boss>(OwnerComp.GetAIOwner()->GetPawn());
+	auto Boss = Cast<AEnemy_BossBase>(OwnerComp.GetAIOwner()->GetPawn());
 	if (!Boss) return false;
 
     OwnerComp.GetBlackboardComponent()->SetValueAsInt(GetSelectedBlackboardKey(), Boss->GetPatternNum());
