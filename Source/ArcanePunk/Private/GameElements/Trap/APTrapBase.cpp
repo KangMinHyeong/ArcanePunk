@@ -7,7 +7,6 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "Components/DecalComponent.h"
 
 AAPTrapBase::AAPTrapBase()
 {
@@ -16,12 +15,10 @@ AAPTrapBase::AAPTrapBase()
 	TrapMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TrapMesh"));
 	TrapTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("TrapTrigger"));
 	RotateMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RotateMesh"));
-    RangeDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("RangeDecal"));
 
 	SetRootComponent(TrapMesh);
 	TrapTrigger->SetupAttachment(TrapMesh);
 	RotateMesh->SetupAttachment(TrapMesh);
-    RangeDecal->SetupAttachment(TrapMesh);
 }
 
 void AAPTrapBase::BeginPlay()
@@ -29,16 +26,13 @@ void AAPTrapBase::BeginPlay()
 	Super::BeginPlay();
 	
 	TrapTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase::OnOverlap);
-	RangeDecal->SetHiddenInGame(true);
 }
 
 void AAPTrapBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
 }
-
 
 void AAPTrapBase::AutoRotating()
 {

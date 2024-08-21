@@ -34,59 +34,42 @@ bool AAPLimitCameraArea::CheckLimit(float X, float Y)
 	switch (CurrentArea)
 	{
 	case ECurrentArea::Area_1:
-		if(X >= 0.0f && Y <= 0.0f) {return false;}
+		if(X >= 3.0f && Y <= -3.0f) {return false;}
 		break;
 
 	case ECurrentArea::Area_2:
-		if(X <= 0.0f && Y <= 0.0f) return false;
+		if(X <= -3.0f && Y <= -3.0f) return false;
 		break;
 
 	case ECurrentArea::Area_3:
-		if(X <= 0.0f && Y >= 0.0f) return false;
+		if(X <= -3.0f && Y >= 3.0f) return false;
 		break;
 
 	case ECurrentArea::Area_4:
-		if(X >= 0.0f && Y >= 0.0f) return false;
+		if(X >= 3.0f && Y >= 3.0f) return false;
 		break;
 	}
-
-	// if(AreaDegree > 0.0f && AreaDegree < 90.0f)
-	// {
-	// 	if(X > 0.0f && Y > 0.0f) return false;
-	// }
-	// else if(AreaDegree > 90.0f && AreaDegree < 180.0f)
-	// {
-	// 	if(X > 0.0f && Y < 0.0f) return false;
-	// }
-	// else if(AreaDegree < 0.0f && AreaDegree > -90.0f)
-	// {
-	// 	if(X < 0.0f && Y > 0.0f) return false;
-	// }
-	// else if(AreaDegree < -90.0f && AreaDegree > -180.0f)
-	// {
-	// 	if(X < 0.0f && Y < 0.0f) return false;
-	// }
 
     return true;
 }
 
 void AAPLimitCameraArea::CheckPlayerLocation(float X, float Y)
 {
-	if((X < AreaPoint_1.X && X >= AreaPoint_2.X && Y < AreaPoint_1.Y && Y >= AreaPoint_2.Y) || (X > AreaPoint_1.X && Y < AreaPoint_1.Y) || (X >= AreaPoint_2.X && Y <= AreaPoint_2.Y))
+	if((X <= AreaPoint_1.X && X > AreaPoint_2.X && Y <= AreaPoint_1.Y && Y > AreaPoint_2.Y) || (X >= AreaPoint_1.X && Y <= AreaPoint_1.Y) || (X > AreaPoint_2.X && Y < AreaPoint_2.Y))
 	{
-		if(CurrentArea == ECurrentArea::Area_2) FixedSpringArmLocation = AreaPoint_2;
-		if(CurrentArea == ECurrentArea::Area_4) FixedSpringArmLocation = AreaPoint_1;
+		if(CurrentArea == ECurrentArea::Area_2) {FixedSpringArmLocation = AreaPoint_2;}
+		if(CurrentArea == ECurrentArea::Area_4) {FixedSpringArmLocation = AreaPoint_1;}
 
 		CurrentArea = ECurrentArea::Area_1;
 	}
-	else if((X < AreaPoint_2.X && X >= AreaPoint_3.X && Y > AreaPoint_2.Y && Y <= AreaPoint_3.Y) || (X < AreaPoint_2.X && Y < AreaPoint_2.Y) || (X <= AreaPoint_3.X && Y <= AreaPoint_3.Y))
+	else if((X <= AreaPoint_2.X && X > AreaPoint_3.X && Y >= AreaPoint_2.Y && Y < AreaPoint_3.Y) || (X <= AreaPoint_2.X && Y <= AreaPoint_2.Y) || (X < AreaPoint_3.X && Y < AreaPoint_3.Y))
 	{
 		if(CurrentArea == ECurrentArea::Area_1) FixedSpringArmLocation = AreaPoint_2;
 		if(CurrentArea == ECurrentArea::Area_3) FixedSpringArmLocation = AreaPoint_3;
 
 		CurrentArea = ECurrentArea::Area_2;
 	}
-	else if((X > AreaPoint_3.X && X <= AreaPoint_4.X && Y > AreaPoint_3.Y && Y <= AreaPoint_4.Y) || (X < AreaPoint_3.X && Y > AreaPoint_3.Y) || (X <= AreaPoint_4.X && Y >= AreaPoint_4.Y))
+	else if((X >= AreaPoint_3.X && X < AreaPoint_4.X && Y >= AreaPoint_3.Y && Y < AreaPoint_4.Y) || (X <= AreaPoint_3.X && Y >= AreaPoint_3.Y) || (X < AreaPoint_4.X && Y > AreaPoint_4.Y))
 	{
 		if(CurrentArea == ECurrentArea::Area_2) FixedSpringArmLocation = AreaPoint_3;
 		if(CurrentArea == ECurrentArea::Area_4) FixedSpringArmLocation = AreaPoint_4;
@@ -95,8 +78,8 @@ void AAPLimitCameraArea::CheckPlayerLocation(float X, float Y)
 	}
 	else
 	{
-		if(CurrentArea == ECurrentArea::Area_1) FixedSpringArmLocation = AreaPoint_1;
-		if(CurrentArea == ECurrentArea::Area_3) FixedSpringArmLocation = AreaPoint_4;
+		if(CurrentArea == ECurrentArea::Area_1)  FixedSpringArmLocation = AreaPoint_1;
+		if(CurrentArea == ECurrentArea::Area_3)  FixedSpringArmLocation = AreaPoint_4;
 
 		CurrentArea = ECurrentArea::Area_4;
 	}
@@ -115,24 +98,23 @@ void AAPLimitCameraArea::LineTrace(float &X, float &Y)
 	{
 		check = true;
 		FinalPoint_1 = Hit_1.Location;
-	} 
-	// else {X = FinalPoint_1.X, Y = FinalPoint_1.Y;}
 
+		
+	} 
+	
 	if(GetWorld()->LineTraceSingleByChannel(Hit_2, Start, End_2, ECC_GameTraceChannel8))
 	{
 		check = true;
 		FinalPoint_2 = Hit_2.Location;
 	} 
-	// else {X = FinalPoint_2.X, Y = FinalPoint_2.Y;}
-
+	
 	if(!check) 
 	{
 		X = X - FixedSpringArmLocation.X;
 		Y = Y - FixedSpringArmLocation.Y;
 		return;
 	}
-
-
+	
 	if((FixedSpringArmLocation - FinalPoint_1).Size() < (FixedSpringArmLocation - FinalPoint_2).Size()) 
 	{
 		X = FinalPoint_1.X, Y = FinalPoint_1.Y;
@@ -141,7 +123,6 @@ void AAPLimitCameraArea::LineTrace(float &X, float &Y)
 
 	X = X - FixedSpringArmLocation.X;
 	Y = Y - FixedSpringArmLocation.Y;
-
 }
 
 void AAPLimitCameraArea::InitArea()
@@ -158,11 +139,6 @@ void AAPLimitCameraArea::InitArea()
 	AreaPoint_3 = FVector(AreaCenter.X + cos * (-w) + sin * (-h), AreaCenter.Y -(- sin * (-w) + cos * (-h)), AreaCenter.Z);
 	AreaPoint_4 = FVector(AreaCenter.X + cos * (w) + sin * (-h), AreaCenter.Y -(- sin * (w) + cos * (-h)), AreaCenter.Z);
 
-	UE_LOG(LogTemp, Display, TEXT("AreaPoint_1.X : %f, AreaPoint_1.Y : %f"), AreaPoint_1.X, AreaPoint_1.Y);
-	UE_LOG(LogTemp, Display, TEXT("AreaPoint_2.X : %f, AreaPoint_2.Y : %f"), AreaPoint_2.X, AreaPoint_2.Y);
-	UE_LOG(LogTemp, Display, TEXT("AreaPoint_3.X : %f, AreaPoint_3.Y : %f"), AreaPoint_3.X, AreaPoint_3.Y);
-	UE_LOG(LogTemp, Display, TEXT("AreaPoint_4.X : %f, AreaPoint_4.Y : %f"), AreaPoint_4.X, AreaPoint_4.Y);
-
 }
 
 void AAPLimitCameraArea::Tick(float DeltaTime)
@@ -172,7 +148,7 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 	if(Player.IsValid() && bEnd)
 	{
 		FVector & Current = Player->GetMySpringArm()->TargetOffset;
-		Current = FMath::VInterpConstantTo(Current, FVector::ZeroVector, DeltaTime, 5.0f);
+		Current = FMath::VInterpConstantTo(Current, FVector::ZeroVector, DeltaTime, 200.0f);
 
 		if(Current.X <= KINDA_SMALL_NUMBER && Current.Y <= KINDA_SMALL_NUMBER)
 		{
@@ -182,42 +158,29 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 	}
 	
 
-	if(Player.IsValid())
+	if(Player.IsValid() && !bEnd)
 	{
 		CheckPlayerLocation(Player->GetActorLocation().X, Player->GetActorLocation().Y);
 
 		float X = Player->GetActorLocation().X - FixedSpringArmLocation.X;
 		float Y = Player->GetActorLocation().Y - FixedSpringArmLocation.Y;
-
-		float Min_X = 0.0f; float Min_Y = 0.0f;
-
 		
+		float Min_X = 0.0f; float Min_Y = 0.0f;
+				
 		if(CheckLimit(X,Y))
 		{
 			LineTrace(Min_X, Min_Y);
-
-
+			
 			Player->GetMySpringArm()->TargetOffset.X = Min_X - X;
 			Player->GetMySpringArm()->TargetOffset.Y = Min_Y - Y;
-
-			// UE_LOG(LogTemp, Display, TEXT("Min_X : %f, Min_Y : %f"), Min_X, Min_Y);
-			// Min_X = FMath::Min(abs(X), abs(FMath::Tan(AreaAngle) * Y));
-			// Min_Y = FMath::Min(abs(Y), abs( X / FMath::Tan(AreaAngle)));
-		
-			// if(X < 0) Min_X = -Min_X;
-			// if(Y < 0) Min_Y = -Min_Y;
 		}
 		else
 		{
 			Player->GetMySpringArm()->TargetOffset.X = Min_X - X;
 			Player->GetMySpringArm()->TargetOffset.Y = Min_Y - Y;
 		}
-		// UE_LOG(LogTemp, Display, TEXT("TargetOffset.X : %f, TargetOffset.Y : %f"), Player->GetMySpringArm()->TargetOffset.X, Player->GetMySpringArm()->TargetOffset.Y);
+
 		
-
-		// X_Init = FMath::FInterpConstantTo(X_Init, 0.0f, DeltaTime, InitSpeed);
-		// Y_Init = FMath::FInterpConstantTo(Y_Init, 0.0f, DeltaTime, InitSpeed);
-
 		float Len = (Player->GetActorLocation() - FadeOutTrigger->GetComponentLocation()).Size();
 		FadeOutTrigger->SetBoxExtent(FVector(Len, 32.0f, 32.0f)); 
 
@@ -230,20 +193,28 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 	}
 }
 
+void AAPLimitCameraArea::InitCondition()
+{
+	if(!Player.IsValid()) return;
+
+	FadeOutTrigger = Player->GetFadeOutTrigger();
+	FadeOutTrigger->SetRelativeRotation(FRotator::ZeroRotator);
+	FadeOutTrigger->SetBoxExtent(FVector(Player->GetMySpringArm()->TargetArmLength, 32.0f, 32.0f)); 
+
+	CurrentArea = ECurrentArea::None;
+	bEnd = true;
+}
+
 void AAPLimitCameraArea::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if(Cast<AArcanePunkCharacter>(OtherActor))
 	{
-		Player = Cast<AArcanePunkCharacter>(OtherActor);
-
-		FadeOutTrigger = Player->GetFadeOutTrigger();
-		FadeOutTrigger->SetRelativeRotation(FRotator::ZeroRotator);
-		FadeOutTrigger->SetBoxExtent(FVector(Player->GetMySpringArm()->TargetArmLength, 32.0f, 32.0f)); 
-
 		if(!AreaTrigger->OnComponentEndOverlap.IsBound())
 		AreaTrigger->OnComponentEndOverlap.AddDynamic(this, &AAPLimitCameraArea::OnOverlapEnd);
 		
-		bEnd = true;
+		Player = Cast<AArcanePunkCharacter>(OtherActor);
+
+		InitCondition();
 	}
 }
 
@@ -252,12 +223,13 @@ void AAPLimitCameraArea::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActo
 	if(Cast<AArcanePunkCharacter>(OtherActor))
 	{
 		Player = Cast<AArcanePunkCharacter>(OtherActor);
-		FixedSpringArmLocation = Player->GetMySpringArm()->GetComponentLocation() - Player->GetActorForwardVector() * 80.0f;
+		FixedSpringArmLocation = Player->GetMySpringArm()->GetComponentLocation() - Player->GetActorForwardVector() * 70.0f;
 		SetActorTickEnabled(true);
 		bEnd = false;
-		// Player->GetMySpringArm()->TargetOffset.X = 0.0f;
-		// Player->GetMySpringArm()->TargetOffset.Y = 0.0f;
 		
+		FinalPoint_1 = FixedSpringArmLocation; FinalPoint_1.Z = GetActorLocation().Z;
+		FinalPoint_2 = FinalPoint_1; 
+
 		auto SA = Player->GetMySpringArm();
 		
 		FadeOutTrigger = Player->GetFadeOutTrigger();
@@ -267,10 +239,5 @@ void AAPLimitCameraArea::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActo
 		CameraHeight = SA->TargetArmLength * FMath::Cos(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
 		CameraWidth = SA->TargetArmLength * FMath::Sin(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
 		InitCameraWidth = CameraWidth;
-
-		// Player = nullptr;
-		// TArray<AActor*> OverlappingActors
-		// GetOverlappingActors(OverlappingActors, AAPLimitCameraArea::StaticClass())
-		// for(auto Actor : OverlappingActors) Cast<AAPLimitCameraArea>(Actor)->ResetInit();
 	}
 }

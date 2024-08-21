@@ -21,6 +21,6 @@ EBTNodeResult::Type UBTTask_WaitCancel::ExecuteTask(UBehaviorTreeComponent &Owne
 	if(!EnemyAnim.IsValid()) return EBTNodeResult::Failed;
 
     Enemy->GetMesh()->SetCanEverAffectNavigation(false);
-    
+
     return EBTNodeResult::InProgress;
 }

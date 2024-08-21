@@ -13,8 +13,10 @@
 		"typescript.tsc.autoDetect": "off",
 		"npm.autoDetect": "off",
 		"files.associations": {
+			"fft": "cpp",
 			"*.rh": "cpp",
-			"xiosbase": "cpp"
+			"variant": "cpp",
+			"chrono": "cpp"
 		}
 	},
 	"extensions": {

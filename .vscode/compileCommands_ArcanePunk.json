@@ -80,22 +80,6 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BattleSection\\APBattleSectionBase.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BattleSection\\DataTable\\APBattleStageDataTable.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\BTDecorator_SelectPatrol.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -136,70 +120,6 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice1.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice2.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice3.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice4.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice5.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice6.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice7.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice8.cpp",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Service\\BTService_EnemyEyeSight.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -224,7 +144,15 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Service\\Boss_Chapter_1\\BTService_UpdateRushAttack.cpp",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Service\\Boss\\BTService_CheckPhase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\BehaviorTree\\Service\\Boss\\Boss_Chapter_1\\BTService_UpdateRushAttack.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -489,6 +417,30 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Components\\Character\\APAttackComponent.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Components\\Character\\APAttackPointComponent.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Components\\Character\\APAuraComponent.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Components\\Character\\APCharacterAuraComponent.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -1040,6 +992,14 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\Enemy_BossBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\Enemy_CharacterBase.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -1048,7 +1008,15 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\Enemy_Dummy.cpp",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\Enemy_Drone.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\Enemy_DroneSoldier.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -1081,6 +1049,14 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\SkillActor\\APEnemyAmmo.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\SkillActor\\APEnemyAttackRange.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -1208,7 +1184,31 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\GameElements\\Trap\\APTrapBase_Spear.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\GameElements\\Trigger\\APLimitCameraArea.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\GameElements\\Trigger\\BattleSection\\APBattleSectionBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\GameElements\\Trigger\\BattleSection\\DataTable\\APBattleStageDataTable.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -2240,6 +2240,14 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\UserInterface\\Stage\\Battle\\APBattleStageUI.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\UserInterface\\Title\\APTitleUI.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -2273,22 +2281,6 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\AnimInstance\\ArcanePunkCharacterAnimInstance.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BattleSection\\APBattleSectionBase.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BattleSection\\DataTable\\APBattleStageDataTable.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -2336,70 +2328,6 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice1.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice2.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice3.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice4.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice5.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice6.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice7.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Decorator\\Boss\\PatternChoice\\BTDecorator_PatternChoice8.h",
-		"arguments": [
-			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
-			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
-		],
-		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
-	},
-	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Service\\BTService_EnemyEyeSight.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -2424,7 +2352,15 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Service\\Boss_Chapter_1\\BTService_UpdateRushAttack.h",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Service\\Boss\\BTService_CheckPhase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\BehaviorTree\\Service\\Boss\\Boss_Chapter_1\\BTService_UpdateRushAttack.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -2689,6 +2625,30 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Components\\Character\\APAttackComponent.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Components\\Character\\APAttackPointComponent.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Components\\Character\\APAuraComponent.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Components\\Character\\APCharacterAuraComponent.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -3240,6 +3200,14 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_BossBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_CharacterBase.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -3248,7 +3216,15 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
-		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_Dummy.h",
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_Drone.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_DroneSoldier.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -3281,6 +3257,14 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\SkillActor\\APEnemyAmmo.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\SkillActor\\APEnemyAttackRange.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -3408,7 +3392,31 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\GameElements\\Trap\\APTrapBase_Spear.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\GameElements\\Trigger\\APLimitCameraArea.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\GameElements\\Trigger\\BattleSection\\APBattleSectionBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\GameElements\\Trigger\\BattleSection\\DataTable\\APBattleStageDataTable.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
@@ -4433,6 +4441,14 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\UserInterface\\Stage\\APStageSlotUI.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\UserInterface\\Stage\\Battle\\APBattleStageUI.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"

@@ -36,7 +36,8 @@ AEnemy_DropBase::AEnemy_DropBase()
 void AEnemy_DropBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	InteractionTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	DropTrailEffect->DeactivateImmediate();
 	SpawnMovement();
 }
@@ -110,7 +111,7 @@ void AEnemy_DropBase::InitializePickup(AActor *DamageCauser, const int32 Quantit
 		PlayerCharacter->GetInventory()->HandleAddItem(ItemReference);
 
 		UGameplayStatics::SpawnSound2D(GetWorld(), DropSound, DropSoundVolume);
-
+		
 		Destroy();
 	}
 }

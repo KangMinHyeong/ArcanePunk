@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "GameElements/Portal/Portal_Normal.h"
 
@@ -16,6 +14,7 @@
 #include "Components/Character/APAuraComponent.h"
 #include "EngineUtils.h"
 #include "GameElements/Trigger/APLimitCameraArea.h"
+#include "GameFramework/SpringArmComponent.h"
 
 APortal_Normal::APortal_Normal()
 {
@@ -28,7 +27,8 @@ APortal_Normal::APortal_Normal()
 
 void APortal_Normal::BeginFocus()
 {
-    TWeakObjectPtr<AArcanePunkCharacter> Character = PortalInteractionTrigger->Character; if(!Character.IsValid()) Character = DestinationTrigger->Character;
+    TWeakObjectPtr<AArcanePunkCharacter> Character = PortalInteractionTrigger->Character; 
+	if(!Character.IsValid() && BothSides) Character = DestinationTrigger->Character;
 	if(!Character.IsValid()) return;
 	Character->ActivateInteractionSweep();
 
@@ -49,8 +49,9 @@ void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
 	FVector PlayerLocation = PlayerCharacter->GetMesh()->GetComponentLocation();
 	PlayerCharacter->SetCanMove(false);
-	UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
-	SpawnSound(PlayerLocation);
+	PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	// UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+	// SpawnSound(PlayerLocation);
 	PlayerCharacter->GetPlayerPanelAura()->SetHiddenInGame(true);
 	
 	if(DestinationTrigger->IsOverlappingActor(PlayerCharacter))
@@ -65,7 +66,8 @@ void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 	for(auto Area : TActorRange<AAPLimitCameraArea>(GetWorld()))
     {
     	Area->AreaTrigger->OnComponentEndOverlap.RemoveDynamic(Area, &AAPLimitCameraArea::OnOverlapEnd);
-    }
+		Area->SetActorTickEnabled(false);
+	}
 	
 	CharacterPC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!CharacterPC.IsValid()) return;
 	CharacterPC->StartFadeOut(1.5f, false);
@@ -79,6 +81,8 @@ void APortal_Normal::OnEndedFadeOut()
 	if(!CharacterPC.IsValid()) return;
 	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
 	Character->EnableInput(CharacterPC.Get());
+	Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	Character->GetMySpringArm()->TargetOffset = FVector::ZeroVector;
 
 	CharacterPC->OnEndedFadeOut.RemoveDynamic(this, &APortal_Normal::OnEndedFadeOut);
 

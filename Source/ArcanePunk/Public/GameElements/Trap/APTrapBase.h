@@ -9,7 +9,7 @@
 class USphereComponent;
 class UNiagaraSystem;
 class AArcanePunkCharacter;
-class UDecalComponent;
+class AAPEnemyAttackRange;
 
 UCLASS()
 class ARCANEPUNK_API AAPTrapBase : public AActor
@@ -41,9 +41,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* RotateMesh;
 
-	UPROPERTY(EditAnywhere)
-	UDecalComponent* RangeDecal;
-
 	// Trap Operate Effect
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* TrapOverlapEffect;
@@ -61,6 +58,10 @@ protected:
 	
 	bool bRotating = true;
 	bool bCharging = false;
+
+	// Trap Range
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AAPEnemyAttackRange> RangeClass;
 	
 	// Trap Overlapped Player
 	TWeakObjectPtr<AArcanePunkCharacter> Player;

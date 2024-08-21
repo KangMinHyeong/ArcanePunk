@@ -42,11 +42,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UAPInteractionBoxComponent* DestinationTrigger;
 
-	bool Start = true;
-
-	UPROPERTY(EditAnywhere)
-	FName PlayerTag;
-
 	TWeakObjectPtr<AArcanePunkPlayerController> CharacterPC;
 
 	FVector Dest;

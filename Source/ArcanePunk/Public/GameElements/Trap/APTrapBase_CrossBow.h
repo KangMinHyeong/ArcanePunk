@@ -32,9 +32,6 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	UNiagaraComponent* RangeEffect;
-
-	UPROPERTY(EditAnywhere)
 	USceneComponent* ArrowSpawnComp;
 
 	// Trap Operate Timer

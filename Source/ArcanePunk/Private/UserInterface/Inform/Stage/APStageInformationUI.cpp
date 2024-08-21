@@ -22,12 +22,12 @@ void UAPStageInformationUI::NativeTick(const FGeometry &MyGeometry, float InDelt
 void UAPStageInformationUI::UpdateRemainMonsterNumber()
 {
     auto GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return;
-    auto Information = GM->GetBattleStageInformation();
+    // auto Information = GM->GetBattleStageInformation();
 
-    Text_StageTitle->SetText(FText::FromString(Information.StageTitle));
-    Text_ChapterNumber->SetText(FText::FromString(FString::FromInt(Information.ChapterNumber)));
-    Text_StageClearCondition->SetText(FText::FromString(Information.StageClearCondition));
-    Text_RemainMonsterNumber->SetText(FText::FromString(FString::FromInt(GM->GetRemainMonsterNumber())));
-    Text_TotalMonsterNumber->SetText(FText::FromString(FString::FromInt(GM->GetTotalMonsterNumber())));
+    // Text_StageTitle->SetText(FText::FromString(Information.StageTitle));
+    // Text_ChapterNumber->SetText(FText::FromString(FString::FromInt(Information.ChapterNumber)));
+    // Text_StageClearCondition->SetText(FText::FromString(Information.StageClearCondition));
+    // Text_RemainMonsterNumber->SetText(FText::FromString(FString::FromInt(GM->GetRemainMonsterNumber())));
+    // Text_TotalMonsterNumber->SetText(FText::FromString(FString::FromInt(GM->GetTotalMonsterNumber())));
 }
 

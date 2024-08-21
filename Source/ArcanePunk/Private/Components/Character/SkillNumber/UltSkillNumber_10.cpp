@@ -19,7 +19,7 @@ void UUltSkillNumber_10::BeginPlay()
 {
 	Super::BeginPlay();
 	auto GM = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
-    if(GM) GM->OnMonsterKilled.AddUObject(this, &UUltSkillNumber_10::Activate_Skill);
+    // if(GM) GM->OnMonsterKilled.AddUObject(this, &UUltSkillNumber_10::Activate_Skill);
 }
 
 void UUltSkillNumber_10::PlaySkill()

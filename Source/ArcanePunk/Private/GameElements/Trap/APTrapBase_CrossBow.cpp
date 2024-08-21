@@ -3,21 +3,19 @@
 
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/DecalComponent.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameElements/Projectile/APProjectileBase.h"
+#include "Enemy/SkillActor/APEnemyAttackRange.h"
 
 AAPTrapBase_CrossBow::AAPTrapBase_CrossBow()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-    RangeEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("RangeEffect"));
     ArrowSpawnComp = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSpawnComp"));
 
-	RangeEffect->SetupAttachment(RotateMesh);
     ArrowSpawnComp->SetupAttachment(RotateMesh);
 }
 
@@ -26,7 +24,6 @@ void AAPTrapBase_CrossBow::BeginPlay()
 	Super::BeginPlay();
     
     ShootRange.X = TrapTrigger->GetScaledSphereRadius();
-    RangeEffect->DeactivateImmediate(); 
     TrapTrigger->OnComponentEndOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
 }
 
@@ -63,22 +60,21 @@ void AAPTrapBase_CrossBow::ReadyToShoot()
 
     bRotating = false;
     
-    RangeEffect->SetVariableVec2(TEXT("Size2D"), FVector2D(ShootRange.X / 1000.0f, ShootRange.Y / 200.0f));
-    RangeEffect->Activate(); 
-
+    FRotator Rot = RotateMesh->GetComponentRotation(); Rot.Yaw -= RotatePlus;
+    auto TrapRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(RangeClass, GetActorLocation(), Rot); if(!TrapRange) return;
+	TrapRange->SetDecalSize(ShootRange.Y, ShootRange.X, ShootDelayTime);
+        
     GetWorldTimerManager().SetTimer(ShootTimerHandle, this, &AAPTrapBase_CrossBow::ShootArrow, ShootDelayTime, false);
 }
 
 void AAPTrapBase_CrossBow::ShootArrow()
 {
-    RangeEffect->DeactivateImmediate(); 
-
     auto Ammo = GetWorld()->SpawnActor<AAPProjectileBase>(ProjectileClass, ArrowSpawnComp->GetComponentLocation(), ArrowSpawnComp->GetComponentRotation());
     if(!Ammo) return;
     Ammo->SetDestroy(ShootRange.X / ArrowSpeed);
     Ammo->SetSpeed(ArrowSpeed);
     Ammo->SetDamage(TrapDamage);
-    Ammo->SetRadius(ShootRange.Y * 0.5f);
+    Ammo->SetRadius(ShootRange.Y);
 
     if(!TrapTrigger->IsOverlappingActor(Player.Get())) return;
 

@@ -37,14 +37,10 @@ void AEnemy_Boss::BeginPlay()
 {
     Super::BeginPlay();
 
-    // MonsterAIController = Cast<AEnemyBaseAIController>(GetController());
-    // if(MonsterAIController) MonsterAIController->UnPossessing();
-
     InitPatternNums(); 
     BindMontageEnd();
     BindRushAttack();
 
-    // SetHPUI();
 }
 
 void AEnemy_Boss::Tick(float DeltaTime)

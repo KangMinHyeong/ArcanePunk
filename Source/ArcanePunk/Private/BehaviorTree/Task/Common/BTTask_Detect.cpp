@@ -25,6 +25,7 @@ EBTNodeResult::Type UBTTask_Detect::ExecuteTask(UBehaviorTreeComponent &OwnerCom
         EnemyAnim->PlayDetect_Montage();
         Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
         Enemy->GetCharacterMovement()->MaxWalkSpeed = Enemy->GetDefaultSpeed_Origin();
+        Enemy->GetCharacterMovement()->MaxFlySpeed = Enemy->GetDefaultSpeed_Origin();
         Enemy->SpawnDetectRender();
 
         CalculateWaitTime_Montage(EnemyAnim->Detect_Montage);
