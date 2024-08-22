@@ -549,7 +549,7 @@ void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
 	else {MoveComponent->SetAttackRotation(Rotation, Speed);}
 }
 
-void AEnemy_CharacterBase::SpawnAttackRange()
+void AEnemy_CharacterBase::SpawnAttackRange(AActor* Target)
 {
 	// AttackRange = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackTargetRange, GetMesh()->GetComponentLocation(), GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f));
 	// if(!AttackRange.IsValid()) return;
@@ -560,3 +560,25 @@ void AEnemy_CharacterBase::SpawnAttackRange()
 	AttackRange->SetDecalSize(Monster_AttackRadius, Monster_AttackRange_Plus+Monster_AttackRadius, AttackRangeTime);
 	// FVector2D(ShootRange.X / 1000.0f, ShootRange.Y / 200.0f)
 }
+
+float AEnemy_CharacterBase::GetTargetDist2D(AActor *Target)
+{
+    FVector TargetLoc = Target->GetActorLocation(); TargetLoc.Z = GetActorLocation().Z;
+
+    return (TargetLoc - GetActorLocation()).Size();
+}
+
+void AEnemy_CharacterBase::SetCapsuleOverlap(bool IsOverlap)
+{
+	if(IsOverlap)
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+    	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Overlap); 
+	}
+	else
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+    	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Block); 
+	}
+}
+    

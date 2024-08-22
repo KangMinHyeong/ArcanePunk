@@ -22,12 +22,12 @@ EBTNodeResult::Type UBTTask_SpawnAttackRange::ExecuteTask(UBehaviorTreeComponent
     auto Player = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
     if(!Player) return EBTNodeResult::Failed;
 
-    if((Player->GetActorLocation() - Enemy->GetActorLocation()).Size() > Enemy->GetMonsterAttackRange() + Enemy->GetCapsuleComponent()->GetScaledCapsuleRadius() + 15.0f) 
-    {return EBTNodeResult::Failed;}
+    // if((Player->GetActorLocation() - Enemy->GetActorLocation()).Size() > Enemy->GetMonsterAttackRange() + Enemy->GetCapsuleComponent()->GetScaledCapsuleRadius() + 15.0f) 
+    // {return EBTNodeResult::Failed;}
     
     WaitTime = DelayTime + Enemy->GetAttackRangeTime() + FMath::RandRange(-RandomDeviation, RandomDeviation);
         
-    Enemy->SpawnAttackRange();
+    Enemy->SpawnAttackRange(Player);
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     return EBTNodeResult::InProgress;

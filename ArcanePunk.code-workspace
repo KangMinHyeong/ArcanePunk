@@ -16,7 +16,11 @@
 			"fft": "cpp",
 			"*.rh": "cpp",
 			"variant": "cpp",
-			"chrono": "cpp"
+			"chrono": "cpp",
+			"locale": "cpp",
+			"xlocmon": "cpp",
+			"__config": "cpp",
+			"*.ipp": "cpp"
 		}
 	},
 	"extensions": {

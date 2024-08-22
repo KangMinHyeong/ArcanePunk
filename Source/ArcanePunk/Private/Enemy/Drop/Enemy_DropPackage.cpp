@@ -71,21 +71,18 @@ void AEnemy_DropPackage::AddEnhance()
         EnHanceType = EEnHanceType::Silver;
 		DropMesh->SetCustomDepthStencilValue(80);
 		// To Do : 실버 이펙트 및 사운드
-        if(DropTrailEffect) DropTrailEffect->SetVariableLinearColor(TEXT("Color"), SilverColor);
     }
     else if(CurrentEnHanceType > SilverPercent && CurrentEnHanceType <= GoldPercent)
     {
         EnHanceType = EEnHanceType::Gold;
 		DropMesh->SetCustomDepthStencilValue(160);
 		// To Do : 골드 이펙트 및 사운드
-        if(DropTrailEffect) DropTrailEffect->SetVariableLinearColor(TEXT("Color"), GoldColor);
     }
     else if (CurrentEnHanceType > GoldPercent && CurrentEnHanceType <= PlatinumPercent)
     {
         EnHanceType = EEnHanceType::Platinum;
 		DropMesh->SetCustomDepthStencilValue(240);
 		// To Do : 플레 이펙트 및 사운드
-        if(DropTrailEffect) DropTrailEffect->SetVariableLinearColor(TEXT("Color"), PlatinumColor);
     }
 	DropMesh->SetRenderCustomDepth(true);
 	

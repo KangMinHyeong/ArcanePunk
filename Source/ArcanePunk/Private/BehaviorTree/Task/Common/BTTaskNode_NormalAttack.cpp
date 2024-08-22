@@ -19,13 +19,11 @@ EBTNodeResult::Type UBTTaskNode_NormalAttack::ExecuteTask(UBehaviorTreeComponent
     SetAIOwner(OwnerComp);
     if(!Enemy.IsValid()) return EBTNodeResult::Failed;
 	if(!EnemyAnim.IsValid()) return EBTNodeResult::Failed;
+  
     
-    CalculateWaitTime_Montage(EnemyAnim->NormalAttack_Montage);
-
-    Super::ExecuteTask(OwnerComp, NodeMemory);
-
-    EnemyAnim->PlayNormalAttack_Montage();
+    CalculateWaitTime_Montage(EnemyAnim->PlayNormalAttack_Montage());
     Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
+    Super::ExecuteTask(OwnerComp, NodeMemory);
     return EBTNodeResult::InProgress;
 }

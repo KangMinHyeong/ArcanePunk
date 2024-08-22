@@ -111,7 +111,7 @@ void AEnemy_DropBase::InitializePickup(AActor *DamageCauser, const int32 Quantit
 		PlayerCharacter->GetInventory()->HandleAddItem(ItemReference);
 
 		UGameplayStatics::SpawnSound2D(GetWorld(), DropSound, DropSoundVolume);
-		
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DropEffect, GetActorLocation(), GetActorRotation());
 		Destroy();
 	}
 }

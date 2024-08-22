@@ -22,13 +22,13 @@ EBTNodeResult::Type UBTTask_Detect::ExecuteTask(UBehaviorTreeComponent &OwnerCom
     if(!EnemyAnim->IsBattleMode())
     {
         EnemyAnim->SetbBattleMode(true);
-        EnemyAnim->PlayDetect_Montage();
+        
         Enemy->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
         Enemy->GetCharacterMovement()->MaxWalkSpeed = Enemy->GetDefaultSpeed_Origin();
         Enemy->GetCharacterMovement()->MaxFlySpeed = Enemy->GetDefaultSpeed_Origin();
         Enemy->SpawnDetectRender();
 
-        CalculateWaitTime_Montage(EnemyAnim->Detect_Montage);
+        CalculateWaitTime_Montage(EnemyAnim->PlayDetect_Montage());
     }
     
     Enemy->GetMesh()->SetCanEverAffectNavigation(false);

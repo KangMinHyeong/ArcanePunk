@@ -57,12 +57,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* GroundEffect_Platinum;
 
-	UPROPERTY(EditAnywhere)
-	FLinearColor SilverColor;
-	UPROPERTY(EditAnywhere)
-	FLinearColor GoldColor;
-	UPROPERTY(EditAnywhere)
-	FLinearColor PlatinumColor;
-
 	bool IsInit = false;
 };

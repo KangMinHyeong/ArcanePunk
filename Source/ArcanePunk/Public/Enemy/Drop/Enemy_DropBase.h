@@ -78,4 +78,8 @@ protected:
 	USoundBase* DropSound;
 	UPROPERTY(EditAnywhere)
 	float DropSoundVolume = 1.0f;
+
+	// Drop Effect
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* DropEffect;
 };

@@ -21,10 +21,7 @@ EBTNodeResult::Type UBTTask_RandomIdle::ExecuteTask(UBehaviorTreeComponent &Owne
     auto Current = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BlackboardKey.SelectedKeyName) - 1;
     OwnerComp.GetBlackboardComponent()->SetValueAsInt(BlackboardKey.SelectedKeyName, Current);
 
-    auto MT = EnemyAnim->PlayRandomIdle_Montage();
-    if(!MT) return EBTNodeResult::Failed;  
-
-    CalculateWaitTime_Montage(MT);
+    CalculateWaitTime_Montage(EnemyAnim->PlayRandomIdle_Montage());
     
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
