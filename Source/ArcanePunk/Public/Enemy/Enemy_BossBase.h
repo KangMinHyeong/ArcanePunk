@@ -25,6 +25,16 @@ public:
 
 	int32 GetPatternNum();
 
+	virtual void MeleeAttack_1();
+	virtual void MeleeAttack_2();
+
+	virtual void RangeAttack_1();
+	virtual void RangeAttack_2();
+	virtual void RangeAttack_3();
+
+	virtual void TraceAttack_1();
+	virtual void TraceAttack_2();
+	
 protected:
 	UPROPERTY()
 	EBossPhase BossPhase = EBossPhase::Phase_1;
@@ -39,4 +49,6 @@ protected:
 	TMap<FString, float> Phase2_Pattern; // Pattern, Percent
 
 	TArray<int32> PatternNums;
+
+	uint8 CurrentPatterNum = 0;
 };

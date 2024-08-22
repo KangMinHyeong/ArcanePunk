@@ -16,18 +16,41 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void MeleeAttack_1();
-	void MeleeAttack_2();
+	virtual void MeleeAttack_1() override;
+	virtual void MeleeAttack_2() override;
 
-	void RangeAttack_1();
-	void RangeAttack_2();
-	void RangeAttack_3();
+	virtual void RangeAttack_1() override;
+	virtual void RangeAttack_2() override;
+	virtual void RangeAttack_3() override;
 
-	void TraceAttack_1();
-	void TraceAttack_2();
+	virtual void TraceAttack_1() override;
+	virtual void TraceAttack_2() override;
 
+	virtual void SpawnAttackRange(AActor* Target) override;
 
+	UFUNCTION()
+	void OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+
+private:
+	UPROPERTY(EditAnywhere)
+	USceneComponent* AmmoSpawnComponent;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> AmmoClass;
+
+	UPROPERTY(EditAnywhere, Category = "Range")
+	float Monster_RangeAttack1_Range = 1200.0f;
+	UPROPERTY(EditAnywhere, Category = "Range")
+	float Monster_RangeAttack1_Radius = 60.0f;
+
+	float Monster_TraceAttack1_Range = 150.0f;
+	bool bTraceAttack = false;
+	FVector TargetLocation;
+	UPROPERTY(EditAnywhere, Category = "Range")
+	float TraceSpeed = 5.0f;
+	
 };

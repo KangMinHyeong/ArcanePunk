@@ -14,6 +14,7 @@ class ARCANEPUNK_API UAP_EnemyBaseAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 public:
 	UAP_EnemyBaseAnimInstance();
+	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	FORCEINLINE bool IsBattleMode() {return bBattleMode;};
@@ -23,11 +24,15 @@ public:
 	bool IsRun();
 
 	// Play Anim
-	void PlayNormalAttack_Montage();
+	float PlayNormalAttack_Montage();
 	void PlayDeath_Montage();
 	void PlayHit_Montage();
-	void PlayDetect_Montage();
-	UAnimMontage* PlayRandomIdle_Montage();
+	float PlayDetect_Montage();
+	float PlayRandomIdle_Montage();
+
+	// Boss
+	float Play_Phase1Attack_Montage(uint8 Index);
+	float Play_Phase2Attack_Montage(uint8 Index);
 
 	/* Notify */ 
 	UFUNCTION()
@@ -41,6 +46,15 @@ public:
 	UFUNCTION()
 	void AnimNotify_LeapEnd();
 	
+	// Boss
+	UFUNCTION()
+	void AnimNotify_RangeAttack_1();
+	UFUNCTION()
+	void AnimNotify_TraceAttack_1();
+	// UFUNCTION()
+	// void AnimNotify_LeapEnd();
+	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	float CurrentPawnSpeed;
@@ -55,7 +69,7 @@ protected:
 	class UAnimSequence* RunPose;
 
 	TWeakObjectPtr<AEnemy_CharacterBase> Enemy;
-	
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* NormalAttack_Montage;
@@ -71,4 +85,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Idle", Meta = (AllowPrivateAccess = true))
 	TArray<UAnimMontage*> Idle_Montages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Idle", Meta = (AllowPrivateAccess = true))
+	TArray<UAnimMontage*> Phase1_Attacks;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Idle", Meta = (AllowPrivateAccess = true))
+	TArray<UAnimMontage*> Phase2_Attacks;
 };

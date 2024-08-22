@@ -8,6 +8,7 @@
 
 class UAP_EnemyBaseAnimInstance;
 class AEnemy_CharacterBase;
+class AEnemy_BossBase;
 
 UCLASS()
 class ARCANEPUNK_API UBTTask_InCludeWaitBase : public UBTTask_Wait
@@ -16,15 +17,19 @@ class ARCANEPUNK_API UBTTask_InCludeWaitBase : public UBTTask_Wait
 public:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;
 	void SetAIOwner(UBehaviorTreeComponent &OwnerComp);
-	void CalculateWaitTime_Montage(UAnimSequenceBase* AnimSequence);
+	void SetAIOwner_Boss(UBehaviorTreeComponent &OwnerComp);
+	void CalculateWaitTime_Montage(float AnimSequenceTime);
 
 protected:
 	float DelayTime = 0.0f;
 
 	TWeakObjectPtr<AEnemy_CharacterBase> Enemy;
+	TWeakObjectPtr<AEnemy_BossBase> Boss;
 	TWeakObjectPtr<UAP_EnemyBaseAnimInstance> EnemyAnim;
 
 	/** blackboard key selector */
 	UPROPERTY(EditAnywhere, Category=Blackboard)
 	struct FBlackboardKeySelector BlackboardKey;
+
+
 };

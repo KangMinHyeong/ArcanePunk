@@ -20,7 +20,10 @@ void AEnemy_BossBase::Tick(float DeltaTime)
     if(BossPhase == EBossPhase::Phase_1)
     {
         if(TotalStatus.StatusData.HP / TotalStatus.StatusData.MaxHP <= Phase2_HPPercent)
-        BossPhase = EBossPhase::Phase_2;
+        {
+            BossPhase = EBossPhase::Phase_2;
+            PatternNums.Empty();
+        }
     }
 }
 
@@ -66,8 +69,6 @@ void AEnemy_BossBase::InitPatternNums()
         PatternNums.Emplace(Index);
         Percents.Remove(Index);
     }
-
-    for(auto V : PatternNums) UE_LOG(LogTemp, Display, TEXT("PatternNums %d"), V);
 }
 
 int32 AEnemy_BossBase::GetPatternNum()
@@ -77,9 +78,37 @@ int32 AEnemy_BossBase::GetPatternNum()
         InitPatternNums();
     }
 
-    int32 Num = PatternNums.Last(PatternNums.Num() - 1);
-    PatternNums.Remove(Num);
+    CurrentPatterNum = PatternNums.Last(PatternNums.Num() - 1);
+    PatternNums.Remove(CurrentPatterNum);
 
-    UE_LOG(LogTemp, Display, TEXT("Num %d"), Num);
-    return Num;
+    UE_LOG(LogTemp, Display, TEXT("CurrentPatterNum %d"), CurrentPatterNum);
+    return CurrentPatterNum;
+}
+
+void AEnemy_BossBase::MeleeAttack_1()
+{
+}
+
+void AEnemy_BossBase::MeleeAttack_2()
+{
+}
+
+void AEnemy_BossBase::RangeAttack_1()
+{
+}
+
+void AEnemy_BossBase::RangeAttack_2()
+{
+}
+
+void AEnemy_BossBase::RangeAttack_3()
+{
+}
+
+void AEnemy_BossBase::TraceAttack_1()
+{
+}
+
+void AEnemy_BossBase::TraceAttack_2()
+{
 }

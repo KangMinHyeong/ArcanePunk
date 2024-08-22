@@ -82,7 +82,7 @@ public:
 
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
-	virtual void SpawnAttackRange();
+	virtual void SpawnAttackRange(AActor* Target);
 	FORCEINLINE float GetAttackRangeTime()const {return AttackRangeTime;}; 
 	FORCEINLINE float GetMonsterAttackRange()const {return Monster_AttackRange;}; 
 
@@ -150,6 +150,9 @@ protected:
 	void SubtractDamageMultiple(float Subtract);
 	void OnDetachingDamagedMark();
 
+	float GetTargetDist2D(AActor* Target);
+	void SetCapsuleOverlap(bool IsOverlap);
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
 	FDropData DropData;

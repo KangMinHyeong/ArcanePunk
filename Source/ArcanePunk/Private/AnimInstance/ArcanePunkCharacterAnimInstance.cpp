@@ -391,19 +391,19 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_1()
 {
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(1);
+    // OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(1);
 }
 void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_2()
 {
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(2);
+    // OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(2);
 }
 void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
 {
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
+    // OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_Trigger()
