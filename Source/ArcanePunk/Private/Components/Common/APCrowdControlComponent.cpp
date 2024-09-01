@@ -380,7 +380,7 @@ void UAPCrowdControlComponent::PlayStateEffect(ECharacterState UpdateState, bool
 		break;
 		
 		case ECharacterState::Stun:
-		if(OwnerCharacter) {IsPlay ? OwnerCharacter->GetStunEffect()->Activate() : OwnerCharacter->GetStunEffect()->DeactivateImmediate(); }
+		if(OwnerCharacter && OwnerCharacter->GetStunEffect()) {IsPlay ? OwnerCharacter->GetStunEffect()->Activate() : OwnerCharacter->GetStunEffect()->DeactivateImmediate(); }
 		break;
 
 		case ECharacterState::Sleep:

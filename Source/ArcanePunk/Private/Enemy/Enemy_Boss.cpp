@@ -296,7 +296,7 @@ void AEnemy_Boss::SpawnRangeAttack_1()
         FVector Location = FVector(SpawnRangeAttackLocation.Top()->GetActorLocation().X, SpawnRangeAttackLocation.Top()->GetActorLocation().Y, SpawnRangeAttackLocation.Top()->GetActorLocation().Z - SpawnRangeAttackLocation.Top()->GetBlockingArea()->GetScaledCapsuleHalfHeight());
         UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), RangeAttack_1_Impact, Location , GetActorRotation());
         FHitResult HitResult; FVector HitVector; 
-        if(AttackTrace(HitResult, HitVector, true, SpawnRangeAttackLocation.Top()->GetBlockingArea()->GetScaledCapsuleRadius(), Location, SpawnRangeAttackLocation.Top()->GetActorLocation()))
+        if(AttackTrace(HitResult, HitVector, SpawnRangeAttackLocation.Top()->GetBlockingArea()->GetScaledCapsuleRadius(), Location, SpawnRangeAttackLocation.Top()->GetActorLocation()))
         {
             if(AActor* Actor = HitResult.GetActor())
             {
@@ -416,16 +416,6 @@ void AEnemy_Boss::OnPillarAttackEnd()
 }
 
 // HPUI Set Start
-bool AEnemy_Boss::SetHPUI()
-{ 
-    PlayerHUD = Cast<AAPHUD>(NewObject<AHUD>(this, UGameplayStatics::GetGameMode(GetWorld())->HUDClass));
-    if(!PlayerHUD.IsValid()) return false;
-    PlayerHUD->SetBossHPUI();
-	UAPEnemyHP* HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
-	if(HPUI) HPUI->SetEnemy(this);
-	OnEnemyHPChanged.Broadcast();
-    return true;
-}
 
 void AEnemy_Boss::EnemyDestroyed()
 {
@@ -451,7 +441,7 @@ void AEnemy_Boss::OnAttackMove(float DeltaTime)
 void AEnemy_Boss::OnHitPlayerMove(FVector MoveLocation)
 {
     FHitResult HitResult; FVector HitVector;
-    if(!AttackTrace(HitResult, HitVector)) return;
+    // if(!AttackTrace(HitResult, HitVector)) return;
     auto Character = Cast<ACharacter>(HitResult.GetActor());
     if(Character) Character->SetActorLocation(Character->GetActorLocation() + MoveLocation);
 }

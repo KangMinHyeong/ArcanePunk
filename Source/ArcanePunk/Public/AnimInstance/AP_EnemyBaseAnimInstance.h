@@ -50,10 +50,20 @@ public:
 	UFUNCTION()
 	void AnimNotify_RangeAttack_1();
 	UFUNCTION()
+	void AnimNotify_RangeAttack_2();
+	UFUNCTION()
+	void AnimNotify_RangeAttack_3();
+	UFUNCTION()
 	void AnimNotify_TraceAttack_1();
+	UFUNCTION()
+	void AnimNotify_TraceAttack_2();
+
+	UFUNCTION()
+	void AnimNotify_AroundDamage();
 	// UFUNCTION()
 	// void AnimNotify_LeapEnd();
 	
+	float GetMontageSectionLength(UAnimMontage* Montage, FName InSectionName);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))

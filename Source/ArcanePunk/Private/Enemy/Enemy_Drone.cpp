@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/CapsuleComponent.h"
 
 AEnemy_Drone::AEnemy_Drone()
 {
@@ -24,13 +25,16 @@ void AEnemy_Drone::BeginPlay()
 void AEnemy_Drone::NormalAttack()
 {
     Super::NormalAttack();
+    auto Loc = DestroyPoint->GetComponentLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+    auto Rot = GetActorRotation(); Rot.Pitch -= 6.5f;
+    auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), LaserEffect, Loc, Rot);
 }
 
 void AEnemy_Drone::OnDeath_MontageEnded()
 {
     Super::OnDeath_MontageEnded();
 
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DestroyEffect, DestroyPoint->GetComponentLocation(), GetActorRotation(), FVector(2.0f, 2.0f, 2.0f));
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DestroyEffect, DestroyPoint->GetComponentLocation(), GetActorRotation(), FVector(3.0f, 3.0f, 3.0f));
 	EnemyDestroyed();
     // USkeletalMeshComponent 
 }

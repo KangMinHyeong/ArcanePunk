@@ -73,9 +73,6 @@ public:
 	// Pattern Num 관련함수
 	int32 GetPatternNum();
 
-	UFUNCTION(BlueprintPure)
-	bool SetHPUI();
-
 protected:
 	// 몽타주 엔드 콜백 함수
 	void BindMontageEnd();
@@ -258,9 +255,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Test Rotator")
 	FRotator FastSlashRotator = FRotator(0,0,0);
-
-	//AAPHUD
-	TWeakObjectPtr<AAPHUD> PlayerHUD;
 
 	// Pattern Num
 	TArray<int32> PatternNums;

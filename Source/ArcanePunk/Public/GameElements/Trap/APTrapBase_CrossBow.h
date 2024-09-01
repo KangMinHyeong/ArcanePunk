@@ -8,6 +8,7 @@
 
 class UNiagaraComponent;
 class AAPProjectileBase;
+class UBoxComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPTrapBase_CrossBow : public AAPTrapBase
@@ -34,6 +35,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* ArrowSpawnComp;
 
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* StaticCollision;
+
 	// Trap Operate Timer
 	FTimerHandle TimerHandle;
 
@@ -54,4 +58,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AAPProjectileBase> ProjectileClass;
+
+	UPROPERTY(EditAnywhere)
+	bool bStatic = false;
 };

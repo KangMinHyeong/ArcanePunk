@@ -70,15 +70,12 @@ void AEnemy_ScoutDog::AttackCondition(bool NewBool)
 {
     if(NewBool)
     {
-        GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Ignore);
-        GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
         RushTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     }
     else
     {
-        GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
-        GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
         RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision); 
     }
+    SetCapsuleOverlap(NewBool);
     SetActorTickEnabled(NewBool);
 }

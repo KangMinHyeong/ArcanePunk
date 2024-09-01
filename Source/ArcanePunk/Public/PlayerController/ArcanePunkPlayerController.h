@@ -23,7 +23,6 @@ class UAPSkillWindow;
 class ULoadingFade;
 
 DECLARE_MULTICAST_DELEGATE(FOnUpdateStatusText);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndedFadeOut);
 
 UENUM()
 enum class ECursorType : uint8
@@ -223,8 +222,7 @@ private:
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;
-	FOnEndedFadeOut OnEndedFadeOut;
-
+	
 	UPROPERTY()
 	TArray<bool> SmartKeyArr; // QER 스마트키
 	

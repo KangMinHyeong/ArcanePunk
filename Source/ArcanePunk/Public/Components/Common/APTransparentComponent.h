@@ -15,6 +15,8 @@ class ARCANEPUNK_API UAPTransparentComponent : public UActorComponent
 public:	
 	UAPTransparentComponent();
 
+	FORCEINLINE void SetDestroy(bool NewBool) {bDestroy = NewBool;};
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -23,9 +25,12 @@ public:
 
 	void FadeOut();
 	void FadeIn();
+
+	void SetMeshMaterials(UMeshComponent* Meshes);
+
 private:
 	bool bFadeOut = false;	
-	float Opacity = 0.0f;
+	float Opacity = 1.0f;
 
 	UPROPERTY(EditAnywhere)
 	float FadeOutLimit = 0.15f;
@@ -33,4 +38,9 @@ private:
 	float FadeSpeed = 0.15f;
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> Materials;
+
+	UPROPERTY(EditAnywhere)
+	bool bAuto = true;
+	UPROPERTY(EditAnywhere)
+	bool bDestroy = false;
 };

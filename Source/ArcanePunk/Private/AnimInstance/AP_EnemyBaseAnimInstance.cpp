@@ -147,6 +147,24 @@ void UAP_EnemyBaseAnimInstance::AnimNotify_RangeAttack_1()
 	Boss->RangeAttack_1();
 }
 
+void UAP_EnemyBaseAnimInstance::AnimNotify_RangeAttack_2()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+    auto Boss = Cast<AEnemy_BossBase>(Enemy); if(!Boss) return;
+	Boss->RangeAttack_2();
+}
+
+void UAP_EnemyBaseAnimInstance::AnimNotify_RangeAttack_3()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+    auto Boss = Cast<AEnemy_BossBase>(Enemy); if(!Boss) return;
+	Boss->RangeAttack_3();
+}
+
 void UAP_EnemyBaseAnimInstance::AnimNotify_TraceAttack_1()
 {
 	if(IsDead || !Enemy.IsValid()) return;
@@ -154,4 +172,31 @@ void UAP_EnemyBaseAnimInstance::AnimNotify_TraceAttack_1()
 
     auto Boss = Cast<AEnemy_BossBase>(Enemy); if(!Boss) return;
 	Boss->TraceAttack_1();
+}
+
+void UAP_EnemyBaseAnimInstance::AnimNotify_TraceAttack_2()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+	auto Boss = Cast<AEnemy_BossBase>(Enemy); if(!Boss) return;
+	Boss->TraceAttack_2();
+}
+
+void UAP_EnemyBaseAnimInstance::AnimNotify_AroundDamage()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+	if(Enemy->IsHardCC()) return;
+
+	auto Boss = Cast<AEnemy_BossBase>(Enemy); if(!Boss) return;
+	Boss->AroundDamage();
+}
+
+float UAP_EnemyBaseAnimInstance::GetMontageSectionLength(UAnimMontage* Montage, FName InSectionName)
+{
+    if (Montage && Montage->IsValidSectionName(InSectionName))
+    {
+        return Montage->GetSectionLength(Montage->GetSectionIndex(InSectionName)) / Montage->RateScale;
+    }
+    return 0.0f;
 }

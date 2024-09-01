@@ -98,8 +98,6 @@ void AAPLimitCameraArea::LineTrace(float &X, float &Y)
 	{
 		check = true;
 		FinalPoint_1 = Hit_1.Location;
-
-		
 	} 
 	
 	if(GetWorld()->LineTraceSingleByChannel(Hit_2, Start, End_2, ECC_GameTraceChannel8))
@@ -138,7 +136,6 @@ void AAPLimitCameraArea::InitArea()
 	AreaPoint_2 = FVector(AreaCenter.X + cos * (-w) + sin * (h), AreaCenter.Y -(- sin * (-w) + cos * (h)), AreaCenter.Z);
 	AreaPoint_3 = FVector(AreaCenter.X + cos * (-w) + sin * (-h), AreaCenter.Y -(- sin * (-w) + cos * (-h)), AreaCenter.Z);
 	AreaPoint_4 = FVector(AreaCenter.X + cos * (w) + sin * (-h), AreaCenter.Y -(- sin * (w) + cos * (-h)), AreaCenter.Z);
-
 }
 
 void AAPLimitCameraArea::Tick(float DeltaTime)

@@ -12,6 +12,7 @@ class UAPInteractionBoxComponent;
 class UNiagaraSystem;
 class USoundBase;
 class UNiagaraComponent;
+class UAPGameInstance;
 
 UCLASS()
 class ARCANEPUNK_API APortal_Base : public AActor, public IInteractionInterface
@@ -64,4 +65,5 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USoundBase* PortalSound;
 
+	TWeakObjectPtr<UAPGameInstance> APGI;
 };

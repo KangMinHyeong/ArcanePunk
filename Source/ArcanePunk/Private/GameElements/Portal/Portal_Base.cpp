@@ -35,6 +35,7 @@ APortal_Base::APortal_Base()
 void APortal_Base::BeginPlay()
 {
 	Super::BeginPlay();
+	APGI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!APGI.IsValid()) return;
 
 	InitHide(DefaultHidden);
 	FLatentActionInfo LatentActionInfo;
@@ -68,8 +69,6 @@ void APortal_Base::StartTeleport(AArcanePunkCharacter* Character, FVector Telepo
 
 void APortal_Base::SpawnSound(FVector Location)
 {
-	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-
-	float SoundVolume = GI->GetGameSoundVolume().MasterVolume * GI->GetGameSoundVolume().EffectVolume;
+	float SoundVolume = APGI->GetGameSoundVolume().MasterVolume * APGI->GetGameSoundVolume().EffectVolume;
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PortalSound, Location, FRotator::ZeroRotator, SoundVolume, 1.0f, SoundStartTime);
 }
