@@ -15,8 +15,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-
+	
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -30,7 +29,9 @@ public:
 	virtual void TraceAttack_1() override;
 	virtual void TraceAttack_2() override;
 
-	virtual void SpawnAttackRange(AActor* Target) override;
+	virtual void AroundDamage() override;
+
+	virtual void SpawnAttackRange(AActor* Target, float WaitTime) override;
 
 	UFUNCTION()
 	void OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
@@ -43,14 +44,17 @@ private:
 	TSubclassOf<AActor> AmmoClass;
 
 	UPROPERTY(EditAnywhere, Category = "Range")
-	float Monster_RangeAttack1_Range = 1200.0f;
+	float Monster_RangeAttack_Range = 1200.0f;
 	UPROPERTY(EditAnywhere, Category = "Range")
-	float Monster_RangeAttack1_Radius = 60.0f;
+	float Monster_RangeAttack_Radius = 60.0f;
 
 	float Monster_TraceAttack1_Range = 150.0f;
 	bool bTraceAttack = false;
 	FVector TargetLocation;
 	UPROPERTY(EditAnywhere, Category = "Range")
 	float TraceSpeed = 5.0f;
-	
+
+	bool bJump = false;
+	UPROPERTY(EditAnywhere, Category = "Range")
+	float Monster_JumpAttack_Range = 400.0f;
 };

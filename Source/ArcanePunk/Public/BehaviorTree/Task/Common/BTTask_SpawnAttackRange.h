@@ -15,5 +15,8 @@ public:
 	UBTTask_SpawnAttackRange();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);	
-		
+
+private:
+	UPROPERTY(EditAnywhere)
+	bool bAttackDelay = true;		
 };

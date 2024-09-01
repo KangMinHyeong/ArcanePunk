@@ -30,6 +30,8 @@
 #include "Components/Common/APManaDropComponent.h"
 #include "Enemy/SkillActor/APEnemyAttackRange.h"
 #include "GameElements/Trigger/BattleSection/APBattleSectionBase.h"
+#include "UserInterface/HUD/APHUD.h"
+#include "UserInterface/Enemy/APEnemyHP.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -159,7 +161,8 @@ bool AEnemy_CharacterBase::AttackPushBack(FVector NewLocation)
 float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
+	OnEnemyHPChanged.Broadcast();
+	
 	if(IsDead()) return 0.0f;
 	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
 
@@ -170,8 +173,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	HP = HP - DamageMath(DamageApplied);
 	TotalStatus.StatusData.HP = HP;
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
-	OnEnemyHPChanged.Broadcast();
-	
+		
 	if(IsDead())
 	{
 		// UnPossess
@@ -262,15 +264,9 @@ float AEnemy_CharacterBase::DamageMath(float Damage)
     return Damage * Defense_constant * (1/(Defense_constant + TotalStatus.StatusData.DEF));
 }
 
-bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom, float Radius, FVector CustomStart, FVector CustomEnd)
+bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, float Radius, FVector Start, FVector End)
 {
     FRotator Rotation = GetActorRotation();
-
-	FVector Start = CustomStart + FVector::UpVector* 15.0f ;
-	if(!Custom) Start = GetActorLocation();
-
-	FVector End = CustomEnd + FVector::UpVector* 15.0f ;
-	if(!Custom) End = GetActorLocation() + Rotation.Vector() * Monster_AttackRange_Plus + FVector::UpVector* 15.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
 
 	// 같은 아군은 타격 판정이 안되게 하는 코드
 	FCollisionQueryParams Params;
@@ -282,6 +278,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
     {
 		Params.AddIgnoredActor(Actor);
     }    
+
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Ground"), Actors);
 	for (AActor* Actor : Actors)
     {
@@ -290,15 +287,11 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	
 	HitVector = -Rotation.Vector();
 
-	
-	float FinalRadius = Radius;
-	if(!Custom) FinalRadius = Monster_AttackRadius;
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(FinalRadius);
-
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
 	bool bResult = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);
 	
-	FVector Center = (Start + End) / 2.0f;
-	float HalfHeight = Monster_AttackRange_Plus * 0.5f + Monster_AttackRadius;
+	FVector Center = (Start + End) * 0.5f;
+	float HalfHeight = FMath::Max((Start - End).Size() * 0.5f, Radius);
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
@@ -307,7 +300,7 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 		DrawDebugCapsule(GetWorld(),
 			Center,
 			HalfHeight,
-			Monster_AttackRadius,
+			Radius,
 			CapsuleRot,
 			DrawColor,
 			false,
@@ -319,13 +312,13 @@ bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector
 	return bResult;
 }
 
-
 void AEnemy_CharacterBase::NormalAttack()
 {
 	float Damage = TotalStatus.StatusData.ATK * CriticalCalculate();
 	FHitResult HitResult;
 	FVector HitVector;
-	if(AttackTrace(HitResult, HitVector))
+	FVector Start = GetActorLocation();
+	if(AttackTrace(HitResult, HitVector, Monster_AttackRadius, Start, Start + GetActorForwardVector() *Monster_AttackRange_Plus))
 	{
 		if(AActor* Actor = HitResult.GetActor())
 		{
@@ -549,15 +542,10 @@ void AEnemy_CharacterBase::RotateTowardsTarget(AActor *TargetActor, float Speed)
 	else {MoveComponent->SetAttackRotation(Rotation, Speed);}
 }
 
-void AEnemy_CharacterBase::SpawnAttackRange(AActor* Target)
+void AEnemy_CharacterBase::SpawnAttackRange(AActor* Target, float WaitTime)
 {
-	// AttackRange = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackTargetRange, GetMesh()->GetComponentLocation(), GetActorRotation() + FRotator(0.0f, -90.0f, 0.0f));
-	// if(!AttackRange.IsValid()) return;
-	// AttackRange->SetVariableFloat(TEXT("Lifetime"), AttackRangeTime);
-    // AttackRange->SetVariableVec2(TEXT("Size2D"), FVector2D((Monster_AttackRange_Plus+Monster_AttackRadius) / 1000.0f, Monster_AttackRadius / 100.0f));
-
 	auto AttackRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(AttackRangeClass, GetMesh()->GetComponentLocation(), GetActorRotation()); if(!AttackRange) return;
-	AttackRange->SetDecalSize(Monster_AttackRadius, Monster_AttackRange_Plus+Monster_AttackRadius, AttackRangeTime);
+	AttackRange->SetDecalSize(Monster_AttackRadius, Monster_AttackRange_Plus+Monster_AttackRadius, WaitTime);
 	// FVector2D(ShootRange.X / 1000.0f, ShootRange.Y / 200.0f)
 }
 
@@ -572,6 +560,7 @@ void AEnemy_CharacterBase::SetCapsuleOverlap(bool IsOverlap)
 {
 	if(IsOverlap)
 	{
+    
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
     	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Overlap); 
 	}
@@ -580,5 +569,16 @@ void AEnemy_CharacterBase::SetCapsuleOverlap(bool IsOverlap)
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
     	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Block); 
 	}
+}
+
+bool AEnemy_CharacterBase::SetHPUI()
+{ 
+    PlayerHUD = Cast<AAPHUD>(NewObject<AHUD>(this, UGameplayStatics::GetGameMode(GetWorld())->HUDClass));
+    if(!PlayerHUD.IsValid()) return false;
+    PlayerHUD->SetBossHPUI();
+	UAPEnemyHP* HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
+	if(HPUI) HPUI->SetEnemy(this);
+	OnEnemyHPChanged.Broadcast();
+    return true;
 }
     

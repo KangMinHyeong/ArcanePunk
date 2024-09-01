@@ -4,6 +4,7 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -15,23 +16,35 @@ AAPTrapBase_CrossBow::AAPTrapBase_CrossBow()
  	PrimaryActorTick.bCanEverTick = true;
 
     ArrowSpawnComp = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSpawnComp"));
+    ArrowSpawnComp->SetupAttachment(TopMesh);
 
-    ArrowSpawnComp->SetupAttachment(RotateMesh);
+    StaticCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("StaticCollision"));
+    StaticCollision->SetupAttachment(GetRootComponent());
 }
 
 void AAPTrapBase_CrossBow::BeginPlay()
 {
 	Super::BeginPlay();
     
-    ShootRange.X = TrapTrigger->GetScaledSphereRadius();
-    TrapTrigger->OnComponentEndOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
+    if(bStatic)
+    {
+        TrapCollision->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase_CrossBow::OnOverlap);
+        StaticCollision->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlap);
+        ShootRange.X = StaticCollision->GetScaledBoxExtent().Y * 2.0f;
+        StaticCollision->OnComponentEndOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
+    }
+    else
+    {
+        ShootRange.X = TrapCollision->GetScaledSphereRadius();
+        TrapCollision->OnComponentEndOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
+    }
 }
 
 void AAPTrapBase_CrossBow::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     
-    if(TrapTrigger->IsOverlappingActor(Player.Get()) && bRotating) AutoRotating();
+    if(TrapCollision->IsOverlappingActor(Player.Get()) && bRotating) AutoRotating();
 }
 
 void AAPTrapBase_CrossBow::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -39,7 +52,7 @@ void AAPTrapBase_CrossBow::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor
     if(!Cast<AArcanePunkCharacter>(OtherActor)) return;
     Player = Cast<AArcanePunkCharacter>(OtherActor);
 
-    bRotating = true;
+    if(!bStatic) bRotating = true;
 
     GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPTrapBase_CrossBow::ReadyToShoot, TrapOperationTime, false);
 }
@@ -48,7 +61,7 @@ void AAPTrapBase_CrossBow::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AAc
 {
     if(!Cast<AArcanePunkCharacter>(OtherActor)) return;
 
-    bRotating = false;
+    if(!bStatic) bRotating = false;
 
     GetWorldTimerManager().ClearTimer(TimerHandle);
 }
@@ -56,11 +69,17 @@ void AAPTrapBase_CrossBow::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AAc
 void AAPTrapBase_CrossBow::ReadyToShoot()
 {
     GetWorldTimerManager().ClearTimer(TimerHandle);
-    if(!TrapTrigger->IsOverlappingActor(Player.Get())) return;
-
-    bRotating = false;
+    if(bStatic)
+    {
+        if(!StaticCollision->IsOverlappingActor(Player.Get())) return;
+    }
+    else
+    {
+        if(!TrapCollision->IsOverlappingActor(Player.Get())) return;
+        bRotating = true;
+    }
     
-    FRotator Rot = RotateMesh->GetComponentRotation(); Rot.Yaw -= RotatePlus;
+    FRotator Rot = TopMesh->GetComponentRotation(); Rot.Yaw -= RotatePlus;
     auto TrapRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(RangeClass, GetActorLocation(), Rot); if(!TrapRange) return;
 	TrapRange->SetDecalSize(ShootRange.Y, ShootRange.X, ShootDelayTime);
         
@@ -76,8 +95,16 @@ void AAPTrapBase_CrossBow::ShootArrow()
     Ammo->SetDamage(TrapDamage);
     Ammo->SetRadius(ShootRange.Y);
 
-    if(!TrapTrigger->IsOverlappingActor(Player.Get())) return;
 
-    bRotating = true;
+    if(bStatic)
+    {
+        if(!StaticCollision->IsOverlappingActor(Player.Get())) return;
+    }
+    else
+    {
+        if(!TrapCollision->IsOverlappingActor(Player.Get())) return;
+        bRotating = true;
+    }
+     
     GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPTrapBase_CrossBow::ReadyToShoot, TrapOperationTime, false);
 }

@@ -24,7 +24,9 @@ public:
 
 	UFUNCTION()
 	void OnEndedFadeOut();
-
+	UFUNCTION()
+	void OnStartFadeIn();
+	
 protected:	
 	virtual void BeginPlay() override;
 

@@ -6,6 +6,27 @@
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Enemy_BossBase.generated.h"
 
+
+USTRUCT()
+struct FRangeAttackInform
+{
+	GENERATED_USTRUCT_BODY()
+
+	FRangeAttackInform() {}
+
+	UPROPERTY(EditAnywhere)
+	float Angle_Start = -60.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Angle_Plus = 30.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Frequency = 0.2f;
+
+	UPROPERTY(EditAnywhere)
+	int32 RepeatNum = 1;
+};
+
 UCLASS()
 class ARCANEPUNK_API AEnemy_BossBase : public AEnemy_CharacterBase
 {
@@ -19,6 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void InitPatternNums();
+	void SetRangeSpawnRot(int32 Index);
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -35,6 +57,8 @@ public:
 	virtual void TraceAttack_1();
 	virtual void TraceAttack_2();
 	
+	virtual void AroundDamage();
+
 protected:
 	UPROPERTY()
 	EBossPhase BossPhase = EBossPhase::Phase_1;
@@ -48,7 +72,14 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TMap<FString, float> Phase2_Pattern; // Pattern, Percent
 
+	UPROPERTY(EditAnywhere)
+	TArray<FRangeAttackInform> RangeAttackInform;
+
 	TArray<int32> PatternNums;
 
 	uint8 CurrentPatterNum = 0;
+
+	TArray<FRotator> SpawnRot;
+
+	FTimerHandle RangeTimerHandle;
 };

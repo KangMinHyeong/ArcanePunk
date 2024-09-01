@@ -18,28 +18,18 @@ void AAPTrapBase_Mine::BeginPlay()
 {
     Super::BeginPlay();
 
-    Player = Cast<AArcanePunkCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
-    OperationLocation = RotateMesh->GetComponentLocation() - FVector(0.0f, 0.0f, 40.0f);
+}
+
+void AAPTrapBase_Mine::OnTrapOperation_MontageEnded()
+{
 }
 
 void AAPTrapBase_Mine::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    if(Player.IsValid() && bRotating) AutoRotating();
-    if(Player.IsValid() && bOperation) OperateExplosion(DeltaTime);
 }
 
-void AAPTrapBase_Mine::OperateExplosion(float DeltaTime)
-{
-    FVector Current = RotateMesh->GetComponentLocation();
-    Current = FMath::VInterpConstantTo(Current, OperationLocation, DeltaTime, OperateSpeed);
-    RotateMesh->SetWorldLocation(Current);
-
-    if(abs(OperationLocation.Z - Current.Z) <= KINDA_SMALL_NUMBER) bOperation = false;
-}
-
-void AAPTrapBase_Mine::Explosion()
+void AAPTrapBase_Mine::OnDamageTrigger()
 {
     TArray<AActor*> Actors;
     GetOverlappingActors(Actors, AArcanePunkCharacter::StaticClass());
@@ -56,13 +46,10 @@ void AAPTrapBase_Mine::Explosion()
 
 void AAPTrapBase_Mine::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-    auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
+    Super::OnOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+    if(!Player.IsValid()) return;
 
-    bRotating = false;
-    bOperation = true;
-
+    UE_LOG(LogTemp, Display, TEXT("OperationTime %f"), OperationTime);
     auto TrapRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(RangeClass, GetActorLocation(), GetActorRotation()); if(!TrapRange) return;
-	TrapRange->SetDecalSize(TrapTrigger->GetScaledSphereRadius(), TrapTrigger->GetScaledSphereRadius(), TrapOperationTime, false);
-    
-    GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPTrapBase_Mine::Explosion, TrapOperationTime, false);
+	TrapRange->SetDecalSize(TrapCollision->GetScaledSphereRadius(), TrapCollision->GetScaledSphereRadius(), OperationTime, false);
 }

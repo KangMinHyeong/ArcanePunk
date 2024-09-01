@@ -50,8 +50,6 @@ void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 	FVector PlayerLocation = PlayerCharacter->GetMesh()->GetComponentLocation();
 	PlayerCharacter->SetCanMove(false);
 	PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	// UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
-	// SpawnSound(PlayerLocation);
 	PlayerCharacter->GetPlayerPanelAura()->SetHiddenInGame(true);
 	
 	if(DestinationTrigger->IsOverlappingActor(PlayerCharacter))
@@ -71,22 +69,33 @@ void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 	
 	CharacterPC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!CharacterPC.IsValid()) return;
 	CharacterPC->StartFadeOut(1.5f, false);
-	CharacterPC->OnEndedFadeOut.AddDynamic(this, &APortal_Normal::OnEndedFadeOut);
+	APGI->OnEndedFadeOut.AddDynamic(this, &APortal_Normal::OnEndedFadeOut);
+	APGI->OnStartFadeIn.AddDynamic(this, &APortal_Normal::OnStartFadeIn);
     PlayerCharacter->DisableInput(CharacterPC.Get());
 	PlayerCharacter->SetActorEnableCollision(false);
+	
 }
 
 void APortal_Normal::OnEndedFadeOut()
 {
 	if(!CharacterPC.IsValid()) return;
 	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
+	Character->SetActorEnableCollision(true);
+	StartTeleport(Character, Dest);
+	APGI->OnEndedFadeOut.RemoveDynamic(this, &APortal_Normal::OnEndedFadeOut);
+}
+
+void APortal_Normal::OnStartFadeIn()
+{
+	if(!CharacterPC.IsValid()) return;
+	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
 	Character->EnableInput(CharacterPC.Get());
 	Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	Character->GetMySpringArm()->TargetOffset = FVector::ZeroVector;
+	CharacterPC->StartFadeIn(1.0f, false);
 
-	CharacterPC->OnEndedFadeOut.RemoveDynamic(this, &APortal_Normal::OnEndedFadeOut);
-
-	StartTeleport(Character, Dest);
+	Destination->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	APGI->OnStartFadeIn.RemoveDynamic(this, &APortal_Normal::OnStartFadeIn);
 }
 
 void APortal_Normal::BeginPlay()

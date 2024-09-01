@@ -27,5 +27,8 @@ private:
 	UNiagaraSystem* DestroyEffect;
 
 	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* LaserEffect;
+
+	UPROPERTY(EditAnywhere)
 	USceneComponent* DestroyPoint;
 };

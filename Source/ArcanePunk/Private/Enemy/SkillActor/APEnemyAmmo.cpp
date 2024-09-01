@@ -29,8 +29,8 @@ void AAPEnemyAmmo::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	AmmoEffect->DeactivateImmediate();
 	AmmoRoot->OnComponentHit.AddDynamic(this, &AAPEnemyAmmo::OnHitting);
-
 }
 
 void AAPEnemyAmmo::Tick(float DeltaTime)
@@ -46,6 +46,9 @@ void AAPEnemyAmmo::SetOwnerEnemy(float Dist, float Radius)
 	AmmoRoot->SetSphereRadius(Radius, false);
 	float DestroyTime = Dist / AmmoSpeed;
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AAPEnemyAmmo::DestroyExplosion, DestroyTime, false);
+
+	AmmoEffect->SetVariableFloat(TEXT("Size"), Radius / 25.0f);
+	AmmoEffect->Activate();
 }
 
 void AAPEnemyAmmo::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)

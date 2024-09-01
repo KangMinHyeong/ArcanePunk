@@ -17,25 +17,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void OperateExplosion(float DeltaTime);
-
-	void Explosion();
-
+	virtual void OnTrapOperation_MontageEnded() override;
 public:	
 	virtual void Tick(float DeltaTime) override;
 
   	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
+	virtual void OnDamageTrigger() override;
+
 private:
-	// Trap Operate Timer
-	FTimerHandle TimerHandle;
 
-	UPROPERTY(EditAnywhere)
-	float TrapOperationTime = 1.0f;
-	UPROPERTY(EditAnywhere)
-	float OperateSpeed = 500.0f;
-
-	bool bOperation = false;
-	
-	FVector OperationLocation;
 };

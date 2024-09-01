@@ -8,6 +8,8 @@
 #include "Engine/GameInstance.h"
 #include "APGameInstance.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartFadeIn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndedFadeOut);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSkillEnhanceDataUpdate, ESkillKey, FSkillAbilityNestingData);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillEnhanceDataClear, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGettingGold, int32);
@@ -211,4 +213,6 @@ public:
 	FOnSkillEnhanceDataClear OnSkillEnhanceDataClear;
 	FOnGettingGold OnGettingGold;
 	FOnChangingSoundVolume OnChangingSoundVolume;
+	FOnStartFadeIn OnStartFadeIn;
+	FOnEndedFadeOut OnEndedFadeOut;
 };

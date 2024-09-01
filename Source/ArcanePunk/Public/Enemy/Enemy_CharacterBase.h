@@ -22,6 +22,7 @@ class UAPMovementComponent;
 class USkillNumberBase;
 class UAPManaDropComponent;
 class AAPEnemyAttackRange;
+class AAPHUD;
 
 UENUM(BlueprintType)
 enum class EBossPhase : uint8 // E스킬
@@ -82,7 +83,7 @@ public:
 
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
-	virtual void SpawnAttackRange(AActor* Target);
+	virtual void SpawnAttackRange(AActor* Target, float WaitTime);
 	FORCEINLINE float GetAttackRangeTime()const {return AttackRangeTime;}; 
 	FORCEINLINE float GetMonsterAttackRange()const {return Monster_AttackRange;}; 
 
@@ -112,9 +113,13 @@ public:
 	// Detect Render 스폰
 	void SpawnDetectRender();
 
+	// HP UI
+	UFUNCTION(BlueprintPure)
+	bool SetHPUI();
+
 protected:
 	float DamageMath(float Damage);
-	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, bool Custom = false, float Radius = 0.0f, FVector CustomStart = FVector(0,0,0), FVector CustomEnd = FVector(0,0,0));
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, float Radius, FVector Start, FVector End);
 	void SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation);
 
 	//Monster 세팅 초기화
@@ -268,8 +273,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AAPEnemyAttackRange> AttackRangeClass;
 	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AAPEnemyAttackRange> AttackRangeClass_2;
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	float AttackRangeTime = 1.2f;
 
+	//AAPHUD
+	TWeakObjectPtr<AAPHUD> PlayerHUD;
 public:
 	FOnHPChanged OnEnemyHPChanged;
 

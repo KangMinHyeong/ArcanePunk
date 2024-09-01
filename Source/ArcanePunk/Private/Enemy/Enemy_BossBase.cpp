@@ -11,6 +11,7 @@ void AEnemy_BossBase::BeginPlay()
     Super::BeginPlay();
     SetActorTickEnabled(true);
     InitPatternNums();
+    SetHPUI();
 }
 
 void AEnemy_BossBase::Tick(float DeltaTime)
@@ -71,6 +72,21 @@ void AEnemy_BossBase::InitPatternNums()
     }
 }
 
+void AEnemy_BossBase::SetRangeSpawnRot(int32 Index)
+{
+    if(Index >= RangeAttackInform.Num()) return;
+    SpawnRot.Empty();
+
+    auto Current = RangeAttackInform[Index];
+    
+    for(int32 i = Current.RepeatNum - 1; i >= 0 ; i--)
+    {
+        auto Rot = GetActorRotation();
+        Rot.Yaw += Current.Angle_Start + Current.Angle_Plus * i;
+        SpawnRot.Emplace(Rot);
+    }
+}
+
 int32 AEnemy_BossBase::GetPatternNum()
 {
     if(PatternNums.IsEmpty())
@@ -110,5 +126,9 @@ void AEnemy_BossBase::TraceAttack_1()
 }
 
 void AEnemy_BossBase::TraceAttack_2()
+{
+}
+
+void AEnemy_BossBase::AroundDamage()
 {
 }

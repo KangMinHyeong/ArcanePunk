@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Character/ArcanePunkCharacter.h"
+#include "AnimInstance/AP_EnemyBaseAnimInstance.h"
 
 AEnemyBoss_Chapter1::AEnemyBoss_Chapter1()
 {
@@ -18,6 +19,7 @@ AEnemyBoss_Chapter1::AEnemyBoss_Chapter1()
 void AEnemyBoss_Chapter1::BeginPlay()
 {
     Super::BeginPlay();
+
 }
 
 void AEnemyBoss_Chapter1::Tick(float DeltaTime)
@@ -50,19 +52,31 @@ void AEnemyBoss_Chapter1::MeleeAttack_2()
 }
 
 void AEnemyBoss_Chapter1::RangeAttack_1()
-{
-    auto Ammo = GetWorld()->SpawnActor<AAPEnemyAmmo>(AmmoClass, AmmoSpawnComponent->GetComponentLocation(), GetActorRotation());
-    if(!Ammo) return;
+{    
+    if(SpawnRot.IsEmpty()) return;
+    GetWorldTimerManager().ClearTimer(RangeTimerHandle);
+    auto Ammo = GetWorld()->SpawnActor<AAPEnemyAmmo>(AmmoClass, AmmoSpawnComponent->GetComponentLocation(), SpawnRot.Top()); if(!Ammo) return;
     Ammo->SetOwner(this);
-    Ammo->SetOwnerEnemy(Monster_RangeAttack1_Range, Monster_RangeAttack1_Radius);
+    Ammo->SetOwnerEnemy(Monster_RangeAttack_Range-50.0f, Monster_RangeAttack_Radius);
+    SpawnRot.Pop();
 }
 
 void AEnemyBoss_Chapter1::RangeAttack_2()
 {
+    RangeAttack_1();
+    
+    if(!EnemyAnim.IsValid()) return;
+    if(RangeAttackInform.Num() >= 1 && EnemyAnim->Montage_GetCurrentSection() == "FireTrigger")
+    GetWorldTimerManager().SetTimer(RangeTimerHandle, this, &AEnemyBoss_Chapter1::RangeAttack_2 , RangeAttackInform[1].Frequency, false);
 }
 
 void AEnemyBoss_Chapter1::RangeAttack_3()
 {
+    RangeAttack_1();
+
+    if(!EnemyAnim.IsValid()) return;
+    if(RangeAttackInform.Num() >= 2 && EnemyAnim->Montage_GetCurrentSection() == "FireTrigger")
+    GetWorldTimerManager().SetTimer(RangeTimerHandle, this, &AEnemyBoss_Chapter1::RangeAttack_3 , RangeAttackInform[2].Frequency, false);
 }
 
 void AEnemyBoss_Chapter1::TraceAttack_1()
@@ -74,12 +88,44 @@ void AEnemyBoss_Chapter1::TraceAttack_1()
 
 void AEnemyBoss_Chapter1::TraceAttack_2()
 {
+    bJump = !bJump;
+    if(!bJump)
+    {
+        SetActorLocation(TargetLocation);
+    }
+    SetActorHiddenInGame(bJump);
+    SetCapsuleOverlap(bJump);
 }
 
-void AEnemyBoss_Chapter1::SpawnAttackRange(AActor* Target)
+void AEnemyBoss_Chapter1::AroundDamage()
+{
+    float Damage = TotalStatus.StatusData.ATK * CriticalCalculate();
+	FHitResult HitResult;
+	FVector HitVector;
+	FVector Start = GetMesh()->GetComponentLocation();
+	if(AttackTrace(HitResult, HitVector, Monster_JumpAttack_Range, Start, GetActorLocation()))
+	{
+		if(AActor* Actor = HitResult.GetActor())
+		{
+			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
+			AController* MyController = Cast<AController>(GetController());
+			if(MyController == nullptr) return;
+			DistinctHitPoint(HitResult.Location, Actor);
+			Actor->TakeDamage(Damage, myDamageEvent, MyController, this);
+			if(bKnockBackAttack) OnPlayerKnockBack(Actor, KnockBackDist, KnockBackTime);
+		}
+	}
+}
+
+void AEnemyBoss_Chapter1::SpawnAttackRange(AActor* Target, float WaitTime)
 {
     FVector SpawnLoc = GetMesh()->GetComponentLocation();
+    SpawnRot.Empty(); SpawnRot.Emplace(GetActorRotation());
     float Radius = 0.0f; float Range = 0.0f; 
+    auto RangeClass = AttackRangeClass; 
+    bool bSquare = true;
+    
+    AAPEnemyAttackRange* AttackRange = nullptr;
 
     if(BossPhase == EBossPhase::Phase_1)
     {
@@ -91,10 +137,12 @@ void AEnemyBoss_Chapter1::SpawnAttackRange(AActor* Target)
             break;
         
         case 2:
-            Radius = Monster_RangeAttack1_Radius;
-            Range = Monster_RangeAttack1_Range + Radius;
+            Radius = Monster_RangeAttack_Radius;
+            Range = Monster_RangeAttack_Range + Radius;
             SpawnLoc.X = AmmoSpawnComponent->GetComponentLocation().X;
-            SpawnLoc.Y = AmmoSpawnComponent->GetComponentLocation().Y;
+            SpawnLoc.Y = AmmoSpawnComponent->GetComponentLocation().Y;  
+            
+            SetRangeSpawnRot(0);
             break;
 
         case 3:
@@ -109,19 +157,44 @@ void AEnemyBoss_Chapter1::SpawnAttackRange(AActor* Target)
         switch (CurrentPatterNum)
         {
         case 1:
+            Radius = Monster_AttackRadius;
+            Range = Monster_AttackRange_Plus + Radius;
             break;
         
         case 2:
+            Radius = Monster_RangeAttack_Radius;
+            Range = Monster_RangeAttack_Range + Radius;
+            SpawnLoc.X = AmmoSpawnComponent->GetComponentLocation().X;
+            SpawnLoc.Y = AmmoSpawnComponent->GetComponentLocation().Y;
+            
+            SetRangeSpawnRot(1);
             break;
 
         case 3:
+            Radius = Monster_JumpAttack_Range;
+            Range = Monster_JumpAttack_Range;
+            TargetLocation = Target->GetActorLocation(); TargetLocation.Z = GetActorLocation().Z;
+            SpawnLoc.X = TargetLocation.X;
+            SpawnLoc.Y = TargetLocation.Y;
+            RangeClass = AttackRangeClass_2;
+            bSquare = false;
+            break;
+
+        case 4:
+            Radius = Monster_RangeAttack_Radius;
+            Range = Monster_RangeAttack_Range + Radius;
+            SpawnLoc.X = AmmoSpawnComponent->GetComponentLocation().X;
+            SpawnLoc.Y = AmmoSpawnComponent->GetComponentLocation().Y;
+            SetRangeSpawnRot(2);
             break;
         }
     }
-
-    auto AttackRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(AttackRangeClass, SpawnLoc, GetActorRotation()); if(!AttackRange) return;
-	AttackRange->SetDecalSize(Radius, Range, AttackRangeTime);
-	
+    
+    for(auto Rot : SpawnRot)
+    {
+        AttackRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(RangeClass, SpawnLoc, Rot); if(!AttackRange) return;
+	    AttackRange->SetDecalSize(Radius, Range, WaitTime, bSquare);
+    }	
 }
 
 void AEnemyBoss_Chapter1::OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)

@@ -10,6 +10,9 @@ class USphereComponent;
 class UNiagaraSystem;
 class AArcanePunkCharacter;
 class AAPEnemyAttackRange;
+class USkeletalMeshComponent;
+class UAPDestructibleMeshComponent;
+class UAPTransparentComponent;
 
 UCLASS()
 class ARCANEPUNK_API AAPTrapBase : public AActor
@@ -22,24 +25,38 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void OnTrapOperation_MontageEnded();
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
   	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void TrapMontageEnded(UAnimMontage *Montage, bool bInterrupted);
+	UFUNCTION(BlueprintCallable)
+	bool IsOperationEnd() const {return bOperationEnd;};
 
 	void AutoRotating();
+	void AutoDestroy();
+	virtual void OnDamageTrigger();
+
 
 protected:
 	// Component
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* TrapMesh;
+	USkeletalMeshComponent* RootMesh;
 
 	UPROPERTY(EditAnywhere)
-	USphereComponent* TrapTrigger;
+	USkeletalMeshComponent* TopMesh;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* RotateMesh;
+	UAPDestructibleMeshComponent* DestructibleMesh;
+
+	UPROPERTY(EditAnywhere)
+	UAPTransparentComponent* FadeComp;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* TrapCollision;
 
 	// Trap Operate Effect
 	UPROPERTY(EditAnywhere)
@@ -65,4 +82,11 @@ protected:
 	
 	// Trap Overlapped Player
 	TWeakObjectPtr<AArcanePunkCharacter> Player;
+
+	FTimerHandle DestroyTimerHandle;
+	UPROPERTY(EditAnywhere)
+	float DestroyTime = 0.0f;
+
+	bool bOperationEnd = false;
+	float OperationTime = 0.0f;
 };

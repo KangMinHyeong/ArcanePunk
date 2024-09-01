@@ -17,10 +17,10 @@ void AAPTrapBase_Spear::BeginPlay()
 {
     Super::BeginPlay();
 	
-    TrapTrigger->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase::OnOverlap);
-	RotateMesh->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase_Spear::OnOverlap);
+    TrapCollision->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase::OnOverlap);
+	TopMesh->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase_Spear::OnOverlap);
 
-    InitLocation = RotateMesh->GetComponentLocation();
+    InitLocation = TopMesh->GetComponentLocation();
     Destination = InitLocation; Destination.Z += SpearHeight;
     GetWorldTimerManager().SetTimer(TriggerTimerHandle, this, &AAPTrapBase_Spear::OnOperating, TriggerTime, false);
 }
@@ -31,22 +31,22 @@ void AAPTrapBase_Spear::Tick(float DeltaTime)
     
     if(bOperation)
     {
-        auto Current = RotateMesh->GetComponentLocation();
+        auto Current = TopMesh->GetComponentLocation();
         Current = FMath::VInterpConstantTo(Current, Destination, DeltaTime, RotateSpeed);
-        RotateMesh->SetWorldLocation(Current);
+        TopMesh->SetWorldLocation(Current);
 
         if((Current - Destination).Size() <= Margin)
         {
             bOperation = false;
-            RotateMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            TopMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
             GetWorldTimerManager().SetTimer(TriggerTimerHandle, this, &AAPTrapBase_Spear::OnOperatingEnd, HoldTime, false);
         }
     }
     if(bEnd)
     {
-        auto Current = RotateMesh->GetComponentLocation();
+        auto Current = TopMesh->GetComponentLocation();
         Current = FMath::VInterpConstantTo(Current, InitLocation, DeltaTime, RotateSpeed);
-        RotateMesh->SetWorldLocation(Current);
+        TopMesh->SetWorldLocation(Current);
 
         if((Current - InitLocation).Size() <= Margin)
         {
@@ -60,7 +60,7 @@ void AAPTrapBase_Spear::OnOperating()
 {
     GetWorldTimerManager().ClearTimer(TriggerTimerHandle);
     bOperation = true;
-    RotateMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    TopMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void AAPTrapBase_Spear::OnOperatingEnd()
@@ -73,8 +73,7 @@ void AAPTrapBase_Spear::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *O
 {
     auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
+	TopMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	UGameplayStatics::ApplyDamage(Character, TrapDamage, nullptr, this, UDamageType::StaticClass());
-
-	// auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TrapOverlapEffect, GetActorLocation(), GetActorRotation());
 }
 
