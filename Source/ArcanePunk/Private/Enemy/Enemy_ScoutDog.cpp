@@ -54,6 +54,7 @@ void AEnemy_ScoutDog::SpawnJumpEffect()
 
 void AEnemy_ScoutDog::OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
+    if(IsDead()) return;
     float Damage = TotalStatus.StatusData.ATK * CriticalCalculate();
 	if (OtherActor && OtherActor != this)
 	{
@@ -72,7 +73,7 @@ void AEnemy_ScoutDog::AttackCondition(bool NewBool)
     {
         RushTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     }
-    else
+    else 
     {
         RushTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision); 
     }

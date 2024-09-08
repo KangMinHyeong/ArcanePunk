@@ -45,7 +45,7 @@ void APortal_Base::BeginPlay()
 void APortal_Base::InitHide(bool IsHidden)
 {
 	SetActorHiddenInGame(IsHidden);
-	
+
 	if(IsHidden)
 	{
 		SetActorEnableCollision(ECollisionEnabled::NoCollision);

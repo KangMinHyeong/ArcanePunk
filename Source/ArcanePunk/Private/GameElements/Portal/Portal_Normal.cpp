@@ -82,6 +82,7 @@ void APortal_Normal::OnEndedFadeOut()
 	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
 	Character->SetActorEnableCollision(true);
 	StartTeleport(Character, Dest);
+
 	APGI->OnEndedFadeOut.RemoveDynamic(this, &APortal_Normal::OnEndedFadeOut);
 }
 
@@ -93,7 +94,6 @@ void APortal_Normal::OnStartFadeIn()
 	Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	Character->GetMySpringArm()->TargetOffset = FVector::ZeroVector;
 	CharacterPC->StartFadeIn(1.0f, false);
-
 	Destination->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	APGI->OnStartFadeIn.RemoveDynamic(this, &APortal_Normal::OnStartFadeIn);
 }

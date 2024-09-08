@@ -33,7 +33,7 @@ void AEnemyBoss_Chapter1::Tick(float DeltaTime)
         auto CurrentLocation = GetActorLocation();
         CurrentLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, DeltaTime, TraceSpeed);
         SetActorLocation(CurrentLocation, true);
-        if(abs(CurrentLocation.X - TargetLocation.X )< 1.0f && abs(CurrentLocation.Y - TargetLocation.Y) < 1.0f) 
+        if(abs(CurrentLocation.X - TargetLocation.X )< 5.0f && abs(CurrentLocation.Y - TargetLocation.Y) < 5.0f) 
         {
             GetCapsuleComponent()->OnComponentBeginOverlap.RemoveDynamic(this, &AEnemyBoss_Chapter1::OnOverlapping);
             bTraceAttack = false;
@@ -81,6 +81,7 @@ void AEnemyBoss_Chapter1::RangeAttack_3()
 
 void AEnemyBoss_Chapter1::TraceAttack_1()
 {
+    GetCapsuleComponent()->OnComponentBeginOverlap.RemoveDynamic(this, &AEnemyBoss_Chapter1::OnOverlapping);
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBoss_Chapter1::OnOverlapping);
     bTraceAttack = true;
     SetCapsuleOverlap(true);

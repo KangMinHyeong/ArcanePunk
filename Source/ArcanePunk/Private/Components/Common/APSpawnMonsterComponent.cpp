@@ -8,6 +8,7 @@
 #include "GameInstance/APGameInstance.h"
 #include "GameMode/APGameModeBattleStage.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 UAPSpawnMonsterComponent::UAPSpawnMonsterComponent()
 {
@@ -83,9 +84,27 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy
     while(SpawnMonsterNum > 0)
     {
         auto Location = GetRandomLocation(V_1, V_2, V_3);
+        UE_LOG(LogTemp, Display, TEXT("Your Location.Z %f"), Location.Z);
         auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, Location, GetOwner()->GetActorRotation(), SpawnParams);
         if(SpawnMonster) 
         {
+            SpawnMonster->SetActorLocation(SpawnMonster->GetActorLocation()+ SpawnMonster->GetActorUpVector() * SpawnMonster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+            PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
+            SpawnMonsterNum--;
+            SpawnMonster->SetOwnerSection(GetOwner());
+        }
+    }
+}
+
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, uint8 SpawnMonsterNum, FVector SpawnLocation)
+{
+    while(SpawnMonsterNum > 0)
+    {
+        FRotator rot = GetOwner()->GetActorRotation(); rot.Yaw += 180.0f;
+        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, SpawnLocation, rot, SpawnParams);
+        if(SpawnMonster) 
+        {
+            SpawnMonster->SetActorLocation(SpawnMonster->GetActorLocation()+ SpawnMonster->GetActorUpVector() * SpawnMonster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
             PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
             SpawnMonsterNum--;
             SpawnMonster->SetOwnerSection(GetOwner());

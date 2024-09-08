@@ -3,73 +3,68 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "GameInstance/APGameInstance.h"
+#include "GameElements/Prop/APBackGroundAssetBase.h"
 
 void AAPLevelStreamingVolume::PostLoad()
 {
     Super::PostLoad();
-    
+                    
+}
+
+void AAPLevelStreamingVolume::BeginPlay()
+{
+    Super::BeginPlay();
+
+    StreamingUsage = EStreamingVolumeUsage::SVB_VisibilityBlockingOnLoad;
     for(auto LevelName : StreamingLevelNames)
     {
-        StreamingLevel = UGameplayStatics::GetStreamingLevel(this, LevelName);
-        if(StreamingLevel.IsValid())
+        auto StreamingLevel = UGameplayStatics::GetStreamingLevel(this, LevelName);
+        if(StreamingLevel)
         {
-            StreamingLevel->OnLevelLoaded.AddDynamic(this, &AAPLevelStreamingVolume::OnLevelLoaded);
+            StreamingLevels.Emplace(StreamingLevel);
         }
     }
+
+    if(StreamingLevels.IsEmpty()) return;
+    StreamingLevels.Top()->OnLevelLoaded.RemoveDynamic(this, &AAPLevelStreamingVolume::OnLevelLoadComplete);
+    StreamingLevels.Top()->OnLevelLoaded.AddDynamic(this, &AAPLevelStreamingVolume::OnLevelLoadComplete);
+
 }
 
-void AAPLevelStreamingVolume::OnLevelLoaded()
+void AAPLevelStreamingVolume::OnLevelLoadComplete()
 {
-    if(!StreamingLevel.IsValid()) return;
-    ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel();
+    if(StreamingLevels.IsEmpty()) return;
 
-    if (LoadedLevel)
-    {
-        bool bAllActorsReady = true;
-        for (AActor* Actor : LoadedLevel->Actors)
-        {
-            if (Actor && !Actor->HasActorBegunPlay())
-            {
-                bAllActorsReady = false;
-                break;
-            }
-        }
-        
-        if (bAllActorsReady)
-        {
-            // 모든 오브젝트가 스폰되었습니다.
-            HideLoadingScreen();
-        }
-        else
-        {
-            // 모든 오브젝트가 스폰될 때까지 대기하는 로직 추가
-            GetWorld()->GetTimerManager().SetTimer(CheckActorsHandle, this, &AAPLevelStreamingVolume::CheckAllActorsLoaded, 1.1f, true);
-        }
-    }
-}
-
-void AAPLevelStreamingVolume::CheckAllActorsLoaded()
-{
     bool bAllActorsReady = true;
-    for (AActor* Actor : StreamingLevel->GetLoadedLevel()->Actors)
+    for(auto StreamingLevel : StreamingLevels)
     {
-        if (Actor && !Actor->HasActorBegunPlay())
-        {
-            bAllActorsReady = false;
-            break;
-        }
+        ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel();
+        if (!LoadedLevel) {bAllActorsReady = false; break;}    
+        
+        for (AActor* Actor : LoadedLevel->Actors)
+        {  
+            auto SpawnActor = Cast<AAPBackGroundAssetBase>(Actor); if(!SpawnActor) continue;
+            if (!SpawnActor->IsSpawnCompleted()) {bAllActorsReady = false; break;}    
+
+        }     
+
+        if(!bAllActorsReady) break;
     }
 
+    GetWorld()->GetTimerManager().ClearTimer(CheckActorsHandle);
     if (bAllActorsReady)
     {
-        // 모든 오브젝트가 스폰되었습니다.
-        GetWorld()->GetTimerManager().ClearTimer(CheckActorsHandle);
-        HideLoadingScreen();
+        GetWorld()->GetTimerManager().SetTimer(CheckActorsHandle, this, &AAPLevelStreamingVolume::HideLoadingScreen, 0.45f, false);
+    }
+    else
+    {
+        GetWorld()->GetTimerManager().SetTimer(CheckActorsHandle, this, &AAPLevelStreamingVolume::OnLevelLoadComplete, 0.15f, false);
     }
 }
 
 void AAPLevelStreamingVolume::HideLoadingScreen()
 {
+    GetWorld()->GetTimerManager().ClearTimer(CheckActorsHandle);
     auto APGI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); 
     if(APGI) APGI->OnStartFadeIn.Broadcast();
 }
