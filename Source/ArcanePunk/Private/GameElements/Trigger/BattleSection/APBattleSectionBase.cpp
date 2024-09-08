@@ -1,6 +1,7 @@
 
 #include "GameElements/Trigger/BattleSection/APBattleSectionBase.h"
 
+#include "Enemy/Enemy_BossBase.h"
 #include "Components/BoxComponent.h"
 #include "Components/Common/APSpawnMonsterComponent.h"
 #include "Character/ArcanePunkCharacter.h"
@@ -26,7 +27,8 @@ void AAPBattleSectionBase::BeginPlay()
 	Super::BeginPlay();
 	
 	InitArea();
-	ClearChecking();
+	// ClearChecking();
+	GetWorldTimerManager().SetTimer(TriggerTimerHandle, this, &AAPBattleSectionBase::ClearChecking, 0.1f, false);
 }
 
 void AAPBattleSectionBase::Tick(float DeltaTime)
@@ -54,18 +56,21 @@ void AAPBattleSectionBase::InitArea()
 void AAPBattleSectionBase::ClearChecking() // 인스턴스 던전에서 해당 배틀 섹션을 클리어 하였는지 체크 & BattleStage Information 정보들 초기화
 {
 	auto GS = Cast<AAPGameState>(GetWorld()->GetGameState()); if(!GS) return;
-
-	BattleTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPBattleSectionBase::OnSpawnLocation);
-	
 	BattleStageData = BattleStageDataTable->FindRow<FBattleStageDataTable>(BattleSectionID, BattleSectionID.ToString()); if(!BattleStageData) return;
+
+	// BattleTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPBattleSectionBase::OnSpawnLocation);
+	TArray<AActor*> Players;
+	BattleTrigger->GetOverlappingActors(Players, AArcanePunkCharacter::StaticClass());
+	
+	if(!Players.IsEmpty()) OnSpawnLocation();
 }
 
-void AAPBattleSectionBase::OnSpawnLocation(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AAPBattleSectionBase::OnSpawnLocation()
 {
-	if(bOvelapped) return;
-	auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
-	bOvelapped = true;
-	BattleTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// if(bOvelapped) return;
+	// auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
+	// bOvelapped = true;
+	// BattleTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	if(!BattleStageData) return;
 
@@ -86,8 +91,13 @@ void AAPBattleSectionBase::SpawnMonster()
 	{
 		for( auto Spawn : BattleStageData->Spawn_OnTime[SpawnNum_OnTime].SpawnMonsterData)
 		{
+			if (Spawn.Key->IsChildOf(AEnemy_BossBase::StaticClass()))
+			{
+				SpawnMonsterComp->SpawnMonsterRandomWithLocation(Spawn.Key, Spawn.Value, GetActorLocation());
+				continue;
+			}
+			
 			bool Check = FMath::RandBool();
-
 			if (Check)
 			{
 				SpawnMonsterComp->SpawnMonsterRandomWithTriangle(Spawn.Key, Spawn.Value, AreaPoint_1, AreaPoint_2, AreaPoint_3);
@@ -104,7 +114,7 @@ void AAPBattleSectionBase::SpawnMonster()
 
 bool AAPBattleSectionBase::CheckSpawnEnd()
 {
-	if(!bOvelapped) return false;
+	// if(!bOvelapped) return false;
 	BattleStageData = BattleStageDataTable->FindRow<FBattleStageDataTable>(BattleSectionID, BattleSectionID.ToString()); if(!BattleStageData)return false;
 
 

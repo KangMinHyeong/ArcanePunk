@@ -19,8 +19,6 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 {
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
     if(!OwnerComp.GetAIOwner()) return;
 
     AEnemyBaseAIController* AIController = Cast<AEnemyBaseAIController>(OwnerComp.GetAIOwner());
@@ -45,7 +43,7 @@ void UBTService_EnemyEyeSight::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
     {
         FVector TargetLocation = TargetActor->GetActorLocation();
         float Distance =  FVector::Distance(Monster->GetActorLocation(), TargetLocation);
-
+        
         if((AIController->GetEyeSightTrace() ? AIController->LineOfSightTo(TargetActor.Get()) : true) && (AIController->GetDistanceTrace() ? Distance < Monster->GetDetectDist() : true))
         {
             OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), TargetActor.Get());
@@ -80,7 +78,12 @@ AActor *UBTService_EnemyEyeSight::GetPlayerActor(AActor* AIOwner)
     TArray<AActor*> Actors;
     UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
 
-    if(Actors.IsEmpty()) return nullptr;
+    if(Actors.IsEmpty())
+    {
+        APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+        if(!PlayerPawn) return nullptr;
+        Actors.Emplace(PlayerPawn);
+    }
 
     if(Actors.Num() >= 2)
 	{

@@ -17,12 +17,18 @@ class ARCANEPUNK_API AAPLevelStreamingVolume : public ALevelStreamingVolume
 public:
 	virtual void PostLoad() override;	
 
+public:
+	virtual void BeginPlay() override;	
+
 	UFUNCTION()
-	void OnLevelLoaded();
-	void CheckAllActorsLoaded();
+	void OnLevelLoadComplete();
+
 	void HideLoadingScreen();
 
 private:
-	TWeakObjectPtr<ULevelStreaming> StreamingLevel;
-	FTimerHandle CheckActorsHandle;
+	UPROPERTY()
+	TArray<TWeakObjectPtr<ULevelStreaming>> StreamingLevels;
+
+	FTimerHandle CheckActorsHandle; 
+
 };

@@ -16,6 +16,7 @@ class ARCANEPUNK_API AAPLavaField : public AActor
 	
 public:	
 	AAPLavaField();
+	FORCEINLINE void SetbOverlap(bool NewBool) {bOverlap = NewBool;};
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,6 +31,8 @@ public:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex);
 	
+	float ClearTrap();
+	
 private:
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* LavaTrigger;
@@ -42,4 +45,6 @@ private:
 	float FieldDamage = 1.0f;
 	UPROPERTY(EditAnywhere)
 	float DamageFrequency = 1.0f;
+
+	bool bOverlap = false;
 };

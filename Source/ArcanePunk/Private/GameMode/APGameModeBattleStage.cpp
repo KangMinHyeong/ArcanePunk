@@ -32,7 +32,7 @@ void AAPGameModeBattleStage::PlayerKilled()
 void AAPGameModeBattleStage::CheckBattleSection(AActor* BattleSection)
 {
     auto BS = Cast<AAPBattleSectionBase>(BattleSection); if(!BS) return;
-    UE_LOG(LogTemp, Display, TEXT("Your b"));
+
     // 몬스터가 다 처지 되었으면 호출, 배틀섹션에서 추가로 몬스터를 스폰할껀지 확인, 확인해서 배틀섹션 종료 및 지속 결정
 	if(BS->CheckSpawnEnd())
     {

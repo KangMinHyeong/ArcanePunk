@@ -14,7 +14,6 @@ class ATextRenderActor;
 class UAP_EnemyBaseAnimInstance;
 class UNiagaraComponent;
 class AEnemy_DropBase;
-class UWidgetComponent;
 class AEnemyBaseAIController;
 class AEnemy_DropPackage;
 class UNiagaraSystem;
@@ -161,9 +160,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Status")
 	FDropData DropData;
-
-	UPROPERTY(EditAnywhere, Category = "Status")
-	UWidgetComponent* HealthWidgetComp;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	UAPManaDropComponent* ManaDropComp;

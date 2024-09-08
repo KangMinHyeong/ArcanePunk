@@ -31,7 +31,7 @@ public:
 	void SpawnMonsterFromLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, TArray<AActor*>& SpawnLocations, TArray<AEnemy_CharacterBase*>& MonsterArr);
 	void SpawnLocationRandom(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, FVector MinimumRange, FVector MaximumRange);
 	void SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3);
-	
+	void SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector SpawnLocation);
 	FActorSpawnParameters SpawnParams;
 
 private:

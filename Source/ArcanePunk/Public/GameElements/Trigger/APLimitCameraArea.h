@@ -33,7 +33,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	bool CheckLimit(float X, float Y);
-	void CheckPlayerLocation(float X, float Y);
+	void CheckPlayerLocation(float X, float Y, bool first = false);
 	void LineTrace(float & X, float & Y);
 	void InitArea();
 

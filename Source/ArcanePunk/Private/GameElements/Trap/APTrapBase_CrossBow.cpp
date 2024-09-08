@@ -31,6 +31,7 @@ void AAPTrapBase_CrossBow::BeginPlay()
         TrapCollision->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase_CrossBow::OnOverlap);
         StaticCollision->OnComponentBeginOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlap);
         ShootRange.X = StaticCollision->GetScaledBoxExtent().Y * 2.0f;
+        ShootRange.Y = StaticCollision->GetScaledBoxExtent().X * 1.0f;
         StaticCollision->OnComponentEndOverlap.AddDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
     }
     else
@@ -81,7 +82,7 @@ void AAPTrapBase_CrossBow::ReadyToShoot()
     
     FRotator Rot = TopMesh->GetComponentRotation(); Rot.Yaw -= RotatePlus;
     auto TrapRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(RangeClass, GetActorLocation(), Rot); if(!TrapRange) return;
-	TrapRange->SetDecalSize(ShootRange.Y, ShootRange.X, ShootDelayTime);
+	TrapRange->SetDecalSize(ShootRange.Y, ShootRange.X + ShootRange.Y * 0.5f, ShootDelayTime);
         
     GetWorldTimerManager().SetTimer(ShootTimerHandle, this, &AAPTrapBase_CrossBow::ShootArrow, ShootDelayTime, false);
 }
@@ -90,11 +91,10 @@ void AAPTrapBase_CrossBow::ShootArrow()
 {
     auto Ammo = GetWorld()->SpawnActor<AAPProjectileBase>(ProjectileClass, ArrowSpawnComp->GetComponentLocation(), ArrowSpawnComp->GetComponentRotation());
     if(!Ammo) return;
-    Ammo->SetDestroy(ShootRange.X / ArrowSpeed);
+    Ammo->SetDestroy((ShootRange.X - ShootRange.Y) / ArrowSpeed);
     Ammo->SetSpeed(ArrowSpeed);
     Ammo->SetDamage(TrapDamage);
     Ammo->SetRadius(ShootRange.Y);
-
 
     if(bStatic)
     {

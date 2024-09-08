@@ -96,7 +96,8 @@
 			"execution": "cpp",
 			"fft": "cpp",
 			"complex": "cpp",
-			"valarray": "cpp"
+			"valarray": "cpp",
+			"ctime": "cpp"
 		}
 	},
 	"extensions": {
