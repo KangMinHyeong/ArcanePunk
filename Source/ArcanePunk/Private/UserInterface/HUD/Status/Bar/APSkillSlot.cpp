@@ -80,7 +80,6 @@ void UAPSkillSlot::SetCoolTimePercent()
     float CoolTime = GetCurrentCoolTime() / SkillCoolTime;
     if(CoolTime > 0.001f) {CoolTimePercent->SetVisibility(ESlateVisibility::Visible);}
     else {CoolTimePercent->SetVisibility(ESlateVisibility::Hidden);}
-
     CoolTimePercent->GetDynamicMaterial()->SetScalarParameterValue(TEXT("Percent"), CoolTime);
 }
 
@@ -140,6 +139,8 @@ void UAPSkillSlot::StartSkillCoolTime(ESkillKey UpdateSkillKey, float CoolTime)
     SetSkillLimit(false);
     CurrentCoolTime = CoolTime;
     SkillCoolTime = CoolTime;
+    bStartPercent = true;
+    CurrentSkillKey = UpdateSkillKey;
     GetWorld()->GetTimerManager().SetTimer(SkillCoolTimerHandle, this, &UAPSkillSlot::SkillCoolDown, CurrentCoolTime, false);
 }
 
@@ -266,6 +267,10 @@ void UAPSkillSlot::SetSkillLimit(bool NewBool)
         case ESkillKey::R:
         OwnerCharacter->SetbCanSkill_R(NewBool);
         if(NewBool) OwnerCharacter->GetRSkillNumber()->OnCoolDown();
+        break;
+
+        case ESkillKey::Dash:
+        OwnerCharacter->SetbCanDash(NewBool);
         break;
     }
 }

@@ -36,15 +36,16 @@ void AAPGameModeBattleStage::CheckBattleSection(AActor* BattleSection)
     // 몬스터가 다 처지 되었으면 호출, 배틀섹션에서 추가로 몬스터를 스폰할껀지 확인, 확인해서 배틀섹션 종료 및 지속 결정
 	if(BS->CheckSpawnEnd())
     {
+        GetWorld()->GetWorldSettings()->SetTimeDilation(0.25f);
         FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AAPGameModeBattleStage::PortalSpawn, BS->GetBattleSectionID());
-	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 2.5f, false);
+	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 1.25f, false);
     }
 }
 
 void AAPGameModeBattleStage::PortalSpawn(FName CurrentClearStage)
 {
     GetWorld()->GetTimerManager().ClearTimer(PortalSpawnTimerHandle);
-
+    GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f);
     for(auto Portal : TActorRange<APortal_Base>(GetWorld()))
     {
         if(CurrentClearStage == Portal->GetPortalID())

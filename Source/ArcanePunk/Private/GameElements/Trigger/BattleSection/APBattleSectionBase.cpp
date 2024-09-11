@@ -97,15 +97,7 @@ void AAPBattleSectionBase::SpawnMonster()
 				continue;
 			}
 			
-			bool Check = FMath::RandBool();
-			if (Check)
-			{
-				SpawnMonsterComp->SpawnMonsterRandomWithTriangle(Spawn.Key, Spawn.Value, AreaPoint_1, AreaPoint_2, AreaPoint_3);
-			}
-			else
-			{
-				SpawnMonsterComp->SpawnMonsterRandomWithTriangle(Spawn.Key, Spawn.Value, AreaPoint_3, AreaPoint_4, AreaPoint_1);
-			}
+			SpawnMonsterComp->SpawnMonsterRandomWithSquare(Spawn.Key, Spawn.Value, AreaPoint_1, AreaPoint_2, AreaPoint_3, AreaPoint_4);
 		}
 		SpawnNum_OnTime++;
 		if(BattleUI.IsValid()) BattleUI->UpdateBattleUI(BattleStageData->Spawn_OnTime.Num() - SpawnNum_OnTime, BattleStageData->NextWaveTime);

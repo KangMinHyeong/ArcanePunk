@@ -21,6 +21,14 @@ void UAPSpawnMonsterComponent::BeginPlay()
 	Super::BeginPlay();
 
     SpawnParamsSetting();
+
+	Params.AddIgnoredActor(GetOwner());
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Ground"), Actors);
+	for (AActor* Actor : Actors)
+    {
+		Params.AddIgnoredActor(Actor);
+    }
 }
 
 void UAPSpawnMonsterComponent::SpawnParamsSetting()
@@ -81,14 +89,44 @@ void UAPSpawnMonsterComponent::SpawnMonsterFromLocation(TSubclassOf<AEnemy_Chara
 
 void UAPSpawnMonsterComponent::SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3)
 {
+    int32 loopcnt = 0;
     while(SpawnMonsterNum > 0)
     {
         auto Location = GetRandomLocation(V_1, V_2, V_3);
-        UE_LOG(LogTemp, Display, TEXT("Your Location.Z %f"), Location.Z);
+        if(!IsPossibleLocation(Location))
+        {
+            continue;
+        }
+        
         auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, Location, GetOwner()->GetActorRotation(), SpawnParams);
         if(SpawnMonster) 
         {
             SpawnMonster->SetActorLocation(SpawnMonster->GetActorLocation()+ SpawnMonster->GetActorUpVector() * SpawnMonster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+            PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
+            SpawnMonsterNum--;
+            SpawnMonster->SetOwnerSection(GetOwner());
+        }
+    }
+}
+
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3, FVector V_4)
+{
+    int32 loopcnt = 0;
+    while(SpawnMonsterNum > 0)
+    {
+        bool Check = FMath::RandBool();
+        auto Location = GetRandomLocation(V_1, V_2, V_3);
+        if(Check) Location = GetRandomLocation(V_3, V_4, V_1);
+
+        if(!IsPossibleLocation(Location))
+        {
+            continue;
+        }
+        
+        auto SpawnMonster = GetWorld()->SpawnActor<AEnemy_CharacterBase>(SpawnMonsterClass, Location, GetOwner()->GetActorRotation(), SpawnParams);
+        if(SpawnMonster) 
+        {
+            SpawnMonster->SetActorLocation(SpawnMonster->GetActorLocation()+ FVector(0.0f, 0.0f, SpawnMonster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
             PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
             SpawnMonsterNum--;
             SpawnMonster->SetOwnerSection(GetOwner());
@@ -144,4 +182,33 @@ FVector UAPSpawnMonsterComponent::GetRandomLocation(FVector V_1, FVector V_2, FV
         V_1.Z
     );
 }
+
 // TArray 없이 스폰
+
+bool UAPSpawnMonsterComponent::IsPossibleLocation(FVector Location)
+{
+    FCollisionShape Sphere = FCollisionShape::MakeSphere(120.0f);
+	
+    TArray<FHitResult> HitResult;
+    bool bResult = GetWorld()->SweepMultiByChannel(HitResult, 
+    Location, 
+    Location, 
+    FQuat::Identity,   
+    ECC_Camera, 
+    Sphere,
+    Params);// 타격 판정 인자 Params 인자 추가
+
+    FColor color = FColor::Green;
+    if(HitResult.Num() > 0) {color = FColor::Red; bResult = true;}
+
+    DrawDebugSphere(GetWorld(),
+			Location,
+			120.0f,
+			12,
+			color,
+			false,
+			5.0f,
+			0,
+			10);
+    return !bResult;
+}

@@ -1,6 +1,7 @@
 
 #include "GameElements/Trigger/APLimitCameraArea.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -196,7 +197,7 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 	if(Player.IsValid() && bEnd)
 	{
 		FVector & Current = Player->GetMySpringArm()->TargetOffset;
-		Current = FMath::VInterpConstantTo(Current, FVector::ZeroVector, DeltaTime, 200.0f);
+		Current = FMath::VInterpConstantTo(Current, FVector::ZeroVector, DeltaTime, 100.0f);
 
 		if(Current.X <= KINDA_SMALL_NUMBER && Current.Y <= KINDA_SMALL_NUMBER)
 		{
@@ -227,28 +228,12 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 			Player->GetMySpringArm()->TargetOffset.X = Min_X - X;
 			Player->GetMySpringArm()->TargetOffset.Y = Min_Y - Y;
 		}
-
-		
-		float Len = (Player->GetMySpringArm()->GetComponentLocation() - FadeOutTrigger->GetComponentLocation()).Size();
-		FadeOutTrigger->SetBoxExtent(FVector(Len, 32.0f, 32.0f)); 
-
-		CameraWidth = InitCameraWidth + Player->GetMySpringArm()->TargetOffset.Y;
-		FadeTriggerRot.Pitch = FMath::RadiansToDegrees(UKismetMathLibrary::Atan(CameraWidth/CameraHeight)) + SpringArmRot.Pitch;
-		
-		float aba = (90.0f - FMath::RadiansToDegrees(UKismetMathLibrary::Acos(Player->GetMySpringArm()->TargetOffset.X/Len)));
-		FadeTriggerRot.Yaw = -(aba + SpringArmRot.Yaw);
-		FadeOutTrigger->SetRelativeRotation(FadeTriggerRot);
 	}
 }
 
 void AAPLimitCameraArea::InitCondition()
 {
 	if(!Player.IsValid()) return;
-
-	FadeOutTrigger = Player->GetFadeOutTrigger();
-	FadeOutTrigger->SetRelativeRotation(FRotator::ZeroRotator);
-	FadeOutTrigger->SetBoxExtent(FVector(Player->GetMySpringArm()->TargetArmLength, 32.0f, 32.0f)); 
-
 	CurrentArea = ECurrentArea::None;
 	bEnd = true;
 }
@@ -261,7 +246,6 @@ void AAPLimitCameraArea::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *
 		AreaTrigger->OnComponentEndOverlap.AddDynamic(this, &AAPLimitCameraArea::OnOverlapEnd);
 		
 		Player = Cast<AArcanePunkCharacter>(OtherActor);
-
 		InitCondition();
 	}
 }
@@ -271,20 +255,10 @@ void AAPLimitCameraArea::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActo
 	if(Cast<AArcanePunkCharacter>(OtherActor))
 	{
 		Player = Cast<AArcanePunkCharacter>(OtherActor);
-		FixedSpringArmLocation = Player->GetMySpringArm()->GetComponentLocation() - Player->GetActorForwardVector() * 45.0f;
+		FixedSpringArmLocation = Player->GetMySpringArm()->GetComponentLocation() - Player->GetActorForwardVector() * Player->GetCapsuleComponent()->GetScaledCapsuleRadius();
 		SetActorTickEnabled(true);
 		bEnd = false;
 		
 		CheckPlayerLocation(FixedSpringArmLocation.X, FixedSpringArmLocation.Y, true);
-
-		auto SA = Player->GetMySpringArm();
-		
-		FadeOutTrigger = Player->GetFadeOutTrigger();
-		FadeTriggerRot = FadeOutTrigger->GetRelativeRotation();
-
-		SpringArmRot.Pitch = SA->GetComponentRotation().Pitch;
-		CameraHeight = SA->TargetArmLength * FMath::Cos(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
-		CameraWidth = SA->TargetArmLength * FMath::Sin(FMath::DegreesToRadians(abs(SpringArmRot.Pitch)));
-		InitCameraWidth = CameraWidth;
 	}
 }

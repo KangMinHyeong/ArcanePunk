@@ -25,6 +25,7 @@ void UAPMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	
 	if(bMove) TickMove(DeltaTime);
 	if(bRotation) TickRotate(DeltaTime);
+	if(bDash) TickDash(DeltaTime);
 	TickCheck();
 }
 
@@ -77,7 +78,7 @@ void UAPMovementComponent::PlayerMoveRight(float AxisValue)
 
 void UAPMovementComponent::TickCheck()
 {
-	if(!bMove && !bRotation) SetComponentTickEnabled(false);
+	if(!bMove && !bRotation && !bDash) SetComponentTickEnabled(false);
 }
 
 void UAPMovementComponent::TickRotate(float DeltaTime)
@@ -103,6 +104,16 @@ void UAPMovementComponent::TickMove(float DeltaTime)
 	{
 		ComboMoveStop();
 	}
+}
+
+void UAPMovementComponent::TickDash(float DeltaTime)
+{
+	if(!OwnerCharacter.IsValid()) return;
+	if(OwnerCharacter->returnState() != ECharacterState::None && OwnerCharacter->returnState() != ECharacterState::Slow) return;
+
+	FVector CurrentLoc = OwnerCharacter->GetActorLocation();
+	CurrentLoc = FMath::VInterpConstantTo(CurrentLoc, DashLocation, DeltaTime, DashSpeed);
+	OwnerCharacter->SetActorLocation(CurrentLoc);
 }
 
 void UAPMovementComponent::ComboMovement()
@@ -154,3 +165,28 @@ void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float Speed)
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UAPMovementComponent::RotateMovement, 0.00001f, false);
 }
 
+void UAPMovementComponent::StartDash()
+{
+	if(!OwnerCharacter.IsValid()) return;
+	OwnerPC = Cast<APlayerController>(OwnerCharacter->GetController());
+	if(!OwnerPC.IsValid()) return;
+
+	FHitResult HitResult;
+	OwnerPC->GetHitResultUnderCursor(ECC_GameTraceChannel3, false, HitResult); if(!HitResult.bBlockingHit) return;
+	
+	FVector HitPoint;
+	FVector Location = GetOwner()->GetActorLocation();
+    HitPoint = HitResult.Location - Location; HitPoint.Z = 0.0f;
+	HitPoint = HitPoint/HitPoint.Size();  
+	OwnerCharacter->SetActorRotation(FRotationMatrix::MakeFromX(HitPoint).Rotator());
+
+	DashLocation = Location + HitPoint * DashLength;
+
+	bDash = true; 
+	SetComponentTickEnabled(true);
+}
+
+void UAPMovementComponent::EndDash()
+{
+	bDash = false; 
+}

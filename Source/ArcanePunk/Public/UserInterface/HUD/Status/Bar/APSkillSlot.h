@@ -49,7 +49,7 @@ private:
 	void SetSkillLimit(bool NewBool);
 	void SetSkillSlotImage(uint8 SkillNumber);
 
-private:
+protected:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UImage* SkillImage;
 

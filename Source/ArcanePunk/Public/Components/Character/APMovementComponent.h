@@ -7,6 +7,7 @@
 #include "APMovementComponent.generated.h"
 
 class AAPCharacterBase;
+class APlayerController;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
@@ -15,6 +16,8 @@ class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
 
 public:	
 	UAPMovementComponent();
+	
+	FORCEINLINE float GetDashTime() const {return DashLength / DashSpeed;};
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,10 +37,15 @@ public:
 	void ComboMoveStop(); // 콤보어택 Move 끝
 
 	void SetAttackRotation(FRotator NewTargetRot, float Speed = 0.0f);
+	
+	void StartDash();
+	void EndDash();
+
 private:
 	void TickCheck();
 	void TickRotate(float DeltaTime); // 틱 회전 함수
 	void TickMove(float DeltaTime); // 틱 이동 함수
+	void TickDash(float DeltaTime); // 틱 대쉬 함수
 
 private:
 	// 회전 관련 변수
@@ -71,5 +79,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	float Combo_3_Distance = 300.0f;
 
+	bool bDash = false;
+	UPROPERTY(EditAnywhere)
+	float DashSpeed = 500.0f;
+	UPROPERTY(EditAnywhere)
+	float DashLength = 1000.0f;
+	FVector DashLocation;
+
 	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
+	TWeakObjectPtr<APlayerController> OwnerPC;
 };
