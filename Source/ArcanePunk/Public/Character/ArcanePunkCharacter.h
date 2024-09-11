@@ -191,10 +191,12 @@ public:
 	void ActivateInteractionSweep();
 	void InteractionActorRemove(AActor* InteractionActor);
 	
-	// 달리기
-	FORCEINLINE bool GetbJogging() const {return bJogging;};
-	void EndJog(); // 빨리 달리기 끝
-	
+	void PressedDash();
+	void ReleasedDash();
+	UFUNCTION(BlueprintPure)
+	bool IsDash() const {return bDash;};
+	FORCEINLINE void SetbCanDash(bool NewBool) {bCanDash = NewBool;};	
+
 private:
 	void InitPlayerStatus();
 	
@@ -222,12 +224,6 @@ private:
 	// Move 관련 함수
 	void MoveForward(float AxisValue); // 위 아래 Move
 	void MoveRight(float AxisValue); // 오른, 왼쪽 Move
-
-	void StartJog(); // 빨리 달리기 시작
-
-	virtual void Jump() override;
-
-	void Dash();
 
 	void OnBlockMode();
 	void ClearBlockMode();
@@ -305,9 +301,11 @@ private:
 
 	float CurrentArmLength = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Move")
-	float DashSpeed = 650.0f;
-
+	bool bDash = false;
+	bool bCanDash = true;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float DashCoolTime = 5.0f;
+	
 	// State 관련 변수
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	AArcanePunkPlayerState* MyPlayerState;

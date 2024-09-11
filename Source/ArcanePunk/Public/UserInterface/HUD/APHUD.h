@@ -35,6 +35,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnChargingEnd, bool); // 차징 스킬 시�
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAddingCoolTime, ESkillKey, float); // 쿨타임 빼기
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDashTime, float); // 쿨타임 빼기
+
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
 {
@@ -163,4 +165,5 @@ public:
 
 	FOnAddingCoolTime OnAddingCoolTime;
 
+	FOnDashTime OnDashTime;
 };

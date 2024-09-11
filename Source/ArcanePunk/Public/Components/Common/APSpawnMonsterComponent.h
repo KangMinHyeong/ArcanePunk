@@ -23,6 +23,7 @@ protected:
 	void SpawnParamsSetting();
 	void PlaySpawnEffect(FVector Location);
 	FVector GetRandomLocation(FVector V_1, FVector V_2, FVector V_3);
+	bool IsPossibleLocation(FVector Location);
 	
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -31,10 +32,13 @@ public:
 	void SpawnMonsterFromLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, TArray<AActor*>& SpawnLocations, TArray<AEnemy_CharacterBase*>& MonsterArr);
 	void SpawnLocationRandom(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, FVector MinimumRange, FVector MaximumRange);
 	void SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3);
+	void SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3, FVector V_4);
 	void SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector SpawnLocation);
 	FActorSpawnParameters SpawnParams;
 
 private:
 	UPROPERTY(EditAnywhere)
 	float Sink = 0.4f;
+
+	FCollisionQueryParams Params;
 };

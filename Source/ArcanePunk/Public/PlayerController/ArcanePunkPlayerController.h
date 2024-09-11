@@ -101,7 +101,6 @@ protected:
 
 private:
 	void LookStatus();
-	void FreeCameraMode();
 
 	//Interaction
 	void OnStageSelectingUI();
@@ -155,12 +154,6 @@ private:
 	FInputModeGameAndUI GameAndUIInputMode;
 	FInputModeUIOnly UIInputMode;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<APawn> FreeCameraClass;
-
-	bool bFreeCameraMode = false;
-
-	TWeakObjectPtr<APawn> FreeCamera;
 	TWeakObjectPtr<AArcanePunkCharacter> MyCharacter;
 
 	// Loading

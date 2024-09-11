@@ -97,7 +97,8 @@
 			"fft": "cpp",
 			"complex": "cpp",
 			"valarray": "cpp",
-			"ctime": "cpp"
+			"ctime": "cpp",
+			"adolcforward": "cpp"
 		}
 	},
 	"extensions": {

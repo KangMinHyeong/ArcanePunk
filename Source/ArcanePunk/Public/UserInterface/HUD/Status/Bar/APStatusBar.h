@@ -17,6 +17,7 @@ class UAPSkillSlot;
 class UAPUltSkillSlot;
 class UAPHPBar;
 class UAPSkillChargingGauge;
+class UAPDashSlot;
 
 UCLASS()
 class ARCANEPUNK_API UAPStatusBar : public UUserWidget
@@ -61,6 +62,8 @@ public:
 	void ChargeEnd(bool Start);
 	UFUNCTION()
 	void AddSkillCoolTime(ESkillKey SkillKey, float AddTime);
+	UFUNCTION()
+	void StartDashTime(float DashTime);
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -77,6 +80,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPSkillSlot* Slot_RSkill;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UAPDashSlot* Slot_Dash;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPSkillChargingGauge* SkillChargingGauge;

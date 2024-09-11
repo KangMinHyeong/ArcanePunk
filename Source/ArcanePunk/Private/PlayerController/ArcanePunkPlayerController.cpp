@@ -40,7 +40,6 @@ void AArcanePunkPlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
     InputComponent->BindAction(TEXT("Status"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::LookStatus);
-    InputComponent->BindAction(TEXT("FreeCameraMode"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::FreeCameraMode);
     InputComponent->BindAction(TEXT("Setting"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::OptionSetting);
     InputComponent->BindAction(TEXT("SkillWindow"), EInputEvent::IE_Pressed, this, &AArcanePunkPlayerController::DisplaySkillWindow);
 }
@@ -71,7 +70,7 @@ void AArcanePunkPlayerController::SetMouseCursor()
 
 void AArcanePunkPlayerController::LookStatus()
 {
-    auto APCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!APCharacter) return; if(bFreeCameraMode) return;
+    auto APCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!APCharacter) return;
     
 	if(!bLookStatus)
 	{
@@ -89,32 +88,32 @@ void AArcanePunkPlayerController::LookStatus()
 	}
 }
 
-void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
-{  
-    if(!bFreeCameraMode)
-    {
-        MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
-        FreeCamera = GetWorld()->SpawnActor<APawn>(FreeCameraClass, MyCharacter->ReturnCameraTransform()); if(!FreeCamera.IsValid()) return;
+// void AArcanePunkPlayerController::FreeCameraMode() // 수정 필요
+// {  
+//     if(!bFreeCameraMode)
+//     {
+//         MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
+//         FreeCamera = GetWorld()->SpawnActor<APawn>(FreeCameraClass, MyCharacter->ReturnCameraTransform()); if(!FreeCamera.IsValid()) return;
         
-        Possess(FreeCamera.Get());
-        bFreeCameraMode = true;
-    }
-    else
-    {
-        TArray<AActor*> Actors;
-        UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
+//         Possess(FreeCamera.Get());
+//         bFreeCameraMode = true;
+//     }
+//     else
+//     {
+//         TArray<AActor*> Actors;
+//         UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
         
-        for(AActor* Actor : Actors)
-        {
-            MyCharacter = Cast<AArcanePunkCharacter>(Actor);
-        }
-        if(!MyCharacter.IsValid()) return;
-        bFreeCameraMode = false;
-        Possess(MyCharacter.Get());
-        if(!FreeCamera.IsValid()) return;
-        FreeCamera->Destroy();
-    }
-}
+//         for(AActor* Actor : Actors)
+//         {
+//             MyCharacter = Cast<AArcanePunkCharacter>(Actor);
+//         }
+//         if(!MyCharacter.IsValid()) return;
+//         bFreeCameraMode = false;
+//         Possess(MyCharacter.Get());
+//         if(!FreeCamera.IsValid()) return;
+//         FreeCamera->Destroy();
+//     }
+// }
 
 void AArcanePunkPlayerController::OptionSetting()
 {

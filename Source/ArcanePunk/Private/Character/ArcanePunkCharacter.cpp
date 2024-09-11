@@ -150,12 +150,7 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
 	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
 
-	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::StartJog);
-	PlayerInputComponent->BindAction(TEXT("Jogging"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::EndJog);
-
-	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Jump);
-
-	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Dash);
+	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::PressedDash);
 
 	PlayerInputComponent->BindAction(TEXT("Block"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::OnBlockMode);
 	
@@ -356,37 +351,52 @@ void AArcanePunkCharacter::SkillBase_R()
 	OnRSkill = true;
 }
 
-void AArcanePunkCharacter::StartJog()
-{
-	if(!bCanJog || bJogging)  return;
-	CrowdControlComp->FastState(1.0f, true);
-	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2.0f;
-	GhostTrailSpawnComp->SetRunTrail(true);
-	bJogging = true;
-	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
-}
+// void AArcanePunkCharacter::StartJog()
+// {
+// 	if(!bCanJog || bJogging)  return;
+// 	CrowdControlComp->FastState(1.0f, true);
+// 	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 2.0f;
+// 	GhostTrailSpawnComp->SetRunTrail(true);
+// 	bJogging = true;
+// 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressShift + PressMove");
+// }
 
-void AArcanePunkCharacter::EndJog()
-{
-	if(!bCanJog || !bJogging) return; 
-	CrowdControlComp->FastState(1.0f, false);
-	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 0.5f;
-	bJogging = false;
-	GhostTrailSpawnComp->SetRunTrail(false);
-}
+// void AArcanePunkCharacter::EndJog()
+// {
+// 	if(!bCanJog || !bJogging) return; 
+// 	CrowdControlComp->FastState(1.0f, false);
+// 	// GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * 0.5f;
+// 	bJogging = false;
+// 	GhostTrailSpawnComp->SetRunTrail(false);
+// }
 
-void AArcanePunkCharacter::Jump()
-{
-	if(!bCanMove || !StopState.IsEmpty() || bDoing) return;
-	Super::Jump();
-}
-
-void AArcanePunkCharacter::Dash()
+void AArcanePunkCharacter::PressedDash()
 {
 	if(!bCanMove || !StopState.IsEmpty() || bDoing || IsDead()) return;
-	FVector DashDirection = GetActorForwardVector() * DashSpeed;
-	GetCharacterMovement()->BrakingFrictionFactor = 0.0f;
-	LaunchCharacter(DashDirection, true, true);
+	if(bDash || !bCanDash) return;
+	bDash = true;
+	bCanDash = false;
+	bCanMove = false;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	MoveComponent->StartDash();
+	GhostTrailSpawnComp->SetRunTrail(true);
+
+	if(HUD) HUD->OnDashTime.Broadcast(MoveComponent->GetDashTime());
+}
+
+void AArcanePunkCharacter::ReleasedDash()
+{
+	if(IsDead()) return;
+	if(!bDash) return;
+	bDash = false;
+	bCanMove = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+	MoveComponent->EndDash();
+	GhostTrailSpawnComp->SetRunTrail(false);
+
+	if(HUD) HUD->OnStartCoolTime.Broadcast(ESkillKey::Dash, DashCoolTime);	
 }
 
 void AArcanePunkCharacter::OnBlockMode()
@@ -569,6 +579,7 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 	if(!bBlockMode)
 	{
 		TakeDamageComp->DamageCalculation(DamageApplied);
+		if(bDash) ReleasedDash();
 		UpdateStatus();
 		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
 	}

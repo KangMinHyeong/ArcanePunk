@@ -11,6 +11,7 @@
 #include "UserInterface/HUD/Status/Bar/APSkillSlot.h"
 #include "UserInterface/HUD/Status/Bar/APUltSkillSlot.h"
 #include "UserInterface/HUD/Status/Bar/APSkillChargingGauge.h"
+#include "UserInterface/HUD/Status/Bar/APDashSlot.h"
 
 void UAPStatusBar::NativeOnInitialized()
 {
@@ -57,6 +58,7 @@ void UAPStatusBar::InitStatusBar()
     HUD->OnHightLightSkill.AddUObject(this, &UAPStatusBar::HightLightSkillSlot);
     HUD->OnUsingSkill.AddUObject(this, &UAPStatusBar::UsingSkillSlot);
     HUD->OnStartCoolTime.AddUObject(this, &UAPStatusBar::StartCoolTimeSlot);
+    HUD->OnDashTime.AddUObject(this, &UAPStatusBar::StartDashTime);
 
     HUD->OnChargeTime.AddUObject(this, &UAPStatusBar::CheckChargeTime); 
     HUD->OnOnlyChargingNumberChange.AddUObject(this, &UAPStatusBar::ChangeCharginNum); 
@@ -201,6 +203,10 @@ void UAPStatusBar::StartCoolTimeSlot(ESkillKey SkillKey, float CoolTime)
         case ESkillKey::R:
         Slot_RSkill->StartSkillCoolTime(SkillKey, CoolTime);
         break;
+
+        case ESkillKey::Dash:
+        Slot_Dash->StartSkillCoolTime(SkillKey, CoolTime);
+        break;
     }
 }
 
@@ -302,4 +308,9 @@ void UAPStatusBar::AddSkillCoolTime(ESkillKey SkillKey, float AddTime)
         Slot_RSkill->AddSkillCoolTime(AddTime);
         break;
     }
+}
+
+void UAPStatusBar::StartDashTime(float DashTime)
+{
+    Slot_Dash->StartDashTime(DashTime);
 }

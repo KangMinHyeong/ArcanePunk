@@ -26,11 +26,9 @@ EBTNodeResult::Type UBTTask_MoveToCheckDist::ExecuteTask(UBehaviorTreeComponent 
     if(Player)
     {
         AcceptableRadius = Enemy->GetMonsterAttackRange();
-        
         if((Player->GetActorLocation() - Enemy->GetActorLocation()).Size() <= AcceptableRadius) 
-        return EBTNodeResult::Succeeded;
+        {return EBTNodeResult::Succeeded;}
     }
     
-   
     return Super::ExecuteTask(OwnerComp, NodeMemory);
 }

@@ -6,13 +6,14 @@
 
 UAPFadeOutTriggerComponent::UAPFadeOutTriggerComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UAPFadeOutTriggerComponent::BeginPlay()
 {
     Super::BeginPlay();
 
+    // SetComponentTickEnabled(false);
     this->OnComponentBeginOverlap.AddDynamic(this, &UAPFadeOutTriggerComponent::OnOverlap);
     this->OnComponentEndOverlap.AddDynamic(this, &UAPFadeOutTriggerComponent::OnOverlapEnd);
 }
@@ -21,6 +22,12 @@ void UAPFadeOutTriggerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	FVector Location = GetComponentLocation();
+	Location = Location - GetOwner()->GetActorLocation(); 
+    float Length = Location.Size();
+    Location = Location/Length;  
+    SetWorldRotation(FRotationMatrix::MakeFromX(Location).Rotator());
+    SetBoxExtent(FVector(Length, 32.0f, 32.0f));
 }
 
 void UAPFadeOutTriggerComponent::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
@@ -35,4 +42,9 @@ void UAPFadeOutTriggerComponent::OnOverlapEnd(UPrimitiveComponent *OverlappedCom
     auto Mesh = OtherActor->GetComponentByClass<UAPTransparentComponent>();
     if(!Mesh) return;
     Mesh->FadeIn();
+}
+
+void UAPFadeOutTriggerComponent::FocusToPlayer()
+{
+    SetComponentTickEnabled(false);
 }
