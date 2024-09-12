@@ -98,7 +98,8 @@
 			"complex": "cpp",
 			"valarray": "cpp",
 			"ctime": "cpp",
-			"adolcforward": "cpp"
+			"adolcforward": "cpp",
+			"forward_list": "cpp"
 		}
 	},
 	"extensions": {

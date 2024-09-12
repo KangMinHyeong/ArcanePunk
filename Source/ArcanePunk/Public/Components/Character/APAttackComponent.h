@@ -31,12 +31,6 @@ public:
 	void StartAttack_A(bool & bCanMove);
 	void StartAttack_B(bool & bCanMove);
 
-	void SetAttack_A(bool NewBool);
-	void SetAttack_B(bool NewBool);
-
-	bool GetAttack_A();
-	bool GetAttack_B();
-
 	//Combo
 	void ComboAttackStart();
 	void ComboAttackEnd();
@@ -59,6 +53,11 @@ public:
 	void MultiAttack_Slow(FVector Start, FVector End, float Radius, int32 SlowPercent,float TotalTime);
 	void MultiAttack_OnlyCC(FVector Start, FVector End, float Radius, ECharacterState UpdateState, float TotalTime);
 	
+	FORCEINLINE void SetAttack_A(bool NewBool) {bAttack_A = NewBool;};
+	FORCEINLINE void SetAttack_B(bool NewBool) {bAttack_B = NewBool;};
+	FORCEINLINE bool GetAttack_A() const {return bAttack_A;}; // 공격 bAttack_A 반환
+	FORCEINLINE bool GetAttack_B() const {return bAttack_B;}; // 공격 bAttack_B 반환
+
 	FORCEINLINE float GetMaxDistance() const {return MaxDistance;}; // 공격 사거리 반환
 
 	FORCEINLINE float GetBaseInstantDeathPercent() const {return BaseInstantDeathPercent;};

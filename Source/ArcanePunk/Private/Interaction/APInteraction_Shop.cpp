@@ -42,7 +42,7 @@ void AAPInteraction_Shop::Interact(AArcanePunkCharacter *PlayerCharacter)
     if(!PlayerCharacter) return;
     MainPlayer = Cast<AArcanePunkCharacter>(PlayerCharacter);
 
-    if(MainPlayer->IsDash()) {MainPlayer->ReleasedDash();}
+    // if(MainPlayer->IsDash()) {MainPlayer->ReleasedDash();}
 
     if(bInit) {bInit = false; InitSuffle();}
 

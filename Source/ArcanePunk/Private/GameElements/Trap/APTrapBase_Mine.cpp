@@ -31,6 +31,7 @@ void AAPTrapBase_Mine::Tick(float DeltaTime)
 
 void AAPTrapBase_Mine::OnDamageTrigger()
 {
+    if(!bActivate) return;
     TArray<AActor*> Actors;
     GetOverlappingActors(Actors, AArcanePunkCharacter::StaticClass());
 
@@ -49,7 +50,6 @@ void AAPTrapBase_Mine::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *Ot
     Super::OnOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
     if(!Player.IsValid()) return;
 
-    UE_LOG(LogTemp, Display, TEXT("OperationTime %f"), OperationTime);
     auto TrapRange = GetWorld()->SpawnActor<AAPEnemyAttackRange>(RangeClass, GetActorLocation(), GetActorRotation()); if(!TrapRange) return;
 	TrapRange->SetDecalSize(TrapCollision->GetScaledSphereRadius(), TrapCollision->GetScaledSphereRadius(), OperationTime, false);
 }

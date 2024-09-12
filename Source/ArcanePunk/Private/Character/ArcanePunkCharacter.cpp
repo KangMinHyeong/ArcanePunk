@@ -372,12 +372,14 @@ void AArcanePunkCharacter::SkillBase_R()
 
 void AArcanePunkCharacter::PressedDash()
 {
-	if(!bCanMove || !StopState.IsEmpty() || bDoing || IsDead()) return;
-	if(bDash || !bCanDash) return;
-	bDash = true;
+	if(!bCanMove || !StopState.IsEmpty() || IsDead()) return;
+	if(bDoing && !AttackComponent->GetAttack_A() && !AttackComponent->GetAttack_B()) return;
+	if(!bCanDash) return;
+
+	bDoing = true;
 	bCanDash = false;
 	bCanMove = false;
-
+	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	MoveComponent->StartDash();
 	GhostTrailSpawnComp->SetRunTrail(true);
@@ -388,13 +390,17 @@ void AArcanePunkCharacter::PressedDash()
 void AArcanePunkCharacter::ReleasedDash()
 {
 	if(IsDead()) return;
-	if(!bDash) return;
-	bDash = false;
+
+	bDoing = false;
 	bCanMove = true;
+	AttackComponent->SetAttack_A(false);
+	AttackComponent->SetAttack_B(false);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 	MoveComponent->EndDash();
 	GhostTrailSpawnComp->SetRunTrail(false);
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 	if(HUD) HUD->OnStartCoolTime.Broadcast(ESkillKey::Dash, DashCoolTime);	
 }
@@ -579,7 +585,7 @@ float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &D
 	if(!bBlockMode)
 	{
 		TakeDamageComp->DamageCalculation(DamageApplied);
-		if(bDash) ReleasedDash();
+		// if(bDash) ReleasedDash();
 		UpdateStatus();
 		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
 	}

@@ -67,9 +67,19 @@ void AAPTrapBase_CrossBow::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AAc
     GetWorldTimerManager().ClearTimer(TimerHandle);
 }
 
+void AAPTrapBase_CrossBow::Deactivate()
+{
+    Super::Deactivate();
+    StaticCollision->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase_CrossBow::OnOverlap);
+    StaticCollision->OnComponentEndOverlap.RemoveDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
+    TrapCollision->OnComponentEndOverlap.RemoveDynamic(this, &AAPTrapBase_CrossBow::OnOverlapEnd);
+}
+
 void AAPTrapBase_CrossBow::ReadyToShoot()
 {
     GetWorldTimerManager().ClearTimer(TimerHandle);
+    if(!bActivate) return;
+    
     if(bStatic)
     {
         if(!StaticCollision->IsOverlappingActor(Player.Get())) return;
@@ -89,6 +99,7 @@ void AAPTrapBase_CrossBow::ReadyToShoot()
 
 void AAPTrapBase_CrossBow::ShootArrow()
 {
+    if(!bActivate) return;
     auto Ammo = GetWorld()->SpawnActor<AAPProjectileBase>(ProjectileClass, ArrowSpawnComp->GetComponentLocation(), ArrowSpawnComp->GetComponentRotation());
     if(!Ammo) return;
     Ammo->SetDestroy((ShootRange.X - ShootRange.Y) / ArrowSpeed);

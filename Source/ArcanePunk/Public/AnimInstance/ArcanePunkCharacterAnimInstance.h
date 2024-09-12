@@ -27,6 +27,9 @@ public:
 	void PlayAttack_B_Montage();
 	void StopComboAttack();
 
+	void PlayDash_Montage();
+	void StopDash_Montage();
+
 	void PlaySkill_1_Montage();
 	void PlaySkill_2_Montage();
 	void PlaySkill_3_Montage();
@@ -164,6 +167,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Attack_B_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* Dash_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Skill_1_Montage;

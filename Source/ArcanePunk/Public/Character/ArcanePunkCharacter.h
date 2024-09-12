@@ -193,8 +193,6 @@ public:
 	
 	void PressedDash();
 	void ReleasedDash();
-	UFUNCTION(BlueprintPure)
-	bool IsDash() const {return bDash;};
 	FORCEINLINE void SetbCanDash(bool NewBool) {bCanDash = NewBool;};	
 
 private:
@@ -301,7 +299,6 @@ private:
 
 	float CurrentArmLength = 0.0f;
 
-	bool bDash = false;
 	bool bCanDash = true;
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float DashCoolTime = 5.0f;
@@ -356,9 +353,7 @@ private:
 
 	
 	bool OnQSkill = false;
-
 	bool OnESkill = false;
-
 	bool OnRSkill = false;
 
 	bool bCanSkill_Q = true;  // Q쿨타임 체크
@@ -376,8 +371,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Foot Print")
 	UAPCharacterAuraComponent* CharacterAura;
-
-	bool bJogging = false;
 
 	// 드랍
 	UPROPERTY(EditAnywhere, Category = "Drop")

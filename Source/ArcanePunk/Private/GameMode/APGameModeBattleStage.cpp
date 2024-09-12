@@ -8,6 +8,7 @@
 #include "GameElements/Portal/Portal_Base.h"
 #include "GameFramework/Controller.h"
 #include "AIController.h"
+#include "GameElements/Trap/APTrapBase.h"
 
 void AAPGameModeBattleStage::MonsterKilled(AActor* BattleSection)
 {
@@ -36,9 +37,12 @@ void AAPGameModeBattleStage::CheckBattleSection(AActor* BattleSection)
     // 몬스터가 다 처지 되었으면 호출, 배틀섹션에서 추가로 몬스터를 스폰할껀지 확인, 확인해서 배틀섹션 종료 및 지속 결정
 	if(BS->CheckSpawnEnd())
     {
+        for(auto Trap : TActorRange<AAPTrapBase>(GetWorld()))
+            Trap->Deactivate();
+
         GetWorld()->GetWorldSettings()->SetTimeDilation(0.25f);
         FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AAPGameModeBattleStage::PortalSpawn, BS->GetBattleSectionID());
-	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 1.25f, false);
+	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 1.0f, false);
     }
 }
 

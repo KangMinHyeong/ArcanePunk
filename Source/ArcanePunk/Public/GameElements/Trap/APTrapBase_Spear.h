@@ -28,7 +28,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
+	virtual void Deactivate() override;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	float SpearHeight = 150.0f;

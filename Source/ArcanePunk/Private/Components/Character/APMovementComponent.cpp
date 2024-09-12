@@ -36,15 +36,14 @@ void UAPMovementComponent::SetBind()
 
 void UAPMovementComponent::PlayerMoveForward(float AxisValue)
 {
-	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
-
-	// X축 기준
 	PlayerVec.Y = -AxisValue;
-	if(PlayerVec.SizeSquared() != 0)
-	{
-		OwnerCharacter->GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-		OwnerCharacter->AddMovementInput(PlayerVec);
-	}
+	if(PlayerVec.SizeSquared() == 0) return;
+	PlayerRot = FRotationMatrix::MakeFromX(PlayerVec).Rotator();
+
+	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
+	// X축 기준
+	OwnerCharacter->GetController()->SetControlRotation(PlayerRot);
+	OwnerCharacter->AddMovementInput(PlayerVec);
 
 	// Y축 기준
 	// PlayerVec.X = AxisValue;
@@ -57,15 +56,14 @@ void UAPMovementComponent::PlayerMoveForward(float AxisValue)
 
 void UAPMovementComponent::PlayerMoveRight(float AxisValue)
 {
+	PlayerVec.X = AxisValue;
+	if(PlayerVec.SizeSquared() == 0) return;
+	PlayerRot = FRotationMatrix::MakeFromX(PlayerVec).Rotator();
 	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
 
 	// X축 기준
-	PlayerVec.X = AxisValue;
-	if(PlayerVec.SizeSquared() != 0)
-	{
-		OwnerCharacter->GetController()->SetControlRotation(FRotationMatrix::MakeFromX(PlayerVec).Rotator());
-		OwnerCharacter->AddMovementInput(PlayerVec);
-	}
+	OwnerCharacter->GetController()->SetControlRotation(PlayerRot);
+	OwnerCharacter->AddMovementInput(PlayerVec);
 
 	// Y축 기준
 	// PlayerVec.Y = AxisValue;
@@ -167,26 +165,31 @@ void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float Speed)
 
 void UAPMovementComponent::StartDash()
 {
-	if(!OwnerCharacter.IsValid()) return;
-	OwnerPC = Cast<APlayerController>(OwnerCharacter->GetController());
-	if(!OwnerPC.IsValid()) return;
+	// if(!OwnerCharacter.IsValid()) return;
+	// OwnerPC = Cast<APlayerController>(OwnerCharacter->GetController());
+	// if(!OwnerPC.IsValid()) return;
 
-	FHitResult HitResult;
-	OwnerPC->GetHitResultUnderCursor(ECC_GameTraceChannel3, false, HitResult); if(!HitResult.bBlockingHit) return;
+	// FHitResult HitResult;
+	// OwnerPC->GetHitResultUnderCursor(ECC_GameTraceChannel3, false, HitResult); if(!HitResult.bBlockingHit) return;
 	
-	FVector HitPoint;
-	FVector Location = GetOwner()->GetActorLocation();
-    HitPoint = HitResult.Location - Location; HitPoint.Z = 0.0f;
-	HitPoint = HitPoint/HitPoint.Size();  
-	OwnerCharacter->SetActorRotation(FRotationMatrix::MakeFromX(HitPoint).Rotator());
-
-	DashLocation = Location + HitPoint * DashLength;
-
-	bDash = true; 
+	// FVector HitPoint;
+	// FVector Location = GetOwner()->GetActorLocation();
+    // HitPoint = HitResult.Location - Location; HitPoint.Z = 0.0f;
+	// HitPoint = HitPoint/HitPoint.Size();  
+	OwnerCharacter->SetActorRotation(PlayerRot);
+	DashLocation = GetOwner()->GetActorLocation() + PlayerRot.Vector() * DashLength;
+	bDash = true;
+	bMove = false; 
 	SetComponentTickEnabled(true);
+
+	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
+	OwnerAnim->	PlayDash_Montage();
 }
 
 void UAPMovementComponent::EndDash()
 {
 	bDash = false; 
+
+	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
+	OwnerAnim->	StopDash_Montage();
 }

@@ -57,7 +57,7 @@ void UAPAttackComponent::StartAttack_A(bool & bCanMove)
 		ComboAttackStart();
 		OwnerAnim->PlayAttack_A_Montage();
 		bAttack_A = true;
-		bCanMove = false;
+		OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
 }
 
@@ -71,26 +71,6 @@ void UAPAttackComponent::StartAttack_B(bool &bCanMove)
 	//UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
 	OwnerAnim->PlayAttack_B_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-}
-
-void UAPAttackComponent::SetAttack_A(bool NewBool)
-{
-	bAttack_A = NewBool;
-}
-
-void UAPAttackComponent::SetAttack_B(bool NewBool)
-{
-	bAttack_B = NewBool;
-}
-
-bool UAPAttackComponent::GetAttack_A()
-{
-    return bAttack_A;
-}
-
-bool UAPAttackComponent::GetAttack_B()
-{
-    return bAttack_B;
 }
 
 void UAPAttackComponent::ComboAttackStart()
