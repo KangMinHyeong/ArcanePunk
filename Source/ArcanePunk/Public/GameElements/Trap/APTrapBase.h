@@ -21,7 +21,8 @@ class ARCANEPUNK_API AAPTrapBase : public AActor
 	
 public:	
 	AAPTrapBase();
-
+	FORCEINLINE bool IsActivate() const {return bActivate;};
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -39,7 +40,7 @@ public:
 	void AutoRotating();
 	void AutoDestroy();
 	virtual void OnDamageTrigger();
-
+	virtual void Deactivate();
 
 protected:
 	// Component
@@ -89,4 +90,6 @@ protected:
 
 	bool bOperationEnd = false;
 	float OperationTime = 0.0f;
+
+	bool bActivate = true;
 };

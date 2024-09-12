@@ -142,7 +142,7 @@ FInteractData AEnemy_DropPackage::GetInteractData()
 void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
 	if(!IsInit) return; if(!PlayerCharacter) return;
-    if(PlayerCharacter->IsDash()) {PlayerCharacter->ReleasedDash();}
+    // if(PlayerCharacter->IsDash()) {PlayerCharacter->ReleasedDash();}
 
 	for(auto DropItems : ItemsInPackage)
 	{

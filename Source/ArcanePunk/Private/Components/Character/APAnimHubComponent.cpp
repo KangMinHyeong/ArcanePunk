@@ -98,8 +98,8 @@ void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 	// if(!OwnerAnim->CheckComboEnd()) return;
 	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
 	OwnerCharacter->GetAttackComponent()->ComboAttackEnd();
-	OwnerCharacter->SetCanMove(true);
 	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void UAPAnimHubComponent::OnAttack_B_MontageEnded()

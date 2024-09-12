@@ -64,6 +64,7 @@ private:
 	// 이동 관련 변수
 	FVector PlayerVec = FVector::ZeroVector;
 	FVector TargetLocation;
+	FRotator PlayerRot;
 
 	bool bMove = false;
 

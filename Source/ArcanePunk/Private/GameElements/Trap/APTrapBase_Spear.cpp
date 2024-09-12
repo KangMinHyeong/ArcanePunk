@@ -77,3 +77,8 @@ void AAPTrapBase_Spear::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *O
 	UGameplayStatics::ApplyDamage(Character, TrapDamage, nullptr, this, UDamageType::StaticClass());
 }
 
+void AAPTrapBase_Spear::Deactivate()
+{
+    Super::Deactivate();
+    TopMesh->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase_Spear::OnOverlap);
+}

@@ -67,6 +67,22 @@ void UArcanePunkCharacterAnimInstance::StopComboAttack()
     Montage_Stop(0.1f, Combo_Montage);
 }
 
+void UArcanePunkCharacterAnimInstance::PlayDash_Montage()
+{
+    if(IsDead) return;
+    if(!OwnerCharacter.IsValid()) return;
+    
+    Montage_Play(Dash_Montage);
+}
+
+void UArcanePunkCharacterAnimInstance::StopDash_Montage()
+{
+    if(IsDead) return;
+    if(!OwnerCharacter.IsValid()) return;
+    
+    Montage_Stop(0.2f, Dash_Montage);
+}
+
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
 {
     if(IsDead) return;

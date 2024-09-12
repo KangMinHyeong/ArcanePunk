@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Engine/DamageEvents.h"
+#include "GameElements/Trap/APTrapBase.h"
 
 AAPProjectileBase::AAPProjectileBase()
 {
@@ -36,6 +37,9 @@ void AAPProjectileBase::Tick(float DeltaTime)
 
 void AAPProjectileBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit)
 {
+	auto Trap = Cast<AAPTrapBase>(GetOwner());
+	if(Trap && !Trap->IsActivate()) return;
+
 	UGameplayStatics::ApplyDamage(OtherActor, AmmoDamage, nullptr, this, UDamageType::StaticClass());
 	DestroyExplosion();
 }
