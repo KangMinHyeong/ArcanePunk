@@ -22,7 +22,7 @@ class ARCANEPUNK_API AAPTrapBase : public AActor
 public:	
 	AAPTrapBase();
 	FORCEINLINE bool IsActivate() const {return bActivate;};
-	
+		
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,6 +36,8 @@ public:
 	virtual void TrapMontageEnded(UAnimMontage *Montage, bool bInterrupted);
 	UFUNCTION(BlueprintCallable)
 	bool IsOperationEnd() const {return bOperationEnd;};
+	UFUNCTION(BlueprintCallable)
+	bool IsRotating() const {return bRotating;};
 
 	void AutoRotating();
 	void AutoDestroy();

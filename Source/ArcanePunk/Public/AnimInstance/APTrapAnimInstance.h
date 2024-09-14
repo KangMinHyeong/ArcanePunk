@@ -20,6 +20,7 @@ public:
 
 	// Play Anim
 	float PlayTrapOperation_Montage();
+	float PlayReload_Montage();
 
 	/* Notify */ 
 	UFUNCTION()
@@ -28,5 +29,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* TrapOperation_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* TrapReload_Montage;
 
 };
