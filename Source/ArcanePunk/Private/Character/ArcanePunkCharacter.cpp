@@ -242,7 +242,7 @@ void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
 {
 	if(!StopState.IsEmpty()) return;
 	
-	if(!OnLeftMouseClick.IsBound()) {AttackComponent->StartAttack_A(bCanMove);	}
+	if(!OnLeftMouseClick.IsBound()) {AttackComponent->StartAttack_A(AttackCancelTime);}
 	else {OnLeftMouseClick.Broadcast();}
 
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");

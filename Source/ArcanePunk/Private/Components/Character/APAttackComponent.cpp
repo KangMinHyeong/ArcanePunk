@@ -39,11 +39,11 @@ void UAPAttackComponent::InitAttackComp()
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 }
 
-void UAPAttackComponent::StartAttack_A(bool & bCanMove)
+void UAPAttackComponent::StartAttack_A(float AttackCancelTime)
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
 	if(OwnerCharacter->GetDoing()) return;
-	
+
 	if(bAttack_A)
 	{
 		if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo)) return;
@@ -55,7 +55,7 @@ void UAPAttackComponent::StartAttack_A(bool & bCanMove)
 	else
 	{
 		ComboAttackStart();
-		OwnerAnim->PlayAttack_A_Montage();
+		OwnerAnim->PlayAttack_A_Montage(AttackCancelTime);
 		bAttack_A = true;
 		OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}

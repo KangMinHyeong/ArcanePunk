@@ -17,6 +17,8 @@ class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
 public:	
 	UAPMovementComponent();
 	
+	FORCEINLINE void SetTickMove(bool NewBool) {bMove = NewBool;};
+
 	FORCEINLINE float GetDashTime() const {return DashLength / DashSpeed;};
 
 protected:
@@ -47,6 +49,8 @@ private:
 	void TickMove(float DeltaTime); // 틱 이동 함수
 	void TickDash(float DeltaTime); // 틱 대쉬 함수
 
+	void EndedAttackCancelTime();
+	
 private:
 	// 회전 관련 변수
 	FRotator Current;
@@ -89,4 +93,6 @@ private:
 
 	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
 	TWeakObjectPtr<APlayerController> OwnerPC;
+
+	FTimerHandle DashTimerHandle;
 };

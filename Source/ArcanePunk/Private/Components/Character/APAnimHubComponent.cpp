@@ -96,9 +96,8 @@ void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	// if(!OwnerAnim->CheckComboEnd()) return;
-	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
 	OwnerCharacter->GetAttackComponent()->ComboAttackEnd();
-	OwnerCharacter->SetDoing(false);
+	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
@@ -106,7 +105,6 @@ void UAPAnimHubComponent::OnAttack_B_MontageEnded()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
-	OwnerCharacter->SetDoing(false);
 	OwnerCharacter->GetAttackComponent()->SetAttack_B(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }

@@ -28,7 +28,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void InitAttackComp();
 
-	void StartAttack_A(bool & bCanMove);
+	void StartAttack_A(float AttackCancelTime);
 	void StartAttack_B(bool & bCanMove);
 
 	//Combo

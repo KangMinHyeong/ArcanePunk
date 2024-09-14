@@ -23,7 +23,7 @@ public:
 
 	void SetDeadAnim() { IsDead = true; }
 
-	void PlayAttack_A_Montage();
+	void PlayAttack_A_Montage(float AttackCancelTime = 0.0f);
 	void PlayAttack_B_Montage();
 	void StopComboAttack();
 
