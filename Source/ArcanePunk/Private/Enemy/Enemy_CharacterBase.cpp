@@ -31,6 +31,8 @@
 #include "GameElements/Trigger/BattleSection/APBattleSectionBase.h"
 #include "UserInterface/HUD/APHUD.h"
 #include "UserInterface/Enemy/APEnemyHP.h"
+#include "Components/WidgetComponent.h"
+#include "UserInterface/Common/APTextWidgetComponent.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -46,6 +48,11 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 	DamagedMark = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DamagedMark"));
 	DamagedMark->SetupAttachment(GetMesh()); DamagedMark->Deactivate();
 
+	TextWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("TextWidgetComp"));
+	TextWidgetComp->SetupAttachment(GetCapsuleComponent());
+	TextWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TextWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -254,8 +261,9 @@ FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
 
 void AEnemy_CharacterBase::SpawnDetectRender()
 {
-	auto DetectText = GetWorld()->SpawnActor<AActor>(DetectTextClass, DamagedMark->GetComponentLocation(), FRotator(0.0f, 90.0f, 0.0f)); if(!DetectText) return;
-	DetectText->SetOwner(this);
+	// auto DetectText = GetWorld()->SpawnActor<AActor>(DetectTextClass, DamagedMark->GetComponentLocation(), FRotator(0.0f, 90.0f, 0.0f)); if(!DetectText) return;
+	// DetectText->SetOwner(this);
+	TextUI->SetDetectText();
 }
 
 float AEnemy_CharacterBase::DamageMath(float Damage)
@@ -338,15 +346,16 @@ void AEnemy_CharacterBase::PossessedBy(AController *NewController)
 
 void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation)
 {
-	ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 90.0f, 0.0f));
-	if(!DamageText) return;
+	// ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 90.0f, 0.0f));
+	// if(!DamageText) return;
 
 	bool Check = false; 
 	auto Character = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); 
 	if(Character) Check = Character->IsCriticalAttack();
 
-	DamageText->SetOwner(this);
-	DamageText->SetDamageText(Damage, Check);
+	// DamageText->SetOwner(this);
+	// DamageText->SetDamageText(Damage, Check);
+	TextUI->SetDamageText(Damage, Check);
 }
 
 void AEnemy_CharacterBase::InitMonster()
@@ -368,6 +377,8 @@ void AEnemy_CharacterBase::InitMonster()
     auto DataTable = GI->GetNPCData()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
     if(DataTable) DropData = * DataTable; 
 	SetManaDrop();
+
+	TextUI = Cast<UAPTextWidgetComponent>(TextWidgetComp->GetUserWidgetObject());
 
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }
