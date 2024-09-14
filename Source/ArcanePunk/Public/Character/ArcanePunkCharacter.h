@@ -194,7 +194,8 @@ public:
 	void PressedDash();
 	void ReleasedDash();
 	FORCEINLINE void SetbCanDash(bool NewBool) {bCanDash = NewBool;};	
-
+	FORCEINLINE void SetAttackCancelTime(float NewValue) {AttackCancelTime = NewValue;};	
+	
 private:
 	void InitPlayerStatus();
 	
@@ -307,6 +308,7 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	AArcanePunkPlayerState* MyPlayerState;
 
+	float AttackCancelTime = 0.0f;
 	float FinalATK = 0.0f;
 
 	UPROPERTY()

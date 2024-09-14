@@ -111,7 +111,12 @@ void UAPMovementComponent::TickDash(float DeltaTime)
 
 	FVector CurrentLoc = OwnerCharacter->GetActorLocation();
 	CurrentLoc = FMath::VInterpConstantTo(CurrentLoc, DashLocation, DeltaTime, DashSpeed);
-	OwnerCharacter->SetActorLocation(CurrentLoc);
+	OwnerCharacter->SetActorLocation(CurrentLoc, true);
+
+	if((CurrentLoc - DashLocation).Size() < 75.0f) 
+	{
+		Cast<AArcanePunkCharacter>(OwnerCharacter)->SetAttackCancelTime(0.2f);
+	}
 }
 
 void UAPMovementComponent::ComboMovement()
@@ -183,7 +188,7 @@ void UAPMovementComponent::StartDash()
 	SetComponentTickEnabled(true);
 
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
-	OwnerAnim->	PlayDash_Montage();
+	OwnerAnim->PlayDash_Montage();
 }
 
 void UAPMovementComponent::EndDash()
@@ -192,4 +197,11 @@ void UAPMovementComponent::EndDash()
 
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
 	OwnerAnim->	StopDash_Montage();
+
+	 GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, this, &UAPMovementComponent::EndedAttackCancelTime, 0.3f, false);
+}
+
+void UAPMovementComponent::EndedAttackCancelTime()
+{
+	Cast<AArcanePunkCharacter>(OwnerCharacter)->SetAttackCancelTime(0.0f);
 }

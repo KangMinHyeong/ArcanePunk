@@ -44,13 +44,13 @@ void UArcanePunkCharacterAnimInstance::NativeBeginPlay()
     OnUltChargeEnd.AddUObject(this, &UArcanePunkCharacterAnimInstance::JumpToFireMontage_Ult);
 }
 
-void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage()
+void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage(float AttackCancelTime)
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
+    if(Montage_IsPlaying(Combo_Montage)) return;
     OwnerCharacter->SetAttackRotation();
-    // Montage_Play(Attack_A_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
-    Montage_Play(Combo_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+    Montage_Play(Combo_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed, EMontagePlayReturnType::MontageLength, AttackCancelTime);
 }
 
 void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
@@ -80,7 +80,7 @@ void UArcanePunkCharacterAnimInstance::StopDash_Montage()
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
     
-    Montage_Stop(0.2f, Dash_Montage);
+    Montage_Stop(0.05f, Dash_Montage);
 }
 
 void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
