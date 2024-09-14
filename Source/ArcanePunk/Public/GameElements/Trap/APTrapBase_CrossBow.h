@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void ReadyToShoot();
-	void ShootArrow();
+	void Shoot();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -31,6 +31,9 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex);
 	virtual void Deactivate() override;
 
+	virtual void TrapMontageEnded(UAnimMontage *Montage, bool bInterrupted) override;
+	virtual void OnDamageTrigger() override;
+	virtual void OnTrapOperation_MontageEnded() override;
 
 protected:
 	UPROPERTY(EditAnywhere)

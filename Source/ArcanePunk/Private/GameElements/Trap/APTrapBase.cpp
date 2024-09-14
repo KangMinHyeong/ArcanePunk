@@ -50,8 +50,8 @@ void AAPTrapBase::Tick(float DeltaTime)
 
 void AAPTrapBase::TrapMontageEnded(UAnimMontage *Montage, bool bInterrupted)
 {
-	auto Anim = Cast<UAPTrapAnimInstance>(RootMesh->GetAnimInstance()); if(!Anim) return;
-	if(Montage == Anim->TrapOperation_Montage) OnTrapOperation_MontageEnded();
+	auto Anim_Root = Cast<UAPTrapAnimInstance>(RootMesh->GetAnimInstance()); if(!Anim_Root) return;
+	if(Montage == Anim_Root->TrapOperation_Montage) OnTrapOperation_MontageEnded();
 }
 
 void AAPTrapBase::OnTrapOperation_MontageEnded()

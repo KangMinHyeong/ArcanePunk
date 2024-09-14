@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/Character/APAttackComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "Components/Character/APMovementComponent.h"
 
 UAPAnimHubComponent::UAPAnimHubComponent()
 {
@@ -98,6 +99,7 @@ void UAPAnimHubComponent::OnAttack_A_MontageEnded()
 	// if(!OwnerAnim->CheckComboEnd()) return;
 	OwnerCharacter->GetAttackComponent()->ComboAttackEnd();
 	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
+	OwnerCharacter->GetAPMoveComponent()->SetTickMove(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 

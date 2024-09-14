@@ -14,8 +14,12 @@ void UAPTrapAnimInstance::NativeBeginPlay()
 
 float UAPTrapAnimInstance::PlayTrapOperation_Montage()
 {
-    UE_LOG(LogTemp, Display, TEXT("PlayTrapOperation_Montage"));
     return Montage_Play(TrapOperation_Montage);
+}
+
+float UAPTrapAnimInstance::PlayReload_Montage()
+{
+    return Montage_Play(TrapReload_Montage);
 }
 
 void UAPTrapAnimInstance::AnimNotify_DamageTrigger()
