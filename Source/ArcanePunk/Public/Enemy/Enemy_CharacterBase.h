@@ -22,6 +22,8 @@ class USkillNumberBase;
 class UAPManaDropComponent;
 class AAPEnemyAttackRange;
 class AAPHUD;
+class UWidgetComponent;
+class UAPTextWidgetComponent;
 
 UENUM(BlueprintType)
 enum class EBossPhase : uint8 // E스킬
@@ -163,6 +165,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	UAPManaDropComponent* ManaDropComp;
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	UWidgetComponent* TextWidgetComp;
+
+	TWeakObjectPtr<UAPTextWidgetComponent> TextUI;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRange = 250.0f; // if equal, Trace Stop
