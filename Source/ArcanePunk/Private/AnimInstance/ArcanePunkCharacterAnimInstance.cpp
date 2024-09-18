@@ -44,7 +44,7 @@ void UArcanePunkCharacterAnimInstance::NativeBeginPlay()
     OnUltChargeEnd.AddUObject(this, &UArcanePunkCharacterAnimInstance::JumpToFireMontage_Ult);
 }
 
-void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage(float AttackCancelTime)
+void UArcanePunkCharacterAnimInstance::PlayCombo_Montage(float AttackCancelTime)
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
@@ -53,10 +53,13 @@ void UArcanePunkCharacterAnimInstance::PlayAttack_A_Montage(float AttackCancelTi
     Montage_Play(Combo_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed, EMontagePlayReturnType::MontageLength, AttackCancelTime);
 }
 
-void UArcanePunkCharacterAnimInstance::PlayAttack_B_Montage()
+void UArcanePunkCharacterAnimInstance::PlayParrying_Montage()
 {
     if(IsDead) return;
-    Montage_Play(Attack_B_Montage, OwnerCharacter->GetPlayerStatus().StatusData.ATKSpeed);
+    if(Montage_IsPlaying(Parrying_Montage)) return;
+
+    OwnerCharacter->SetAttackRotation();
+    Montage_Play(Parrying_Montage);
 }
 
 void UArcanePunkCharacterAnimInstance::StopComboAttack()
@@ -87,7 +90,6 @@ void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
 {
     if(IsDead) return;
     AttackSection = NewSection;
-	// if(!Montage_IsPlaying(Attack_A_Montage)) return;
     if(!OwnerCharacter.IsValid()) return;
     OwnerCharacter->SetAttackRotation();
 
@@ -102,14 +104,6 @@ void UArcanePunkCharacterAnimInstance::JumpToComboSection(int32 NewSection)
     //     break;
     // }
 	// Montage_JumpToSection(GetAttackMontageSectionName(NewSection), Attack_A_Montage);
-}
-
-bool UArcanePunkCharacterAnimInstance::CheckComboEnd()
-{
-    if(Montage_IsPlaying(Attack_A_Montage)) return false;
-    if(Montage_IsPlaying(Combo_2_Montage)) return false;
-    if(Montage_IsPlaying(Combo_3_Montage)) return false;
-    return true;
 }
 
 FName UArcanePunkCharacterAnimInstance::GetAttackMontageSectionName(int32 Section)
@@ -419,7 +413,14 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
 {
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    // OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
+    OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_ParryingEnd()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->GetAttackComponent()->SetParrying(false);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_Trigger()

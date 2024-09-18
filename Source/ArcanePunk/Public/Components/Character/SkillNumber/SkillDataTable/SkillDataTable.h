@@ -135,6 +135,7 @@ enum class ESkillKey : uint8
     E			= 2,
     R		 	= 3, 
 	Dash	 	= 4, 
+	Parrying 	= 5, 
 };
 
 UENUM(BlueprintType)

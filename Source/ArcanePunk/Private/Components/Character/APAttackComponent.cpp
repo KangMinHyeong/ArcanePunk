@@ -15,6 +15,9 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "Components/Character/APSpringArmComponent.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
+#include "Components/CapsuleComponent.h"
 
 UAPAttackComponent::UAPAttackComponent()
 {
@@ -24,7 +27,6 @@ UAPAttackComponent::UAPAttackComponent()
 void UAPAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void UAPAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -39,12 +41,12 @@ void UAPAttackComponent::InitAttackComp()
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 }
 
-void UAPAttackComponent::StartAttack_A(float AttackCancelTime)
+void UAPAttackComponent::StartComboAttack(float AttackCancelTime)
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
 	if(OwnerCharacter->GetDoing()) return;
 
-	if(bAttack_A)
+	if(bComboAttack)
 	{
 		if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo)) return;
 		if (CanCombo)
@@ -55,21 +57,21 @@ void UAPAttackComponent::StartAttack_A(float AttackCancelTime)
 	else
 	{
 		ComboAttackStart();
-		OwnerAnim->PlayAttack_A_Montage(AttackCancelTime);
-		bAttack_A = true;
+		OwnerAnim->PlayCombo_Montage(AttackCancelTime);
+		bComboAttack = true;
 		OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
 }
 
-void UAPAttackComponent::StartAttack_B(bool &bCanMove)
+void UAPAttackComponent::StartParrying()
 {
 	if(!OwnerCharacter.IsValid()) return;  if(!OwnerAnim.IsValid()) return;
 	if(OwnerCharacter->GetDoing()) return;
 
-	if(bAttack_B) return;
-	bAttack_B = true;
+	if(bParrying) return;
+	bParrying = true;
 	//UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
-	OwnerAnim->PlayAttack_B_Montage();
+	OwnerAnim->PlayParrying_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 }
 
@@ -107,6 +109,47 @@ void UAPAttackComponent::ComboCheck()
 	{
 		OwnerAnim->StopComboAttack();
 	}
+}
+
+bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent, AController *EventInstigator)
+{
+	if(!OwnerCharacter.IsValid() || !bParrying) return false;	
+
+	// Parrying
+	if(!DamageEvent.IsOfType(FPointDamageEvent::ClassID)) return false;
+
+	FPointDamageEvent* const PointDamageEvent = (FPointDamageEvent*) &DamageEvent;
+	FVector HitLocation = PointDamageEvent->HitInfo.ImpactPoint;
+	HitLocation -= OwnerCharacter->GetActorLocation();
+	HitLocation = HitLocation/HitLocation.Size();
+	HitLocation.Z = 0.0f;
+
+	FVector Forward = OwnerCharacter->GetActorForwardVector();
+	auto DotProduct = FVector::DotProduct(HitLocation, Forward);
+	float AngleInDegrees = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
+	
+	if(AngleInDegrees > 90.0) return false;
+
+	OnParrying();
+	return true;
+}
+
+void UAPAttackComponent::OnParrying()
+{
+	GetWorld()->GetWorldSettings()->SetTimeDilation(0.45f);
+	bParrying = false;
+	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
+	if(Player)
+	{
+		Player->GetAPSpringArm()->Zoom(-300.0f, 0.3f);
+		auto PC = Cast<AArcanePunkPlayerController>(Player->GetController());
+		if (PC) PC->ParryingCameraShake();
+	}
+	
+	FVector Loc = OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
+	FRotator Rot = OwnerCharacter->GetActorRotation(); Rot.Yaw -= 90.0f;
+	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ParryingEffect, Loc, Rot);
+
 }
 
 void UAPAttackComponent::SpawnSwordTrail(uint8 ComboStack)

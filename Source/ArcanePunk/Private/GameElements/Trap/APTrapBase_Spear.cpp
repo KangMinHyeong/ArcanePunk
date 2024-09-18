@@ -74,7 +74,10 @@ void AAPTrapBase_Spear::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *O
     auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
 	TopMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	UGameplayStatics::ApplyDamage(Character, TrapDamage, nullptr, this, UDamageType::StaticClass());
+    
+	FHitResult Hit;
+	Hit.Location = GetActorLocation(); Hit.ImpactPoint = GetActorLocation();
+	UGameplayStatics::ApplyPointDamage(Character, TrapDamage, Hit.ImpactPoint, Hit, GetInstigatorController(), this, UDamageType::StaticClass());
 }
 
 void AAPTrapBase_Spear::Deactivate()

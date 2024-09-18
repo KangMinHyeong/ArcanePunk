@@ -11,7 +11,7 @@
 void UAPSkillSlot::NativeConstruct()
 {
     Super::NativeConstruct();
-
+    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
 }
 
 void UAPSkillSlot::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
@@ -271,6 +271,10 @@ void UAPSkillSlot::SetSkillLimit(bool NewBool)
 
         case ESkillKey::Dash:
         OwnerCharacter->SetbCanDash(NewBool);
+        break;
+
+        case ESkillKey::Parrying: 
+        OwnerCharacter->SetbCanParrying(NewBool);
         break;
     }
 }

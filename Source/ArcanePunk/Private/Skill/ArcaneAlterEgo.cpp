@@ -56,7 +56,7 @@ void AArcaneAlterEgo::CopyAttack(uint8 ComboStack)
 	if(bDoing) return;
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
 
-	if(ComboStack == 1) {OwnerAnim->PlayAttack_A_Montage();}
+	if(ComboStack == 1) {OwnerAnim->PlayCombo_Montage();}
 	else {OwnerAnim->JumpToComboSection(ComboStack);}
 	bCanMove = false;
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());

@@ -85,6 +85,9 @@ private:
 	UAPDashSlot* Slot_Dash;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UAPSkillSlot* Slot_Parrying;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPSkillChargingGauge* SkillChargingGauge;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;

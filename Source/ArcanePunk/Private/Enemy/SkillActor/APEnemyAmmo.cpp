@@ -56,9 +56,8 @@ void AAPEnemyAmmo::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, U
 	if(!OwnerEnemy.IsValid()) return; 
 	float Damage = OwnerEnemy->GetCurrentATK() * OwnerEnemy->CriticalCalculate();
 
-	FVector HitVector;	
-	FPointDamageEvent myDamageEvent(Damage, Hit, HitVector, nullptr);
-	AController* MyController = Cast<AController>(OwnerEnemy->GetController());
+	FPointDamageEvent myDamageEvent(Damage, Hit, Hit.ImpactPoint, nullptr);
+	AController* MyController = OwnerEnemy->GetController();
 	if(MyController == nullptr) return;
 
 	OwnerEnemy->DistinctHitPoint(Hit.Location, OtherActor);

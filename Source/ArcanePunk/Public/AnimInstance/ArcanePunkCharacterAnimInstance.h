@@ -23,8 +23,8 @@ public:
 
 	void SetDeadAnim() { IsDead = true; }
 
-	void PlayAttack_A_Montage(float AttackCancelTime = 0.0f);
-	void PlayAttack_B_Montage();
+	void PlayCombo_Montage(float AttackCancelTime = 0.0f);
+	void PlayParrying_Montage();
 	void StopComboAttack();
 
 	void PlayDash_Montage();
@@ -90,6 +90,9 @@ public:
 	void AnimNotify_SwordTrail_3();
 
 	UFUNCTION()
+	void AnimNotify_ParryingEnd();
+
+	UFUNCTION()
 	void AnimNotify_Skill_Trigger();
 	UFUNCTION()
 	void AnimNotify_Skill_Charging();
@@ -122,7 +125,6 @@ public:
 	void AnimNotify_HideClear();
 
 	void JumpToComboSection(int32 NewSection);
-	bool CheckComboEnd();
 
 	FName GetAttackMontageSectionName(int32 Section);
 
@@ -155,18 +157,10 @@ public:
 	FOnUltChargeEnd OnUltChargeEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Attack_A_Montage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Combo_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Combo_2_Montage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Combo_3_Montage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	UAnimMontage* Attack_B_Montage;
+	UAnimMontage* Parrying_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Dash_Montage;

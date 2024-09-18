@@ -16,8 +16,10 @@ AAPTrapBase_CrossBow::AAPTrapBase_CrossBow()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-    ArrowSpawnComp = CreateDefaultSubobject<USceneComponent>(TEXT("ArrowSpawnComp"));
-    ArrowSpawnComp->SetupAttachment(TopMesh);
+    bRotating = false;
+   
+    ArrowComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ArrowComp"));
+    ArrowComp->SetupAttachment(TopMesh);
 
     StaticCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("StaticCollision"));
     StaticCollision->SetupAttachment(GetRootComponent());
@@ -43,6 +45,7 @@ void AAPTrapBase_CrossBow::BeginPlay()
 
     auto Anim = Cast<UAPTrapAnimInstance>(TopMesh->GetAnimInstance());
 	if(Anim) Anim->OnMontageEnded.AddDynamic(this, &AAPTrapBase::TrapMontageEnded);
+
 }
 
 void AAPTrapBase_CrossBow::Tick(float DeltaTime)
@@ -85,9 +88,14 @@ void AAPTrapBase_CrossBow::ReadyToShoot()
     if(!bActivate) return;
     float DelayTime = ShootDelayTime;
 
-    auto Anim = Cast<UAPTrapAnimInstance>(TopMesh->GetAnimInstance()); if(!Anim) return;
-	DelayTime += Anim->PlayReload_Montage();
+    auto Anim = Cast<UAPTrapAnimInstance>(TopMesh->GetAnimInstance()); 
+	if(Anim) DelayTime += Anim->PlayReload_Montage();
+
+    Anim = Cast<UAPTrapAnimInstance>(ArrowComp->GetAnimInstance());
+	if(Anim) Anim->PlayReload_Montage();
     
+    bOperationEnd = true;
+
     if(bStatic)
     {
         if(!StaticCollision->IsOverlappingActor(Player.Get())) return;
@@ -109,6 +117,9 @@ void AAPTrapBase_CrossBow::Shoot()
 {
     auto Anim = Cast<UAPTrapAnimInstance>(TopMesh->GetAnimInstance());
 	if(Anim) Anim->PlayTrapOperation_Montage();
+
+    Anim = Cast<UAPTrapAnimInstance>(ArrowComp->GetAnimInstance());
+	if(Anim) Anim->PlayTrapOperation_Montage();
 }
 
 void AAPTrapBase_CrossBow::TrapMontageEnded(UAnimMontage * Montage, bool bInterrupted)
@@ -121,12 +132,16 @@ void AAPTrapBase_CrossBow::TrapMontageEnded(UAnimMontage * Montage, bool bInterr
 void AAPTrapBase_CrossBow::OnDamageTrigger()
 {
     if(!bActivate) return;
-    auto Ammo = GetWorld()->SpawnActor<AAPProjectileBase>(ProjectileClass, ArrowSpawnComp->GetComponentLocation(), ArrowSpawnComp->GetComponentRotation());
+    auto Rot = TopMesh->GetComponentRotation(); Rot.Yaw -= RotatePlus;
+    auto Ammo = GetWorld()->SpawnActor<AAPProjectileBase>(ProjectileClass, ArrowComp->GetComponentLocation(), Rot);
     if(!Ammo) return;
+    Ammo->SetOwner(this);
     Ammo->SetDestroy((ShootRange.X - ShootRange.Y) / ArrowSpeed);
     Ammo->SetSpeed(ArrowSpeed);
     Ammo->SetDamage(TrapDamage);
     Ammo->SetRadius(ShootRange.Y);    
+
+    bOperationEnd = false;
 }
 
 void AAPTrapBase_CrossBow::OnTrapOperation_MontageEnded()

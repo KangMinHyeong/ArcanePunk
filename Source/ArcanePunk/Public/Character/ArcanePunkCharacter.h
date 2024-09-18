@@ -20,7 +20,7 @@ class UAPTakeDamageComponent;
 class UAPSpawnFootPrintComponent;
 class APickup;
 class UArcanePunkCharacterAnimInstance;
-class USpringArmComponent;
+class UAPSpringArmComponent;
 class UCameraComponent;
 class AArcanePunkPlayerController;
 class AArcanePunkPlayerState;
@@ -74,7 +74,7 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	FTransform ReturnCameraTransform();
-	FORCEINLINE USpringArmComponent* GetMySpringArm() {return MySpringArm;};
+	FORCEINLINE UAPSpringArmComponent* GetAPSpringArm() {return APSpringArm;};
 	FORCEINLINE UAPFadeOutTriggerComponent* GetFadeOutTrigger() {return FadeOutTigger;};
 
 	FORCEINLINE AAPHUD* GetAPHUD() const {return HUD;};
@@ -191,11 +191,17 @@ public:
 	void ActivateInteractionSweep();
 	void InteractionActorRemove(AActor* InteractionActor);
 	
+	// Dash
 	void PressedDash();
 	void ReleasedDash();
 	FORCEINLINE void SetbCanDash(bool NewBool) {bCanDash = NewBool;};	
 	FORCEINLINE void SetAttackCancelTime(float NewValue) {AttackCancelTime = NewValue;};	
 	
+	// Parrying
+	FORCEINLINE void SetbCanParrying(bool NewBool) {bCanParrying = NewBool;};	
+	FORCEINLINE float GetParryingCoolTime() const {return ParryingCoolTime;};	
+	
+
 private:
 	void InitPlayerStatus();
 	
@@ -228,8 +234,8 @@ private:
 	void ClearBlockMode();
 
 	// 공격 관련 함수
-	void Attack_typeA(); // 마우스 오른쪽 공격
-	void Attack_typeB(); // 마우스 왼쪽 공격
+	void ComboAttack(); // 마우스 오른쪽 공격
+	void Parrying(); // 패링
 
 	//캐릭터장비 데이터 초기화
 	void InitEquipData(TArray<UAPItemBase*> & EquipArr, FName EquipID);
@@ -282,7 +288,7 @@ private:
 
 	// 카메라, 스프링암 변수
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	USpringArmComponent* MySpringArm;
+	UAPSpringArmComponent* APSpringArm;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	UCameraComponent* MyCamera;
@@ -291,14 +297,14 @@ private:
 	UAPFadeOutTriggerComponent* FadeOutTigger;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	float MinimumSpringArmLength = 150.0f;
+	float WheelZoomCoefficient = 20.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	float ZoomCoefficient = 20.0f;
+	float WheelZoomTime = 0.5f;
 
-	float MaximumSpringArmLength = 0.0f;
-
-	float CurrentArmLength = 0.0f;
+	bool bCanParrying = true;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float ParryingCoolTime = 5.0f;
 
 	bool bCanDash = true;
 	UPROPERTY(EditAnywhere, Category = "Camera")

@@ -37,7 +37,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	USceneComponent* ArrowSpawnComp;
+	USkeletalMeshComponent* ArrowComp;
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* StaticCollision;

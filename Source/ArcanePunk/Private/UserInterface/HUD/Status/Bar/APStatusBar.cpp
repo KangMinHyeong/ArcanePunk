@@ -207,6 +207,10 @@ void UAPStatusBar::StartCoolTimeSlot(ESkillKey SkillKey, float CoolTime)
         case ESkillKey::Dash:
         Slot_Dash->StartSkillCoolTime(SkillKey, CoolTime);
         break;
+
+        case ESkillKey::Parrying:
+        Slot_Parrying->StartSkillCoolTime(SkillKey, CoolTime);
+        break;
     }
 }
 

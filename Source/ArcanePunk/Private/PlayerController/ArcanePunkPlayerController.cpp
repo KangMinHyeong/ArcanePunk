@@ -380,3 +380,8 @@ void AArcanePunkPlayerController::DisplaySkillWindow()
 	auto SkillWindowUI = CreateWidget<UAPSkillWindow>(GetWorld(), SkillWindowUIClass);
 	if(SkillWindowUI) SkillWindowUI->AddToViewport();
 }
+
+void AArcanePunkPlayerController::ParryingCameraShake()
+{
+    if(ParryingCS) ClientStartCameraShake(ParryingCS);
+}

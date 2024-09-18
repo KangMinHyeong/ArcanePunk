@@ -28,14 +28,17 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void InitAttackComp();
 
-	void StartAttack_A(float AttackCancelTime);
-	void StartAttack_B(bool & bCanMove);
+	void StartComboAttack(float AttackCancelTime);
+	void StartParrying();
 
 	//Combo
 	void ComboAttackStart();
 	void ComboAttackEnd();
 	void ComboCheck();
 
+	bool CheckParryingCondition(FDamageEvent const &DamageEvent, AController *EventInstigator);
+	void OnParrying();
+	
 	void SpawnSwordTrail(uint8 ComboStack);
 
 	void NormalAttack(FVector Start, bool CloseAttack, float Multiple = 1.0f, bool bStun = false, float StunTime = 0.0f, bool Custom = false, float CustomRadius = 0.0f); 	//Attack 트리거 발동
@@ -53,10 +56,10 @@ public:
 	void MultiAttack_Slow(FVector Start, FVector End, float Radius, int32 SlowPercent,float TotalTime);
 	void MultiAttack_OnlyCC(FVector Start, FVector End, float Radius, ECharacterState UpdateState, float TotalTime);
 	
-	FORCEINLINE void SetAttack_A(bool NewBool) {bAttack_A = NewBool;};
-	FORCEINLINE void SetAttack_B(bool NewBool) {bAttack_B = NewBool;};
-	FORCEINLINE bool GetAttack_A() const {return bAttack_A;}; // 공격 bAttack_A 반환
-	FORCEINLINE bool GetAttack_B() const {return bAttack_B;}; // 공격 bAttack_B 반환
+	FORCEINLINE void SetComboAttack(bool NewBool) {bComboAttack = NewBool;};
+	FORCEINLINE void SetParrying(bool NewBool) {bParrying = NewBool;};
+	FORCEINLINE bool IsComboAttack() const {return bComboAttack;}; // 공격 bAttack_A 반환
+	FORCEINLINE bool IsParrying() const {return bParrying;}; // 공격 bParrying 반환
 
 	FORCEINLINE float GetMaxDistance() const {return MaxDistance;}; // 공격 사거리 반환
 
@@ -91,8 +94,8 @@ private:
 	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
 	TWeakObjectPtr<UArcanePunkCharacterAnimInstance> OwnerAnim;
 	
-	bool bAttack_A = false;
-	bool bAttack_B = false;
+	bool bComboAttack = false;
+	bool bParrying = false;
 
 	//Combo
 	bool CanCombo = true;
@@ -141,6 +144,11 @@ private:
 	FRotator Combo_3_Rot = FRotator::ZeroRotator;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FVector SwordTrailHeight = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	float ParryingCoeff = 1.0f;
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	UNiagaraSystem* ParryingEffect;
 
 public:
 	FOnSuperiorAttack OnSuperiorAttack;
