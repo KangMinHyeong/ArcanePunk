@@ -7,7 +7,7 @@
 void UAPDashSlot::NativeConstruct()
 {
     Super::NativeConstruct();
-    OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
+    
 }
 
 void UAPDashSlot::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)

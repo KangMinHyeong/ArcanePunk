@@ -6,6 +6,7 @@
 #include "Components/Character/APAttackComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APMovementComponent.h"
+#include "Components/Character/APSpringArmComponent.h"
 
 UAPAnimHubComponent::UAPAnimHubComponent()
 {
@@ -52,11 +53,8 @@ void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterr
 	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 	
-	if(Montage == OwnerAnim->Attack_A_Montage) OnAttack_A_MontageEnded();
-	else if(Montage == OwnerAnim->Combo_2_Montage) OnAttack_A_MontageEnded();
-	else if(Montage == OwnerAnim->Combo_3_Montage) OnAttack_A_MontageEnded();
-	else if(Montage == OwnerAnim->Combo_Montage) OnAttack_A_MontageEnded();
-	else if(Montage == OwnerAnim->Attack_B_Montage) OnAttack_B_MontageEnded();
+	if(Montage == OwnerAnim->Combo_Montage) OnCombo_Montage();
+	else if(Montage == OwnerAnim->Parrying_Montage) OnParrying_Montage();
 	else if(Montage == OwnerAnim->Skill_1_Montage) OnSkill_1_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_2_Montage) OnSkill_2_MontageEnded();
 	else if(Montage == OwnerAnim->Skill_3_Montage) OnSkill_3_MontageEnded();
@@ -92,23 +90,30 @@ void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterr
 	else if(Montage == OwnerAnim->UltSkill_Fire_Montage) OnUltSkill_Fire_MontageEnded();
 }
 
-void UAPAnimHubComponent::OnAttack_A_MontageEnded()
+void UAPAnimHubComponent::OnCombo_Montage()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
-	// if(!OwnerAnim->CheckComboEnd()) return;
 	OwnerCharacter->GetAttackComponent()->ComboAttackEnd();
-	OwnerCharacter->GetAttackComponent()->SetAttack_A(false);
+	OwnerCharacter->GetAttackComponent()->SetComboAttack(false);
 	OwnerCharacter->GetAPMoveComponent()->SetTickMove(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
-void UAPAnimHubComponent::OnAttack_B_MontageEnded()
+void UAPAnimHubComponent::OnParrying_Montage()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
-	OwnerCharacter->GetAttackComponent()->SetAttack_B(false);
+	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
+	if(Player)
+	{
+		Player->GetAPSpringArm()->Restore();
+		Player->GetAPHUD()->OnStartCoolTime.Broadcast(ESkillKey::Parrying, Player->GetParryingCoolTime());	
+	}
+	GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f);
+	OwnerCharacter->GetAttackComponent()->SetParrying(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	
 }
 
 void UAPAnimHubComponent::OnSkill_1_MontageEnded()

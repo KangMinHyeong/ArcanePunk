@@ -14,7 +14,6 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Components/Character/APAuraComponent.h"
 
 ALevelPoratl::ALevelPoratl()
 {

@@ -94,6 +94,9 @@ public:
 	// Skill Window
 	void DisplaySkillWindow();
 
+	// Parrying CameraShake
+	void ParryingCameraShake();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -128,6 +131,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera Shake")
 	TSubclassOf<UCameraShakeBase> HitCS;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Shake")
+	TSubclassOf<UCameraShakeBase> ParryingCS;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UHomingTargetUI> HomingUIClass;

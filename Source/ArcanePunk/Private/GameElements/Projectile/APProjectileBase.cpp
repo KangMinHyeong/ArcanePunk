@@ -15,10 +15,12 @@ AAPProjectileBase::AAPProjectileBase()
  	PrimaryActorTick.bCanEverTick = true;
 
 	AmmoRoot = CreateDefaultSubobject<USphereComponent>(TEXT("AmmoRoot"));
+	AmmoMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("AmmoMesh"));
 	AmmoEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("AmmoEffect"));
 	AmmoMoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("AmmoMoveComp"));
 
 	SetRootComponent(AmmoRoot);
+	AmmoMesh->SetupAttachment(AmmoRoot);
 	AmmoEffect->SetupAttachment(AmmoRoot);
 }
 
@@ -27,6 +29,7 @@ void AAPProjectileBase::BeginPlay()
 	Super::BeginPlay();
 	
 	AmmoRoot->OnComponentHit.AddDynamic(this, &AAPProjectileBase::OnHitting);	
+	AmmoMesh->OnComponentHit.AddDynamic(this, &AAPProjectileBase::OnHitting);	
 }
 
 void AAPProjectileBase::Tick(float DeltaTime)
@@ -40,7 +43,10 @@ void AAPProjectileBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherAct
 	auto Trap = Cast<AAPTrapBase>(GetOwner());
 	if(Trap && !Trap->IsActivate()) return;
 
-	UGameplayStatics::ApplyDamage(OtherActor, AmmoDamage, nullptr, this, UDamageType::StaticClass());
+	FPointDamageEvent myDamageEvent(AmmoDamage, Hit, Hit.ImpactPoint, nullptr);
+	AController* MyController = GetOwner()->GetInstigatorController();
+	
+	OtherActor->TakeDamage(AmmoDamage, myDamageEvent, MyController, GetOwner());
 	DestroyExplosion();
 }
 

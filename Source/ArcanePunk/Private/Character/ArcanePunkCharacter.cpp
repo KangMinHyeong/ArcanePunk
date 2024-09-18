@@ -3,7 +3,7 @@
 // Minhyeong
 #include "Character/ArcanePunkCharacter.h"
 
-#include "GameFramework/SpringArmComponent.h"
+#include "Components/Character/APSpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
@@ -47,7 +47,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	APSpringArm = CreateDefaultSubobject<UAPSpringArmComponent>(TEXT("APSpringArm"));
 	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
@@ -64,9 +64,9 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	PassiveComp = CreateDefaultSubobject<UAPPassiveComponent>(TEXT("PassiveComp"));
 	CharacterAura = CreateDefaultSubobject<UAPCharacterAuraComponent>(TEXT("CharacterAura"));
 
-	MySpringArm->SetupAttachment(GetRootComponent());
-	MyCamera->SetupAttachment(MySpringArm);
-	FadeOutTigger->SetupAttachment(MySpringArm);
+	APSpringArm->SetupAttachment(GetRootComponent());
+	MyCamera->SetupAttachment(APSpringArm);
+	FadeOutTigger->SetupAttachment(APSpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
 	FootPrint_R->SetupAttachment(GetMesh(), FName("FootPrint_R"));
@@ -105,9 +105,6 @@ void AArcanePunkCharacter::BeginPlay()
 	PC = Cast<AArcanePunkPlayerController>(GetController());
 	GM = Cast<AAPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	MaximumSpringArmLength = MySpringArm->TargetArmLength;
-	CurrentArmLength = MaximumSpringArmLength;
-
 	BuffComp->BindBuffComp();
 	
 	InitPlayerStatus();
@@ -138,8 +135,8 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
 
-	PlayerInputComponent->BindAction(TEXT("Attack_A"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeA); // 연속 공격
-	PlayerInputComponent->BindAction(TEXT("Attack_B"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Attack_typeB); // 차징 공격
+	PlayerInputComponent->BindAction(TEXT("ComboAttack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::ComboAttack); // 연속 공격
+	PlayerInputComponent->BindAction(TEXT("Parrying"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Parrying); // 차징 공격
 
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
 	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_Q);
@@ -208,18 +205,19 @@ void AArcanePunkCharacter::MoveRight(float AxisValue)
 
 void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 {
-
 	if (!HUD->TutorialDone)
 	{
 		if (AxisValue < 0) HUD->UpdateTutorialWidget("WheelUp");
 		else if (AxisValue > 0) HUD->UpdateTutorialWidget("WheelDown");
 	}
 
-	CurrentArmLength += AxisValue * ZoomCoefficient;
-	if (CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
-	else if (CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
+	// CurrentArmLength += AxisValue * ZoomCoefficient;
+	// if (CurrentArmLength > MaximumSpringArmLength) CurrentArmLength = MaximumSpringArmLength;
+	// else if (CurrentArmLength < MinimumSpringArmLength) CurrentArmLength = MinimumSpringArmLength;
 
-	MySpringArm->TargetArmLength = CurrentArmLength;
+	// APSpringArm->TargetArmLength = CurrentArmLength;
+	if (AxisValue < -0.01f || AxisValue > 0.01f)
+	APSpringArm->ZoomImmediate(AxisValue * WheelZoomCoefficient);
 }
 
 void AArcanePunkCharacter::SetAttackRotation()
@@ -238,22 +236,23 @@ void AArcanePunkCharacter::SetAttackRotation()
 	}
 }
 
-void AArcanePunkCharacter::Attack_typeA() //몽타주 델리게이트 사용
+void AArcanePunkCharacter::ComboAttack() //몽타주 델리게이트 사용
 {
 	if(!StopState.IsEmpty()) return;
 	
-	if(!OnLeftMouseClick.IsBound()) {AttackComponent->StartAttack_A(AttackCancelTime);}
+	if(!OnLeftMouseClick.IsBound()) {AttackComponent->StartComboAttack(AttackCancelTime);}
 	else {OnLeftMouseClick.Broadcast();}
 
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickLeft");
 }
 
-void AArcanePunkCharacter::Attack_typeB()
+void AArcanePunkCharacter::Parrying()
 {
-	if(!bCanMove || !StopState.IsEmpty()) return;
+	if(!StopState.IsEmpty() || !bCanParrying) return;
 
+	bCanParrying = false;
 	SkillHubComponent->LastSkill = ESkillKey::None;
-	AttackComponent->StartAttack_B(bCanMove);
+	AttackComponent->StartParrying();
 
 	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("ClickRight");
 }
@@ -373,7 +372,7 @@ void AArcanePunkCharacter::SkillBase_R()
 void AArcanePunkCharacter::PressedDash()
 {
 	if(!bCanMove || !StopState.IsEmpty() || IsDead()) return;
-	if(bDoing && !AttackComponent->GetAttack_A() && !AttackComponent->GetAttack_B()) return;
+	if(bDoing && !AttackComponent->IsComboAttack() && !AttackComponent->IsParrying()) return;
 	if(!bCanDash) return;
 
 	bDoing = true;
@@ -393,8 +392,8 @@ void AArcanePunkCharacter::ReleasedDash()
 
 	bDoing = false;
 	bCanMove = true;
-	AttackComponent->SetAttack_A(false);
-	AttackComponent->SetAttack_B(false);
+	AttackComponent->SetComboAttack(false);
+	AttackComponent->SetParrying(false);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 	MoveComponent->EndDash();
@@ -577,6 +576,7 @@ void AArcanePunkCharacter::SetHideMode(bool NewBool)
 
 float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
+	if(AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator)) return 0.0f;
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if(ReflectingModeGauge > 0) {TakeDamageComp->ReflectDamage(DamageApplied, DamageCauser); return DamageApplied;}

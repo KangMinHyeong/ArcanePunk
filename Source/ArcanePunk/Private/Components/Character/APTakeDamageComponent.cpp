@@ -79,7 +79,10 @@ void UAPTakeDamageComponent::DamageCalculation(float &DamageApplied)
 void UAPTakeDamageComponent::ReflectDamage(float & DamageApplied, AActor* DamageCauser)
 {
 	if(!OwnerCharacter.IsValid()) return;
-	UGameplayStatics::ApplyDamage(DamageCauser, DamageApplied, OwnerCharacter->GetInstigatorController(), OwnerCharacter.Get(), UDamageType::StaticClass());
+
+	FHitResult Hit;
+	Hit.Location = OwnerCharacter->GetActorLocation(); Hit.ImpactPoint = Hit.Location;
+	UGameplayStatics::ApplyPointDamage(DamageCauser, DamageApplied, Hit.ImpactPoint, Hit, OwnerCharacter->GetInstigatorController(), OwnerCharacter.Get(), UDamageType::StaticClass());
 }
 
 void UAPTakeDamageComponent::SetHitPoint(float Forward, float Right)

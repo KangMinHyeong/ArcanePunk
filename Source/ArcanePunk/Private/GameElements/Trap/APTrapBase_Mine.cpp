@@ -35,9 +35,11 @@ void AAPTrapBase_Mine::OnDamageTrigger()
     TArray<AActor*> Actors;
     GetOverlappingActors(Actors, AArcanePunkCharacter::StaticClass());
 
+    FHitResult Hit;
+	Hit.Location = GetActorLocation(); Hit.ImpactPoint = GetActorLocation();
     for(AActor* Actor : Actors)
     {
-        UGameplayStatics::ApplyDamage(Actor, TrapDamage, nullptr, this, UDamageType::StaticClass());
+        UGameplayStatics::ApplyPointDamage(Actor, TrapDamage, Hit.ImpactPoint, Hit, GetInstigatorController(), this, UDamageType::StaticClass());
     }
 
     auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TrapOverlapEffect, GetActorLocation(), GetActorRotation());

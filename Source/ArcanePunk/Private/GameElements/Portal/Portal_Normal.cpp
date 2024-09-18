@@ -11,10 +11,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameInstance/APGameInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
-#include "Components/Character/APAuraComponent.h"
 #include "EngineUtils.h"
 #include "GameElements/Trigger/APLimitCameraArea.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Components/Character/APSpringArmComponent.h"
 
 APortal_Normal::APortal_Normal()
 {
@@ -92,7 +91,7 @@ void APortal_Normal::OnStartFadeIn()
 	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
 	Character->EnableInput(CharacterPC.Get());
 	Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	Character->GetMySpringArm()->TargetOffset = FVector::ZeroVector;
+	Character->GetAPSpringArm()->TargetOffset = FVector::ZeroVector;
 	CharacterPC->StartFadeIn(1.0f, false);
 	Destination->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	APGI->OnStartFadeIn.RemoveDynamic(this, &APortal_Normal::OnStartFadeIn);

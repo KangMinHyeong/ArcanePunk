@@ -81,8 +81,10 @@ void AAPTrapBase::AutoDestroy()
 void AAPTrapBase::OnDamageTrigger()
 {
 	if(!Player.IsValid() || !bActivate) return;	
-
-	UGameplayStatics::ApplyDamage(Player.Get(), TrapDamage, nullptr, this, UDamageType::StaticClass());
+	FHitResult Hit;
+	Hit.Location = GetActorLocation();
+	Hit.ImpactPoint = GetActorLocation();
+	UGameplayStatics::ApplyPointDamage(Player.Get(), TrapDamage, Hit.ImpactPoint, Hit, GetInstigatorController(), this, UDamageType::StaticClass());
 }
 
 void AAPTrapBase::Deactivate()

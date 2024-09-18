@@ -86,7 +86,10 @@ void AAPLavaField::OnFieldDamage()
 	TArray<AActor*> Players;
 	LavaTrigger->GetOverlappingActors(Players, AArcanePunkCharacter::StaticClass());
 
+	FHitResult Hit;
+	Hit.Location = GetActorLocation(); Hit.ImpactPoint = GetActorLocation();
 	for(auto Player : Players)
-	UGameplayStatics::ApplyDamage(Player, FieldDamage, nullptr, this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyPointDamage(Player, FieldDamage, Hit.ImpactPoint, Hit, GetInstigatorController(), this, UDamageType::StaticClass());
+	
 	GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &AAPLavaField::OnFieldDamage, DamageFrequency, false);
 }

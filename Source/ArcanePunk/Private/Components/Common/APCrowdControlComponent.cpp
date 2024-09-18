@@ -273,9 +273,9 @@ void UAPCrowdControlComponent::BurnState(APawn* DamageCauser, float DOT, float T
 
 void UAPCrowdControlComponent::OnBurnDamage(APawn* DamageCauser, float DOT)
 {
-	auto MyOwnerInstigator = DamageCauser->GetInstigatorController();
-	auto DamageTypeClass = UDamageType::StaticClass();
-	UGameplayStatics::ApplyDamage(GetOwner(), DOT, MyOwnerInstigator, DamageCauser, DamageTypeClass);
+	FHitResult Hit;
+	Hit.Location = DamageCauser->GetActorLocation(); Hit.ImpactPoint = Hit.Location;
+	UGameplayStatics::ApplyPointDamage(GetOwner(), DOT, Hit.ImpactPoint, Hit, DamageCauser->GetInstigatorController(), DamageCauser, UDamageType::StaticClass());
 	// Burn Effect 추가
 }
 

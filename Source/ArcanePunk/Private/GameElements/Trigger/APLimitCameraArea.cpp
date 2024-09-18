@@ -4,7 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Components/Character/APSpringArmComponent.h"
 #include "Components/Character/APFadeOutTriggerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -114,7 +114,7 @@ void AAPLimitCameraArea::LineTrace(float &X, float &Y)
 {
 	if(!Player.IsValid()) return;
 	FHitResult Hit_1; FHitResult Hit_2;
-	FVector Start = Player->GetMySpringArm()->GetComponentLocation(); Start.Z = GetActorLocation().Z;
+	FVector Start = Player->GetAPSpringArm()->GetComponentLocation(); Start.Z = GetActorLocation().Z;
 
 	FVector End_1 = GetActorLocation(); End_1.X = Start.X;
 	FVector End_2 = GetActorLocation(); End_2.Y = Start.Y;
@@ -196,7 +196,7 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 
 	if(Player.IsValid() && bEnd)
 	{
-		FVector & Current = Player->GetMySpringArm()->TargetOffset;
+		FVector & Current = Player->GetAPSpringArm()->TargetOffset;
 		Current = FMath::VInterpConstantTo(Current, FVector::ZeroVector, DeltaTime, 100.0f);
 
 		if(Current.X <= KINDA_SMALL_NUMBER && Current.Y <= KINDA_SMALL_NUMBER)
@@ -209,10 +209,10 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 
 	if(Player.IsValid() && !bEnd)
 	{
-		CheckPlayerLocation(Player->GetMySpringArm()->GetComponentLocation().X, Player->GetMySpringArm()->GetComponentLocation().Y);
+		CheckPlayerLocation(Player->GetAPSpringArm()->GetComponentLocation().X, Player->GetAPSpringArm()->GetComponentLocation().Y);
 
-		float X = Player->GetMySpringArm()->GetComponentLocation().X - FixedSpringArmLocation.X;
-		float Y = Player->GetMySpringArm()->GetComponentLocation().Y - FixedSpringArmLocation.Y;
+		float X = Player->GetAPSpringArm()->GetComponentLocation().X - FixedSpringArmLocation.X;
+		float Y = Player->GetAPSpringArm()->GetComponentLocation().Y - FixedSpringArmLocation.Y;
 		
 		float Min_X = 0.0f; float Min_Y = 0.0f;
 				
@@ -220,13 +220,13 @@ void AAPLimitCameraArea::Tick(float DeltaTime)
 		{
 			LineTrace(Min_X, Min_Y);
 			
-			Player->GetMySpringArm()->TargetOffset.X = Min_X - X;
-			Player->GetMySpringArm()->TargetOffset.Y = Min_Y - Y;
+			Player->GetAPSpringArm()->TargetOffset.X = Min_X - X;
+			Player->GetAPSpringArm()->TargetOffset.Y = Min_Y - Y;
 		}
 		else
 		{
-			Player->GetMySpringArm()->TargetOffset.X = Min_X - X;
-			Player->GetMySpringArm()->TargetOffset.Y = Min_Y - Y;
+			Player->GetAPSpringArm()->TargetOffset.X = Min_X - X;
+			Player->GetAPSpringArm()->TargetOffset.Y = Min_Y - Y;
 		}
 	}
 }
@@ -255,7 +255,7 @@ void AAPLimitCameraArea::OnOverlapEnd(UPrimitiveComponent *OverlappedComp, AActo
 	if(Cast<AArcanePunkCharacter>(OtherActor))
 	{
 		Player = Cast<AArcanePunkCharacter>(OtherActor);
-		FixedSpringArmLocation = Player->GetMySpringArm()->GetComponentLocation() - Player->GetActorForwardVector() * Player->GetCapsuleComponent()->GetScaledCapsuleRadius();
+		FixedSpringArmLocation = Player->GetAPSpringArm()->GetComponentLocation() - Player->GetActorForwardVector() * Player->GetCapsuleComponent()->GetScaledCapsuleRadius();
 		SetActorTickEnabled(true);
 		bEnd = false;
 		

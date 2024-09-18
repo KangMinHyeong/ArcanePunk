@@ -38,8 +38,8 @@ private:
 	// 스킬 몽타주 엔드 함수	
 	void ComboCheck();
 
-	void OnAttack_A_MontageEnded();
-	void OnAttack_B_MontageEnded();
+	void OnCombo_Montage();
+	void OnParrying_Montage();
 	void OnSkill_1_MontageEnded();
 	void OnSkill_2_MontageEnded();
 	void OnSkill_3_MontageEnded();

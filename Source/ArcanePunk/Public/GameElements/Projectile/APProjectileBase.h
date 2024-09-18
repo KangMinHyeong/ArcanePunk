@@ -40,6 +40,9 @@ private:
 	USphereComponent* AmmoRoot;
 
 	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* AmmoMesh;
+	
+	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* AmmoEffect;
 
 	UPROPERTY(EditAnywhere)

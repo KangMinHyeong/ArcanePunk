@@ -9,7 +9,7 @@
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Components/Character/APSpringArmComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -85,7 +85,7 @@ void UUltSkillNumber_7::OnSkill()
 
     CharacterRotation();
     TeleportLocation = SkillRange_Target->GetActorLocation(); 
-    OwnerCharacter->GetMySpringArm()->bEnableCameraLag = false;
+    OwnerCharacter->GetAPSpringArm()->bEnableCameraLag = false;
 
     GetWorld()->GetTimerManager().SetTimer(TeleportDelayTimerHandle, this, &UUltSkillNumber_7::Activate_Skill, TeleportDelay, false);
 }
@@ -125,7 +125,7 @@ void UUltSkillNumber_7::SkillEnd()
 
 void UUltSkillNumber_7::CameraLagStart()
 {
-    OwnerCharacter->GetMySpringArm()->bEnableCameraLag = true;
+    OwnerCharacter->GetAPSpringArm()->bEnableCameraLag = true;
 }
 
 

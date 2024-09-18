@@ -13,7 +13,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameInstance/APGameInstance.h"
-#include "Components/Character/APAuraComponent.h"
 
 // Sets default values
 APortal_Base::APortal_Base()
