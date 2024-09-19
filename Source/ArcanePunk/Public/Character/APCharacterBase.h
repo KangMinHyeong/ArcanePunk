@@ -123,7 +123,7 @@ public:
 
 	// Attack 관련 함수
 	FORCEINLINE UAPAttackComponent* GetAttackComponent() const {return AttackComponent;};  // AttackComp 반환
-	virtual void SetAttackRotation();
+	virtual void SetAttackRotation(float AddSpeed = 0.0f);
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 	void OnHittingEnd();

@@ -87,7 +87,7 @@ public:
 	virtual void UpdateStatus() override;
 
 	// Attack 관련 함수
-	virtual void SetAttackRotation() override; // 마우스 커서 방향으로 플레이어 회전
+	virtual void SetAttackRotation(float AddSpeed = 0.0f) override; // 마우스 커서 방향으로 플레이어 회전
 
 	FORCEINLINE UAPSkillAbility* GetAPSkillAbility() const {return SkillAbility;}; // SkillComp 반환
 	FORCEINLINE UAPPassiveComponent* GetAPPassiveComp() const {return PassiveComp;}; // PassiveComp 반환

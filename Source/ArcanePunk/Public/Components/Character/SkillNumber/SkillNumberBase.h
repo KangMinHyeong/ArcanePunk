@@ -132,7 +132,7 @@ protected:
 
 	float SpawnAddLocation = 35.0f;
 
-	float RotSpeed = 900.0f;
+	float RotSpeed = 200.0f;
 
 	uint8 MPConsumption = 1;
 	float CurrentCoolTime = 5.0f;

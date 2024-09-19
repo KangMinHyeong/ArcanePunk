@@ -158,12 +158,11 @@ void UAPMovementComponent::RotateMoveStop()
 	bRotation = false;
 }
 
-void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float Speed)
+void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float AddSpeed)
 {
 	Current = GetOwner()->GetActorRotation();
 	TargetRot = NewTargetRot;
-	if(Speed < 1.0f) {RotSpeed = InitRotSpeed;}
-	else if(abs(Speed - RotSpeed)  >= 1.0f) RotSpeed = Speed;
+	RotSpeed = InitRotSpeed + AddSpeed;
 	// SetComponentTickEnabled(true);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UAPMovementComponent::RotateMovement, 0.00001f, false);
 }

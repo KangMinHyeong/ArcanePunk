@@ -58,11 +58,11 @@ void AEnemy_ScoutDog::OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor 
     float Damage = TotalStatus.StatusData.ATK * CriticalCalculate();
 	if (OtherActor && OtherActor != this)
 	{
-        FVector HitVector;
-        FPointDamageEvent myDamageEvent(Damage, SweepResult, HitVector, nullptr);
-		AController* MyController = Cast<AController>(GetController());
+        FHitResult Hit;
+	    Hit.Location = GetActorLocation(); Hit.ImpactPoint = Hit.Location;
+        FPointDamageEvent myDamageEvent(Damage, Hit, Hit.ImpactPoint, nullptr);
 		DistinctHitPoint(OtherActor->GetActorLocation(), OtherActor);
-        OtherActor->TakeDamage( Damage, myDamageEvent, MyController, this);
+        OtherActor->TakeDamage( Damage, myDamageEvent, GetController(), this);
 		if(bKnockBackAttack) OnPlayerKnockBack(OtherActor, KnockBackDist, KnockBackTime);
 	}
 }

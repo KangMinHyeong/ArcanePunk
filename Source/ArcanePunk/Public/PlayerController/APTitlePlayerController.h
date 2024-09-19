@@ -40,4 +40,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float IntroTime = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	FName StartMap = "Chapter_1";
 };

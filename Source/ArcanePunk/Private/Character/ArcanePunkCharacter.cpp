@@ -220,7 +220,7 @@ void AArcanePunkCharacter::ZoomInOut(float AxisValue)
 	APSpringArm->ZoomImmediate(AxisValue * WheelZoomCoefficient);
 }
 
-void AArcanePunkCharacter::SetAttackRotation()
+void AArcanePunkCharacter::SetAttackRotation(float AddSpeed)
 {
 	if(PC.IsValid()) 
 	{

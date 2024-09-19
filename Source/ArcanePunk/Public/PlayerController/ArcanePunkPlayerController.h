@@ -97,6 +97,9 @@ public:
 	// Parrying CameraShake
 	void ParryingCameraShake();
 
+	// Attack CameraShake
+	void AttackCameraShake();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -129,11 +132,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> HitWidgetClass;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> ParryScreenEffectClass;
+
 	UPROPERTY(EditAnywhere, Category = "Camera Shake")
 	TSubclassOf<UCameraShakeBase> HitCS;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Shake")
 	TSubclassOf<UCameraShakeBase> ParryingCS;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Shake")
+	TSubclassOf<UCameraShakeBase> AttackCS;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UHomingTargetUI> HomingUIClass;
