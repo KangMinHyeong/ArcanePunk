@@ -58,7 +58,7 @@ void UArcanePunkCharacterAnimInstance::PlayParrying_Montage()
     if(IsDead) return;
     if(Montage_IsPlaying(Parrying_Montage)) return;
 
-    OwnerCharacter->SetAttackRotation();
+    OwnerCharacter->SetAttackRotation(200.0f);
     Montage_Play(Parrying_Montage);
 }
 
@@ -394,6 +394,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_MultiAttackTrigger()
 {
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
+    
     OwnerCharacter->GetAttackComponent()->MultiAttack();
 }
 

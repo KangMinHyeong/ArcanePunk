@@ -101,7 +101,8 @@ void USkillNumber3::SpawnAttackSphere()
 	bool bStun = false;
 	if(SkillRange_Target.IsValid()) bStun = SkillRange_Target->GetbStun();
 
-	OwnerCharacter->GetAttackComponent()->MultiAttack(SkillRange_Target->GetActorLocation(), false, 1.2f, bStun, 3.0f ,true, Skill3_TargetRange * SkillRange_Target->GetActorScale3D().X);
+	// OwnerCharacter->GetAttackComponent()->MultiAttack(SkillRange_Target->GetActorLocation(), false, 1.2f, bStun, 3.0f ,true, Skill3_TargetRange * SkillRange_Target->GetActorScale3D().X);
+	OwnerCharacter->GetAttackComponent()->MultiAttack(SkillRange_Target->GetActorLocation(), SkillRange_Target->GetActorLocation(), Skill3_TargetRange * SkillRange_Target->GetActorScale3D().X, 1.2f, 5, bStun, 3.0f);
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OwnerCharacter->Skill3_Effect, SkillRange_Target->GetActorLocation(), OwnerCharacter->GetActorRotation());
 }
 

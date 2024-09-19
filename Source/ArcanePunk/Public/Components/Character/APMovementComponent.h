@@ -18,9 +18,9 @@ public:
 	UAPMovementComponent();
 	
 	FORCEINLINE void SetTickMove(bool NewBool) {bMove = NewBool;};
-
 	FORCEINLINE float GetDashTime() const {return DashLength / DashSpeed;};
-
+	FORCEINLINE FRotator GetTargetRot() const {return TargetRot;};
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -38,7 +38,7 @@ public:
 	void ComboMovement(); // 콤보어택 Move 시작
 	void ComboMoveStop(); // 콤보어택 Move 끝
 
-	void SetAttackRotation(FRotator NewTargetRot, float Speed = 0.0f);
+	void SetAttackRotation(FRotator NewTargetRot, float AddSpeed = 0.0f);
 	
 	void StartDash();
 	void EndDash();

@@ -18,6 +18,7 @@
 #include "GameMode/APGameModeBase.h"
 #include "UserInterface/Shop/APShoppingUI.h"
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
+#include "UserInterface/Common/APScreenEffect.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -384,4 +385,13 @@ void AArcanePunkPlayerController::DisplaySkillWindow()
 void AArcanePunkPlayerController::ParryingCameraShake()
 {
     if(ParryingCS) ClientStartCameraShake(ParryingCS);
+
+    auto ParryUI = CreateWidget<UAPScreenEffect>(GetWorld(), ParryScreenEffectClass); if(!ParryUI) return;
+	ParryUI->OnScreenEffect();
+    ParryUI->AddToViewport();
+}
+
+void AArcanePunkPlayerController::AttackCameraShake()
+{
+    if(AttackCS) ClientStartCameraShake(AttackCS);
 }

@@ -18,7 +18,6 @@ USkillNumber5::USkillNumber5()
 {
 	SkillAbilityNestingData.SkillName = TEXT("Skill_5");
 
-	RotSpeed = 780.0f;
 }
 
 void USkillNumber5::BeginPlay()

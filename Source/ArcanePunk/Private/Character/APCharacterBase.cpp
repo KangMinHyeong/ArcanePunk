@@ -67,7 +67,7 @@ void AAPCharacterBase::UpdateStatus()
 {
 }
 
-void AAPCharacterBase::SetAttackRotation()
+void AAPCharacterBase::SetAttackRotation(float AddSpeed)
 {
 }
 

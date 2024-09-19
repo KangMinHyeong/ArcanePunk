@@ -18,6 +18,7 @@
 #include "Components/Character/APSpringArmComponent.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/Character/APMovementComponent.h"
 
 UAPAttackComponent::UAPAttackComponent()
 {
@@ -128,7 +129,8 @@ bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent,
 	auto DotProduct = FVector::DotProduct(HitLocation, Forward);
 	float AngleInDegrees = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
 	
-	if(AngleInDegrees > 90.0) return false;
+	UE_LOG(LogTemp, Display, TEXT("Your AngleInDegrees %f"), AngleInDegrees);
+	if(AngleInDegrees > 100.0f) return false;
 
 	OnParrying();
 	return true;
@@ -136,18 +138,19 @@ bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent,
 
 void UAPAttackComponent::OnParrying()
 {
-	GetWorld()->GetWorldSettings()->SetTimeDilation(0.45f);
+	GetWorld()->GetWorldSettings()->SetTimeDilation(0.55f);
 	bParrying = false;
 	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
 	if(Player)
 	{
-		Player->GetAPSpringArm()->Zoom(-300.0f, 0.3f);
+		Player->GetAPSpringArm()->Zoom(-175.0f, 0.25f);
 		auto PC = Cast<AArcanePunkPlayerController>(Player->GetController());
 		if (PC) PC->ParryingCameraShake();
 	}
 	
-	FVector Loc = OwnerCharacter->GetActorLocation() + OwnerCharacter->GetActorForwardVector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
-	FRotator Rot = OwnerCharacter->GetActorRotation(); Rot.Yaw -= 90.0f;
+	FRotator Rot = OwnerCharacter->GetAPMoveComponent()->GetTargetRot(); 
+	FVector Loc = OwnerCharacter->GetActorLocation() + Rot.Vector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
+	Rot.Yaw -= 90.0f;
 	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ParryingEffect, Loc, Rot);
 
 }
@@ -229,65 +232,64 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 			0,
 			5);
 	}
-	
 
 	return bResult;
 }
 
-bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
-{
-	FRotator Rotation = GetOwner()->GetActorRotation();
-	FVector End = Start;
-	if(CloseAttack) End = End + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
-	else End = End + FVector::UpVector* 70.0f;
+// bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
+// {
+// 	FRotator Rotation = GetOwner()->GetActorRotation();
+// 	FVector End = Start;
+// 	if(CloseAttack) End = End + Rotation.Vector() * MaxDistance + FVector::UpVector* 25.0f; // 캐릭터와 몬스터의 높이차가 심하면 + FVector::UpVector* MonsterHigh
+// 	else End = End + FVector::UpVector* 70.0f;
 	
-	// 아군은 타격 판정이 안되게 하는 코드
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetOwner());
-	TArray<AActor*> Actors;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
-	for (AActor* Actor : Actors)
-    {
-		Params.AddIgnoredActor(Actor);
-    }    
+// 	// 아군은 타격 판정이 안되게 하는 코드
+// 	FCollisionQueryParams Params;
+// 	Params.AddIgnoredActor(GetOwner());
+// 	TArray<AActor*> Actors;
+// 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), Actors);
+// 	for (AActor* Actor : Actors)
+//     {
+// 		Params.AddIgnoredActor(Actor);
+//     }    
 	
-	HitVector = -Rotation.Vector();
+// 	HitVector = -Rotation.Vector();
 
-	FCollisionShape Sphere;
-	float Rad = CustomRadius;
-	if(Custom)
-	{
-		Sphere= FCollisionShape::MakeSphere(Rad);
-	}
-	else
-	{
-		Rad = AttackRadius;
-		Sphere = FCollisionShape::MakeSphere(Rad);
-	}
+// 	FCollisionShape Sphere;
+// 	float Rad = CustomRadius;
+// 	if(Custom)
+// 	{
+// 		Sphere= FCollisionShape::MakeSphere(Rad);
+// 	}
+// 	else
+// 	{
+// 		Rad = AttackRadius;
+// 		Sphere = FCollisionShape::MakeSphere(Rad);
+// 	}
 
-	bool bResult = GetWorld()->SweepMultiByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
+// 	bool bResult = GetWorld()->SweepMultiByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, Sphere, Params);// 타격 판정 인자 Params 인자 추가
 	
-	FVector Center = (Start + End) / 2.0f;
-	float HalfHeight = MaxDistance * 0.5f + Rad;
-	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
-	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+// 	FVector Center = (Start + End) / 2.0f;
+// 	float HalfHeight = MaxDistance * 0.5f + Rad;
+// 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+// 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 
-	if(OwnerCharacter->bDebugDraw)
-	{
-		DrawDebugCapsule(GetWorld(),
-			Center,
-			HalfHeight,
-			Rad,
-			CapsuleRot,
-			DrawColor,
-			false,
-			3.0f,
-			0,
-			5);
-	}
+// 	if(OwnerCharacter->bDebugDraw)
+// 	{
+// 		DrawDebugCapsule(GetWorld(),
+// 			Center,
+// 			HalfHeight,
+// 			Rad,
+// 			CapsuleRot,
+// 			DrawColor,
+// 			false,
+// 			3.0f,
+// 			0,
+// 			5);
+// 	}
 
-	return bResult;
-}
+// 	return bResult;
+// }
 
 bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, FVector End, float Radius, bool ExceptPlayer)
 {
@@ -310,21 +312,17 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	HitVector = -Rotation.Vector();
 	
 	FCollisionShape Sphere =  FCollisionShape::MakeSphere(Radius);
-
-
-	// return UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Start, End, Radius, TraceTypeQuery3, true, Actors, EDrawDebugTrace::Persistent, HitResult, true);
-	// ECollisionChannel
 	FCollisionObjectQueryParams ObjectQueryParam(FCollisionObjectQueryParams::InitType::AllDynamicObjects); 
 	
 	bool bResult = GetWorld()->SweepMultiByObjectType(HitResult, Start, End, FQuat::Identity, ObjectQueryParam, Sphere, Params);// 타격 판정 인자 Params 인자 추가
 
-	FVector Center = (Start + End) / 2.0f;
-	float HalfHeight = MaxDistance * 0.5f + Radius;
-	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
-	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
-
 	if(OwnerCharacter->bDebugDraw)
 	{
+		FVector Center = (Start + End) / 2.0f;
+		float HalfHeight = MaxDistance * 0.5f + Radius;
+		FQuat CapsuleRot = FRotationMatrix::MakeFromZ(End - Start).ToQuat();
+		FColor DrawColor = bResult ? FColor::Green : FColor::Red;
+
 		DrawDebugCapsule(GetWorld(),
 			Center,
 			HalfHeight,
@@ -336,7 +334,7 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 			0,
 			5);
 	}
-		
+
 	return bResult;
 }
 
@@ -354,6 +352,7 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 	{
 		if(AActor* Actor = HitResult.GetActor())
 		{
+			if(Actor->ActorHasTag(TEXT("Enemy"))) AttackCameraShake();
 			FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 			AController* MyController = Cast<AController>(OwnerCharacter->GetController());
 			if(!MyController) return;
@@ -362,6 +361,7 @@ void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Mul
 			float DamageApplied = Actor->TakeDamage(Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, GetOwner()); DrainCheck(Actor, DamageApplied, DrainCoefficient);
 			if(ComboHitEffect && Actor->ActorHasTag(TEXT("Enemy"))) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ComboHitEffect, HitResult.ImpactPoint, FRotator::ZeroRotator, HitEffectScale);
 		}
+
 	}
 }
 
@@ -379,7 +379,7 @@ void UAPAttackComponent::MultiAttack()
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, BaseAttackRadius);
 	if(Line)
 	{
-		TArray<AActor*> Actors;
+		TArray<AActor*> Actors; bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -398,42 +398,43 @@ void UAPAttackComponent::MultiAttack()
 				}
 				float DamageApplied = Actor->TakeDamage(Damage *  OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, GetOwner()); 
 				DrainCheck(Actor, DamageApplied, DrainCoefficient);
-					
+
+			if(!bCheck && Actor->ActorHasTag(TEXT("Enemy"))) bCheck = true;	
 		}
-	}
-	
-}
-
-void UAPAttackComponent::MultiAttack(FVector Start, bool CloseAttack, float Multiple, bool bStun, float StunTime, bool Custom, float CustomRadius)
-{
-	if(!OwnerCharacter.IsValid()) return;
-	if(OwnerCharacter->returnState() != ECharacterState::None) return;
-
-	float Damage = OwnerCharacter->GetCurrentATK() * Multiple;
-	TArray<FHitResult> HitResults;
-	FVector HitVector;
-	bool Line = MultiAttackTrace(HitResults, HitVector, Start, CloseAttack, Custom, CustomRadius);
-	if(Line)
-	{
-		TArray<AActor*> Actors;
-		for(FHitResult HitResult : HitResults)
-		{
-			AActor* Actor = HitResult.GetActor();
-			if(Actors.Contains(Actor)) {continue;}
-			else {Actors.Add(Actor);}
-
-			if(Actor)
-			{
-				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
-				AController* MyController = Cast<AController>(OwnerCharacter->GetController());
-				if(!MyController) return;
-				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
-				if(bStun) OwnerCharacter->GetHitPointComponent()->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
-				float DamageApplied = Actor->TakeDamage(Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, GetOwner()); DrainCheck(Actor, DamageApplied, SkillDrainCoefficient);
-			}
-		}
+		if(bCheck) AttackCameraShake();
 	}
 }
+
+// void UAPAttackComponent::MultiAttack(FVector Start, bool CloseAttack, float Multiple, bool bStun, float StunTime, bool Custom, float CustomRadius)
+// {
+// 	if(!OwnerCharacter.IsValid()) return;
+// 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
+
+// 	float Damage = OwnerCharacter->GetCurrentATK() * Multiple;
+// 	TArray<FHitResult> HitResults;
+// 	FVector HitVector;
+// 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, CloseAttack, Custom, CustomRadius);
+// 	if(Line)
+// 	{
+// 		TArray<AActor*> Actors;
+// 		for(FHitResult HitResult : HitResults)
+// 		{
+// 			AActor* Actor = HitResult.GetActor();
+// 			if(Actors.Contains(Actor)) {continue;}
+// 			else {Actors.Add(Actor);}
+
+// 			if(Actor)
+// 			{
+// 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
+// 				AController* MyController = Cast<AController>(OwnerCharacter->GetController());
+// 				if(!MyController) return;
+// 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
+// 				if(bStun) OwnerCharacter->GetHitPointComponent()->SetCrowdControl(Actor, ECharacterState::Stun, StunTime);
+// 				float DamageApplied = Actor->TakeDamage(Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, GetOwner()); DrainCheck(Actor, DamageApplied, SkillDrainCoefficient);
+// 			}
+// 		}
+// 	}
+// }
 
 void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, float Multiple, uint8 HitNumbers, bool bStun, float StunTime)
 {
@@ -446,7 +447,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius);
 	if(Line)
 	{
-		TArray<AActor*> Actors;
+		TArray<AActor*> Actors; bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -455,6 +456,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(OwnerCharacter->GetController()); if(!MyController) return;
 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
@@ -463,6 +465,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 				ApplyDamageToActor(Actor, Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, HitNumbers);
 			}			
 		}
+		if(bCheck) AttackCameraShake();
 	}
 }
 
@@ -477,7 +480,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius);
 	if(Line)
 	{
-		TArray<AActor*> Actors;
+		TArray<AActor*> Actors; bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -486,6 +489,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(OwnerCharacter->GetController()); if(!MyController) return;
 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
@@ -498,9 +502,8 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 				ApplyDamageToActor(Actor, Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, HitNumbers);
 			}			
 		}
-	}
-
-    
+		if(bCheck) AttackCameraShake();
+	}  
 }
 
 TArray<AActor*> UAPAttackComponent::MultiAttack_Return(FVector Start, FVector End, float Radius, float Multiple, uint8 HitNumbers, float InstantDeathPercent, bool bStun, float StunTime)
@@ -515,6 +518,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_Return(FVector Start, FVector En
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius);
 	if(Line)
 	{
+		bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -523,6 +527,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_Return(FVector Start, FVector En
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(OwnerCharacter->GetController()); if(!MyController) return Actors;
 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
@@ -531,6 +536,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_Return(FVector Start, FVector En
 				ApplyDamageToActor(Actor, Damage * OwnerCharacter->CriticalCalculate(), myDamageEvent, MyController, HitNumbers);
 			}			
 		}
+		if(bCheck) AttackCameraShake();
 	}
 	return Actors;
 }
@@ -546,7 +552,7 @@ void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius, false);
 	if(Line)
 	{
-		TArray<AActor*> Actors;
+		TArray<AActor*> Actors; bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -555,6 +561,7 @@ void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(OwnerCharacter->GetController()); if(!MyController) return;
 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
@@ -573,6 +580,7 @@ void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float
 				if(PlayerKnockBack) OwnerCharacter->GetCrowdControlComp()->KnockBackState(Start, Dist, 0.35f);
 			}
 		}
+		if(bCheck) AttackCameraShake();
 	}
 
 }
@@ -589,6 +597,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(FVector Start, 
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius, false);
 	if(Line)
 	{
+		bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -597,6 +606,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(FVector Start, 
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				FPointDamageEvent myDamageEvent(Damage, HitResult, HitVector, nullptr);
 				AController* MyController = Cast<AController>(OwnerCharacter->GetController()); if(!MyController) return Actors;
 				OwnerCharacter->GetHitPointComponent()->DistinctHitPoint(HitResult.Location, Actor);
@@ -619,6 +629,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(FVector Start, 
 				}
 			}
 		}
+		if(bCheck) AttackCameraShake();
 	}
 	return Actors;
 }
@@ -633,7 +644,7 @@ void UAPAttackComponent::MultiAttack_Burn(FVector Start, FVector End, float Radi
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius, false);
 	if(Line)
 	{
-		TArray<AActor*> Actors;
+		TArray<AActor*> Actors; bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -642,10 +653,12 @@ void UAPAttackComponent::MultiAttack_Burn(FVector Start, FVector End, float Radi
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				auto Enemy = Cast<AEnemy_CharacterBase>(Actor); 
 				if(Enemy) Enemy->GetCrowdControlComp()->BurnState(OwnerCharacter.Get(), DOT, TotalTime, InRate);
 			}	
 		}
+		if(bCheck) AttackCameraShake();
 	}
 }
 
@@ -659,7 +672,7 @@ void UAPAttackComponent::MultiAttack_Slow(FVector Start, FVector End, float Radi
 	bool Line = MultiAttackTrace(HitResults, HitVector, Start, End, Radius, false);
 	if(Line)
 	{
-		TArray<AActor*> Actors;
+		TArray<AActor*> Actors; bool bCheck = false;
 		for(FHitResult & HitResult : HitResults)
 		{
 			AActor* Actor = HitResult.GetActor();
@@ -668,10 +681,12 @@ void UAPAttackComponent::MultiAttack_Slow(FVector Start, FVector End, float Radi
 			else {Actors.Add(Actor);}
 			if(Actor->ActorHasTag(TEXT("Enemy")))
 			{
+				bCheck = true;
 				auto Enemy = Cast<AEnemy_CharacterBase>(Actor); 
 				if(Enemy) Enemy->GetCrowdControlComp()->SlowState(SlowPercent, TotalTime);
 			}	
 		}
+		if(bCheck) AttackCameraShake();
 	}
 }
 
@@ -743,4 +758,9 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 
 }
 
-//AttackTrace 코드 끝
+void UAPAttackComponent::AttackCameraShake()
+{
+	UE_LOG(LogTemp, Display, TEXT("Your AttackCameraShake"));
+	auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
+	PC->AttackCameraShake();
+}

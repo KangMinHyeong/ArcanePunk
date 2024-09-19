@@ -62,7 +62,7 @@ void AAPTitlePlayerController::RemoveIntroUI(UUserWidget* IntroWidget)
 {
     GetWorld()->GetTimerManager().ClearTimer(IntroeTimerHandle);
     IntroWidget->RemoveFromParent();
-    UGameplayStatics::OpenLevel(GetWorld(), TEXT("EdanVilage"));
+    UGameplayStatics::OpenLevel(GetWorld(), StartMap);
 }
 
 void AAPTitlePlayerController::OptionSetting()
