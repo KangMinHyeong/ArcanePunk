@@ -38,7 +38,6 @@ void AEnemy_DropBase::BeginPlay()
 	Super::BeginPlay();
 	
 	InteractionTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	DropTrailEffect->DeactivateImmediate();
 	SpawnMovement();
 }
 
@@ -66,11 +65,7 @@ void AEnemy_DropBase::BeginFocus()
 	if(Actors.IsEmpty()) return;
 
 	auto PlayerCharacter = Cast<AArcanePunkCharacter>(Actors.Top()); if(!PlayerCharacter) return;
-	
-	// if(DropItems->ID == "Gold") {DropItems->SetQuantity(CheckGoldAmount());}
-	PlayerCharacter->GetInventory()->HandleAddItem(ItemReference);
-
-	Destroy();
+	OnRooting(PlayerCharacter);	
 }
 
 void AEnemy_DropBase::SpawnMovement()
@@ -106,12 +101,17 @@ void AEnemy_DropBase::InitializePickup(AActor *DamageCauser, const int32 Quantit
 	if(RootingImmediate)
 	{
 		auto PlayerCharacter = Cast<AArcanePunkCharacter>(DamageCauser); if(!PlayerCharacter) return;
-	
-		// if(DropItems->ID == "Gold") {DropItems->SetQuantity(CheckGoldAmount());}
-		PlayerCharacter->GetInventory()->HandleAddItem(ItemReference);
 
-		UGameplayStatics::SpawnSound2D(GetWorld(), DropSound, DropSoundVolume);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DropEffect, GetActorLocation(), GetActorRotation());
-		Destroy();
+		FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemy_DropBase::OnRooting, PlayerCharacter);
+		GetWorld()->GetTimerManager().SetTimer(RootingTimerHandle, TimerDelegate, RootingTime, false);
 	}
+}
+
+void AEnemy_DropBase::OnRooting(AArcanePunkCharacter* PlayerCharacter)
+{
+	PlayerCharacter->GetInventory()->HandleAddItem(ItemReference);
+
+	UGameplayStatics::SpawnSound2D(GetWorld(), DropSound, DropSoundVolume);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DropEffect, GetActorLocation(), GetActorRotation());
+	Destroy();
 }

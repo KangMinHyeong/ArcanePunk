@@ -28,6 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void SpawnMovement();
+	void OnRooting(AArcanePunkCharacter* PlayerCharacter);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -82,4 +83,8 @@ protected:
 	// Drop Effect
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* DropEffect;
+
+	FTimerHandle RootingTimerHandle;
+	UPROPERTY(EditAnywhere)
+	float RootingTime = 2.5f;
 };

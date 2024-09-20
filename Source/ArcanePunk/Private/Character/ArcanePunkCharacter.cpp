@@ -250,7 +250,6 @@ void AArcanePunkCharacter::Parrying()
 {
 	if(!StopState.IsEmpty() || !bCanParrying) return;
 
-	bCanParrying = false;
 	SkillHubComponent->LastSkill = ESkillKey::None;
 	AttackComponent->StartParrying();
 

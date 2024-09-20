@@ -403,7 +403,10 @@ void AEnemy_CharacterBase::DropChecking(AActor *DamageCauser)
 	if(DropPercent < DropData.DropGold_Percent)
 	{
 		int32 Quantity = FMath::RandRange(DropData.DropGold_Min, DropData.DropGold_Max);
-		auto DropGold = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropGoldClass(), GetActorLocation() + GetActorUpVector()*GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), GetActorRotation());
+		float SpawnAdd_X = FMath::RandRange(-150.0f, 150.0f);
+		float SpawnAdd_Y = FMath::RandRange(-150.0f, 150.0f);
+		FVector SpawnLocation = GetMesh()->GetComponentLocation() + FVector(SpawnAdd_X, SpawnAdd_Y, 0.0f);
+		auto DropGold = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropGoldClass(), SpawnLocation, GetActorRotation());
 		if(DropGold) DropGold->InitializePickup(DamageCauser, Quantity, true);
 	}
 
