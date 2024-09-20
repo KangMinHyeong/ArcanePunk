@@ -4,7 +4,7 @@
 #include "Character/ArcanePunkCharacter.h"
 
 #include "Components/Character/APSpringArmComponent.h"
-#include "Camera/CameraComponent.h"
+#include "Components/Character/APCameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -48,7 +48,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	PrimaryActorTick.bCanEverTick = false;
 
 	APSpringArm = CreateDefaultSubobject<UAPSpringArmComponent>(TEXT("APSpringArm"));
-	MyCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	APCamera = CreateDefaultSubobject<UAPCameraComponent>(TEXT("APCamera"));
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	FootPrint_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_L"));
 	FootPrint_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FootPrint_R"));
@@ -65,7 +65,7 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	CharacterAura = CreateDefaultSubobject<UAPCharacterAuraComponent>(TEXT("CharacterAura"));
 
 	APSpringArm->SetupAttachment(GetRootComponent());
-	MyCamera->SetupAttachment(APSpringArm);
+	APCamera->SetupAttachment(APSpringArm);
 	FadeOutTigger->SetupAttachment(APSpringArm);
 	Weapon->SetupAttachment(GetMesh(),FName("Bip001-Prop1"));
 	FootPrint_L->SetupAttachment(GetMesh(), FName("FootPrint_L"));
@@ -541,7 +541,7 @@ void AArcanePunkCharacter::CurrentPlayerLocation() // 후에 사용할지 말지
 
 FTransform AArcanePunkCharacter::ReturnCameraTransform()
 {
-    return MyCamera->GetComponentTransform();
+    return APCamera->GetComponentTransform();
 }
 
 void AArcanePunkCharacter::SetHavingSkills()

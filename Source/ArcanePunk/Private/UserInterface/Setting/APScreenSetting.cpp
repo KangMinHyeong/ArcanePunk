@@ -98,7 +98,7 @@ void UAPScreenSetting::OnApply()
     APGI->SetGamma(Gamma);
     APGI->SetGain(Gain);
     APGI->SetOffset(Offset);
-
+ 
     float SaturationValue = FMath::Lerp(0.0f, 2.0f, Saturation); 
     for (auto PPV : TActorRange<APostProcessVolume>(GetWorld())) {
         PPV->Settings.bOverride_ColorSaturation = true;
