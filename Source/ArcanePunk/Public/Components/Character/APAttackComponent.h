@@ -90,6 +90,8 @@ private:
 	
 	void ApplyDamageToActor(AActor* DamagedActor, float Damage, FPointDamageEvent myDamageEvent, AController* MyController, uint8 HitNumbers);
 
+	void AffectParrying();
+	void EndParrying();
 	void AttackCameraShake();
 
 private:
@@ -148,9 +150,23 @@ private:
 	FVector SwordTrailHeight = FVector::ZeroVector;
 
 	UPROPERTY(EditAnywhere, Category = "Parrying")
-	float ParryingCoeff = 1.0f;
+	float ParryingTimeSlow = 0.25f;
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	float ParryingZoomDist = 175.0f;
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	float ParryingZoomSpeed = 5.0f;
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	float AffectParryingTime = 0.1f;
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	float EndParryingTime = 0.1f;
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	UNiagaraSystem* ParryingEffect_First;
 	UPROPERTY(EditAnywhere, Category = "Parrying")
 	UNiagaraSystem* ParryingEffect;
+	
+
+	FTimerHandle ParryingTimerHandle;
+
 
 public:
 	FOnSuperiorAttack OnSuperiorAttack;

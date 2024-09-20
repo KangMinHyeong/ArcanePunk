@@ -20,13 +20,16 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Restore();
-	void Zoom(float InOutLength, float ZoomTime);
+	void RestoreConstant();
+	void RestoreInterp();
+	void ZoomConstant(float InOutLength, float ZoomTime);
+	void ZoomInterpto(float InOutLength, float Speed);
 	void ZoomImmediate(float InOutLength);
 	// void ZoomOut(float ZoomTime);
 
 private:
-	bool bZoom = false;
+	bool bZoomConstant = false;
+	bool bZoomInterp = false;
 
 	float OriginLength;
 	float TargetLength;

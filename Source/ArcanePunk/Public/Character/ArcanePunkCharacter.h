@@ -21,7 +21,7 @@ class UAPSpawnFootPrintComponent;
 class APickup;
 class UArcanePunkCharacterAnimInstance;
 class UAPSpringArmComponent;
-class UCameraComponent;
+class UAPCameraComponent;
 class AArcanePunkPlayerController;
 class AArcanePunkPlayerState;
 class AEnemy_DropUnlock;
@@ -75,6 +75,7 @@ public:
 
 	FTransform ReturnCameraTransform();
 	FORCEINLINE UAPSpringArmComponent* GetAPSpringArm() {return APSpringArm;};
+	FORCEINLINE UAPCameraComponent* GetAPCameraComponent() {return APCamera;};
 	FORCEINLINE UAPFadeOutTriggerComponent* GetFadeOutTrigger() {return FadeOutTigger;};
 
 	FORCEINLINE AAPHUD* GetAPHUD() const {return HUD;};
@@ -291,7 +292,7 @@ private:
 	UAPSpringArmComponent* APSpringArm;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	UCameraComponent* MyCamera;
+	UAPCameraComponent* APCamera;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	UAPFadeOutTriggerComponent* FadeOutTigger;

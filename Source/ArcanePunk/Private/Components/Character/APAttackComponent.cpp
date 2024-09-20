@@ -19,6 +19,7 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Character/APMovementComponent.h"
+#include "Components/Character/APCameraComponent.h"
 
 UAPAttackComponent::UAPAttackComponent()
 {
@@ -28,6 +29,8 @@ UAPAttackComponent::UAPAttackComponent()
 void UAPAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 }
 
 void UAPAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -138,21 +141,16 @@ bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent,
 
 void UAPAttackComponent::OnParrying()
 {
-	GetWorld()->GetWorldSettings()->SetTimeDilation(0.55f);
 	bParrying = false;
 	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
-	if(Player)
-	{
-		Player->GetAPSpringArm()->Zoom(-175.0f, 0.25f);
-		auto PC = Cast<AArcanePunkPlayerController>(Player->GetController());
-		if (PC) PC->ParryingCameraShake();
-	}
-	
+	if(Player) Player->GetAPSpringArm()->ZoomInterpto(-ParryingZoomDist, ParryingZoomSpeed);
+
 	FRotator Rot = OwnerCharacter->GetAPMoveComponent()->GetTargetRot(); 
 	FVector Loc = OwnerCharacter->GetActorLocation() + Rot.Vector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
 	Rot.Yaw -= 90.0f;
-	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ParryingEffect, Loc, Rot);
+	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ParryingEffect_First, Loc, Rot);
 
+	GetWorld()->GetTimerManager().SetTimer(ParryingTimerHandle, this, &UAPAttackComponent::AffectParrying, AffectParryingTime, false);
 }
 
 void UAPAttackComponent::SpawnSwordTrail(uint8 ComboStack)
@@ -758,9 +756,40 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 
 }
 
+void UAPAttackComponent::AffectParrying()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ParryingTimerHandle);
+	GetWorld()->GetWorldSettings()->SetTimeDilation(ParryingTimeSlow);
+
+	auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
+	if(PC) PC->ParryingCameraShake();
+
+	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
+	if(Player) Player->GetAPCameraComponent()->OnParryingCameraEffect();
+
+	FRotator Rot = OwnerCharacter->GetAPMoveComponent()->GetTargetRot(); 
+	FVector Loc = OwnerCharacter->GetActorLocation() + Rot.Vector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
+	Rot.Yaw -= 90.0f;
+	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ParryingEffect, Loc, Rot);
+
+	GetWorld()->GetTimerManager().SetTimer(ParryingTimerHandle, this, &UAPAttackComponent::EndParrying, EndParryingTime, false);
+}
+
+void UAPAttackComponent::EndParrying()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ParryingTimerHandle);
+	GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f);
+
+	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
+	if(Player)
+	{
+		Player->GetAPSpringArm()->RestoreInterp();
+		Player->GetAPCameraComponent()->Restore();
+	}
+}
+
 void UAPAttackComponent::AttackCameraShake()
 {
-	UE_LOG(LogTemp, Display, TEXT("Your AttackCameraShake"));
 	auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
 	PC->AttackCameraShake();
 }

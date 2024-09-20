@@ -386,9 +386,9 @@ void AArcanePunkPlayerController::ParryingCameraShake()
 {
     if(ParryingCS) ClientStartCameraShake(ParryingCS);
 
-    auto ParryUI = CreateWidget<UAPScreenEffect>(GetWorld(), ParryScreenEffectClass); if(!ParryUI) return;
-	ParryUI->OnScreenEffect();
-    ParryUI->AddToViewport();
+    // auto ParryUI = CreateWidget<UAPScreenEffect>(GetWorld(), ParryScreenEffectClass); if(!ParryUI) return;
+	// ParryUI->OnScreenEffect();
+    // ParryUI->AddToViewport();
 }
 
 void AArcanePunkPlayerController::AttackCameraShake()

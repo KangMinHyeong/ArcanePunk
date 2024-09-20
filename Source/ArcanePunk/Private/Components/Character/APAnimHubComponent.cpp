@@ -106,11 +106,9 @@ void UAPAnimHubComponent::OnParrying_Montage()
 
 	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
 	if(Player)
-	{
-		Player->GetAPSpringArm()->Restore();
+	{	
 		Player->GetAPHUD()->OnStartCoolTime.Broadcast(ESkillKey::Parrying, Player->GetParryingCoolTime());	
 	}
-	GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f);
 	OwnerCharacter->GetAttackComponent()->SetParrying(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	
