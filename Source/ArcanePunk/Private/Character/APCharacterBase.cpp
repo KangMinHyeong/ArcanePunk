@@ -65,10 +65,12 @@ bool AAPCharacterBase::IsDead()
 
 void AAPCharacterBase::UpdateStatus()
 {
+	
 }
 
 void AAPCharacterBase::SetAttackRotation(float AddSpeed)
 {
+
 }
 
 float AAPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
