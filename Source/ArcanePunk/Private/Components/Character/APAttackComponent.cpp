@@ -776,10 +776,10 @@ void UAPAttackComponent::AffectParrying()
 	Rot.Yaw -= 90.0f;
 	auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ParryingEffect, Loc, Rot);
 
-	GetWorld()->GetTimerManager().SetTimer(ParryingTimerHandle, this, &UAPAttackComponent::EndParrying, EndParryingTime, false);
+	GetWorld()->GetTimerManager().SetTimer(ParryingTimerHandle, this, &UAPAttackComponent::OnEndingParrying, EndParryingTime, false);
 }
 
-void UAPAttackComponent::EndParrying()
+void UAPAttackComponent::OnEndingParrying()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ParryingTimerHandle);
 	GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f);
