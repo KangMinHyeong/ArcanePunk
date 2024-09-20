@@ -74,6 +74,7 @@ void UAPAttackComponent::StartParrying()
 
 	if(bParrying) return;
 	bParrying = true;
+	Cast<AArcanePunkCharacter>(OwnerCharacter)->SetbCanParrying(false);
 	//UGameplayStatics::PlaySoundAtLocation(GetWorld(), Attack_Sound, GetActorLocation(), E_SoundScale);
 	OwnerAnim->PlayParrying_Montage();
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -143,7 +144,13 @@ void UAPAttackComponent::OnParrying()
 {
 	bParrying = false;
 	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
-	if(Player) Player->GetAPSpringArm()->ZoomInterpto(-ParryingZoomDist, ParryingZoomSpeed);
+	if(Player)
+	{
+		Player->GetAPSpringArm()->ZoomInterpto(-ParryingZoomDist, ParryingZoomSpeed);
+		Player->GetAPCameraComponent()->OnParryingCameraEffect();
+		auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
+		if(PC) PC->ParryingCameraShake();
+	}
 
 	FRotator Rot = OwnerCharacter->GetAPMoveComponent()->GetTargetRot(); 
 	FVector Loc = OwnerCharacter->GetActorLocation() + Rot.Vector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
@@ -760,12 +767,6 @@ void UAPAttackComponent::AffectParrying()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ParryingTimerHandle);
 	GetWorld()->GetWorldSettings()->SetTimeDilation(ParryingTimeSlow);
-
-	auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController());
-	if(PC) PC->ParryingCameraShake();
-
-	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
-	if(Player) Player->GetAPCameraComponent()->OnParryingCameraEffect();
 
 	FRotator Rot = OwnerCharacter->GetAPMoveComponent()->GetTargetRot(); 
 	FVector Loc = OwnerCharacter->GetActorLocation() + Rot.Vector() * OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f + OwnerCharacter->GetActorUpVector() * 25.0f;
