@@ -109,6 +109,7 @@ void UAPAnimHubComponent::OnParrying_Montage()
 	{	
 		Player->GetAPHUD()->OnStartCoolTime.Broadcast(ESkillKey::Parrying, Player->GetParryingCoolTime());	
 	}
+
 	OwnerCharacter->GetAttackComponent()->SetParrying(false);
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	
