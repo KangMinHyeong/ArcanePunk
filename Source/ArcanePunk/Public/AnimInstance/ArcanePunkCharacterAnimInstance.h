@@ -25,6 +25,7 @@ public:
 
 	void PlayCombo_Montage(float AttackCancelTime = 0.0f);
 	void PlayParrying_Montage();
+	void PlayParryingSuccess_Montage();
 	void StopComboAttack();
 
 	void PlayDash_Montage();
@@ -88,9 +89,6 @@ public:
 	void AnimNotify_SwordTrail_2();
 	UFUNCTION()
 	void AnimNotify_SwordTrail_3();
-
-	UFUNCTION()
-	void AnimNotify_ParryingEnd();
 
 	UFUNCTION()
 	void AnimNotify_Skill_Trigger();
@@ -161,6 +159,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Parrying_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
+	UAnimMontage* ParryingSuccess_Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	UAnimMontage* Dash_Montage;

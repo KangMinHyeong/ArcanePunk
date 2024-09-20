@@ -23,20 +23,23 @@
 
 UAPAttackComponent::UAPAttackComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UAPAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
 }
 
 void UAPAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if(OwnerCharacter.IsValid() && OwnerCharacter->bDebugDraw && bParrying)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Can Parrying"));
+	}
 }
 
 void UAPAttackComponent::InitAttackComp()
@@ -132,8 +135,7 @@ bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent,
 	FVector Forward = OwnerCharacter->GetActorForwardVector();
 	auto DotProduct = FVector::DotProduct(HitLocation, Forward);
 	float AngleInDegrees = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
-	
-	UE_LOG(LogTemp, Display, TEXT("Your AngleInDegrees %f"), AngleInDegrees);
+
 	if(AngleInDegrees > 100.0f) return false;
 
 	OnParrying();
@@ -143,6 +145,7 @@ bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent,
 void UAPAttackComponent::OnParrying()
 {
 	bParrying = false;
+	OwnerAnim->PlayParryingSuccess_Montage();
 	auto Player = Cast<AArcanePunkCharacter>(OwnerCharacter.Get()); 
 	if(Player)
 	{

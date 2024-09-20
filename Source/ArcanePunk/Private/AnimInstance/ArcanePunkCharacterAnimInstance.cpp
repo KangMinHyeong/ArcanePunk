@@ -70,6 +70,15 @@ void UArcanePunkCharacterAnimInstance::StopComboAttack()
     Montage_Stop(0.1f, Combo_Montage);
 }
 
+void UArcanePunkCharacterAnimInstance::PlayParryingSuccess_Montage()
+{
+    if(IsDead) return;
+    if(Montage_IsPlaying(ParryingSuccess_Montage)) return;
+
+    OwnerCharacter->SetAttackRotation(200.0f);
+    Montage_Play(ParryingSuccess_Montage);
+}
+
 void UArcanePunkCharacterAnimInstance::PlayDash_Montage()
 {
     if(IsDead) return;
@@ -415,13 +424,6 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
-}
-
-void UArcanePunkCharacterAnimInstance::AnimNotify_ParryingEnd()
-{
-    if(!OwnerCharacter.IsValid() || IsDead) return;
-
-    OwnerCharacter->GetAttackComponent()->SetParrying(false);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_Trigger()
