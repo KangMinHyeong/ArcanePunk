@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "AIController.h"
 #include "GameElements/Trap/APTrapBase.h"
+#include "Enemy/Drop/Enemy_DropPackage.h"
 
 void AAPGameModeBattleStage::MonsterKilled(AActor* BattleSection)
 {
@@ -56,6 +57,12 @@ void AAPGameModeBattleStage::PortalSpawn(FName CurrentClearStage)
         {
             Portal->InitHide(false);
         }
+    }
+
+    for(auto Drop : TActorRange<AEnemy_DropPackage>(GetWorld()))
+    {
+        if(CurrentClearStage == Drop->GetDropID())
+            Drop->DropActivate();
     }
 }
 
