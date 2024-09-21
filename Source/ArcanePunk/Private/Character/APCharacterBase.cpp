@@ -81,9 +81,13 @@ float AAPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &Damag
 
 	bHitting = true;
 
-	int32 Index = 0;
-	for(auto Mat : DefaultMaterial)
-	{GetMesh()->SetMaterial(Index, HitMaterial); Index++;}
+	if(DamageApplied > KINDA_SMALL_NUMBER)
+	{
+		int32 Index = 0;
+		for(auto Mat : DefaultMaterial)
+		{GetMesh()->SetMaterial(Index, HitMaterial); Index++;}
+	}
+	
 
 	GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AAPCharacterBase::OnHittingEnd, HitMotionTime, false);
 	GetWorldTimerManager().SetTimer(HitMaterialTimerHandle, this, &AAPCharacterBase::ResetDefaultMaterial, HitMaterailTime, false);

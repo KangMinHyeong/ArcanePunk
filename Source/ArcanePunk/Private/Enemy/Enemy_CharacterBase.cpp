@@ -348,7 +348,7 @@ void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float D
 {
 	// ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 90.0f, 0.0f));
 	// if(!DamageText) return;
-
+	if(Damage <= KINDA_SMALL_NUMBER) return;
 	bool Check = false; 
 	auto Character = Cast<AArcanePunkCharacter>(EventInstigator->GetPawn()); 
 	if(Character) Check = Character->IsCriticalAttack();
