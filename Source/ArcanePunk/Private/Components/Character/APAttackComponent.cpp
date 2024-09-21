@@ -138,7 +138,7 @@ bool UAPAttackComponent::CheckParryingCondition(FDamageEvent const &DamageEvent,
 
 	if(AngleInDegrees > 100.0f) return false;
 
-	ParryCounter(EventInstigator->GetPawn());	
+	if(EventInstigator) ParryCounter(EventInstigator->GetPawn());	
 	OnParrying();
 	return true;
 }
@@ -769,7 +769,8 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 
 void UAPAttackComponent::ParryCounter(AActor * DamageCauser)
 {
-	if(!DamageCauser) return;
+	auto Enemy = Cast<AEnemy_CharacterBase>(DamageCauser); if(!Enemy) return;
+	if(!Enemy->CanParryingCounter()) return;
 
 	FHitResult Hit;
 	Hit.Location = OwnerCharacter->GetActorLocation(); Hit.ImpactPoint = Hit.Location;

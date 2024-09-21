@@ -40,6 +40,16 @@ void AEnemy_ScoutDog::Tick(float DeltaTime)
     }
 }
 
+float AEnemy_ScoutDog::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
+{
+    float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    if(DamageApplied <= KINDA_SMALL_NUMBER)
+    AttackCondition(false);
+
+    return DamageApplied;
+}
+
 void AEnemy_ScoutDog::LeapFoward()
 {
     CurrentLocation = GetActorLocation(); 
