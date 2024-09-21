@@ -15,6 +15,7 @@ class ARCANEPUNK_API AEnemy_DropPackage : public AEnemy_DropBase
 	GENERATED_BODY()
 public:
 	AEnemy_DropPackage();
+	FORCEINLINE FName GetDropID() const {return DropID;};
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -25,6 +26,8 @@ public:
 	virtual void EndFocus() override;
 	virtual FInteractData GetInteractData() override;
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
+
+	void DropActivate();
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,6 +59,14 @@ private:
 	UNiagaraSystem* GroundEffect_Gold;
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* GroundEffect_Platinum;
+
+	UNiagaraSystem* CurrentEffect;
+
+	UPROPERTY(EditAnywhere)
+	float EffectScale = 1.5f;
+
+	UPROPERTY(EditAnywhere, Category = "ID")
+	FName DropID = "1-1";
 
 	bool IsInit = false;
 };
