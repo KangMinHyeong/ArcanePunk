@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraComponent.h"
 #include "GameInstance/APGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 AAPCharacterBase::AAPCharacterBase()
 {
@@ -86,8 +87,10 @@ float AAPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &Damag
 		int32 Index = 0;
 		for(auto Mat : DefaultMaterial)
 		{GetMesh()->SetMaterial(Index, HitMaterial); Index++;}
+
+		if(IsDead()) {SpawnVoiceSound(DeadVoiceSound);}
+		else {SpawnVoiceSound(HitVoiceSound);}
 	}
-	
 
 	GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AAPCharacterBase::OnHittingEnd, HitMotionTime, false);
 	GetWorldTimerManager().SetTimer(HitMaterialTimerHandle, this, &AAPCharacterBase::ResetDefaultMaterial, HitMaterailTime, false);
@@ -101,6 +104,26 @@ void AAPCharacterBase::OnHittingEnd()
 	GetCharacterMovement()->BrakingFrictionFactor = DefaultSlip;
 	
 	GetWorldTimerManager().ClearTimer(HitTimerHandle);
+}
+
+void AAPCharacterBase::SpawnVoiceSound(USoundBase *VoiceSound)
+{
+	if(!VoiceSound) return;
+
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
+    
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), VoiceSound, GetActorLocation(), GetActorRotation(), Volume);
+}
+
+void AAPCharacterBase::SpawnAttackVoiceSound()
+{
+	if(!AttackVoiceSound) return;
+
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
+    
+	UGameplayStatics::SpawnSoundAttached(AttackVoiceSound, GetMesh(), TEXT("AttackVoiceSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume);
 }
 
 float AAPCharacterBase::CriticalCalculate()

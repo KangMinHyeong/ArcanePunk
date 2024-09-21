@@ -76,6 +76,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float RotatePlus = 0.0f;
 	
+	UPROPERTY(EditAnywhere)
 	bool bRotating = true;
 	bool bCharging = false;
 
