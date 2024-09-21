@@ -128,6 +128,9 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 	void OnHittingEnd();
 
+	void SpawnVoiceSound(USoundBase* VoiceSound);
+	void SpawnAttackVoiceSound();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	FName CharacterName = "";
@@ -158,6 +161,7 @@ protected:
 	FTimerHandle BlockTimerHandle;
 	UPROPERTY(EditAnywhere, Category = "Super Stance")
 	float BlockTime = 1.5f;
+	UPROPERTY(EditAnywhere, Category = "Super Stance")
 	bool bBlockMode = false;
 
 	// 머터리얼
@@ -194,8 +198,14 @@ protected:
 	float HitMotionTime = 0.6f;
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	float HitMaterailTime = 0.4f;
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	USoundBase* HitVoiceSound;
 
-	
+	UPROPERTY(EditAnywhere, Category = "Dead")
+	USoundBase* DeadVoiceSound;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	USoundBase* AttackVoiceSound;
 
 public:
 	TArray<bool> StopState;

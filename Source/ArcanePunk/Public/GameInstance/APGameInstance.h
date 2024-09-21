@@ -28,11 +28,11 @@ struct FGameSoundVolume
 	FGameSoundVolume() {}
 
 	UPROPERTY()
-	float MasterVolume = 1.0f;
+	float MasterVolume = 0.5f;
 	UPROPERTY()
-	float BGMVolume = 1.0f;
+	float BGMVolume = 0.5;
 	UPROPERTY()
-	float EffectVolume = 1.0f;
+	float EffectVolume = 0.5f;
 };
 
 

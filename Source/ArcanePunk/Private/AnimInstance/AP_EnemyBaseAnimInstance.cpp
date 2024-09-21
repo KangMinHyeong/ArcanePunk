@@ -110,6 +110,13 @@ void UAP_EnemyBaseAnimInstance::AnimNotify_NormalAttack()
 	Enemy->NormalAttack();
 }
 
+void UAP_EnemyBaseAnimInstance::AnimNotify_AttackVoiceSound_Enemy()
+{
+	if(IsDead || !Enemy.IsValid()) return;
+
+    Enemy->SpawnAttackVoiceSound();
+}
+
 // ScoutDog
 void UAP_EnemyBaseAnimInstance::AnimNotify_JumpEffect()
 {

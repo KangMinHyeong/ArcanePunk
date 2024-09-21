@@ -17,7 +17,8 @@
 			"adolcforward": "cpp",
 			"complex": "cpp",
 			"valarray": "cpp",
-			"cstdlib": "cpp"
+			"cstdlib": "cpp",
+			"xiosbase": "cpp"
 		}
 	},
 	"extensions": {

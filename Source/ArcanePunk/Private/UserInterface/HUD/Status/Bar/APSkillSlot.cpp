@@ -12,6 +12,10 @@ void UAPSkillSlot::NativeConstruct()
 {
     Super::NativeConstruct();
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
+    SkillKeyName->SetText(FText::FromString(SkillKey));
+    // FSlateFontInfo Font = SkillKeyName->GetFont(); 
+    // Font.Size = SkillKeyFontSize;
+    // SkillKeyName->SetFont(Font);   
 }
 
 void UAPSkillSlot::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)

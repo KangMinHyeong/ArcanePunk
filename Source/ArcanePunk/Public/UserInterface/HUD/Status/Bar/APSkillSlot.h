@@ -77,6 +77,12 @@ protected:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* ChargeTimeText;
 
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UTextBlock* SkillKeyName;
+
+	// UPROPERTY(EditAnywhere)
+	// float SkillKeyFontSize = 18.0f;
+
 	float CurrentCoolTime = 0.0f;
 	float SkillCoolTime = 1.0f;
 	float AddCoolTime = 0.0f;
