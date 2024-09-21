@@ -41,11 +41,29 @@ class ARCANEPUNK_API AEnemy_CharacterBase : public AAPCharacterBase
 
 public:
 	AEnemy_CharacterBase();
+	// 드롭 데이타
+	FORCEINLINE FDropData GetDropData() const {return DropData;};
+
+	// 데미지 계수
+	FORCEINLINE float GetDamageMultiple() const {return DamageMultiple;};
+
+	// 공격 범위 관련
+	FORCEINLINE float GetAttackRangeTime()const {return AttackRangeTime;}; 
+	FORCEINLINE float GetMonsterAttackRange()const {return Monster_AttackRange;}; 
+
+	// 탐지 범위
+	FORCEINLINE float GetDetectDist()const {return DetectDist;}; 
+
+	// 흡혈 영역
+	FORCEINLINE bool IsInDrainField() const {return InDrainField;}; // InDrainField 반환;
+	FORCEINLINE void AddInDrainField(bool NewBool) { InDrainField = NewBool;};
+
+	// 패링 경직 여부
+	FORCEINLINE bool CanParryingCounter() const {return bCanParryingCounter;};
 
 protected:
 	virtual void BeginPlay() override;
 
-	TArray<ATextRenderActor*> PresentDamages;
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -54,8 +72,6 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
-	FORCEINLINE FDropData GetDropData() const {return DropData;};
 
 	void SetOwnerSection(AActor* BattleSection);
 
@@ -67,15 +83,12 @@ public:
 
 	void SetHitPoint(float Forward, float Right);
 
-	FORCEINLINE float GetDamageMultiple() const {return DamageMultiple;};
 	void AddDamageMultiple(float Add, float Time);
 	void OnAttachingDamagedMark(float Time);
 
 	// 몬스터 Attack 관련 함수
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void NormalAttack();
-
-	FORCEINLINE float GetDetectDist()const {return DetectDist;}; 
 
 	void TeleportMarkActivate(float Time, AActor * MarkOwner, USkillNumberBase* SkillComp);
 	void TeleportMarkDeactivate();
@@ -85,8 +98,6 @@ public:
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
 	virtual void SpawnAttackRange(AActor* Target, float WaitTime);
-	FORCEINLINE float GetAttackRangeTime()const {return AttackRangeTime;}; 
-	FORCEINLINE float GetMonsterAttackRange()const {return Monster_AttackRange;}; 
 
 	// HitPoint 관련 함수
 	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
@@ -103,10 +114,6 @@ public:
 
 	// 몬스터 어그로
 	AActor* IsAggro();
-
-	// 흡혈 영역
-	FORCEINLINE bool IsInDrainField() const {return InDrainField;}; // InDrainField 반환;
-	FORCEINLINE void AddInDrainField(bool NewBool) { InDrainField = NewBool;};
 
 	// 패트롤 위치
 	FVector GetPatrolLocation(FVector Start);
@@ -282,6 +289,10 @@ protected:
 
 	//AAPHUD
 	TWeakObjectPtr<AAPHUD> PlayerHUD;
+
+	UPROPERTY(EditAnywhere, Category = "Parrying")
+	bool bCanParryingCounter = true;
+
 public:
 	FOnHPChanged OnEnemyHPChanged;
 
