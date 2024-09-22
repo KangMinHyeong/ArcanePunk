@@ -20,11 +20,11 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void SpawnParamsSetting();
 	void PlaySpawnEffect(FVector Location);
 	FVector GetRandomLocation(FVector V_1, FVector V_2, FVector V_3);
 	bool IsPossibleLocation(FVector Location);
-	
+	void SpawnParamsSetting();
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

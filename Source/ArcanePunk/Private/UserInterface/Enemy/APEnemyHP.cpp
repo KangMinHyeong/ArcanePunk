@@ -50,5 +50,5 @@ void UAPEnemyHP::UpdateHealthPercentage(float InDeltaTime)
     HPPercent->SetPercent(OriginHP / OriginMaxHP);
     HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
 
-    if(OriginHP <= KINDA_SMALL_NUMBER) RemoveFromParent();
+    if(OriginHP <= KINDA_SMALL_NUMBER) Enemy->RemoveHPUI();
 }

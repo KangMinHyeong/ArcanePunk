@@ -35,23 +35,26 @@ void APortal_Base::BeginPlay()
 {
 	Super::BeginPlay();
 	APGI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!APGI.IsValid()) return;
-
+	PortalEffectComp->DeactivateImmediate();
 	InitHide(DefaultHidden);
 	FLatentActionInfo LatentActionInfo;
 	// UKismetSystemLibrary::RetriggerableDelay(GetWorld(), Delay_Time + 0.5f, LatentActionInfo);
 }
 
-void APortal_Base::InitHide(bool IsHidden)
+void APortal_Base::InitHide(bool IsHidden, float DelayTime)
 {
-	SetActorHiddenInGame(IsHidden);
-
 	if(IsHidden)
 	{
+		SetActorHiddenInGame(IsHidden);
 		SetActorEnableCollision(ECollisionEnabled::NoCollision);
 	}
 	else
 	{
-		SetActorEnableCollision(ECollisionEnabled::QueryOnly);
+		if(DelayTime > KINDA_SMALL_NUMBER)
+		{
+			GetWorld()->GetTimerManager().SetTimer(HiddenTimerHandle, this, &APortal_Base::DelayHidden, DelayTime, false);
+		}
+		else {DelayHidden();}
 	}
 }
 
@@ -70,4 +73,12 @@ void APortal_Base::SpawnSound(FVector Location)
 {
 	float SoundVolume = APGI->GetGameSoundVolume().MasterVolume * APGI->GetGameSoundVolume().EffectVolume;
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PortalSound, Location, FRotator::ZeroRotator, SoundVolume, 1.0f, SoundStartTime);
+}
+
+void APortal_Base::DelayHidden()
+{
+	GetWorld()->GetTimerManager().ClearTimer(HiddenTimerHandle);
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(ECollisionEnabled::QueryOnly);
+	PortalEffectComp->Activate();
 }

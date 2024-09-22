@@ -36,7 +36,9 @@ public:
 	void RotateMoveStop(); // RotateMovement 끝
 
 	void ComboMovement(); // 콤보어택 Move 시작
-	void ComboMoveStop(); // 콤보어택 Move 끝
+	
+	void StartTickMove(FVector ToLocation);
+	void StopTickMove(); 
 
 	void SetAttackRotation(FRotator NewTargetRot, float AddSpeed = 0.0f);
 	
@@ -84,6 +86,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float Combo_3_Distance = 300.0f;
 
+	UPROPERTY(EditAnywhere)
+	float PushSpeed = 500.0f;
+
 	bool bDash = false;
 	UPROPERTY(EditAnywhere)
 	float DashSpeed = 500.0f;
@@ -95,4 +100,5 @@ private:
 	TWeakObjectPtr<APlayerController> OwnerPC;
 
 	FTimerHandle DashTimerHandle;
+
 };

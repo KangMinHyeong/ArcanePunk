@@ -100,8 +100,9 @@ void UAPMovementComponent::TickMove(float DeltaTime)
 	GetOwner()->SetActorLocation(Location, true);
 	if(abs(Location.X - TargetLocation.X) < 0.01f && abs(Location.Y - TargetLocation.Y) < 0.01f) 
 	{
-		ComboMoveStop();
+		StopTickMove();
 	}
+
 }
 
 void UAPMovementComponent::TickDash(float DeltaTime)
@@ -141,7 +142,15 @@ void UAPMovementComponent::ComboMovement()
 	SetComponentTickEnabled(true);
 }
 
-void UAPMovementComponent::ComboMoveStop()
+void UAPMovementComponent::StartTickMove(FVector ToLocation)
+{
+	TargetLocation = OwnerCharacter->GetActorLocation() + ToLocation;
+	LocSpeed = PushSpeed;
+	bMove = true;
+	SetComponentTickEnabled(true);
+}
+
+void UAPMovementComponent::StopTickMove()
 {
 	bMove = false;
 }

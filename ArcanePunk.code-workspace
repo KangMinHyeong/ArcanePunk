@@ -18,7 +18,8 @@
 			"complex": "cpp",
 			"valarray": "cpp",
 			"cstdlib": "cpp",
-			"xiosbase": "cpp"
+			"xiosbase": "cpp",
+			"random": "cpp"
 		}
 	},
 	"extensions": {

@@ -22,6 +22,7 @@ public:
 private:
 	void GetHealthPercentage();
 	void UpdateHealthPercentage(float InDeltaTime);
+	
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UProgressBar* HPPercent;
