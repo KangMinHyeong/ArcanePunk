@@ -1,6 +1,10 @@
 
 #include "Enemy/Enemy_BossBase.h"
 
+#include "UserInterface/HUD/APHUD.h"
+#include "UserInterface/Enemy/APEnemyHP.h"
+#include "Kismet/GameplayStatics.h"
+
 AEnemy_BossBase::AEnemy_BossBase()
 {
 
@@ -131,4 +135,15 @@ void AEnemy_BossBase::TraceAttack_2()
 
 void AEnemy_BossBase::AroundDamage()
 {
+}
+
+bool AEnemy_BossBase::SetHPUI()
+{
+    PlayerHUD = Cast<AAPHUD>(NewObject<AHUD>(this, UGameplayStatics::GetGameMode(GetWorld())->HUDClass));
+    if(!PlayerHUD.IsValid()) return false;
+    PlayerHUD->SetBossHPUI();
+	HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
+	if(HPUI.IsValid()) HPUI->SetEnemy(this);
+	OnEnemyHPChanged.Broadcast();
+    return true;
 }

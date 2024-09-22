@@ -71,7 +71,6 @@ void AAPBattleSectionBase::OnSpawnLocation()
 	// auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 	// bOvelapped = true;
 	// BattleTrigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	if(!BattleStageData) return;
 
 	BattleUI = CreateWidget<UAPBattleStageUI>(GetWorld(), BattleUIClass);
@@ -86,7 +85,7 @@ void AAPBattleSectionBase::OnSpawnLocation()
 void AAPBattleSectionBase::SpawnMonster()
 {
 	if(!BattleStageData) return;
-	
+
 	if(SpawnNum_OnTime < BattleStageData->Spawn_OnTime.Num())
 	{
 		for( auto Spawn : BattleStageData->Spawn_OnTime[SpawnNum_OnTime].SpawnMonsterData)

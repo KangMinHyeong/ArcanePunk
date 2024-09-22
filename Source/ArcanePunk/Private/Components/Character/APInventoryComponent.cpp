@@ -338,7 +338,6 @@ void UAPInventoryComponent::AddNewItem(UAPItemBase* Item, const int32 AmountToAd
 
 bool UAPInventoryComponent::MoveItemBetweenPanels(int32 SourceIndex, int32 DestinationIndex)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("slot numbers : %d , item numbers : %d"), InventorySlotsCapacity, ItemNumbers);
 
 	if (InventoryContents[SourceIndex]->ID == "NONE") return true;
 

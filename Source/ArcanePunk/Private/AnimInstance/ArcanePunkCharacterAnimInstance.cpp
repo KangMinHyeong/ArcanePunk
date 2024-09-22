@@ -491,7 +491,7 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_AnimStop()
 {
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
-    OwnerCharacter->GetAPMoveComponent()->ComboMoveStop();
+    OwnerCharacter->GetAPMoveComponent()->StopTickMove();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_FootRight()

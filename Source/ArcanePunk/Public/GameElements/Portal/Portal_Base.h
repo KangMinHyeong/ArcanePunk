@@ -22,13 +22,15 @@ class ARCANEPUNK_API APortal_Base : public AActor, public IInteractionInterface
 public:	
 	APortal_Base();
 	FORCEINLINE FName GetPortalID() const {return PortalID;};
-	void InitHide(bool IsHidden);
+	void InitHide(bool IsHidden, float DelayTime = 0.0f);
 
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint);
 	virtual void SpawnSound(FVector Location);
+
+	void DelayHidden();
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -66,4 +68,6 @@ protected:
 	USoundBase* PortalSound;
 
 	TWeakObjectPtr<UAPGameInstance> APGI;
+
+	FTimerHandle HiddenTimerHandle;
 };

@@ -126,7 +126,7 @@ public:
 	virtual void SetAttackRotation(float AddSpeed = 0.0f);
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
-	void OnHittingEnd();
+	virtual void OnHittingEnd();
 
 	void SpawnVoiceSound(USoundBase* VoiceSound);
 	void SpawnAttackVoiceSound();

@@ -10,6 +10,8 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameElements/Portal/Portal_Base.h"
+#include "EngineUtils.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {
@@ -20,10 +22,9 @@ void AEnemy_DropPackage::BeginPlay()
 {
 	Super::BeginPlay();
     
-    IsInit = true;
-    SetActorEnableCollision(false);
-    SetActorHiddenInGame(true);
     AddEnhance();
+    IsInit = true;
+    InitHidden(bInitHidden);
 }
 
 void AEnemy_DropPackage::Tick(float DeltaTime)
@@ -56,6 +57,27 @@ int32 AEnemy_DropPackage::CheckGoldAmount()
 {
     auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return 1;
     return APGI->CheckGoldAmount();
+}
+
+void AEnemy_DropPackage::InitHidden(bool bHide)
+{
+    if(bHide)
+    {
+        SetActorEnableCollision(false);
+        SetActorHiddenInGame(true);
+    }
+    else
+    {
+        SetActorEnableCollision(true);
+        SetActorHiddenInGame(false);
+        InteractionTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+        if(CurrentEffect)
+        {
+            auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(CurrentEffect, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+            if(NC) NC->SetVariableFloat(TEXT("Size"), EffectScale);
+        }
+    }
 }
 
 void AEnemy_DropPackage::AddEnhance()
@@ -157,6 +179,14 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 	// 	PlayerCharacter->GetInventory()->HandleAddItem(DropItems);
 	// 	PlayerCharacter->InteractionActorRemove(this);
 	// }
+    for(auto Portal : TActorRange<APortal_Base>(GetWorld()))
+    {
+        if(GetDropID() == Portal->GetPortalID())
+        {
+            Portal->InitHide(false, 0.5f);
+        }
+    }
+
     PlayerCharacter->InteractionActorRemove(this);
 	if(EnhanceCategory != EEnhanceCategory::None) PlayerCharacter->SetSkillAbility(EnhanceCategory, EnHanceType);
 
@@ -167,15 +197,8 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 
 void AEnemy_DropPackage::DropActivate()
 {
-    SetActorEnableCollision(true);
-    SetActorHiddenInGame(false);
-    InteractionTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    if(CurrentEffect)
-    {
-        auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(CurrentEffect, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
-        if(NC) NC->SetVariableFloat(TEXT("Size"), EffectScale);
-    }
-
+    InitHidden(false);
+    
     auto PC = Cast<AArcanePunkPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)); 
 	if(PC) PC->AttackCameraShake();
 }

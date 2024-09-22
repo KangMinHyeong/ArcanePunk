@@ -33,7 +33,8 @@ protected:
 	virtual void BeginPlay() override;
 	EEnhanceCategory GetRandCategory();
 	int32 CheckGoldAmount();
-	
+	void InitHidden(bool bHidden);
+
 private:
 	UPROPERTY()
 	TArray<UAPItemBase*> ItemsInPackage;
@@ -69,4 +70,7 @@ private:
 	FName DropID = "1-1";
 
 	bool IsInit = false;
+
+	UPROPERTY(EditAnywhere)
+	bool bInitHidden = true;
 };

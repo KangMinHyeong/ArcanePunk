@@ -25,11 +25,11 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UProgressBar* HPPercent;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* MaxHP_Text;
+	// UPROPERTY(EditAnywhere, meta = (BindWidget))
+	// UTextBlock* MaxHP_Text;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	UTextBlock* HP_Text;
+	// UPROPERTY(EditAnywhere, meta = (BindWidget))
+	// UTextBlock* HP_Text;
 
 	float MaxHP = 100.0f;
 	float TargetHP = 100.0f;

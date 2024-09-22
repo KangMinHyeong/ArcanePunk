@@ -52,6 +52,11 @@ AEnemy_CharacterBase::AEnemy_CharacterBase()
 	TextWidgetComp->SetupAttachment(GetCapsuleComponent());
 	TextWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	TextWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
+
+	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidgetComp"));
+	HealthWidgetComp->SetupAttachment(GetCapsuleComponent());
+	HealthWidgetComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HealthWidgetComp->SetWidgetSpace(EWidgetSpace::Screen);
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECollisionResponse::ECR_Block);
@@ -153,13 +158,15 @@ float AEnemy_CharacterBase::GetRight()
     return MonsterIsRight;
 }
 
-bool AEnemy_CharacterBase::AttackPushBack(FVector NewLocation)
+bool AEnemy_CharacterBase::AttackPushBack(AActor* DamagedCauser)
 {
 	if(!IsAttackPush) return false;
 	else
 	{
-		GetCharacterMovement()->BrakingFrictionFactor = 0;
-		SetActorLocation(GetActorLocation() + NewLocation);
+		FVector HitLocation = DamagedCauser->GetActorLocation();
+		HitLocation -= GetActorLocation(); HitLocation.Z = 0.0f;
+		HitLocation = HitLocation/HitLocation.Size();
+		MoveComponent->StartTickMove(-HitPushDist * HitLocation);
 	}
 	return true;
 }
@@ -200,10 +207,21 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		// Checking Section End
 		CheckAllEnemyKilled();
 	}
-	else EnemyAnim->PlayHit_Montage();
+	else 
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		AttackPushBack(DamageCauser);
+		if(bNormalMonster) EnemyAnim->PlayHit_Montage();
+	}
 	
 
     return DamageApplied;
+}
+
+void AEnemy_CharacterBase::OnHittingEnd()
+{
+	Super::OnHittingEnd();
+	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
 
 bool AEnemy_CharacterBase::IsHardCC()
@@ -377,14 +395,17 @@ void AEnemy_CharacterBase::InitMonster()
     auto DataTable = GI->GetNPCData()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
     if(DataTable) DropData = * DataTable; 
 	SetManaDrop();
+	SetHPUI();
 
 	TextUI = Cast<UAPTextWidgetComponent>(TextWidgetComp->GetUserWidgetObject());
-
+	
+	bBlockMode = true;
 	GetWorldTimerManager().SetTimer(StopTimerHandle, this, &AEnemy_CharacterBase::StopClear, 1.1f, false);
 }
 
 void AEnemy_CharacterBase::StopClear()
 {
+	bBlockMode = false;
 	GetWorldTimerManager().ClearTimer(StopTimerHandle);
 	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
@@ -586,12 +607,17 @@ void AEnemy_CharacterBase::SetCapsuleOverlap(bool IsOverlap)
 
 bool AEnemy_CharacterBase::SetHPUI()
 { 
-    PlayerHUD = Cast<AAPHUD>(NewObject<AHUD>(this, UGameplayStatics::GetGameMode(GetWorld())->HUDClass));
-    if(!PlayerHUD.IsValid()) return false;
-    PlayerHUD->SetBossHPUI();
-	UAPEnemyHP* HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
-	if(HPUI) HPUI->SetEnemy(this);
+	HPUI = Cast<UAPEnemyHP>(HealthWidgetComp->GetUserWidgetObject());
+	if(HPUI.IsValid()) HPUI->SetEnemy(this);
 	OnEnemyHPChanged.Broadcast();
     return true;
 }
-    
+
+void AEnemy_CharacterBase::RemoveHPUI()
+{
+	if(HPUI.IsValid())
+	{
+		HPUI->ReleaseSlateResources(true);
+		HPUI->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}

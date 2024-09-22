@@ -59,6 +59,8 @@ public:
 	
 	virtual void AroundDamage();
 
+	virtual bool SetHPUI() override;
+	
 protected:
 	UPROPERTY()
 	EBossPhase BossPhase = EBossPhase::Phase_1;

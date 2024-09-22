@@ -421,8 +421,8 @@ void AEnemy_Boss::EnemyDestroyed()
 {
     Super::EnemyDestroyed();
     if(!PlayerHUD.IsValid()) return;
-    UAPEnemyHP* HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
-	if(HPUI) HPUI->RemoveFromParent();
+    HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
+	if(HPUI.IsValid()) HPUI->RemoveFromParent();
 }
 // HPUI Set End
 

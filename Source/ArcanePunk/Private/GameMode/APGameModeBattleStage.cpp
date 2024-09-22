@@ -5,11 +5,11 @@
 #include "EngineUtils.h"
 #include "ArcanePunk/Public/Enemy/Enemy_CharacterBase.h"
 #include "GameState/APGameState.h"
-#include "GameElements/Portal/Portal_Base.h"
 #include "GameFramework/Controller.h"
 #include "AIController.h"
 #include "GameElements/Trap/APTrapBase.h"
 #include "Enemy/Drop/Enemy_DropPackage.h"
+#include "GameElements/Portal/Portal_Base.h"
 
 void AAPGameModeBattleStage::MonsterKilled(AActor* BattleSection)
 {
@@ -43,7 +43,7 @@ void AAPGameModeBattleStage::CheckBattleSection(AActor* BattleSection)
 
         GetWorld()->GetWorldSettings()->SetTimeDilation(0.25f);
         FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AAPGameModeBattleStage::PortalSpawn, BS->GetBattleSectionID());
-	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 1.0f, false);
+	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 0.8f, false);
     }
 }
 
@@ -51,18 +51,22 @@ void AAPGameModeBattleStage::PortalSpawn(FName CurrentClearStage)
 {
     GetWorld()->GetTimerManager().ClearTimer(PortalSpawnTimerHandle);
     GetWorld()->GetWorldSettings()->SetTimeDilation(1.0f);
-    for(auto Portal : TActorRange<APortal_Base>(GetWorld()))
-    {
-        if(CurrentClearStage == Portal->GetPortalID())
-        {
-            Portal->InitHide(false);
-        }
-    }
-
+    
+    bool Check = false;
     for(auto Drop : TActorRange<AEnemy_DropPackage>(GetWorld()))
     {
         if(CurrentClearStage == Drop->GetDropID())
+        {
+            Check = true;
             Drop->DropActivate();
+        }
+    }
+
+    if(Check) return;
+    for(auto Portal : TActorRange<APortal_Base>(GetWorld()))
+    {
+        if(CurrentClearStage == Portal->GetPortalID())
+            Portal->InitHide(false);
     }
 }
 

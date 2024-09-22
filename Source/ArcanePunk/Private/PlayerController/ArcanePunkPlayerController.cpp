@@ -232,8 +232,9 @@ void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName 
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
     MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
-    MyCharacter->SetActorHiddenInGame(true); MyCharacter->DisableInput(this); 
-    SetViewTargetWithBlend(CameraActor, BlendTime);
+    // MyCharacter->SetActorHiddenInGame(true); 
+    MyCharacter->DisableInput(this); 
+    // SetViewTargetWithBlend(CameraActor, BlendTime);
 
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, RowName);
 	GetWorld()->GetTimerManager().SetTimer(InteractionTimerHandle, TimerDelegate, BlendTime, false);
@@ -253,7 +254,12 @@ void AArcanePunkPlayerController::CloseConversationUI()
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Visible);
     if(ConversationUI.IsValid()) ConversationUI->RemoveFromParent();
-    if(MyCharacter.IsValid()) {MyCharacter->SetActorHiddenInGame(false); SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); MyCharacter->EnableInput(this);} 
+    if(MyCharacter.IsValid()) 
+    {   
+        // MyCharacter->SetActorHiddenInGame(false); 
+        // SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); 
+        MyCharacter->EnableInput(this);
+    } 
 }
 
 void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, FShopListData ShopListData)

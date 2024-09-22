@@ -24,6 +24,7 @@ class AAPEnemyAttackRange;
 class AAPHUD;
 class UWidgetComponent;
 class UAPTextWidgetComponent;
+class UAPEnemyHP;
 
 UENUM(BlueprintType)
 enum class EBossPhase : uint8 // E스킬
@@ -64,6 +65,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void OnClearGodMode();
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -72,6 +75,8 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void OnHittingEnd() override;
 
 	void SetOwnerSection(AActor* BattleSection);
 
@@ -93,7 +98,7 @@ public:
 	void TeleportMarkActivate(float Time, AActor * MarkOwner, USkillNumberBase* SkillComp);
 	void TeleportMarkDeactivate();
 
-	bool AttackPushBack(FVector NewLocation);
+	bool AttackPushBack(AActor* DamagedCauser);
 
 	void RotateTowardsTarget(AActor *TargetActor, float Speed = -1.0f);
 
@@ -123,7 +128,8 @@ public:
 
 	// HP UI
 	UFUNCTION(BlueprintPure)
-	bool SetHPUI();
+	virtual bool SetHPUI();
+	void RemoveHPUI();
 
 protected:
 	float DamageMath(float Damage);
@@ -159,6 +165,7 @@ protected:
 	void OnPlayerStun(AActor *Actor, float Time);
 	void CrowdControlCheck();
 
+
 	// 피격 데미지 배수 관련 함수
 	void SubtractDamageMultiple(float Subtract);
 	void OnDetachingDamagedMark();
@@ -176,7 +183,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	UWidgetComponent* TextWidgetComp;
 
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	UWidgetComponent* HealthWidgetComp;
+
 	TWeakObjectPtr<UAPTextWidgetComponent> TextUI;
+
+	TWeakObjectPtr<UAPEnemyHP> HPUI;
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	float Monster_AttackRange = 250.0f; // if equal, Trace Stop
@@ -239,6 +251,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	UNiagaraSystem* HitEffect_B;
 
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	float HitPushDist = 60.0f;
+
 	// 몬스터 Anim 관련 변수
 	TWeakObjectPtr<UAP_EnemyBaseAnimInstance> EnemyAnim;
 
@@ -292,6 +307,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Parrying")
 	bool bCanParryingCounter = true;
+
+	UPROPERTY(EditAnywhere)
+	bool bNormalMonster = true;
 
 public:
 	FOnHPChanged OnEnemyHPChanged;
