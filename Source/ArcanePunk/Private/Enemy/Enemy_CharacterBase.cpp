@@ -209,12 +209,19 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 	}
 	else 
 	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 		AttackPushBack(DamageCauser);
 		if(bNormalMonster) EnemyAnim->PlayHit_Montage();
 	}
 	
 
     return DamageApplied;
+}
+
+void AEnemy_CharacterBase::OnHittingEnd()
+{
+	Super::OnHittingEnd();
+	GetCharacterMovement()->SetMovementMode(Basic_MOVE);
 }
 
 bool AEnemy_CharacterBase::IsHardCC()

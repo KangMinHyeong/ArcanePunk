@@ -76,6 +76,8 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	virtual void OnHittingEnd() override;
+
 	void SetOwnerSection(AActor* BattleSection);
 
 	UFUNCTION(BlueprintPure)
@@ -162,6 +164,7 @@ protected:
 	void OnPlayerKnockBack(AActor* Actor, float Dist, float Time);
 	void OnPlayerStun(AActor *Actor, float Time);
 	void CrowdControlCheck();
+
 
 	// 피격 데미지 배수 관련 함수
 	void SubtractDamageMultiple(float Subtract);
