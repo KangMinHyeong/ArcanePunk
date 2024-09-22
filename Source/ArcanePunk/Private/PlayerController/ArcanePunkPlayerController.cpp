@@ -262,10 +262,15 @@ void AArcanePunkPlayerController::CloseConversationUI()
     } 
 }
 
-void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, FShopListData ShopListData)
+void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, const FShopListData & ShopListData)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
     ShoppingUI = Cast<UAPShoppingUI>(CreateWidget<UUserWidget>(this, ShoppingUIClass));
+
+    MyCharacter->DisableInput(this); 
+    
+    FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UAPAttackComponent::ApplyDamageToActor, DamagedActor, Damage, myDamageEvent, MyController, HitNumbers);
+	GetWorld()->GetTimerManager().SetTimer(Timer, TimerDelegate, 0.2f, false);
 
     if(ShoppingUI.IsValid())
     {
@@ -273,7 +278,7 @@ void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, FShopListDat
         ShoppingUI->AddToViewport();
         
         MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
-        MyCharacter->DisableInput(this); 
+        
     }
 }
 

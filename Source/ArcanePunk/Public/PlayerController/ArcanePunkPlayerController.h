@@ -62,7 +62,7 @@ public:
 	void CloseConversationUI();
 
 	// Shopping UI
-	void OpenShoppingUI(AActor* ShopActor, FShopListData ShopListData);
+	void OpenShoppingUI(AActor* ShopActor, const FShopListData & ShopListData);
 	void CloseShoppingUI();
 	
 	// Hit UI
