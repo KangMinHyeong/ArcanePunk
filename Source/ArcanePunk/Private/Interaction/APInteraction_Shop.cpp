@@ -227,10 +227,14 @@ void AAPInteraction_Shop::CheckNewSkill(FShopGoodsData_NewSkill& NewSkillData)
         }
         else
         {
+            int loopcnt = 0;
             while(1)
             {
                 CurrentNum = FMath::RandRange(1, SkillNum->NumEnums() - 2);
                 CurrentNum = SkillNum->GetValueByIndex(CurrentNum);
+
+                if(loopcnt > 100) break;
+                loopcnt++;
 
                 if(MainPlayer->GetQSkill() == (ESkillNumber)CurrentNum || AlreadySkillNumber_Q.Contains(CurrentNum)) continue;
                 else {break;}
@@ -255,10 +259,14 @@ void AAPInteraction_Shop::CheckNewSkill(FShopGoodsData_NewSkill& NewSkillData)
         }
         else
         {
+            int loopcnt = 0;
             while(1)
             {
                 CurrentNum = FMath::RandRange(1, SkillNum->NumEnums() - 2);
                 CurrentNum = SkillNum->GetValueByIndex(CurrentNum);
+
+                if(loopcnt > 100) break;
+                loopcnt++;
 
                 if(MainPlayer->GetESkill() == (ESkillNumber)CurrentNum || AlreadySkillNumber_E.Contains(CurrentNum)) continue;
                 else {break;}
@@ -283,10 +291,14 @@ void AAPInteraction_Shop::CheckNewSkill(FShopGoodsData_NewSkill& NewSkillData)
         }
         else
         {
+            int loopcnt = 0;
             while(1)
             {
                 CurrentNum = FMath::RandRange(1, SkillNum->NumEnums() - 2);
                 CurrentNum = SkillNum->GetValueByIndex(CurrentNum);
+
+                if(loopcnt > 100) break;
+                loopcnt++;               
 
                 if(MainPlayer->GetRSkill() == (EUltSkillNumber)CurrentNum || AlreadySkillNumber_R.Contains(CurrentNum)) continue;
                 else {break;}
@@ -311,8 +323,12 @@ void AAPInteraction_Shop::CheckNewSkill(FShopGoodsData_NewSkill& NewSkillData)
         }
         else
         {
+            int loopcnt = 0;
             while(1)
             {
+                if(loopcnt > 100) break;
+                loopcnt++;
+                
                 CurrentNum = FMath::RandRange(1, SkillNum->NumEnums() - 2);
 
                 if(MainPlayer->GetPassiveSkills().Contains(CurrentNum) || AlreadySkillNumber_Passive.Contains(CurrentNum))
@@ -400,8 +416,11 @@ void AAPInteraction_Shop::CheckEnhance(FShopGoodsData_Enhance &EnhanceData)
     TArray<uint8> SkillAbilities = IndexSuffle(RowName.Num());
 
     FString CurrentRowName;
+    int loopcnt = 0;
     while(1)
     {
+        if(loopcnt > 100) break;
+        loopcnt++;
         if(SkillAbilities.IsEmpty())
         {
             EnhanceData.GoodsCategory = EEnhanceCategory::None; return;
