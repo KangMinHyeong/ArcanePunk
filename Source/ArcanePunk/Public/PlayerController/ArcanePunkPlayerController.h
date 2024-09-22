@@ -59,7 +59,7 @@ public:
 	
 	// Conversation UI
 	void OpenConversationUI(AActor* CameraActor, FName RowName);
-	void CloseConversationUI();
+	void CloseConversationUI(FName Name);
 
 	// Shopping UI
 	void OpenShoppingUI(AActor* ShopActor, const FShopListData & ShopListData);
@@ -227,6 +227,9 @@ private:
 	// SkillWindowUIClass 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SkillWindowUIClass;
+
+	UPROPERTY()
+	AActor* ConversationActor;
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;

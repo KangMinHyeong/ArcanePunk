@@ -30,4 +30,5 @@ private:
 	UAPConversationText* ConversationText;
 
 	FName RowName;
+	FName InitName;
 };

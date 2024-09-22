@@ -126,6 +126,16 @@ void AAPCharacterBase::SpawnAttackVoiceSound()
 	UGameplayStatics::SpawnSoundAttached(AttackVoiceSound, GetMesh(), TEXT("AttackVoiceSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume);
 }
 
+void AAPCharacterBase::SpawnAttackSound()
+{
+	if(!AttackVoiceSound) return;
+
+	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
+    
+	UGameplayStatics::SpawnSoundAttached(AttackSound, GetMesh(), TEXT("AttackVoiceSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume);
+}
+
 float AAPCharacterBase::CriticalCalculate()
 {
 	float Percent = FMath::RandRange(0.0f, 100.0f);

@@ -213,3 +213,16 @@ void AAPHUD::UpdateImitatorSlot(uint8 SkillNumber)
 	ImitatorSlotUI->UpdateSkillSlot(SkillNumber);
 }
 
+void AAPHUD::SetStatusVisibility(bool bHide)
+{
+	if(!StatusBarWidget.IsValid()) return;
+
+	if(bHide)
+	{
+		StatusBarWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		StatusBarWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}

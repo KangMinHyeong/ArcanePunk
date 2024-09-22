@@ -128,7 +128,7 @@ UWrapBox* UAPConversationText::CreateCustomWrap()
 
     Wrap->SetExplicitWrapSize(true); 
     Wrap->SetWrapSize(TextWrapBox->GetWrapSize()); 
-    Wrap->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center); 
+    Wrap->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Left); 
     Wrap->SetInnerSlotPadding(TextWrapBox->GetInnerSlotPadding());
     Wrap->SetVisibility(ESlateVisibility::Visible);
 

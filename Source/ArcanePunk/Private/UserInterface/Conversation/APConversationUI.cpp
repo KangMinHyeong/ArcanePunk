@@ -27,6 +27,13 @@ FReply UAPConversationUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, c
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
     
+    if(InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+        ConversationCompleteCheck();
+
+        return Reply.Handled();
+    }
+
     return Reply.Handled();
 }
 
@@ -46,6 +53,7 @@ FReply UAPConversationUI::NativeOnKeyDown( const FGeometry& InGeometry, const FK
 
 void UAPConversationUI::InitOrder(FName Name)
 {
+    InitName = Name;
     RowName = Name; SetOrder();
 }
 
@@ -54,7 +62,7 @@ void UAPConversationUI::SetOrder()
     if(RowName == "None")
     {
         auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer());
-        if(PC) PC->CloseConversationUI();
+        if(PC) PC->CloseConversationUI(InitName);
     }
     else
     {

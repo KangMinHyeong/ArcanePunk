@@ -26,6 +26,8 @@ public:
 
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
+	void OpenShopUI();
+
 	FORCEINLINE void SetShopData(FShopListData ShopData) {ShopListData = ShopData;};
 
 	void SkillChange(FShopListData ShopData, EEnhanceCategory ChangedSkill);
