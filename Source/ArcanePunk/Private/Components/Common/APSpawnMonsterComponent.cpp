@@ -207,14 +207,14 @@ bool UAPSpawnMonsterComponent::IsPossibleLocation(FVector Location)
     FColor color = FColor::Green;
     if(HitResult.Num() > 0) {color = FColor::Red; bResult = true;}
 
-    DrawDebugSphere(GetWorld(),
-			Location,
-			120.0f,
-			12,
-			color,
-			false,
-			5.0f,
-			0,
-			10);
+    // DrawDebugSphere(GetWorld(),
+	// 		Location,
+	// 		120.0f,
+	// 		12,
+	// 		color,
+	// 		false,
+	// 		5.0f,
+	// 		0,
+	// 		10);
     return !bResult;
 }
