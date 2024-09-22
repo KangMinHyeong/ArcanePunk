@@ -65,32 +65,32 @@ UENUM(BlueprintType)
 enum class EQSkill : uint8 // Q스킬
 {
 	None 			 = 0 UMETA(DisplayName = "None"),
-	Skill_1			 = 1 UMETA(DisplayName = "스킬 No.1"),
-	Skill_2 		 = 2 UMETA(DisplayName = "스킬 No.2"),
+	// Skill_1			 = 1 UMETA(DisplayName = "스킬 No.1"),
+	// Skill_2 		 = 2 UMETA(DisplayName = "스킬 No.2"),
 	Skill_6			 = 6 UMETA(DisplayName = "스킬 No.6"),
 	Skill_8			 = 8 UMETA(DisplayName = "스킬 No.8"),
 	Skill_9			 = 9 UMETA(DisplayName = "스킬 No.9"),
-	Skill_11		 = 11 UMETA(DisplayName = "스킬 No.11"),
-	Skill_14		 = 14 UMETA(DisplayName = "스킬 No.14"),
-	Skill_16 		 = 16 UMETA(DisplayName = "스킬 No.16"),
-	Skill_17		 = 17 UMETA(DisplayName = "스킬 No.17"),
-	Skill_18		 = 18 UMETA(DisplayName = "스킬 No.18"),
-	Skill_19		 = 19 UMETA(DisplayName = "스킬 No.19"),
+	// Skill_11		 = 11 UMETA(DisplayName = "스킬 No.11"),
+	// Skill_14		 = 14 UMETA(DisplayName = "스킬 No.14"),
+	// Skill_16 		 = 16 UMETA(DisplayName = "스킬 No.16"),
+	// Skill_17		 = 17 UMETA(DisplayName = "스킬 No.17"),
+	// Skill_18		 = 18 UMETA(DisplayName = "스킬 No.18"),
+	// Skill_19		 = 19 UMETA(DisplayName = "스킬 No.19"),
 };
 
 UENUM(BlueprintType)
 enum class EESkill : uint8 // E스킬
 {
 	None 			 = 0 UMETA(DisplayName = "None"),
-	Skill_3			 = 3 UMETA(DisplayName = "스킬 No.3"),
-	Skill_4			 = 4 UMETA(DisplayName = "스킬 No.4"),
+	// Skill_3			 = 3 UMETA(DisplayName = "스킬 No.3"),
+	// Skill_4			 = 4 UMETA(DisplayName = "스킬 No.4"),
 	Skill_5 		 = 5 UMETA(DisplayName = "스킬 No.5"),
 	Skill_7			 = 7 UMETA(DisplayName = "스킬 No.7"),
 	Skill_10		 = 10 UMETA(DisplayName = "스킬 No.10"),
-	Skill_12		 = 12 UMETA(DisplayName = "스킬 No.12"),
-	Skill_13		 = 13 UMETA(DisplayName = "스킬 No.13"),
-	Skill_15 		 = 15 UMETA(DisplayName = "스킬 No.15"),
-	Skill_20		 = 20 UMETA(DisplayName = "스킬 No.20"),
+	// Skill_12		 = 12 UMETA(DisplayName = "스킬 No.12"),
+	// Skill_13		 = 13 UMETA(DisplayName = "스킬 No.13"),
+	// Skill_15 		 = 15 UMETA(DisplayName = "스킬 No.15"),
+	// Skill_20		 = 20 UMETA(DisplayName = "스킬 No.20"),
 };
 
 UENUM(BlueprintType)

@@ -139,7 +139,7 @@ void AArcanePunkPlayerController::StartFadeIn(float MultipleSpeed, bool bEntranc
         LoadingWidget->RemoveFromParent();
         GetWorldTimerManager().ClearTimer(LoadTimerHandle);
         
-        CreateEntranceUI();
+        // CreateEntranceUI();
     }
 }
 

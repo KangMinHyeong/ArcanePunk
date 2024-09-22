@@ -90,6 +90,7 @@ private:
 	
 	void ApplyDamageToActor(AActor* DamagedActor, float Damage, FPointDamageEvent myDamageEvent, AController* MyController, uint8 HitNumbers);
 
+	void ParryCounter(AActor* DamageCauser);
 	void AffectParrying();
 	void OnEndingParrying(); 
 	void AttackCameraShake();

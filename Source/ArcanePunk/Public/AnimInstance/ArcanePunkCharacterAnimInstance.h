@@ -91,6 +91,9 @@ public:
 	void AnimNotify_SwordTrail_3();
 
 	UFUNCTION()
+	void AnimNotify_AttackVoiceSound();
+
+	UFUNCTION()
 	void AnimNotify_Skill_Trigger();
 	UFUNCTION()
 	void AnimNotify_Skill_Charging();

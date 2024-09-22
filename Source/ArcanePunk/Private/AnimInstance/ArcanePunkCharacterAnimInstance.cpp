@@ -75,7 +75,7 @@ void UArcanePunkCharacterAnimInstance::PlayParryingSuccess_Montage()
     if(IsDead) return;
     if(Montage_IsPlaying(ParryingSuccess_Montage)) return;
 
-    OwnerCharacter->SetAttackRotation(200.0f);
+    // OwnerCharacter->SetAttackRotation(200.0f);
     Montage_Play(ParryingSuccess_Montage);
 }
 
@@ -424,6 +424,13 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_AttackVoiceSound()
+{
+    if(!OwnerCharacter.IsValid() || IsDead) return;
+
+    OwnerCharacter->SpawnAttackVoiceSound();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_Skill_Trigger()

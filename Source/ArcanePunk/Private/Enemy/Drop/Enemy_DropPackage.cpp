@@ -9,17 +9,21 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {
-    IsInit = false;
 	EnHanceTypePercent.SetNum(3);
 }
 
 void AEnemy_DropPackage::BeginPlay()
 {
 	Super::BeginPlay();
-
+    
+    IsInit = true;
+    SetActorEnableCollision(false);
+    SetActorHiddenInGame(true);
+    AddEnhance();
 }
 
 void AEnemy_DropPackage::Tick(float DeltaTime)
@@ -65,26 +69,29 @@ void AEnemy_DropPackage::AddEnhance()
 
     float CurrentEnHanceType = FMath::RandRange(0.0f, PlatinumPercent);
 
-    if(DropTrailEffect) DropTrailEffect->Activate();
     if(CurrentEnHanceType >= 0.0f && CurrentEnHanceType <= SilverPercent)
     {
         EnHanceType = EEnHanceType::Silver;
-		DropMesh->SetCustomDepthStencilValue(80);
+        CurrentEffect = GroundEffect_Silver;
+		
+        // DropMesh->SetCustomDepthStencilValue(80);
 		// To Do : 실버 이펙트 및 사운드
     }
     else if(CurrentEnHanceType > SilverPercent && CurrentEnHanceType <= GoldPercent)
     {
         EnHanceType = EEnHanceType::Gold;
-		DropMesh->SetCustomDepthStencilValue(160);
+        CurrentEffect = GroundEffect_Gold;
+		// DropMesh->SetCustomDepthStencilValue(160);
 		// To Do : 골드 이펙트 및 사운드
     }
     else if (CurrentEnHanceType > GoldPercent && CurrentEnHanceType <= PlatinumPercent)
     {
         EnHanceType = EEnHanceType::Platinum;
-		DropMesh->SetCustomDepthStencilValue(240);
+        CurrentEffect = GroundEffect_Platinum;
+		// DropMesh->SetCustomDepthStencilValue(240);
 		// To Do : 플레 이펙트 및 사운드
     }
-	DropMesh->SetRenderCustomDepth(true);
+	// DropMesh->SetRenderCustomDepth(true);
 	
 }
 
@@ -101,22 +108,22 @@ EEnhanceCategory AEnemy_DropPackage::GetRandCategory()
 
     float CurrentPercent = FMath::RandRange(0.0f, R_Percent);
     
-    if(CurrentPercent >= 0.0f && CurrentPercent <= Passive_Percent)
+    if(CurrentPercent > 0.0f && CurrentPercent < Passive_Percent)
     {
         Category = EEnhanceCategory::Enhance_Passive;
     }
-    else if(CurrentPercent > Passive_Percent && CurrentPercent <= Q_Percent)
+    else if(CurrentPercent >= Passive_Percent && CurrentPercent < Q_Percent)
     {
         Category = EEnhanceCategory::Enhance_Q;
     }
-    else if (CurrentPercent > Q_Percent && CurrentPercent <= E_Percent)
+    else if (CurrentPercent >= Q_Percent && CurrentPercent <= E_Percent)
     {
         Category = EEnhanceCategory::Enhance_E;
     }
-    else
-    {
-        Category = EEnhanceCategory::Enhance_R;
-    }
+    // else
+    // {
+    //     Category = EEnhanceCategory::Enhance_R;
+    // }
 
     return Category;
 }
@@ -144,18 +151,33 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 	if(!IsInit) return; if(!PlayerCharacter) return;
     // if(PlayerCharacter->IsDash()) {PlayerCharacter->ReleasedDash();}
 
-	for(auto DropItems : ItemsInPackage)
-	{
-        if(DropItems->ID == "Gold") {DropItems->SetQuantity(CheckGoldAmount());}
-		PlayerCharacter->GetInventory()->HandleAddItem(DropItems);
-		PlayerCharacter->InteractionActorRemove(this);
-	}
-
+	// for(auto DropItems : ItemsInPackage)
+	// {
+    //     if(DropItems->ID == "Gold") {DropItems->SetQuantity(CheckGoldAmount());}
+	// 	PlayerCharacter->GetInventory()->HandleAddItem(DropItems);
+	// 	PlayerCharacter->InteractionActorRemove(this);
+	// }
+    PlayerCharacter->InteractionActorRemove(this);
 	if(EnhanceCategory != EEnhanceCategory::None) PlayerCharacter->SetSkillAbility(EnhanceCategory, EnHanceType);
 
 	auto PC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); 
 	if(PC) PC->CloseInteraction(this);
 	Destroy();
+}
+
+void AEnemy_DropPackage::DropActivate()
+{
+    SetActorEnableCollision(true);
+    SetActorHiddenInGame(false);
+    InteractionTrigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    if(CurrentEffect)
+    {
+        auto NC = UNiagaraFunctionLibrary::SpawnSystemAttached(CurrentEffect, DropMesh, TEXT("GroundComp"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+        if(NC) NC->SetVariableFloat(TEXT("Size"), EffectScale);
+    }
+
+    auto PC = Cast<AArcanePunkPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)); 
+	if(PC) PC->AttackCameraShake();
 }
 
 // void AEnemy_DropPackage::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)

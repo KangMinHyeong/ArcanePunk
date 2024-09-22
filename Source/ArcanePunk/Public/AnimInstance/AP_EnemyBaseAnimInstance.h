@@ -38,6 +38,9 @@ public:
 	UFUNCTION()
 	void AnimNotify_NormalAttack();
 
+	UFUNCTION()
+	void AnimNotify_AttackVoiceSound_Enemy();
+	
 	// ScoutDog
 	UFUNCTION()
 	void AnimNotify_JumpEffect();
