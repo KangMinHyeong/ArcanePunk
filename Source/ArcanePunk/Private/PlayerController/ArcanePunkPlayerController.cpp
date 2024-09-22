@@ -19,6 +19,8 @@
 #include "UserInterface/Shop/APShoppingUI.h"
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
 #include "UserInterface/Common/APScreenEffect.h"
+#include "Interaction/APInteraction_Shop.h"
+#include "UserInterface/HUD/APHUD.h"
 
 AArcanePunkPlayerController::AArcanePunkPlayerController()
 {
@@ -234,6 +236,8 @@ void AArcanePunkPlayerController::OpenConversationUI(AActor* CameraActor, FName 
     MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
     // MyCharacter->SetActorHiddenInGame(true); 
     MyCharacter->DisableInput(this); 
+    MyCharacter->GetAPHUD()->SetStatusVisibility(true);
+    ConversationActor = CameraActor;
     // SetViewTargetWithBlend(CameraActor, BlendTime);
 
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OnConversationUI, RowName);
@@ -250,7 +254,7 @@ void AArcanePunkPlayerController::OnConversationUI(FName RowName)
     ConversationUI->InitOrder(RowName);
 }
 
-void AArcanePunkPlayerController::CloseConversationUI()
+void AArcanePunkPlayerController::CloseConversationUI(FName Name)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Visible);
     if(ConversationUI.IsValid()) ConversationUI->RemoveFromParent();
@@ -258,24 +262,19 @@ void AArcanePunkPlayerController::CloseConversationUI()
     {   
         // MyCharacter->SetActorHiddenInGame(false); 
         // SetViewTargetWithBlend(MyCharacter.Get(), BlendTime); 
+        MyCharacter->GetAPHUD()->SetStatusVisibility(false);
         MyCharacter->EnableInput(this);
     } 
+
+    if(Name != "Shop") return;
+    auto ShopActor = Cast<AAPInteraction_Shop>(ConversationActor);
+    if(ShopActor) {ShopActor->OpenShopUI();}
 }
 
 void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, const FShopListData & ShopListData)
 {
     if(InteractionWidget.IsValid()) InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
     ShoppingUI = Cast<UAPShoppingUI>(CreateWidget<UUserWidget>(this, ShoppingUIClass));
-
-    
-
-    // ConversationUI = CreateWidget<UAPConversationUI>(GetWorld(), ConversationUIClass); if(!ConversationUI.IsValid()) return;
-    // ConversationUI->AddToViewport();
-    // ConversationUI->InitOrder(TEXT("Shop"));
-
-    // FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::OpenShop, DamagedActor, Damage, myDamageEvent, MyController, HitNumbers);
-	// GetWorld()->GetTimerManager().SetTimer(Timer, TimerDelegate, 0.2f, false);
-
     if(ShoppingUI.IsValid())
     {
         ShoppingUI->InitShopData(ShopActor, ShopListData);
@@ -283,6 +282,7 @@ void AArcanePunkPlayerController::OpenShoppingUI(AActor* ShopActor, const FShopL
         
         MyCharacter = Cast<AArcanePunkCharacter>(GetPawn()); if(!MyCharacter.IsValid()) return;
         MyCharacter->DisableInput(this); 
+        MyCharacter->GetAPHUD()->SetStatusVisibility(true);
     }
 }
 
@@ -295,6 +295,7 @@ void AArcanePunkPlayerController::CloseShoppingUI()
         MyCharacter->SetActorHiddenInGame(false);
         MyCharacter->EnableInput(this);
         ShoppingUI->RemoveFromParent();
+        MyCharacter->GetAPHUD()->SetStatusVisibility(false);
     } 
 }
 

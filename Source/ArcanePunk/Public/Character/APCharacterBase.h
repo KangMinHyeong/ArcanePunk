@@ -130,6 +130,7 @@ public:
 
 	void SpawnVoiceSound(USoundBase* VoiceSound);
 	void SpawnAttackVoiceSound();
+	void SpawnAttackSound();
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -206,6 +207,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	USoundBase* AttackVoiceSound;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	USoundBase* AttackSound;
 
 public:
 	TArray<bool> StopState;

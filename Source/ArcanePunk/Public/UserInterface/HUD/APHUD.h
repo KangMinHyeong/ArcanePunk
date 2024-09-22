@@ -92,6 +92,8 @@ public:
 	void EndImitatorSlot();
 	void UpdateImitatorSlot(uint8 SkillNumber = 0);
 
+	void SetStatusVisibility(bool bHide);
+	
 protected:
 
 	// ���� ���� ������

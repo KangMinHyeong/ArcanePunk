@@ -47,6 +47,12 @@ void AAPInteraction_Shop::Interact(AArcanePunkCharacter *PlayerCharacter)
     if(bInit) {bInit = false; InitSuffle();}
 
     auto PC = Cast<AArcanePunkPlayerController>(MainPlayer->GetController()); if(!PC) return;
+    PC->OpenConversationUI(this, TEXT("Shop"));
+}
+
+void AAPInteraction_Shop::OpenShopUI()
+{
+    auto PC = Cast<AArcanePunkPlayerController>(MainPlayer->GetController()); if(!PC) return;
     PC->OpenShoppingUI(this, ShopListData);
 }
 

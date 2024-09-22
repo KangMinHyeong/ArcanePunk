@@ -129,6 +129,7 @@ int32 UArcanePunkCharacterAnimInstance::GetAttackSection()
     return AttackSection;
 }
 
+
 void UArcanePunkCharacterAnimInstance::PlaySkill_1_Montage()
 {
     if(IsDead) return;
@@ -424,6 +425,14 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
     if(!OwnerCharacter.IsValid() || IsDead) return;
 
     OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_SpawnSwordSound()
+{
+    if(IsDead) return;
+    if(!OwnerCharacter.IsValid()) return;
+
+    OwnerCharacter->SpawnAttackSound();
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AttackVoiceSound()

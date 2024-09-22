@@ -91,6 +91,9 @@ public:
 	void AnimNotify_SwordTrail_3();
 
 	UFUNCTION()
+	void AnimNotify_SpawnSwordSound();
+	
+	UFUNCTION()
 	void AnimNotify_AttackVoiceSound();
 
 	UFUNCTION()
