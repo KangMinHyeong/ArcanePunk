@@ -22,7 +22,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetHoleRadius(float Radius, float Radius_2);
 
@@ -32,7 +32,7 @@ private:
     void OnGravity();
 	void OnDamage();
 	void OnSlow();
-	void UpdateSlowPercent(FVector EnemyLocation);
+	void UpdateSlowPercent(const FVector & EnemyLocation);
 	void SetBlackHoleSize();
 
 private:

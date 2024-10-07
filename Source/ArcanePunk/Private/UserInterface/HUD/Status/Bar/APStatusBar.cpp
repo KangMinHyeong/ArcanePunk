@@ -32,20 +32,6 @@ void UAPStatusBar::InitStatusBar()
     const auto PD = OwnerCharacter->GetPlayerStatus();
     HUD = Cast<AAPHUD>(GetOwningPlayer()->GetHUD()); if(!HUD.IsValid()) return;
 
-    // 후에 게임 인스턴스로 치환? 안해도 될듯? 이미 캐릭터에서 게임 인스턴스로 업데이트하니까?
-    // for(int32 i = 0; i<PD.PlayerDynamicData.MaxMP; i++)
-    // {
-    //     auto MP = CreateWidget<UAPMPBar>(this, MPBarClass);
-    //     if(MP)
-    //     {
-    //         MPSpaces.Add(MP);
-    //         Remain_MPBars.Add(MP);
-    //     } 
-        
-    //     auto Slots = MPBar->AddChildToHorizontalBox(MP);
-    //     FSlateChildSize SlateChildSize = Slots->GetSize(); // SlateChildSize.SizeRule = ESlateSizeRule::Fill;
-    //     Slots->SetSize(SlateChildSize);
-    // }
     AddMaxMP(PD.StatusData.MaxMP);
     // MPBar->SetPercent(PD.PlayerDynamicData.MP / PD.PlayerDynamicData.MaxMP);
 
@@ -59,6 +45,7 @@ void UAPStatusBar::InitStatusBar()
     HUD->OnUsingSkill.AddUObject(this, &UAPStatusBar::UsingSkillSlot);
     HUD->OnStartCoolTime.AddUObject(this, &UAPStatusBar::StartCoolTimeSlot);
     HUD->OnDashTime.AddUObject(this, &UAPStatusBar::StartDashTime);
+    
 
     HUD->OnChargeTime.AddUObject(this, &UAPStatusBar::CheckChargeTime); 
     HUD->OnOnlyChargingNumberChange.AddUObject(this, &UAPStatusBar::ChangeCharginNum); 
@@ -67,6 +54,7 @@ void UAPStatusBar::InitStatusBar()
     HUD->OnChargingEnd.AddUObject(this, &UAPStatusBar::ChargeEnd);
 
     HUD->OnAddingCoolTime.AddUObject(this, &UAPStatusBar::AddSkillCoolTime);
+    HUD->OnHiddenGuideBar.AddUObject(this, &UAPStatusBar::SetHiddenGuideBar);
 }
 
 void UAPStatusBar::SetMaxHP(float NewValue)
@@ -317,4 +305,16 @@ void UAPStatusBar::AddSkillCoolTime(ESkillKey SkillKey, float AddTime)
 void UAPStatusBar::StartDashTime(float DashTime)
 {
     Slot_Dash->StartDashTime(DashTime);
+}
+
+void UAPStatusBar::SetHiddenGuideBar(bool bVisible)
+{
+    if(bVisible)
+    {
+        GuideBar->SetVisibility(ESlateVisibility::Visible);
+    }
+    else
+    {
+        GuideBar->SetVisibility(ESlateVisibility::Collapsed);
+    }
 }

@@ -25,7 +25,7 @@ public:
 	UFUNCTION()
 	void OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit);
 	
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	FORCEINLINE void SetMaxCannonDist(float Dist) {MaxCannonDist = Dist;};
 	FORCEINLINE void SetCannonWidth(float Width) {CannonWidth = Width;};

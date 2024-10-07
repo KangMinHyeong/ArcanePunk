@@ -16,6 +16,7 @@ class AAPSkillRange_Target;
 class AArcanePunkCharacter;
 class AArcanePunkPlayerController;
 class AAPSkillRange_TwoCircle;
+class UAPSettingSubsystem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API USkillNumberBase : public UActorComponent
@@ -165,4 +166,5 @@ protected:
 	TWeakObjectPtr<AAPSkillRange> SkillRange_Target;
 	TWeakObjectPtr<AAPSkillRange_TwoCircle> SkillRange_TWoCircle;
 
+	TWeakObjectPtr<UAPSettingSubsystem> SettingGI;
 };

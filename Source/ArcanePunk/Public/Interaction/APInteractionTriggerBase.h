@@ -23,10 +23,6 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual FInteractData GetInteractData() override;
-
-	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
-
 	FORCEINLINE void SetConversationRowName(FName Name) {ConversationRowName = Name;};
 	FORCEINLINE UAPInteractionBoxComponent* GetInteractionBox() {return InteractionTrigger;};
 

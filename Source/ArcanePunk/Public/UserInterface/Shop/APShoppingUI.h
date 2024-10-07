@@ -23,13 +23,13 @@ class ARCANEPUNK_API UAPShoppingUI : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void InitShopData(AActor* ShopActor, FShopListData UpdateShopListData);
+	void InitShopData(AActor* ShopActor, const FShopListData & UpdateShopListData);
 
-	void ClickEnhanceList(FShopGoodsData_Enhance EnhanceData, int32 ListNumber);
-	void ClickNewSkillList(FShopGoodsData_NewSkill NewSkillData, int32 ListNumber);
+	void ClickEnhanceList(const FShopGoodsData_Enhance & EnhanceData, int32 ListNumber);
+	void ClickNewSkillList(const FShopGoodsData_NewSkill & NewSkillData, int32 ListNumber);
 
-	void PurchaseEnhance(int32 ChoiceNumber, FShopGoodsData_Enhance EnhanceData, TPair<uint8, uint16> AbilityNestingNum);
-	void PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill NewSkillData);
+	void PurchaseEnhance(int32 ChoiceNumber, FShopGoodsData_Enhance & EnhanceData, TPair<uint8, uint16> AbilityNestingNum);
+	void PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill & NewSkillData);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnNotEnoughGold();
@@ -38,8 +38,7 @@ public:
 private:
 	void InitShoppingList();
 	UFUNCTION()
-	void OnExit();
-
+	void OnClick_Exit();
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	

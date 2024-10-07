@@ -90,10 +90,10 @@ void UAPAttackComponent::ComboAttackStart()
 	if(!FMath::IsWithinInclusive<int32>(CurrentCombo, 0, MaxCombo - 1)) return;
 	CurrentCombo = FMath::Clamp<int32>(CurrentCombo + 1, 1, MaxCombo);
 	
-	if(auto OwnerPlayer = Cast<AArcanePunkCharacter>(OwnerCharacter))
-	{
-		OwnerPlayer->OnComboAttackStart.Broadcast(CurrentCombo);
-	}
+	// if(auto OwnerPlayer = Cast<AArcanePunkCharacter>(OwnerCharacter))
+	// {
+	// 	OwnerPlayer->OnComboAttackStart.Broadcast(CurrentCombo);
+	// }
 }
 
 void UAPAttackComponent::ComboAttackEnd()
@@ -190,7 +190,7 @@ void UAPAttackComponent::SpawnSwordTrail(uint8 ComboStack)
 }
 
 //AttackTrace 코드 시작
-bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, FVector Start, bool CloseAttack,  bool Custom, float CustomRadius)
+bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector & HitVector, const FVector & Start, bool CloseAttack,  bool Custom, float CustomRadius)
 {
 	FRotator Rotation = GetOwner()->GetActorRotation();
 	FVector End = Start;
@@ -300,7 +300,7 @@ bool UAPAttackComponent::AttackTrace(FHitResult &HitResult, FVector &HitVector, 
 // 	return bResult;
 // }
 
-bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, FVector Start, FVector End, float Radius, bool ExceptPlayer)
+bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector &HitVector, const FVector & Start, const FVector & End, float Radius, bool ExceptPlayer)
 {
 	FRotator Rotation = GetOwner()->GetActorRotation();
 
@@ -347,7 +347,7 @@ bool UAPAttackComponent::MultiAttackTrace(TArray<FHitResult> &HitResult, FVector
 	return bResult;
 }
 
-void UAPAttackComponent::NormalAttack(FVector Start, bool CloseAttack, float Multiple, bool bStun, float StunTime, bool Custom, float CustomRadius)
+void UAPAttackComponent::NormalAttack(const FVector & Start, bool CloseAttack, float Multiple, bool bStun, float StunTime, bool Custom, float CustomRadius)
 {
 	if(!OwnerCharacter.IsValid()) return;
 
@@ -445,7 +445,7 @@ void UAPAttackComponent::MultiAttack()
 // 	}
 // }
 
-void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, float Multiple, uint8 HitNumbers, bool bStun, float StunTime)
+void UAPAttackComponent::MultiAttack(const FVector & Start, const FVector & End, float Radius, float Multiple, uint8 HitNumbers, bool bStun, float StunTime)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
@@ -478,7 +478,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 	}
 }
 
-void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, float Multiple, uint8 HitNumbers, float InstantDeathPercent)
+void UAPAttackComponent::MultiAttack(const FVector & Start, const FVector & End, float Radius, float Multiple, uint8 HitNumbers, float InstantDeathPercent)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
@@ -515,7 +515,7 @@ void UAPAttackComponent::MultiAttack(FVector Start, FVector End, float Radius, f
 	}  
 }
 
-TArray<AActor*> UAPAttackComponent::MultiAttack_Return(FVector Start, FVector End, float Radius, float Multiple, uint8 HitNumbers, float InstantDeathPercent, bool bStun, float StunTime)
+TArray<AActor*> UAPAttackComponent::MultiAttack_Return(const FVector & Start, const FVector & End, float Radius, float Multiple, uint8 HitNumbers, float InstantDeathPercent, bool bStun, float StunTime)
 {
 	TArray<AActor*> Actors;
 	if(!OwnerCharacter.IsValid()) return Actors;
@@ -550,7 +550,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_Return(FVector Start, FVector En
 	return Actors;
 }
 
-void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float Radius, float KnockBackDist, float Multiple, uint8 HitNumbers, float InstantDeathPercent, float KnockBackTime, bool PlayerKnockBack)
+void UAPAttackComponent::MultiAttack_KnockBack(const FVector & Start, const FVector & End, float Radius, float KnockBackDist, float Multiple, uint8 HitNumbers, float InstantDeathPercent, float KnockBackTime, bool PlayerKnockBack)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
@@ -594,7 +594,7 @@ void UAPAttackComponent::MultiAttack_KnockBack(FVector Start, FVector End, float
 
 }
 
-TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(FVector Start, FVector End, float Radius, float KnockBackDist, float Multiple, uint8 HitNumbers, float InstantDeathPercent, float KnockBackTime, bool PlayerKnockBack)
+TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(const FVector & Start, const FVector & End, float Radius, float KnockBackDist, float Multiple, uint8 HitNumbers, float InstantDeathPercent, float KnockBackTime, bool PlayerKnockBack)
 {
 	TArray<AActor*> Actors;
 	if(!OwnerCharacter.IsValid()) return Actors;
@@ -643,7 +643,7 @@ TArray<AActor*> UAPAttackComponent::MultiAttack_KnockBack_Return(FVector Start, 
 	return Actors;
 }
 
-void UAPAttackComponent::MultiAttack_Burn(FVector Start, FVector End, float Radius, float DOT, float TotalTime, float InRate)
+void UAPAttackComponent::MultiAttack_Burn(const FVector & Start, const FVector & End, float Radius, float DOT, float TotalTime, float InRate)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
@@ -671,7 +671,7 @@ void UAPAttackComponent::MultiAttack_Burn(FVector Start, FVector End, float Radi
 	}
 }
 
-void UAPAttackComponent::MultiAttack_Slow(FVector Start, FVector End, float Radius, int32 SlowPercent,float TotalTime)
+void UAPAttackComponent::MultiAttack_Slow(const FVector & Start, const FVector & End, float Radius, int32 SlowPercent,float TotalTime)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
@@ -699,7 +699,7 @@ void UAPAttackComponent::MultiAttack_Slow(FVector Start, FVector End, float Radi
 	}
 }
 
-void UAPAttackComponent::MultiAttack_OnlyCC(FVector Start, FVector End, float Radius, ECharacterState UpdateState, float TotalTime)
+void UAPAttackComponent::MultiAttack_OnlyCC(const FVector & Start, const FVector & End, float Radius, ECharacterState UpdateState, float TotalTime)
 {
 	if(!OwnerCharacter.IsValid()) return;
 	if(OwnerCharacter->returnState() != ECharacterState::None) return;
@@ -764,7 +764,15 @@ void UAPAttackComponent::DrainCheck(AActor* DamagedActor, float DamageApplied, f
 	
 	OwnerPlayer->SetDefaultHP(PDD.StatusData.HP); 
 	OwnerPlayer->GetAPHUD()->OnUpdateHPBar.Broadcast(OriginHP);
+}
 
+void UAPAttackComponent::ReflectDamage(float & DamageApplied, AActor* DamageCauser)
+{
+	if(!OwnerCharacter.IsValid()) return;
+
+	FHitResult Hit;
+	Hit.Location = OwnerCharacter->GetActorLocation(); Hit.ImpactPoint = Hit.Location;
+	UGameplayStatics::ApplyPointDamage(DamageCauser, DamageApplied, Hit.ImpactPoint, Hit, OwnerCharacter->GetInstigatorController(), OwnerCharacter.Get(), UDamageType::StaticClass());
 }
 
 void UAPAttackComponent::ParryCounter(AActor * DamageCauser)
@@ -809,3 +817,4 @@ void UAPAttackComponent::AttackCameraShake()
 	auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
 	PC->AttackCameraShake();
 }
+

@@ -16,7 +16,7 @@ public:
 	FORCEINLINE bool IsBattleStage() const {return bBattleStage;};
 
 	UFUNCTION()
-	void OnChangingBGMVolume(float Master, float BGM, float Effect);
+	void OnChangingBGMVolume(float Master, float BGM, float Effect, float UI);
 
 protected:
 	void SpawnMonster();

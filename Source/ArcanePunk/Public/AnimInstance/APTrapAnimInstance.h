@@ -25,6 +25,8 @@ public:
 	/* Notify */ 
 	UFUNCTION()
 	void AnimNotify_DamageTrigger();
+	UFUNCTION()
+	void AnimNotify_SpawnTrapOperationSound();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))

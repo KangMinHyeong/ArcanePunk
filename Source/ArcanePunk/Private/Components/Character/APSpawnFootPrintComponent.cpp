@@ -48,7 +48,8 @@ void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot, bool Step)
 						if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
 						if(StepSound[Num]) RunEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(StepEffect[Num], OwnerCharacter->GetMesh(), TEXT("StepEffect"), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*UpCoeff - OwnerCharacter->GetActorForwardVector()*BackCoeff, OwnerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
 					}
-					if(StepSound[Num]) SpawnSound(StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
+					if(StepSound[Num]) 
+					UAPSoundSubsystem::SpawnEffectSoundAtLocation(UAPGameInstance::GetSoundGI(GetWorld()) , StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
 				}
 				else
 				{
@@ -78,7 +79,8 @@ void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot, bool Step)
 						if(RunEffect.IsValid()) RunEffect->DeactivateImmediate();
 						if(StepSound[Num]) RunEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(StepEffect[Num], OwnerCharacter->GetMesh(), TEXT("StepEffect"), OwnerCharacter->GetMesh()->GetComponentLocation() + OwnerCharacter->GetActorUpVector()*UpCoeff - OwnerCharacter->GetActorForwardVector()*BackCoeff, OwnerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
 					}
-					if(StepSound[Num]) SpawnSound(StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
+					if(StepSound[Num]) 
+					UAPSoundSubsystem::SpawnEffectSoundAtLocation(UAPGameInstance::GetSoundGI(GetWorld()) , StepSound[Num], OwnerCharacter->GetMesh()->GetComponentLocation());
 				}
 				else
 				{
@@ -88,14 +90,6 @@ void UAPSpawnFootPrintComponent::SpawnFootPrint(bool LeftFoot, bool Step)
 			}
 		}
 	}
-}
-
-void UAPSpawnFootPrintComponent::SpawnSound(USoundBase* Sound, FVector Location)
-{
-	auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-
-	float SoundVolume = GI->GetGameSoundVolume().MasterVolume * GI->GetGameSoundVolume().EffectVolume;
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), Sound, Location, FRotator::ZeroRotator, SoundVolume * SoundCoefficient);
 }
 
 TSubclassOf<AActor> UAPSpawnFootPrintComponent::GetFootClass(bool Left) 

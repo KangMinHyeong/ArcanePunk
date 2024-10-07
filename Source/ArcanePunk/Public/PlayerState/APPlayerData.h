@@ -105,7 +105,8 @@ struct FStatusData : public FTableRowBase
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	int32 CriticalStep = 1;
 
-
+	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
+	float ShieldHP = 0.0f;
 	//
 };
 

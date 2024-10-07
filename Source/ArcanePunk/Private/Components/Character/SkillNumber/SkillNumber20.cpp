@@ -10,6 +10,7 @@
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Skill/ArcaneCannon.h"
+#include "GameInstance/APGameInstance.h"
 
 USkillNumber20::USkillNumber20()
 {
@@ -120,7 +121,11 @@ void USkillNumber20::UpdateSkillData()
 bool USkillNumber20::CheckSkillCondition()
 {
 	bool Check = Super::CheckSkillCondition();
-	if(CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); Check = false;}
+	if(CurrentChargeNum == 0)
+	{
+		UAPDataTableSubsystem::DisplaySystemMesseage(UAPGameInstance::GetDataTableGI(GetWorld()), EStringRowName::CannotSkill, true, true); 
+		Check = false;
+	}
 
     return Check;
 }

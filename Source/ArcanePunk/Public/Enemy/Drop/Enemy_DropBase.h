@@ -35,7 +35,7 @@ public:
 	
 	void OnDestinatingGround();
 	
-	virtual void BeginFocus() override;
+	virtual bool BeginFocus() override;
 
 	virtual void InitializePickup(AActor *DamageCauser, const int32 Quantity, bool RootingImmediate = false); 
 
@@ -77,9 +77,7 @@ protected:
 	// Sound
 	UPROPERTY(EditAnywhere)
 	USoundBase* DropSound;
-	UPROPERTY(EditAnywhere)
-	float DropSoundVolume = 1.0f;
-
+	
 	// Drop Effect
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* DropEffect;

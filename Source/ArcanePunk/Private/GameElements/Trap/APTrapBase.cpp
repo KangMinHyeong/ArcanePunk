@@ -10,6 +10,7 @@
 #include "Components/Common/APDestructibleMeshComponent.h"
 #include "AnimInstance/APTrapAnimInstance.h"
 #include "Components/Common/APTransparentComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 AAPTrapBase::AAPTrapBase()
 {
@@ -91,6 +92,26 @@ void AAPTrapBase::Deactivate()
 {
 	bActivate = false;
 	TrapCollision->OnComponentBeginOverlap.RemoveDynamic(this, &AAPTrapBase::OnOverlap);
+}
+
+void AAPTrapBase::SpawnTrapOperationSound()
+{
+	if(!TrapOperationSound) return;
+
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Volume = 5.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
+
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), TrapOperationSound, GetActorLocation(), GetActorRotation(), Volume, 1.0f, OperationSoundDelay);
+}
+
+void AAPTrapBase::SpawnTrapEndSound()
+{
+	if(!TrapEndSound) return;
+
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Volume = 5.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
+
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), TrapEndSound, GetActorLocation(), GetActorRotation(), Volume);
 }
 
 void AAPTrapBase::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)

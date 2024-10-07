@@ -61,12 +61,16 @@ void AAPTrapBase_Spear::OnOperating()
     GetWorldTimerManager().ClearTimer(TriggerTimerHandle);
     bOperation = true;
     TopMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+    SpawnTrapOperationSound();
 }
 
 void AAPTrapBase_Spear::OnOperatingEnd()
 {
     GetWorldTimerManager().ClearTimer(TriggerTimerHandle);
     bEnd = true;
+
+    SpawnTrapEndSound();
 }
 
 void AAPTrapBase_Spear::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)

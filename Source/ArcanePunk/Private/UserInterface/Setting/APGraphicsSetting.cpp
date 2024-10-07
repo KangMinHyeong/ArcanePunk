@@ -37,14 +37,14 @@ void UAPGraphicsSetting::InitWindowSetting()
     ScreenResolution->SetSelectedOption(Str);
 
     EWindowMode::Type SelectWindowMode =  UGameUserSettings::GetGameUserSettings()->GetFullscreenMode();
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;  
     if(SelectWindowMode == EWindowMode::Windowed)
     {
-        WindowMode->SetSelectedOption(APGI->GetStringContent(EStringRowName::ScreenMode_Window));
+        WindowMode->SetSelectedOption(DataTableGI->GetStringContent(EStringRowName::ScreenMode_Window));
     }
     else // if(SelectWindowMode == EWindowMode::Fullscreen)
     {
-        WindowMode->SetSelectedOption(APGI->GetStringContent(EStringRowName::ScreenMode_Full));
+        WindowMode->SetSelectedOption(DataTableGI->GetStringContent(EStringRowName::ScreenMode_Full));
     }  
 
     UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
@@ -169,42 +169,39 @@ void UAPGraphicsSetting::BindButton()
     // Button_Save->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickButton_Save);
     //  Optimal Setting
     Button_OptimalSetting->OnClicked.AddDynamic(this, &UAPGraphicsSetting::OnClickButton_OptimalSetting);
-
-
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
     
     for(auto btn : Btn_Low)
     {
         auto TextBlock = Cast<UTextBlock>(btn->GetContent());
-        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_Low);
+        if(TextBlock) UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock, EStringRowName::Quality_Low);
     }
     for(auto btn : Btn_Middle)
     {
         auto TextBlock = Cast<UTextBlock>(btn->GetContent());
-        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_Middle);
+        if(TextBlock) UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock, EStringRowName::Quality_Middle);
     }
     for(auto btn : Btn_High)
     {
         auto TextBlock = Cast<UTextBlock>(btn->GetContent());
-        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_High);
+        if(TextBlock) UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock, EStringRowName::Quality_High);
     }
     for(auto btn : Btn_Epic)
     {
         auto TextBlock = Cast<UTextBlock>(btn->GetContent());
-        if(TextBlock) APGI->SetTextBlock(TextBlock, EStringRowName::Quality_Ultra);
+        if(TextBlock) UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock, EStringRowName::Quality_Ultra);
     }
 
-    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
-    APGI->SetTextBlock(TextBlock_Optimization, EStringRowName::Optimization);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Init, EStringRowName::Init);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Optimization, EStringRowName::Optimization);
 }
 
 //  Window Mode Select
 void UAPGraphicsSetting::OnSelectChange_WindowMode(FString Items, ESelectInfo::Type type)
 {
     EWindowMode::Type SelectWindowMode;
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;    
 
-    if(Items == APGI->GetStringContent(EStringRowName::ScreenMode_Window))
+    if(Items == DataTableGI->GetStringContent(EStringRowName::ScreenMode_Window))
     {
         SelectWindowMode = EWindowMode::Windowed;
     }
@@ -234,21 +231,25 @@ void UAPGraphicsSetting::OnSelectChange_ScreenResolution(FString Items, ESelectI
 //  Frame Rate Limit
 void UAPGraphicsSetting::OnClickButton_45fps()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FrameRateSetting == EGraphicsSetting::Low) {return;}
     else{FrameRateSetting = EGraphicsSetting::Low; ChangeFrameRate(45.0f);}
 }
 void UAPGraphicsSetting::OnClickButton_60fps()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FrameRateSetting == EGraphicsSetting::Middle) {return;}
     else{FrameRateSetting = EGraphicsSetting::Middle; ChangeFrameRate(60.0f);}
 }
 void UAPGraphicsSetting::OnClickButton_120fps()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FrameRateSetting == EGraphicsSetting::High) {return;}
     else{FrameRateSetting = EGraphicsSetting::High; ChangeFrameRate(120.0f);}
 }
 void UAPGraphicsSetting::OnClickButton_Unlimited()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FrameRateSetting == EGraphicsSetting::Epic) {return;}
     else{FrameRateSetting = EGraphicsSetting::Epic; ChangeFrameRate(240.0f);}
 }
@@ -282,24 +283,28 @@ void UAPGraphicsSetting::ChangeFrameRate(float fps)
 //  OverAll Scalability
 void UAPGraphicsSetting::OnClickOS_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     UGameUserSettings::GetGameUserSettings()->SetOverallScalabilityLevel(0);
     OS_Setting = EGraphicsSetting::Low;
     Change_OS();
 }
 void UAPGraphicsSetting::OnClickOS_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     UGameUserSettings::GetGameUserSettings()->SetOverallScalabilityLevel(1);
     OS_Setting = EGraphicsSetting::Middle;
     Change_OS();
 }
 void UAPGraphicsSetting::OnClickOS_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     UGameUserSettings::GetGameUserSettings()->SetOverallScalabilityLevel(2);
     OS_Setting = EGraphicsSetting::High;
     Change_OS();
 }
 void UAPGraphicsSetting::OnClickOS_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     UGameUserSettings::GetGameUserSettings()->SetOverallScalabilityLevel(3);
     OS_Setting = EGraphicsSetting::Epic;
     Change_OS();
@@ -324,21 +329,25 @@ void UAPGraphicsSetting::Change_OS()
 //  Post Process
 void UAPGraphicsSetting::OnClickPP_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(PP_Setting == EGraphicsSetting::Low) {return;}
     else{PP_Setting = EGraphicsSetting::Low; Change_PP(0);}
 }
 void UAPGraphicsSetting::OnClickPP_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(PP_Setting == EGraphicsSetting::Middle) {return;}
     else{PP_Setting = EGraphicsSetting::Middle; Change_PP(1);}
 }
 void UAPGraphicsSetting::OnClickPP_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(PP_Setting == EGraphicsSetting::High) {return;}
     else{PP_Setting = EGraphicsSetting::High; Change_PP(2);}
 }
 void UAPGraphicsSetting::OnClickPP_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(PP_Setting == EGraphicsSetting::Epic) {return;}
     else{PP_Setting = EGraphicsSetting::Epic; Change_PP(3);}
 }
@@ -372,26 +381,31 @@ void UAPGraphicsSetting::Change_PP(int32 PP)
 //  Texture Quality
 void UAPGraphicsSetting::OnClickTQ_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(TQ_Setting == EGraphicsSetting::Low) {return;}
     else{TQ_Setting = EGraphicsSetting::Low; Change_TQ(0);}
 }
 void UAPGraphicsSetting::OnClickTQ_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(TQ_Setting == EGraphicsSetting::Middle) {return;}
     else{TQ_Setting = EGraphicsSetting::Middle; Change_TQ(1);}
 }
 void UAPGraphicsSetting::OnClickTQ_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(TQ_Setting == EGraphicsSetting::High) {return;}
     else{TQ_Setting = EGraphicsSetting::High; Change_TQ(2);}
 }
 void UAPGraphicsSetting::OnClickTQ_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(TQ_Setting == EGraphicsSetting::Epic) {return;}
     else{TQ_Setting = EGraphicsSetting::Epic; Change_TQ(3);}
 }
 void UAPGraphicsSetting::Change_TQ(int32 TQ)
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     TQ_Low->SetBackgroundColor(DefaultButtonColor);
     TQ_Middle->SetBackgroundColor(DefaultButtonColor);
     TQ_High->SetBackgroundColor(DefaultButtonColor);
@@ -420,26 +434,31 @@ void UAPGraphicsSetting::Change_TQ(int32 TQ)
 //  Anti Aliasing
 void UAPGraphicsSetting::OnClickAA_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(AA_Setting == EGraphicsSetting::Low) {return;}
     else{AA_Setting = EGraphicsSetting::Low; Change_AA(0);}
 }
 void UAPGraphicsSetting::OnClickAA_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(AA_Setting == EGraphicsSetting::Middle) {return;}
     else{AA_Setting = EGraphicsSetting::Middle; Change_AA(1);}
 }
 void UAPGraphicsSetting::OnClickAA_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(AA_Setting == EGraphicsSetting::High) {return;}
     else{AA_Setting = EGraphicsSetting::High; Change_AA(2);}
 }
 void UAPGraphicsSetting::OnClickAA_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(AA_Setting == EGraphicsSetting::Epic) {return;}
     else{AA_Setting = EGraphicsSetting::Epic; Change_AA(3);}
 }
 void UAPGraphicsSetting::Change_AA(int32 AA)
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     AA_Low->SetBackgroundColor(DefaultButtonColor);
     AA_Middle->SetBackgroundColor(DefaultButtonColor);
     AA_High->SetBackgroundColor(DefaultButtonColor);
@@ -468,21 +487,25 @@ void UAPGraphicsSetting::Change_AA(int32 AA)
 //  Shadow Quality
 void UAPGraphicsSetting::OnClickSQ_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(SQ_Setting == EGraphicsSetting::Low) {return;}
     else{SQ_Setting = EGraphicsSetting::Low; Change_SQ(0);}
 }
 void UAPGraphicsSetting::OnClickSQ_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(SQ_Setting == EGraphicsSetting::Middle) {return;}
     else{SQ_Setting = EGraphicsSetting::Middle; Change_SQ(1);}
 }
 void UAPGraphicsSetting::OnClickSQ_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(SQ_Setting == EGraphicsSetting::High) {return;}
     else{SQ_Setting = EGraphicsSetting::High; Change_SQ(2);}
 }
 void UAPGraphicsSetting::OnClickSQ_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(SQ_Setting == EGraphicsSetting::Epic) {return;}
     else{SQ_Setting = EGraphicsSetting::Epic; Change_SQ(3);}
 }
@@ -515,21 +538,25 @@ void UAPGraphicsSetting::Change_SQ(int32 SQ)
 //  Effect Quality
 void UAPGraphicsSetting::OnClickEQ_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(EQ_Setting == EGraphicsSetting::Low) {return;}
     else{EQ_Setting = EGraphicsSetting::Low; Change_EQ(0);} 
 }
 void UAPGraphicsSetting::OnClickEQ_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(EQ_Setting == EGraphicsSetting::Middle) {return;}
     else{EQ_Setting = EGraphicsSetting::Middle; Change_EQ(1);}
 }
 void UAPGraphicsSetting::OnClickEQ_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(EQ_Setting == EGraphicsSetting::High) {return;}
     else{EQ_Setting = EGraphicsSetting::High; Change_EQ(2);}
 }
 void UAPGraphicsSetting::OnClickEQ_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(EQ_Setting == EGraphicsSetting::Epic) {return;}
     else{EQ_Setting = EGraphicsSetting::Epic; Change_EQ(3);}
 }
@@ -563,21 +590,25 @@ void UAPGraphicsSetting::Change_EQ(int32 EQ)
 //  Foliage Quality
 void UAPGraphicsSetting::OnClickFQ_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FQ_Setting == EGraphicsSetting::Low) {return;}
     else{FQ_Setting = EGraphicsSetting::Low; Change_FQ(0);}
 }
 void UAPGraphicsSetting::OnClickFQ_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FQ_Setting == EGraphicsSetting::Middle) {return;}
     else{FQ_Setting = EGraphicsSetting::Middle; Change_FQ(1);}
 }
 void UAPGraphicsSetting::OnClickFQ_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FQ_Setting == EGraphicsSetting::High) {return;}
     else{FQ_Setting = EGraphicsSetting::High; Change_FQ(2);}
 }
 void UAPGraphicsSetting::OnClickFQ_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(FQ_Setting == EGraphicsSetting::Epic) {return;}
     else{FQ_Setting = EGraphicsSetting::Epic; Change_FQ(3);}
 }
@@ -611,21 +642,25 @@ void UAPGraphicsSetting::Change_FQ(int32 FQ)
 //  Shading Quality
 void UAPGraphicsSetting::OnClickShading_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(Shading_Setting == EGraphicsSetting::Low) {return;}
     else{Shading_Setting = EGraphicsSetting::Low; Change_Shading(0);}
 }
 void UAPGraphicsSetting::OnClickShading_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(Shading_Setting == EGraphicsSetting::Middle) {return;}
     else{Shading_Setting = EGraphicsSetting::Middle; Change_Shading(1);}
 }
 void UAPGraphicsSetting::OnClickShading_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(Shading_Setting == EGraphicsSetting::High) {return;}
     else{Shading_Setting = EGraphicsSetting::High; Change_Shading(2);}
 }
 void UAPGraphicsSetting::OnClickShading_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(Shading_Setting == EGraphicsSetting::Epic) {return;}
     else{Shading_Setting = EGraphicsSetting::Epic; Change_Shading(3);}
 }
@@ -659,21 +694,25 @@ void UAPGraphicsSetting::Change_Shading(int32 Shading)
 //	Reflection Quality
 void UAPGraphicsSetting::OnClickRQ_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RQ_Setting == EGraphicsSetting::Low) {return;}
     else{RQ_Setting = EGraphicsSetting::Low; Change_RQ(0);}
 }
 void UAPGraphicsSetting::OnClickRQ_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RQ_Setting == EGraphicsSetting::Middle) {return;}
     else{RQ_Setting = EGraphicsSetting::Middle; Change_RQ(1);}
 }
 void UAPGraphicsSetting::OnClickRQ_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RQ_Setting == EGraphicsSetting::High) {return;}
     else{RQ_Setting = EGraphicsSetting::High; Change_RQ(2);}
 }
 void UAPGraphicsSetting::OnClickRQ_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RQ_Setting == EGraphicsSetting::Epic) {return;}
     else{RQ_Setting = EGraphicsSetting::Epic; Change_RQ(3);}
 }
@@ -707,21 +746,25 @@ void UAPGraphicsSetting::Change_RQ(int32 RQ)
 //  View Distance
 void UAPGraphicsSetting::OnClickVD_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(VD_Setting == EGraphicsSetting::Low) {return;}
     else{VD_Setting = EGraphicsSetting::Low; Change_VD(0);}
 }
 void UAPGraphicsSetting::OnClickVD_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(VD_Setting == EGraphicsSetting::Middle) {return;}
     else{VD_Setting = EGraphicsSetting::Middle; Change_VD(1);}
 }
 void UAPGraphicsSetting::OnClickVD_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(VD_Setting == EGraphicsSetting::High) {return;}
     else{VD_Setting = EGraphicsSetting::High; Change_VD(2);}
 }
 void UAPGraphicsSetting::OnClickVD_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(VD_Setting == EGraphicsSetting::Epic) {return;}
     else{VD_Setting = EGraphicsSetting::Epic; Change_VD(3);}
 }
@@ -755,21 +798,25 @@ void UAPGraphicsSetting::Change_VD(int32 VD)
 //  Global Illumination Quality
 void UAPGraphicsSetting::OnClickGI_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(GI_Setting == EGraphicsSetting::Low) {return;}
     else{GI_Setting = EGraphicsSetting::Low; Change_GI(0);}
 }
 void UAPGraphicsSetting::OnClickGI_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(GI_Setting == EGraphicsSetting::Middle) {return;}
     else{GI_Setting = EGraphicsSetting::Middle; Change_GI(1);}
 }
 void UAPGraphicsSetting::OnClickGI_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(GI_Setting == EGraphicsSetting::High) {return;}
     else{GI_Setting = EGraphicsSetting::High; Change_GI(2);}
 }
 void UAPGraphicsSetting::OnClickGI_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(GI_Setting == EGraphicsSetting::Epic) {return;}
     else{GI_Setting = EGraphicsSetting::Epic; Change_GI(3);}
 }
@@ -803,21 +850,25 @@ void UAPGraphicsSetting::Change_GI(int32 GI)
 //  Resolution Scale 
 void UAPGraphicsSetting::OnClickRS_Low()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RS_Setting == EGraphicsSetting::Low) {return;}
     else{RS_Setting = EGraphicsSetting::Low; Change_RS(0.25f);}
 }
 void UAPGraphicsSetting::OnClickRS_Middle()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RS_Setting == EGraphicsSetting::Middle) {return;}
     else{RS_Setting = EGraphicsSetting::Middle; Change_RS(0.5f);}
 }
 void UAPGraphicsSetting::OnClickRS_High()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RS_Setting == EGraphicsSetting::High) {return;}
     else{RS_Setting = EGraphicsSetting::High; Change_RS(0.75f);}
 }
 void UAPGraphicsSetting::OnClickRS_Epic()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(RS_Setting == EGraphicsSetting::Epic) {return;}
     else{RS_Setting = EGraphicsSetting::Epic; Change_RS(1.0f);}
 }
@@ -857,11 +908,13 @@ void UAPGraphicsSetting::OnClickButton_Back()
 //  Svae Graphics Setting
 void UAPGraphicsSetting::OnClickButton_Save()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     UGameUserSettings::GetGameUserSettings()->SaveSettings();
 }
 
 void UAPGraphicsSetting::OnClickButton_OptimalSetting()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     UGameUserSettings::GetGameUserSettings()->RunHardwareBenchmark();
     UGameUserSettings::GetGameUserSettings()->ApplyHardwareBenchmarkResults();
     InitGraphicsSetting();
@@ -871,39 +924,41 @@ void UAPGraphicsSetting::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;    
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(APGI->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;    
     
     WindowMode->ClearOptions();
     
-    WindowMode->AddOption(APGI->GetStringContent(EStringRowName::ScreenMode_Full));
-    WindowMode->AddOption(APGI->GetStringContent(EStringRowName::ScreenMode_Window));  
+    WindowMode->AddOption(DataTableGI->GetStringContent(EStringRowName::ScreenMode_Full));
+    WindowMode->AddOption(DataTableGI->GetStringContent(EStringRowName::ScreenMode_Window));  
 
-    APGI->SetTextBlock(TextBlock_Window, EStringRowName::Select_WindowMode);
-    APGI->SetTextBlock(TextBlock_AspectRatio, EStringRowName::Select_AspectRatio);
-    APGI->SetTextBlock(TextBlock_MaxFPS, EStringRowName::Select_MaxFPS);
-    APGI->SetTextBlock(TextBlock_OverAll, EStringRowName::Select_OverAll);
-    APGI->SetTextBlock(Text_Texture, EStringRowName::Select_Texture);
-    APGI->SetTextBlock(Text_AntiAliasing, EStringRowName::Select_AntiAliasing);
-    APGI->SetTextBlock(Text_PostProcessing, EStringRowName::Select_PostProcessing);
-    APGI->SetTextBlock(Text_Shadow, EStringRowName::Select_Shadow);
-    APGI->SetTextBlock(Text_Effect, EStringRowName::Select_Effect);
-    APGI->SetTextBlock(Text_Foliage, EStringRowName::Select_Foliage);
-    APGI->SetTextBlock(Text_Shading, EStringRowName::Select_Shading);
-    APGI->SetTextBlock(Text_Reflection, EStringRowName::Select_Reflection);
-    APGI->SetTextBlock(Text_ViewDistance, EStringRowName::Select_ViewDistance);
-    APGI->SetTextBlock(Text_GlobalIllumination, EStringRowName::Select_GlobalIllumination);
-    APGI->SetTextBlock(Text_ResolutionScale, EStringRowName::Select_ResolutionScale);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Window, EStringRowName::Select_WindowMode);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_AspectRatio, EStringRowName::Select_AspectRatio);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_MaxFPS, EStringRowName::Select_MaxFPS);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_OverAll, EStringRowName::Select_OverAll);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Texture, EStringRowName::Select_Texture);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_AntiAliasing, EStringRowName::Select_AntiAliasing);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_PostProcessing, EStringRowName::Select_PostProcessing);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Shadow, EStringRowName::Select_Shadow);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Effect, EStringRowName::Select_Effect);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Foliage, EStringRowName::Select_Foliage);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Shading, EStringRowName::Select_Shading);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Reflection, EStringRowName::Select_Reflection);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_ViewDistance, EStringRowName::Select_ViewDistance);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_GlobalIllumination, EStringRowName::Select_GlobalIllumination);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_ResolutionScale, EStringRowName::Select_ResolutionScale);
 
-    APGI->SetTextBlock(TextBlock_NoLimit, EStringRowName::NoLimit);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_NoLimit, EStringRowName::NoLimit);
+
+    InitGraphicsSetting();
+    InitWindowSetting();
+    InitBindSetting();
 }
 
 void UAPGraphicsSetting::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    InitGraphicsSetting();
-    InitWindowSetting();
-    InitBindSetting();
 }
 
 FReply UAPGraphicsSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)

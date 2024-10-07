@@ -128,7 +128,7 @@ void AShadowShuriken::CollectShuriken()
     DeActivate_Ult();
 }
 
-void AShadowShuriken::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AShadowShuriken::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent); // Wide 곱해주기 추가
     if(!OwnerCharacter.IsValid()) return;

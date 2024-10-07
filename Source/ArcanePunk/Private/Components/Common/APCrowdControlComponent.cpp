@@ -76,7 +76,7 @@ void UAPCrowdControlComponent::NormalState() // 후에 벡터로 관리 ?
 
 }
 
-void UAPCrowdControlComponent::KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime)
+void UAPCrowdControlComponent::KnockBackState(const FVector & KnockBackPoint, float KnockBackDist, float KnockBackTime)
 {
 	if(!CalculateStateTime(ECharacterState::KnockBack, KnockBackTimerHandle, KnockBackTime)){return;}
 

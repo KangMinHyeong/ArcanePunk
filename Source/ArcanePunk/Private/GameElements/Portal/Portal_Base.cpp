@@ -34,7 +34,7 @@ APortal_Base::APortal_Base()
 void APortal_Base::BeginPlay()
 {
 	Super::BeginPlay();
-	APGI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!APGI.IsValid()) return;
+	APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
 	PortalEffectComp->DeactivateImmediate();
 	InitHide(DefaultHidden);
 	FLatentActionInfo LatentActionInfo;
@@ -58,7 +58,7 @@ void APortal_Base::InitHide(bool IsHidden, float DelayTime)
 	}
 }
 
-void APortal_Base::StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint)
+void APortal_Base::StartTeleport(AArcanePunkCharacter* Character, const FVector & TeleportPoint)
 {
 	Character->SetActorLocation(TeleportPoint);
 	Character->SetCanMove(true);
@@ -69,16 +69,12 @@ void APortal_Base::StartTeleport(AArcanePunkCharacter* Character, FVector Telepo
 	GetWorldTimerManager().ClearTimer(Delay_TimerHandle);
 }
 
-void APortal_Base::SpawnSound(FVector Location)
-{
-	float SoundVolume = APGI->GetGameSoundVolume().MasterVolume * APGI->GetGameSoundVolume().EffectVolume;
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PortalSound, Location, FRotator::ZeroRotator, SoundVolume, 1.0f, SoundStartTime);
-}
-
 void APortal_Base::DelayHidden()
 {
 	GetWorld()->GetTimerManager().ClearTimer(HiddenTimerHandle);
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(ECollisionEnabled::QueryOnly);
 	PortalEffectComp->Activate();
+	if(DefaultHidden)
+	UAPDataTableSubsystem::DisplaySystemMesseage(UAPGameInstance::GetDataTableGI(GetWorld()), EStringRowName::PortalOpen, false, false);
 }

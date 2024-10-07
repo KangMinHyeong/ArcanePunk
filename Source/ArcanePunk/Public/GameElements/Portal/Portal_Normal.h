@@ -17,9 +17,6 @@ class ARCANEPUNK_API APortal_Normal : public APortal_Base
 public:
 	APortal_Normal();
 
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
-	virtual FInteractData GetInteractData() override;
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 	UFUNCTION()
@@ -30,9 +27,7 @@ public:
 protected:	
 	virtual void BeginPlay() override;
 
-	virtual void StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint) override;
-
-	virtual void SpawnSound(FVector Location) override;
+	virtual void StartTeleport(AArcanePunkCharacter* Character, const FVector & TeleportPoint) override;
 
 protected:
 	UPROPERTY(EditAnywhere)

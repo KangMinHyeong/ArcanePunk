@@ -26,18 +26,23 @@ void UAPTitleUI::NativeConstruct()
 	Button_Setting->OnClicked.AddDynamic(this, &UAPTitleUI::OnSetting);
 	Button_Exit->OnClicked.AddDynamic(this, &UAPTitleUI::OnExit);
 
-	auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+	Button_NewGame->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+	Button_Continue->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+	Button_Setting->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+	Button_Exit->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 
-	APGI->SetTextBlock(TextBlock_NewGame, EStringRowName::NewGame);
-	APGI->SetTextBlock(TextBlock_Continue, EStringRowName::Continue);
-	APGI->SetTextBlock(TextBlock_GameSetting, EStringRowName::GameSetting);
-	APGI->SetTextBlock(TextBlock_GameExit, EStringRowName::GameExit);
-	APGI->SetTextBlock(TextBlock_MainTitle, EStringRowName::MainTitle);
-	APGI->SetTextBlock(TextBlock_SubTitle, EStringRowName::SubTitle);
+	UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_NewGame, EStringRowName::NewGame);
+	UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Continue, EStringRowName::Continue);
+	UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_GameSetting, EStringRowName::GameSetting);
+	UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_GameExit, EStringRowName::GameExit);
+	UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_MainTitle, EStringRowName::MainTitle);
+	UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_SubTitle, EStringRowName::SubTitle);
 }
 
 void UAPTitleUI::OnNewGame()
 {
+	UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
 	UAPSaveGame* SaveGameData = NewObject<UAPSaveGame>();
 	if(SaveGameData == nullptr) 
 	{
@@ -70,6 +75,7 @@ void UAPTitleUI::OnNewGame()
 
 void UAPTitleUI::OnContinue()
 {
+	UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
 	auto SelectSlotUI =  Cast<UAPSaveSlotUI>(CreateWidget(this, SelectSaveSlotClass)); if(!SelectSlotUI) return;
 	SelectSlotUI->BindButton();
 	SelectSlotUI->BindSlot();
@@ -79,6 +85,7 @@ void UAPTitleUI::OnContinue()
 
 void UAPTitleUI::OnSetting()
 {
+	UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
 	auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer()); if(!TitlePC) return;
 
 	TitlePC->OptionSetting();
@@ -86,5 +93,6 @@ void UAPTitleUI::OnSetting()
 
 void UAPTitleUI::OnExit()
 {
+	UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
 	UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, true);
 }

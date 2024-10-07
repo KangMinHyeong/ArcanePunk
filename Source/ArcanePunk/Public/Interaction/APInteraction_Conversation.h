@@ -11,8 +11,6 @@ class ARCANEPUNK_API AAPInteraction_Conversation : public AAPInteractionTriggerB
 {
 	GENERATED_BODY()
 public:	
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
 
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 

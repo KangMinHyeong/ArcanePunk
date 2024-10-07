@@ -10,6 +10,7 @@
 #include "Character/SkillRange/APSkillRange.h"
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 USkillNumber9::USkillNumber9()
 {
@@ -175,7 +176,11 @@ void USkillNumber9::UpdateSkillData()
 bool USkillNumber9::CheckSkillCondition()
 {
 	bool Check = Super::CheckSkillCondition();
-	if(CurrentChargeNum == 0) {OwnerCharacterPC->DisplayNotEnoughMPUI(); Check = false;}
+	if(CurrentChargeNum == 0) 
+	{
+		UAPDataTableSubsystem::DisplaySystemMesseage(UAPGameInstance::GetDataTableGI(GetWorld()), EStringRowName::CannotSkill, true, true); 
+		Check = false;
+	}
 
     return Check;
 }

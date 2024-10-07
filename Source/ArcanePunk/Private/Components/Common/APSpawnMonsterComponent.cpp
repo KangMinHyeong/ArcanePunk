@@ -63,7 +63,7 @@ void UAPSpawnMonsterComponent::SpawnLocation(TSubclassOf<AAPSpawnPointBase> Spaw
     }
 }
 
-void UAPSpawnMonsterComponent::SpawnLocationRandom(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, FVector MinimumRange, FVector MaximumRange)
+void UAPSpawnMonsterComponent::SpawnLocationRandom(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, const FVector & MinimumRange, const FVector & MaximumRange)
 {   
     while(SpawnMonsterNum != 0)
     {
@@ -87,7 +87,7 @@ void UAPSpawnMonsterComponent::SpawnMonsterFromLocation(TSubclassOf<AEnemy_Chara
     }
 }
 
-void UAPSpawnMonsterComponent::SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3)
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, const FVector & V_1, const FVector & V_2, const FVector & V_3)
 {
     int32 loopcnt = 0;
     while(SpawnMonsterNum > 0)
@@ -111,7 +111,7 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy
     }
 }
 
-void UAPSpawnMonsterComponent::SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3, FVector V_4)
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, uint8 SpawnMonsterNum, const FVector & V_1, const FVector & V_2, const FVector & V_3, const FVector & V_4)
 {
     int32 loopcnt = 0;
     while(SpawnMonsterNum > 0)
@@ -131,7 +131,7 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_C
         if(SpawnMonster) 
         {
             FVector SetLoc = SpawnMonster->GetActorLocation();
-            SetLoc.Z = GetOwner()->GetActorLocation().Z + SpawnMonster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 5.0f;
+            SetLoc.Z = GetOwner()->GetActorLocation().Z + SpawnMonster->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 12.5f;
             SpawnMonster->SetActorLocation(SetLoc);
             PlaySpawnEffect(SpawnMonster->GetMesh()->GetComponentLocation());
             SpawnMonsterNum--;
@@ -140,7 +140,7 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_C
     }
 }
 
-void UAPSpawnMonsterComponent::SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, uint8 SpawnMonsterNum, FVector SpawnLocation)
+void UAPSpawnMonsterComponent::SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, uint8 SpawnMonsterNum, const FVector & SpawnLocation)
 {
     while(SpawnMonsterNum > 0)
     {
@@ -156,18 +156,15 @@ void UAPSpawnMonsterComponent::SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy
     }
 }
 
-void UAPSpawnMonsterComponent::PlaySpawnEffect(FVector Location)
+void UAPSpawnMonsterComponent::PlaySpawnEffect(const FVector & Location)
 {
     auto GM = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld())); if(!GM) return;
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
-
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GM->GetSpawnEffect(),  Location);
 
-    float SpawnSoundVolume = GI->GetGameSoundVolume().MasterVolume * GI->GetGameSoundVolume().EffectVolume * GM->GetSpawnSoundVolume();
-    UGameplayStatics::SpawnSoundAtLocation(GetWorld(), GM->GetSpawnSound(), Location, FRotator::ZeroRotator, SpawnSoundVolume, 1.0f, Sink);
+    UAPSoundSubsystem::SpawnEffectSoundAtLocation(UAPGameInstance::GetSoundGI(GetWorld()) , GM->GetSpawnSound(), Location, Sink);
 }
 
-FVector UAPSpawnMonsterComponent::GetRandomLocation(FVector V_1, FVector V_2, FVector V_3)
+FVector UAPSpawnMonsterComponent::GetRandomLocation(const FVector & V_1, const FVector & V_2, const FVector & V_3) const
 {
     float r1 = FMath::RandRange(0.0f, 1.0f);
     float r2 = FMath::RandRange(0.0f, 1.0f);
@@ -191,7 +188,7 @@ FVector UAPSpawnMonsterComponent::GetRandomLocation(FVector V_1, FVector V_2, FV
 
 // TArray 없이 스폰
 
-bool UAPSpawnMonsterComponent::IsPossibleLocation(FVector Location)
+bool UAPSpawnMonsterComponent::IsPossibleLocation(const FVector & Location)
 {
     FCollisionShape Sphere = FCollisionShape::MakeSphere(120.0f);  
 

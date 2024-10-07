@@ -8,6 +8,8 @@
 #include "Engine/DamageEvents.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "AnimInstance/AP_EnemyBaseAnimInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameMode/APGameModeBattleStage.h"
 
 AEnemyBoss_Chapter1::AEnemyBoss_Chapter1()
 {
@@ -198,6 +200,18 @@ void AEnemyBoss_Chapter1::SpawnAttackRange(AActor* Target, float WaitTime)
     }	
 }
 
+bool AEnemyBoss_Chapter1::IsDead()
+{
+    bool bResult = Super::IsDead();
+
+    auto GM = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
+
+    if(GM)
+    GetWorldTimerManager().SetTimer(EndTimerHandle, GM, &AAPGameModeBattleStage::OnEndedGame , 5.0f, false);
+
+    return bResult;
+}
+
 void AEnemyBoss_Chapter1::OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
     auto Player = Cast<AArcanePunkCharacter>(OtherActor); if(!Player) return;
@@ -211,4 +225,8 @@ void AEnemyBoss_Chapter1::OnOverlapping(UPrimitiveComponent *OverlappedComp, AAc
 	DistinctHitPoint(Player->GetActorLocation(), Player);
     Player->TakeDamage( Damage, myDamageEvent, MyController, this);
 	if(bKnockBackAttack) OnPlayerKnockBack(Player, KnockBackDist, KnockBackTime);
+}
+
+void AEnemyBoss_Chapter1::RemoveHPUI()
+{
 }

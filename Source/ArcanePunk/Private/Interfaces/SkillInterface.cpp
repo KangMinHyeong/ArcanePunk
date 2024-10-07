@@ -5,6 +5,6 @@
 // {
 // }
 
-void ISkillInterface::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ISkillInterface::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
 }

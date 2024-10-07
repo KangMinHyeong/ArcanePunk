@@ -69,22 +69,6 @@ void APickup::UpdateInteractableData()
 	// InteractableData = InstanceInteractableData;
 }
 
-void APickup::BeginFocus()
-{
-	if (PickupMesh)
-	{
-		PickupMesh->SetRenderCustomDepth(true);
-	}
-}
-
-void APickup::EndFocus()
-{
-	if (PickupMesh)
-	{
-		PickupMesh->SetRenderCustomDepth(false);
-	}
-}
-
 void APickup::Interact(AArcanePunkCharacter* PlayerCharacter)
 {
 	if (PlayerCharacter)

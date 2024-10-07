@@ -21,8 +21,7 @@ FReply UAPSaveDataSlot::NativeOnMouseButtonDown(const FGeometry &InGeometry, con
 {
     FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
-    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
-    if(GI) GI->PlayClickSound();
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
 
     if(ParentWidget.IsValid()) ParentWidget->ChangingCurrentSaveSlot(this);
     TurnOnSlot();
@@ -52,20 +51,19 @@ void UAPSaveDataSlot::SetSlotData(UAPSaveGame * SavedData)
     TEXT_Hours->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetHour()))); 
     TEXT_Minutes->SetText(FText::FromString(FString::FromInt(SavedData->SaveInGameData.SaveDateTime.GetMinute()))); 
     
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
     auto Name = SavedData->SaveInGameData.LevelName;
 
-    APGI->SetTextBlock(TEXT_SlotName, EStringRowName::NoData);
-    APGI->SetTextBlock_Name(TEXT_SlotName, FName(*Name));
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TEXT_SlotName, EStringRowName::NoData);
+    UAPDataTableSubsystem::SetTextBlock_Name(UAPGameInstance::GetDataTableGI(GetWorld()), TEXT_SlotName, FName(*Name));
     
-    APGI->SetTextBlock(Text_Slot, EStringRowName::Slot);
-    APGI->SetTextBlock(Text_PlayTime, EStringRowName::PlayTime);
-    APGI->SetTextBlock(Text_Hour, EStringRowName::Hour);
-    APGI->SetTextBlock(Text_Minute, EStringRowName::Minute);
-    APGI->SetTextBlock(Text_Second, EStringRowName::Second);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Slot, EStringRowName::Slot);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_PlayTime, EStringRowName::PlayTime);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Hour, EStringRowName::Hour);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Minute, EStringRowName::Minute);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Second, EStringRowName::Second);
 }
 
-void UAPSaveDataSlot::SetSlotName(FString PlayerSlot, UUserWidget* Parent)
+void UAPSaveDataSlot::SetSlotName(const FString & PlayerSlot, UUserWidget* Parent)
 {
     PlayerSlotName = PlayerSlot;
     ParentWidget = Cast<UAPSaveSlotUI>(Parent);
@@ -99,7 +97,7 @@ void UAPSaveDataSlot::Save()
 void UAPSaveDataSlot::Load()
 {
     if(!bSavingData) return;
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
 
     GI->SetDefaultSlotName(PlayerSlotName);
     

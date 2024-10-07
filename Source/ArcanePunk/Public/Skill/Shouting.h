@@ -28,7 +28,7 @@ protected:
 
 	virtual void CheckSideEffect(TArray<AActor*> Actors) override;
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	
 	void SetShoutingEffect();
 	void SetShoutingAttack();

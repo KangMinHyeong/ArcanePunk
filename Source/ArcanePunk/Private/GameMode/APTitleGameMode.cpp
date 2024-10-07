@@ -31,20 +31,17 @@ void AAPTitleGameMode::StartPlay()
 {
     Super::StartPlay();
 
-    auto APGI = Cast<UAPGameInstance>(GetWorld()->GetGameInstance()); if(!APGI) return;
+	auto APGI = Cast<UAPSoundSubsystem>(GetWorld()->GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!APGI) return;
     APGI->OnChangingSoundVolume.RemoveAll(this);
     APGI->OnChangingSoundVolume.AddUObject(this, &AAPTitleGameMode::OnChangingBGMVolume);
 
     if(BGM_Cue)
-    {
-        float SoundVolume = APGI->GetGameSoundVolume().MasterVolume * APGI->GetGameSoundVolume().BGMVolume;
-        GameMode_BGM = UGameplayStatics::SpawnSound2D(GetWorld(), BGM_Cue, SoundVolume);      
-    }
+    GameMode_BGM = UAPSoundSubsystem::SpawnBGMSoundAtLocation(UAPGameInstance::GetSoundGI(GetWorld()), BGM_Cue);
 }
 
-void AAPTitleGameMode::OnChangingBGMVolume(float Master, float BGM, float Effect)
+void AAPTitleGameMode::OnChangingBGMVolume(float Master, float BGM, float Effect, float UI)
 {
     if(!GameMode_BGM.IsValid()) return;
 
-    GameMode_BGM->AdjustVolume(0.1f, FMath::Max(0.001f,Master*BGM));
+    GameMode_BGM->SetVolumeMultiplier(FMath::Max(0.001f,Master*BGM));
 }

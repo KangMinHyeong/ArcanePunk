@@ -8,9 +8,8 @@ void UAPBattleStageUI::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-    APGI->SetTextBlock(TEXT_RemainWave, EStringRowName::RemainWave);
-    APGI->SetTextBlock(TEXT_NexWaveTime, EStringRowName::RemainWaveTime);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TEXT_RemainWave, EStringRowName::RemainWave);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TEXT_NexWaveTime, EStringRowName::RemainWaveTime);
     
 }
 

@@ -17,6 +17,7 @@ class ARCANEPUNK_API UAPSmartKeySetting : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
@@ -43,6 +44,7 @@ private:
 	UFUNCTION()
 	void OnCancel();
 
+	
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UButton* SmartKeyQ_Button_On;

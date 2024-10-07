@@ -7,7 +7,7 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Blueprint/UserWidget.h"
-#include "UserInterface/Loading/LoadingFade.h"
+#include "UserInterface/Fade/LoadingFade.h"
 #include "TimerManager.h"
 #include "GameInstance/APGameInstance.h"
 #include "Components/Common/APInteractionBoxComponent.h"
@@ -24,30 +24,12 @@ void ALevelPoratl::BeginPlay()
     Super::BeginPlay();
 }
 
-void ALevelPoratl::BeginFocus()
-{
-    TWeakObjectPtr<AArcanePunkCharacter> Character = PortalInteractionTrigger->Character; if(!Character.IsValid()) return;
-	Character->ActivateInteractionSweep();
-
-    GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &ALevelPoratl::BeginFocus, InteractFrequency, true);
-}
-
-void ALevelPoratl::EndFocus()
-{
-    GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
-}
-
-FInteractData ALevelPoratl::GetInteractData()
-{
-    return PortalInteractionTrigger->GetInteractionData();
-}
-
 void ALevelPoratl::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
 	FVector PlayerLocation = PlayerCharacter->GetMesh()->GetComponentLocation();
 	PlayerCharacter->SetCanMove(false);
 	UNiagaraFunctionLibrary::SpawnSystemAttached(PortalEffect, PlayerCharacter->GetMesh(), TEXT("PortalEffect"), PlayerLocation, PlayerCharacter->GetMesh()->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
-	SpawnSound(PlayerLocation);
+	UAPSoundSubsystem::SpawnEffectSoundAtLocation(UAPGameInstance::GetSoundGI(GetWorld()) , PortalSound, PlayerLocation);
 
 	PlayerCharacter->GetPlayerPanelAura()->SetHiddenInGame(true);
 
@@ -56,11 +38,6 @@ void ALevelPoratl::Interact(AArcanePunkCharacter *PlayerCharacter)
     CharacterPC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!CharacterPC.IsValid()) return;
     PlayerCharacter->DisableInput(CharacterPC.Get());
 
-}
-
-void ALevelPoratl::SpawnSound(FVector Location)
-{
-	Super::SpawnSound(Location);
 }
 
 void ALevelPoratl::StartLoading()

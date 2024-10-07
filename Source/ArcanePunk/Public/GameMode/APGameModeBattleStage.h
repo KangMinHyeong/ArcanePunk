@@ -21,6 +21,8 @@ public:
 	FORCEINLINE USoundBase* GetSpawnSound() const {return SpawnSound;}; 
 	FORCEINLINE float GetSpawnSoundVolume() const {return SpawnSoundVolume;}; 
 
+	void OnEndedGame();
+	
 protected:
 	virtual void StartPlay() override;
 

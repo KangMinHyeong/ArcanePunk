@@ -35,15 +35,15 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
 private:
 	UFUNCTION()
 	void MoveToMouseClick(FVector ClickPoint);
-	UFUNCTION()
-	void CopyAttack(uint8 ComboStack);
+	// UFUNCTION()
+	// void CopyAttack(uint8 ComboStack);
 
 	void EndHitting();
 

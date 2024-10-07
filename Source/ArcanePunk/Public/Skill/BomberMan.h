@@ -22,7 +22,7 @@ protected:
     void FastBuff();
 
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	virtual void DestroySKill() override;
 
 private:

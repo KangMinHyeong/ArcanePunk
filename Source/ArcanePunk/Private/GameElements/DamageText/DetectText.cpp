@@ -35,12 +35,12 @@ void ADetectText::TimeLineUpdateFunc(float Output)
 	MyTextRender->SetYScale(InitScale*Output);
 }
 
-void ADetectText::TimeLineUpdateFunc2(FVector Output)
+void ADetectText::TimeLineUpdateFunc2(const FVector & Output)
 {
 	SetActorLocation(InitLocation + Output);
 }
 
-void ADetectText::TimeLineUpdateFunc3(FLinearColor Output)
+void ADetectText::TimeLineUpdateFunc3(const FLinearColor & Output)
 {
 	MyTextRender->SetTextRenderColor(DetectColor.WithAlpha(Output.A));
 }

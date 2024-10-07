@@ -36,7 +36,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	FORCEINLINE void SetTargetEnemy(ACharacter* Enemy) {TargetEnemy = Enemy;};
 	FORCEINLINE void SetTargetEnemyLocation(FVector Location) {TargetEnemyLocation = Location;};

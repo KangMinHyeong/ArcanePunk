@@ -102,14 +102,14 @@ void ABlackHole::OnSlow()
     } 
 }
 
-void ABlackHole::UpdateSlowPercent(FVector EnemyLocation)
+void ABlackHole::UpdateSlowPercent(const FVector & EnemyLocation)
 {
     FVector Current = GetActorLocation() - EnemyLocation; Current.Z = 0.0f;
     float size = (GravityTrigger->GetScaledSphereRadius() - Current.Size()) / GravityTrigger->GetScaledSphereRadius(); size = FMath::Max(0.0f, size);
     HitPointComp->SetSlowPercent(SlowPercent * size);
 }
 
-void ABlackHole::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ABlackHole::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

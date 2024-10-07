@@ -4,16 +4,16 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Character/ArcanePunkCharacter.h"
 
-// Add default functionality here for any IInteractionInterface functions that are not pure virtual.
-void IInteractionInterface::BeginFocus()
+bool IInteractionInterface::BeginFocus()
 {
-
+    // if true, When Focusing Actor Direct Act;
+    return false;
 }
 
-void IInteractionInterface::EndFocus()
-{
+// void IInteractionInterface::EndFocus()
+// {
 
-}
+// }
 
 FInteractData IInteractionInterface::GetInteractData()
 {

@@ -30,9 +30,9 @@ private:
 	UFUNCTION()
 	void TimeLineUpdateFunc(float Output);
 	UFUNCTION()
-	void TimeLineUpdateFunc2(FVector Output);
+	void TimeLineUpdateFunc2(const FVector & Output);
 	UFUNCTION()
-	void TimeLineUpdateFunc3(FLinearColor Output);
+	void TimeLineUpdateFunc3(const FLinearColor & Output);
  
 	UFUNCTION()
 	void TimeLineFinishFunc();

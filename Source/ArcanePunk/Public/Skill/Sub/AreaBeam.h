@@ -22,7 +22,7 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetBeamRotation(FVector TargetVector);
 	FORCEINLINE void SetDestroyTime(float Time) {DestroyTime = Time;};

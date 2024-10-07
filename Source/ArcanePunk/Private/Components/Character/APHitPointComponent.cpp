@@ -11,7 +11,7 @@ UAPHitPointComponent::UAPHitPointComponent()
 
 }
 
-void UAPHitPointComponent::DistinctHitPoint(FVector ImpactPoint, AActor *HitActor)
+void UAPHitPointComponent::DistinctHitPoint(const FVector & ImpactPoint, AActor *HitActor)
 {
 	FVector HitPoint = ImpactPoint - HitActor->GetActorLocation();
 	FVector HitActorForwardVec = HitActor->GetActorForwardVector(); 
@@ -24,7 +24,7 @@ void UAPHitPointComponent::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	if(Enemy) {Enemy->SetHitPoint(Forward, Right); Enemy->SetHitEffect(ImpactPoint);}
 }
 
-void UAPHitPointComponent::DistinctHitPoint(UNiagaraSystem* HitEffect, FVector ImpactPoint, AActor *HitActor)
+void UAPHitPointComponent::DistinctHitPoint(UNiagaraSystem* HitEffect, const FVector & ImpactPoint, AActor *HitActor)
 {
 	FVector HitPoint = ImpactPoint - HitActor->GetActorLocation();
 	FVector HitActorForwardVec = HitActor->GetActorForwardVector(); 

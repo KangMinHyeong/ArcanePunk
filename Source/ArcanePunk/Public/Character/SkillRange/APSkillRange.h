@@ -32,7 +32,7 @@ public:
 	UDecalComponent* GetDecalComponent() {return RangeDecal;};
 	USceneComponent* GetRootComponent() const {return RootComp;};
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetAngle(float AngleSize);
 	void SetScale(float Range);

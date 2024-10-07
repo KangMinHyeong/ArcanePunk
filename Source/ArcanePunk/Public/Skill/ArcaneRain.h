@@ -22,10 +22,10 @@ protected:
 	virtual void BeginPlay() override;	
 
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	
 	UFUNCTION(BlueprintCallable)
-	void SetRainAttack(FVector CollisionLocation);
+	void SetRainAttack(const FVector & CollisionLocation);
 
 private:
 	virtual void DestroySKill() override;

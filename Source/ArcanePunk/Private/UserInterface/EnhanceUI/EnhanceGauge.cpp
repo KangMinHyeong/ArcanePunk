@@ -10,8 +10,7 @@ void UEnhanceGauge::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-    APGI->SetTextBlock(TextBlock_MaxEnhance, EStringRowName::Message_MaxEnhance);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_MaxEnhance, EStringRowName::Message_MaxEnhance);
 }
 
 void UEnhanceGauge::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)

@@ -72,7 +72,7 @@ void ASwordClutch::SpawnClutchTrigger()
     
 }
 
-void ASwordClutch::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ASwordClutch::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent); // Wide 곱해주기 추가
     if(!OwnerCharacter.IsValid()) return;

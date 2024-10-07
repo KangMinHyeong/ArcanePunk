@@ -10,6 +10,7 @@
 
 class AArcanePunkCharacter;
 class UAPGameInstance;
+class UAPDataTableSubsystem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPPassiveComponent : public UActorComponent
@@ -51,6 +52,7 @@ private:
 private:
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPDataTableSubsystem> DataTableGI;
 
 	UPROPERTY(EditAnywhere)
 	FPlayerTotalData Status_Init; // 오리지널 스테이터스 

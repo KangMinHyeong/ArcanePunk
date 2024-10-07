@@ -57,7 +57,7 @@ void UAPDestructibleMeshComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	}
 }
 
-void UAPDestructibleMeshComponent::Explode(FVector HitLocation)
+void UAPDestructibleMeshComponent::Explode(const FVector & HitLocation)
 {
 	SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Ignore);
 	SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);

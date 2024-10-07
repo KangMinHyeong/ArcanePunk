@@ -17,6 +17,7 @@ class ARCANEPUNK_API UAPOptionSetting : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
@@ -32,9 +33,12 @@ public:
 	void OnClickButton_Key();
 	UFUNCTION()
 	void OnClickButton_Screen();
+	UFUNCTION()
+	void OnClickButton_OtherSettings();
 
 	UFUNCTION()
 	void OnClickButton_Back();
+
 
 	// Option Setting
 	// void InitGraphicsSetting();
@@ -52,6 +56,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Screen;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UButton* Button_OtherSettings;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UButton* Button_Back;
@@ -72,6 +79,9 @@ private:
 	UWidget* ScreenSettingUI;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UWidget* OtherSettingUI;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_Graphic;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
@@ -82,6 +92,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* Text_Screen;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* Text_OtherSettings;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_SettingTitle;
@@ -95,4 +108,7 @@ private:
 	UTexture2D* TabImage_ON;
 	UPROPERTY(EditAnywhere)
 	UTexture2D* TabImage_OFF;
+
+	FButtonStyle ButtonStyle_On;
+	FButtonStyle ButtonStyle_Off;
 };

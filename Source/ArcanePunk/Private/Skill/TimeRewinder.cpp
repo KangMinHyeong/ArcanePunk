@@ -68,7 +68,7 @@ void ATimeRewinder::SetTimeRewinderAttack()
     GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ATimeRewinder::DestroySKill, 3.0f, false);
 }
 
-void ATimeRewinder::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ATimeRewinder::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return; 

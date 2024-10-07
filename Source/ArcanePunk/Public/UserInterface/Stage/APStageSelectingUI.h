@@ -27,7 +27,7 @@ public:
 
 	UFUNCTION()
 	void OnClickButton_Back();
-
+	
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UWidgetSwitcher* Switcher_StageSlot;

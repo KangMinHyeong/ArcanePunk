@@ -13,6 +13,7 @@ class UHorizontalBox;
 class UChoiceButton;
 class USizeBox;
 class UAPGameInstance;
+class UAPDataTableSubsystem;
 class UBorder;
 
 UCLASS()
@@ -26,7 +27,7 @@ public:
 
 	void ApplyEnhance(uint8 UpdateSkillNumber, uint8 UpdateSkillAbility, uint16 UpdateNestingNumb, uint16 MaxNestingNumb);
 	void ApplyNewSkill(uint8 UpdateSkillNumber);
-	FORCEINLINE UDataTable* GetSkillAbilityRowNameData() const {return SkillAbilityRowNameData;};
+
 	FORCEINLINE EEnhanceCategory GetEnHanceCategory() const {return EnhanceCategory;};
 	FORCEINLINE EEnHanceType GetEnHanceType() const {return EnHanceType;};
 	FORCEINLINE FSkillAbilityNestingData GetSkillAbilityNestingData() const {return SkillAbilityNestingData;};
@@ -63,7 +64,7 @@ private:
 	void SetChoiceButton();
 
 	UFUNCTION()
-	void OnCancel();
+	void OnClick_Cancel();
 
 	void OnPlayingChoiceButton(uint8 CurrentNum);
 
@@ -91,6 +92,7 @@ private:
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPDataTableSubsystem> DataTableGI;
 
 	EEnhanceCategory EnhanceCategory = EEnhanceCategory::None;
 
@@ -131,9 +133,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float PassiveSkillAppearPercent = 50.0f; // 스킬 등장 확률, 100 - 스킬 등장 확률 = 증강 등장 확률
-
-	UPROPERTY(EditAnywhere)
-	UDataTable* SkillAbilityRowNameData;
 
 	FSkillAbilityNestingData SkillAbilityNestingData;
 

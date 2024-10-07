@@ -31,8 +31,8 @@ void UAPSkillSlot::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)
 void UAPSkillSlot::UpdateSkillSlot(ESkillKey UpdateSkillKey, uint8 SkillNumber)
 {
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());if(!OwnerCharacter.IsValid()) return;
-    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
-
+    DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI.IsValid()) return; 
+  
     CurrentCoolTime = 0.0f;
     CurrentChargeTime = 0.0f;
     CurrentSkillKey = UpdateSkillKey;
@@ -62,7 +62,7 @@ void UAPSkillSlot::SetSkillSlotImage(uint8 SkillNumber)
     if(!SkillNum) return;
     auto SkillRowName = SkillNum->GetNameStringByValue(SkillNumber);
 
-    auto DataTable = APGI->GetSkillNameList()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!DataTable){return;}
+    auto DataTable = DataTableGI->GetSkillNameListDataTable()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!DataTable){return;}
 
     SkillImage->SetBrushFromTexture(DataTable->SkillSlotImage); 
 }

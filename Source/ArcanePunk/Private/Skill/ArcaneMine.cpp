@@ -89,7 +89,7 @@ void AArcaneMine::Explosion()
     DestroySKill();
 }
 
-void AArcaneMine::SetTarget(FVector TargetComponent)
+void AArcaneMine::SetTarget(const FVector & TargetComponent)
 {
     // MineMoveComp->HomingTargetComponent = TargetComponent;
     
@@ -107,7 +107,7 @@ void AArcaneMine::DestroySKill()
     Super::DestroySKill();
 }
 
-void AArcaneMine::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneMine::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

@@ -19,10 +19,10 @@
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Components/Character/APAnimHubComponent.h"
-#include "Components/Character/APTakeDamageComponent.h"
 #include "Components/Character/APSpawnFootPrintComponent.h"
 #include "PlayerState/ArcanePunkPlayerState.h"
 #include "GameMode/APGameModeBase.h"
+#include "GameMode/APGameModeBattleStage.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Common/APGhostTrailSpawnComponent.h"
 #include "Components/SkillActor/APSkillAbility.h"
@@ -56,7 +56,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	FadeOutTigger = CreateDefaultSubobject<UAPFadeOutTriggerComponent>(TEXT("FadeOutTigger"));
 
 	SkillHubComponent = CreateDefaultSubobject<UAPSkillHubComponent>(TEXT("SkillHubComponent"));
-	TakeDamageComp = CreateDefaultSubobject<UAPTakeDamageComponent>(TEXT("TakeDamageComp"));
 	APSpawnStepComp = CreateDefaultSubobject<UAPSpawnFootPrintComponent>(TEXT("APSpawnStepComp"));
 	BuffComp = CreateDefaultSubobject<UAPBuffComponent>(TEXT("BuffComp"));
 	SkillAbility = CreateDefaultSubobject<UAPSkillAbility>(TEXT("SkillAbility"));
@@ -83,8 +82,6 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	bUseControllerRotationYaw = false;
 
 	// prodo
-	InteractionCheckFrequency = 0.1f;
-	InteractionCheckDistance = 225.0f;
 	PlayerInventory = CreateDefaultSubobject<UAPInventoryComponent>(TEXT("PlayerInventory"));
 
 	// set capacity of inventory
@@ -151,15 +148,12 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAction(TEXT("Block"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::OnBlockMode);
 	
-	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Save);
-
 	PlayerInputComponent->BindAction(TEXT("WorldMap"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::WorldMap);
 
 	PlayerInputComponent->BindAction(TEXT("Alt_RightClick"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Alt_RightClick);
-	
-	// prodo
+
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
-	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AArcanePunkCharacter::EndInteract);
+	// PlayerInputComponent->BindAction("Interact", IE_Released, this, &AArcanePunkCharacter::EndInteract);
 	PlayerInputComponent->BindAction("ToggleMenu", IE_Pressed, this, &AArcanePunkCharacter::ToggleMenu);
 }
 
@@ -174,7 +168,6 @@ void AArcanePunkCharacter::InitComponent()
 {
 	// 컴포넌트 초기화
 	AttackComponent->InitAttackComp();
-	TakeDamageComp->InitTakeDamageComp();
 }
 
 void AArcanePunkCharacter::MoveForward(float AxisValue)
@@ -278,8 +271,8 @@ void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName
 	{
 		if (!EquipID.IsNone())
 		{
-			auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-			const FItemData* ItemData = APGI->GetEquipDataTable()->FindRow<FItemData>(EquipID, EquipID.ToString());
+   			auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
+			const FItemData* ItemData = DataTableGI->GetEquipDataTable()->FindRow<FItemData>(EquipID, EquipID.ToString());
 
 			auto ItemReference = NewObject<UAPItemBase>(this, UAPItemBase::StaticClass());
 
@@ -373,7 +366,7 @@ void AArcanePunkCharacter::PressedDash()
 	if(!bCanMove || !StopState.IsEmpty() || IsDead()) return;
 	if(bDoing && !AttackComponent->IsComboAttack() && !AttackComponent->IsParrying()) return;
 	if(!bCanDash) return;
-
+	
 	bDoing = true;
 	bCanDash = false;
 	bCanMove = false;
@@ -420,16 +413,9 @@ void AArcanePunkCharacter::SetSkillAbility(EEnhanceCategory EnhanceCategory, EEn
 	if(!HUD) return;
 
 	HUD->DisplayEnhanceChoice(EnhanceCategory, EnHanceType);
-	bInteract = false;
 }
 
-void AArcanePunkCharacter::Save()
-{
-	if(!PC.IsValid()) return;
-	PC->OpenSaveSlot();
-}
-
-void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName)
+void AArcanePunkCharacter::SaveStatus(const FString & PlayerSlotName)
 {
 	// if (!HUD->TutorialDone) {
 	// 	HUD->UpdateTutorialWidget("PressCtrl + 9");
@@ -451,8 +437,7 @@ void AArcanePunkCharacter::SaveStatus(FString PlayerSlotName)
 
 	MyGameState->UpdateGameData(MyGameStatus);	
 
-	if(!PC.IsValid()) return;
-	PC->StartSaveUI();
+	UAPDataTableSubsystem::DisplaySystemMesseage(UAPGameInstance::GetDataTableGI(GetWorld()), EStringRowName::SaveComplete, false, false);
 }
 
 void AArcanePunkCharacter::SetRSkill(EUltSkillNumber NewSkill)
@@ -483,7 +468,7 @@ void AArcanePunkCharacter::SetRSkill(EUltSkillNumber NewSkill)
 	SkillHubComponent->UpdatingSkill_R();
 }
 
-void AArcanePunkCharacter::AddPassive(EPassiveNumber PassiveNum)
+void AArcanePunkCharacter::AddPassive(const EPassiveNumber & PassiveNum)
 {
 	if(PassiveSkills.Contains((uint8)PassiveNum)) return;
 	
@@ -492,7 +477,7 @@ void AArcanePunkCharacter::AddPassive(EPassiveNumber PassiveNum)
 	PassiveComp->ApplyNewPassive(PassiveNum);
 }
 
-void AArcanePunkCharacter::AddPassive_Enhance(uint8 PassiveNum, EEnHanceType EnHanceType, uint8 AbilityNum, uint16 AbilityNestingNum)
+void AArcanePunkCharacter::AddPassive_Enhance(uint8 PassiveNum, const EEnHanceType & EnHanceType, uint8 AbilityNum, uint16 AbilityNestingNum)
 {
 	if(!PassiveSkills.Contains(PassiveNum)) return;
 	switch (EnHanceType)
@@ -538,7 +523,7 @@ void AArcanePunkCharacter::CurrentPlayerLocation() // 후에 사용할지 말지
 	}
 }
 
-FTransform AArcanePunkCharacter::ReturnCameraTransform()
+const FTransform & AArcanePunkCharacter::ReturnCameraTransform()
 {
     return APCamera->GetComponentTransform();
 }
@@ -576,21 +561,66 @@ void AArcanePunkCharacter::SetHideMode(bool NewBool)
 float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
 	if(AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator)) return 0.0f;
-	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float DamageApplied = DamageAmount;
 
-	if(ReflectingModeGauge > 0) {TakeDamageComp->ReflectDamage(DamageApplied, DamageCauser); return DamageApplied;}
+	if(ReflectingModeGauge > 0) {AttackComponent->ReflectDamage(DamageApplied, DamageCauser); return DamageApplied;}
 
 	float OriginHP = TotalStatus.StatusData.HP;
-	if(!bBlockMode)
+	if(bBlockMode) return 0.0f;
+	
+	bool Check = false;
+	if(GetAPPassiveComp()->IsDamagedPassive()) Check = CheckingDamaged();
+	if(Check) return 0.0f;
+
+	float & HP = TotalStatus.StatusData.HP;
+	DamageApplied = DamageMath(DamageApplied);
+
+	if(CheckShieldHP(DamageApplied, DamageEvent)) return 0.0f;
+
+	if(DamageApplied >= HP && GetRageMode()) {HP = 1.0f;}
+	else
+	{	
+		HP = FMath::Clamp<float>(HP - DamageApplied, 0.0f, TotalStatus.StatusData.MaxHP);
+	}
+	
+	if(IsDead())
 	{
-		TakeDamageComp->DamageCalculation(DamageApplied);
-		// if(bDash) ReleasedDash();
-		UpdateStatus();
-		if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
+		SetCanMove(false);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// OwnerCharacter->DetachFromControllerPendingDestroy();
+		DeadPenalty(3.0f);
+		auto BattleGM = Cast<AAPGameModeBattleStage>(GM); 
+		if(BattleGM) BattleGM->PlayerKilled();
+	}
+	else
+	{ 
+		if(GetRageMode()) return 0.0f;
+		if(PC.IsValid() && DamageApplied > KINDA_SMALL_NUMBER) PC->HitUI();
+		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), HP);
 	}
 
+	UpdateStatus();
+	if(HUD) HUD->OnUpdateHPBar.Broadcast(OriginHP);
+
 	PassiveComp->CheckDamagedGold();
+
+	Super::TakeDamage(DamageApplied, DamageEvent, EventInstigator, DamageCauser);
     return DamageApplied;
+}
+
+bool AArcanePunkCharacter::CheckingDamaged()
+{
+	// DamagedNumber++;
+
+	// if(DamagedNumber == 8 && DamagedShield.IsValid()) {DamagedNumber = 0; DamagedShield->Destroy(); return true;}
+	// else if(DamagedNumber == 7)
+	// {
+	// 	DamagedShield = GetWorld()->SpawnActor<AActor>(DamagedShieldClass, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+	// 	DamagedShield->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+	// }
+
+	return false;
 }
 
 bool AArcanePunkCharacter::IsDead()
@@ -647,7 +677,7 @@ void AArcanePunkCharacter::SetEquipData(uint8 NewValue, UAPItemBase *NewData)
 	}
 }
 
-bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, FVector OverlapStart, FVector OverlapEnd) // 캐릭터 발 밑 피지컬머터리얼 체크
+bool AArcanePunkCharacter::PMCheck(FHitResult &HitResult, const FVector & OverlapStart, const FVector & OverlapEnd) // 캐릭터 발 밑 피지컬머터리얼 체크
 {
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
@@ -686,70 +716,20 @@ void AArcanePunkCharacter::InitPlayerStatus()
 	auto MyGameState = Cast<AAPGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	MyGameStatus = MyGameState->GameData;
 
-	if(HUD) HUD->OnUpdateMaxHPBar.Broadcast(TotalStatus_Origin.StatusData.HP);
+	if(HUD)
+	{
+		HUD->OnUpdateMaxHPBar.Broadcast(TotalStatus_Origin.StatusData.MaxHP);
+		HUD->OnUpdateHPBar.Broadcast(TotalStatus_Origin.StatusData.HP);
+	}
+
+	OnCheckingShield.Broadcast(this);
 }
 
 void AArcanePunkCharacter::BeginInteract()
 {
-	bInteract = true;
-
-	if(!InteractionActors.IsEmpty())
-	{
-		auto Interface = Cast<IInteractionInterface>(InteractionActors.Top());
-		if(Interface)
-		{
-			Interface->Interact(this);
-		}
-	}
+	OnBeginInteract.Broadcast(this);
 }
 
-void AArcanePunkCharacter::EndInteract()
-{
-	bInteract = false;
-}
-
-void AArcanePunkCharacter::ActivateInteractionSweep()
-{
-	TArray<FHitResult> HitResults;
-	FCollisionShape Sphere =  FCollisionShape::MakeSphere(InteractionRadius);
-	FCollisionObjectQueryParams ObjectQueryParam(FCollisionObjectQueryParams::InitType::AllDynamicObjects); 
-	if(GetWorld()->SweepMultiByObjectType(HitResults, GetActorLocation(), GetActorLocation()+GetActorUpVector()*15.0f, FQuat::Identity, ObjectQueryParam, Sphere))// 타격 판정 인자 Params 인자 추가
-	{
-		InteractionActors.Empty();
-		for(auto HitResult : HitResults)
-		{
-			auto Interface = Cast<IInteractionInterface>(HitResult.GetActor());
-			if(Interface)
-			{
-				InteractionActors.Add(HitResult.GetActor());
-			}
-		}
-		if(InteractionActors.IsEmpty()) return;
-
-		if(InteractionActors.Num() >= 2)
-		{
-			InteractionActors.Sort([this](AActor& A, AActor& B) 
-			{
-				return (A.GetActorLocation() - GetActorLocation()).Size() > (B.GetActorLocation() - GetActorLocation()).Size();
-			});
-		}
-		if(PC.IsValid())
-		{
-			auto Interface = Cast<IInteractionInterface>(InteractionActors.Top());
-			if(Interface)
-			{
-				PC->OpenInteraction(InteractionActors.Top(), Interface->GetInteractData());
-			}
-		} 
-	}
-}
-
-void AArcanePunkCharacter::InteractionActorRemove(AActor* InteractionActor)
-{
-	if(InteractionActors.IsEmpty()) return;
-
-	InteractionActors.Remove(InteractionActor);
-}
 
 // prodo
 void AArcanePunkCharacter::DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop)

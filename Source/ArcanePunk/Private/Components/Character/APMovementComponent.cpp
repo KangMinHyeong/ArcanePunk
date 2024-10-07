@@ -40,7 +40,7 @@ void UAPMovementComponent::PlayerMoveForward(float AxisValue)
 	if(PlayerVec.SizeSquared() == 0) return;
 	PlayerRot = FRotationMatrix::MakeFromX(PlayerVec).Rotator();
 
-	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
+	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove() || OwnerCharacter->GetDoing()) return;
 	// X축 기준
 	OwnerCharacter->GetController()->SetControlRotation(PlayerRot);
 	OwnerCharacter->AddMovementInput(PlayerVec);
@@ -59,7 +59,7 @@ void UAPMovementComponent::PlayerMoveRight(float AxisValue)
 	PlayerVec.X = AxisValue;
 	if(PlayerVec.SizeSquared() == 0) return;
 	PlayerRot = FRotationMatrix::MakeFromX(PlayerVec).Rotator();
-	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove()) return;
+	if(!OwnerCharacter.IsValid() || !OwnerCharacter->GetCanMove() || OwnerCharacter->GetDoing()) return;
 
 	// X축 기준
 	OwnerCharacter->GetController()->SetControlRotation(PlayerRot);
@@ -142,7 +142,7 @@ void UAPMovementComponent::ComboMovement()
 	SetComponentTickEnabled(true);
 }
 
-void UAPMovementComponent::StartTickMove(FVector ToLocation)
+void UAPMovementComponent::StartTickMove(const FVector & ToLocation)
 {
 	TargetLocation = OwnerCharacter->GetActorLocation() + ToLocation;
 	LocSpeed = PushSpeed;
@@ -167,7 +167,7 @@ void UAPMovementComponent::RotateMoveStop()
 	bRotation = false;
 }
 
-void UAPMovementComponent::SetAttackRotation(FRotator NewTargetRot, float AddSpeed)
+void UAPMovementComponent::SetAttackRotation(const FRotator & NewTargetRot, float AddSpeed)
 {
 	Current = GetOwner()->GetActorRotation();
 	TargetRot = NewTargetRot;

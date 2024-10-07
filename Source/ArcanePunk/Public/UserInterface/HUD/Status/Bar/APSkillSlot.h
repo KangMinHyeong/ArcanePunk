@@ -12,6 +12,7 @@ class UTextBlock;
 class UBorder;
 class AArcanePunkCharacter;
 class UAPGameInstance;
+class UAPDataTableSubsystem;
 
 UCLASS()
 class ARCANEPUNK_API UAPSkillSlot : public UUserWidget
@@ -97,7 +98,7 @@ protected:
 	FTimerHandle ChargeTimerHandle;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
-	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPDataTableSubsystem> DataTableGI;
 
 	ESkillKey CurrentSkillKey;
 

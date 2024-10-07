@@ -12,35 +12,36 @@ void UAPEnhanceSlot::NativeConstruct()
 {
     Super::NativeConstruct();
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
-    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
+    DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI.IsValid()) return; 
 
-    Button_Enhance->OnClicked.AddDynamic(this, &UAPEnhanceSlot::OnEnhanceInformation);
+    Button_Enhance->OnClicked.AddDynamic(this, &UAPEnhanceSlot::OnClick_Slot);
+    Button_Enhance->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 }
 
-void UAPEnhanceSlot::InitEnhanceData(UUserWidget *Parent, EEnHanceType UpdateEnhanceType, FName UpdateRowName, uint8 UpdateEnhanceNumber, uint16 UpdateNestingNumber)
+void UAPEnhanceSlot::InitEnhanceData(UUserWidget *Parent, EEnHanceType UpdateEnhanceType, const FName & UpdateRowName, uint8 UpdateEnhanceNumber, uint16 UpdateNestingNumber)
 {
     ParentWidget = Parent;
     EnHanceType = UpdateEnhanceType;
     EnhanceNumber = UpdateEnhanceNumber;
     NestingNumber = UpdateNestingNumber;
 
-    auto DataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(UpdateRowName, UpdateRowName.ToString()); if(!DataTable) return;
+    auto DataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(UpdateRowName, UpdateRowName.ToString()); if(!DataTable) return;
     switch (EnHanceType)
     {
     case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName[EnhanceNumber-1];
-        AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
         break;
     
     case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName[EnhanceNumber-1];
-        AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
         Image_TierColor->SetColorAndOpacity(GoldColor);
         break;
 
     case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName[EnhanceNumber-1];
-        AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
         Image_TierColor->SetColorAndOpacity(PlatinumColor);
         break;
     }
@@ -56,8 +57,10 @@ void UAPEnhanceSlot::InitEnhanceData(UUserWidget *Parent, EEnHanceType UpdateEnh
     // image 바꾸기
 }
 
-void UAPEnhanceSlot::OnEnhanceInformation()
+void UAPEnhanceSlot::OnClick_Slot()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+    
     auto SkillWindow = Cast<UAPSkillWindow>(ParentWidget.Get()); if(!SkillWindow) return;
     SkillWindow->OpenEnhanceInformation(EnHanceType, AbilityData, NestingNumber);
 }

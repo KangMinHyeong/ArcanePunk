@@ -11,8 +11,8 @@ void UAPEntranceUI::NativeConstruct()
     Super::NativeConstruct();
 
     auto Name = UGameplayStatics::GetCurrentLevelName(GetWorld());
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-    auto DataTable = APGI->GetStringData()->FindRow<FStringDataTable>(FName(*Name), Name); 
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;     
+    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(FName(*Name), Name); 
     
     if(DataTable) {TEXT_LevelName->SetText(FText::FromString(DataTable->Content));}
     else {TEXT_LevelName->SetText(FText::FromString(Name));}

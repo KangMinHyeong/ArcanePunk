@@ -8,10 +8,8 @@ void UAPShopListTitle::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-
-    APGI->SetTextBlock(Text_GoodsName, EStringRowName::ItemList);
-    APGI->SetTextBlock(Text_GoodsNum, EStringRowName::Quantity);
-    APGI->SetTextBlock(Text_GoodsPrice, EStringRowName::Price);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_GoodsName, EStringRowName::ItemList);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_GoodsNum, EStringRowName::Quantity);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_GoodsPrice, EStringRowName::Price);
 
 }

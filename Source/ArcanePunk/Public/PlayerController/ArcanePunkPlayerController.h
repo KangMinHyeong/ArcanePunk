@@ -10,9 +10,7 @@
 
 class UUserWidget;
 class UAPStatusUI;
-class UHomingTargetUI;
 class UAPOptionSetting;
-class UAPMouseClickBase;
 class UAPSaveSlotUI;
 class UInteractionWidget;
 struct FInteractData;
@@ -44,14 +42,9 @@ public:
 
 	void SetMouseCursor();
 	
-	// Stage Enter UI
-	void CreateEntranceUI();
-
 	// Save UI
 	void OpenSaveSlot();
 	void CloseSaveSlot();
-
-	void StartSaveUI();
 
 	// Stage Selecting UI
 	void OpenStageSelectingUI(AActor* CameraActor);
@@ -59,7 +52,7 @@ public:
 	
 	// Conversation UI
 	void OpenConversationUI(AActor* CameraActor, FName RowName);
-	void CloseConversationUI(FName Name);
+	void CloseConversationUI(const FName & Name);
 
 	// Shopping UI
 	void OpenShoppingUI(AActor* ShopActor, const FShopListData & ShopListData);
@@ -70,10 +63,7 @@ public:
 
 	FORCEINLINE UAPStatusUI* GetStatusUI() { return StatusWidget.Get(); };
 
-	void DisplayHomingUI(ESkillNumber SkillNumber);
 	void ReturnToDefault();
-	void PreventOtherClick(ESkillNumber SkillNumber, bool Loop = false);
-	void PreventOtherClick_Ult( bool Loop = false);
 	
 	// Arcane Tent
 	void SetHideUI(bool NewBool);
@@ -81,15 +71,8 @@ public:
 	// Option Menu
 	void OptionSetting();
 
-	// Interaction UI
-	void OpenInteraction(AActor* NewActor, FInteractData InteractData);
-	void CloseInteraction(AActor* NewActor);
-
 	// Dead UI
 	void DisplayDeadUI();
-
-	// Not Enough MP
-	void DisplayNotEnoughMPUI();
 
 	// Skill Window
 	void DisplaySkillWindow();
@@ -99,6 +82,9 @@ public:
 
 	// Attack CameraShake
 	void AttackCameraShake();
+
+	// DisplayEnding
+	void DisplayEnding();
 
 protected:
 	virtual void BeginPlay() override;
@@ -124,12 +110,6 @@ private:
 	TWeakObjectPtr<ULoadingFade> FadeLoadingWidget;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> EntranceUIClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> SaveCompleteClass;
-
-	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> HitWidgetClass;
 
 	UPROPERTY(EditAnywhere)
@@ -145,12 +125,6 @@ private:
 	TSubclassOf<UCameraShakeBase> AttackCS;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UHomingTargetUI> HomingUIClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UAPMouseClickBase> MouseClickUIClass;
-
-	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> HideUIClass;
 
 	UPROPERTY(EditAnywhere)
@@ -159,9 +133,6 @@ private:
 	TWeakObjectPtr<UAPStatusUI> StatusWidget;
 	
 	TWeakObjectPtr<UUserWidget> SaveUI;
-
-	TWeakObjectPtr<UHomingTargetUI> HomingUI;
-	TWeakObjectPtr<UAPMouseClickBase> MouseClickUI;
 
 	TWeakObjectPtr<UUserWidget> HideUI;
 
@@ -192,17 +163,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> OptionSettingClass;
 
+	TWeakObjectPtr<UAPOptionSetting> OptionSettingUI;
+
 	// Stage Select 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> StageSelectingUIClasss;
-
-	// Interaction UI
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> InteractionUIClass;
-
-	TWeakObjectPtr<UInteractionWidget> InteractionWidget;
-
-	TWeakObjectPtr<AActor> InteractionActor;
 
 	FTimerHandle InteractionTimerHandle;
 
@@ -219,23 +184,20 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> ShoppingUIClass;
 	TWeakObjectPtr<UAPShoppingUI> ShoppingUI;
-
-	// Not Enough MP
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> NotEnoughMPUIClass;
 	
 	// SkillWindowUIClass 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> SkillWindowUIClass;
+
+	//Demo Ending UI
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> DemoEndUIClass;
 
 	UPROPERTY()
 	AActor* ConversationActor;
 
 public:
 	FOnUpdateStatusText OnUpdateStatusText;
-	
-	UPROPERTY()
-	TArray<bool> SmartKeyArr; // QER 스마트키
 	
 	float MousePositionAngle = 0.0f;
 };

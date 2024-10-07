@@ -21,10 +21,15 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInteractUI_FadeIn();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInteractUI_FadeOut();
+
 	UFUNCTION()
 	float UpdateInteractionProgress();
 
-	void UpdateWidget(FInteractData InteractData);
+	void UpdateWidget(const FInteractData & InteractData);
 
 protected:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category="Interaction Widget | Interactable Data")

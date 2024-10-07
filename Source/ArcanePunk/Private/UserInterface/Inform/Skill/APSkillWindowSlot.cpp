@@ -15,9 +15,10 @@ void UAPSkillWindowSlot::NativeConstruct()
 {
     Super::NativeConstruct();
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
-    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
+    DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI.IsValid()) return; 
     
-    Button_Skill->OnClicked.AddDynamic(this, &UAPSkillWindowSlot::OnSkillInformation);
+    Button_Skill->OnClicked.AddDynamic(this, &UAPSkillWindowSlot::OnClick_SkillInformation);
+    Button_Skill->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 }
 
 void UAPSkillWindowSlot::InitSkillCategory(UUserWidget* Parent, EEnhanceCategory UpdateEnhanceCategory)
@@ -68,7 +69,7 @@ void UAPSkillWindowSlot::InitPassiveCategory(UUserWidget* Parent, uint8 UpdatePa
 
     const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EPassiveNumber"), true); if(!SkillNum) return;
     SkillRowName = SkillNum->GetNameStringByValue(SkillNumber);
-    SkillNameTable = APGI->GetSkillNameList()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
+    SkillNameTable = DataTableGI->GetSkillNameListDataTable()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
 
     Text_SkillName->SetText(FText::FromString(SkillNameTable->SkillName_Korean));
 
@@ -78,7 +79,7 @@ void UAPSkillWindowSlot::InitPassiveCategory(UUserWidget* Parent, uint8 UpdatePa
 
 void UAPSkillWindowSlot::InitSkillImage()
 {   
-    SkillNameTable = APGI->GetSkillNameList()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
+    SkillNameTable = DataTableGI->GetSkillNameListDataTable()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
     auto SkillImage = SkillNameTable->SkillSlotImage;
 
     auto ButtonStyle = Button_Skill->GetStyle(); 
@@ -111,8 +112,9 @@ void UAPSkillWindowSlot::InitEnhance()
     }
 }
 
-void UAPSkillWindowSlot::OnSkillInformation()
+void UAPSkillWindowSlot::OnClick_SkillInformation()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     auto SkillWindow = Cast<UAPSkillWindow>(ParentWidget.Get()); if(!SkillWindow) return;
     SkillWindow->OpenSkillInformation(EnhanceCategory, SkillNameTable, CoolTime);
 }
