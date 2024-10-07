@@ -150,6 +150,17 @@ enum class EStringRowName : uint8 // String RowName
 
 	RemainWave = 88 UMETA(DisplayName = "RemainWave"),
 	RemainWaveTime = 89 UMETA(DisplayName = "RemainWaveTime"),
+
+	GuideBarSetting = 90 UMETA(DisplayName = "GuideBarSetting"),
+
+	Setting_OtherSettings = 91 UMETA(DisplayName = "Setting_OtherSettings"),
+
+	Volume_Voice = 92 UMETA(DisplayName = "Volume_Voice"),
+	Volume_UI = 93 UMETA(DisplayName = "Volume_UI"),
+
+	SaveComplete = 94 UMETA(DisplayName = "SaveComplete"),
+	CannotSkill = 95 UMETA(DisplayName = "CannotSkill"),
+	PortalOpen = 96 UMETA(DisplayName = "PortalOpen"),
 };
 
 USTRUCT()
@@ -315,11 +326,13 @@ class ARCANEPUNK_API IInteractionInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void BeginFocus();
-	virtual void EndFocus();
+	virtual bool BeginFocus();
+	// virtual void EndFocus();
 	virtual FInteractData GetInteractData();
 
+	UFUNCTION()
 	virtual void BeginInteract();
+	UFUNCTION()
 	virtual void EndInteract();
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter);
 

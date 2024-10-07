@@ -25,11 +25,11 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 
 	void SetCarpetBoomWidth(float Width);
 	FORCEINLINE void SetCarpetBoomLength(float Length) {CollisionLength = Length;};
-	FORCEINLINE void SetBoomTargetLocation(FVector Target) {BoomTargetLocation = Target;};
+	FORCEINLINE void SetBoomTargetLocation(const FVector & Target) {BoomTargetLocation = Target;};
 	
 	virtual void DestroySKill() override;
 	

@@ -9,6 +9,7 @@
 class UTextBlock;
 class UProgressBar;
 class AEnemy_CharacterBase;
+class UAPShieldHPBar;
 
 UCLASS()
 class ARCANEPUNK_API UAPEnemyHP : public UUserWidget
@@ -18,9 +19,9 @@ public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	void SetEnemy(AEnemy_CharacterBase* OwnerEnemy);
+	void UpdateShieldHP(float ShieldHP);
 
 private:
-	void GetHealthPercentage();
 	void UpdateHealthPercentage(float InDeltaTime);
 	
 private:
@@ -34,6 +35,9 @@ private:
 	UTextBlock* HP;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UAPShieldHPBar* ShieldHPBar;
+
+	UPROPERTY(EditAnywhere)
 	float BarSpeed = 15.0f;
 
 	TWeakObjectPtr<AEnemy_CharacterBase> Enemy;

@@ -28,7 +28,7 @@ public:
 
 	UFUNCTION()
 	void StartFadeOut();
-	void Explode(FVector HitLocation);
+	void Explode(const FVector & HitLocation);
 
 protected:
 	UPROPERTY(EditAnywhere)

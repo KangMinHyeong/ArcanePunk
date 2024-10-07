@@ -33,9 +33,13 @@ public:
 
 	virtual void SpawnAttackRange(AActor* Target, float WaitTime) override;
 
+	virtual bool IsDead() override;
+
 	UFUNCTION()
 	void OnOverlapping(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
+	virtual void RemoveHPUI() override;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* AmmoSpawnComponent;
@@ -57,4 +61,6 @@ private:
 	bool bJump = false;
 	UPROPERTY(EditAnywhere, Category = "Range")
 	float Monster_JumpAttack_Range = 400.0f;
+
+	FTimerHandle EndTimerHandle;
 };

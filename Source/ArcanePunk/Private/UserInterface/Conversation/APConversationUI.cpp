@@ -19,8 +19,7 @@ void UAPConversationUI::NativeConstruct()
     SetIsFocusable(true);
     SetKeyboardFocus();
 
-    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
-    if(GI) GI->PlayUIOpenSound();
+    UAPSoundSubsystem::PlayUIOpenSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
 FReply UAPConversationUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent) // 클릭 아이템 인벤토리로 (오른쪽 마우스)
@@ -51,7 +50,7 @@ FReply UAPConversationUI::NativeOnKeyDown( const FGeometry& InGeometry, const FK
 	return Reply.Handled();
 }
 
-void UAPConversationUI::InitOrder(FName Name)
+void UAPConversationUI::InitOrder(const FName & Name)
 {
     InitName = Name;
     RowName = Name; SetOrder();
@@ -66,8 +65,8 @@ void UAPConversationUI::SetOrder()
     }
     else
     {
-        auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-        auto DataTable = APGI->GetSequenceStringData()->FindRow<FSequenceStringDataTable>(RowName, RowName.ToString()); if(!DataTable) return;
+        auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
+        auto DataTable = DataTableGI->GetSequenceStringDataTable()->FindRow<FSequenceStringDataTable>(RowName, RowName.ToString()); if(!DataTable) return;
         RowName = DataTable->NextRowName;
         ConversationText->SetConversation(DataTable);
     }

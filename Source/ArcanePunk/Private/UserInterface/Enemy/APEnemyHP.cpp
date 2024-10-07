@@ -4,6 +4,7 @@
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
 #include "Enemy/Enemy_CharacterBase.h"
+#include "UserInterface/Common/APShieldHPBar.h"
 
 void UAPEnemyHP::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 {
@@ -24,21 +25,9 @@ void UAPEnemyHP::SetEnemy(AEnemy_CharacterBase *OwnerEnemy)
     HPPercent->SetPercent(OriginHP / OriginMaxHP);
     MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
     HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginMaxHP))));
-    Enemy->OnEnemyHPChanged.AddUObject(this, &UAPEnemyHP::GetHealthPercentage);
-}
 
-void UAPEnemyHP::GetHealthPercentage()
-{
-    // if(!Enemy.IsValid()) return;
-    // OriginHP = Enemy->GetDefaultHP();
-    // OriginMaxHP = Enemy->GetDefaultMaxHP();
-    // MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginMaxHP))));
-    // if(Enemy.IsValid())
-    // {
-    //     HPPercent->SetPercent(Enemy->GetDefaultHP() / Enemy->GetDefaultMaxHP());
-    //     MaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetDefaultMaxHP()))));
-    //     HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(Enemy->GetDefaultHP()))));
-    // }
+    Enemy->OnCheckingShield.AddDynamic(ShieldHPBar, &UAPShieldHPBar::CheckShieldHP);
+    ShieldHPBar->CheckShieldHP(Enemy.Get());
 }
 
 void UAPEnemyHP::UpdateHealthPercentage(float InDeltaTime)
@@ -50,5 +39,5 @@ void UAPEnemyHP::UpdateHealthPercentage(float InDeltaTime)
     HPPercent->SetPercent(OriginHP / OriginMaxHP);
     HP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
 
-    if(OriginHP <= KINDA_SMALL_NUMBER) Enemy->RemoveHPUI();
+    if(OriginHP <= KINDA_SMALL_NUMBER && Enemy.IsValid()) Enemy->RemoveHPUI();
 }

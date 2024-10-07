@@ -20,16 +20,16 @@ void UAPShoppingUI::NativeConstruct()
 
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn());
 
-    Button_Cancel->OnClicked.AddDynamic(this, &UAPShoppingUI::OnExit);
-    
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    Button_Cancel->OnClicked.AddDynamic(this, &UAPShoppingUI::OnClick_Exit);
+    Button_Cancel->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 
-    APGI->SetTextBlock(TextBlock_Information, EStringRowName::Information);
-    APGI->SetTextBlock(TextBlock_NoEnough, EStringRowName::NoEnoughGold);
-    APGI->PlayUIOpenSound();
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Information, EStringRowName::Information);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_NoEnough, EStringRowName::NoEnoughGold);
+
+    UAPSoundSubsystem::PlayUIOpenSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
-void UAPShoppingUI::InitShopData(AActor* ShopActor, FShopListData UpdateShopListData)
+void UAPShoppingUI::InitShopData(AActor* ShopActor, const FShopListData & UpdateShopListData)
 {
     ShopListData = UpdateShopListData;
     OwnerShop = Cast<AAPInteraction_Shop>(ShopActor);
@@ -72,14 +72,16 @@ void UAPShoppingUI::InitShoppingList()
     }
 }
 
-void UAPShoppingUI::OnExit()
+void UAPShoppingUI::OnClick_Exit()
 {
+    UAPSoundSubsystem::PlayUICloseSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     if(OwnerShop.IsValid()) OwnerShop->SetShopData(ShopListData);
     auto PC = Cast<AArcanePunkPlayerController>(GetOwningPlayer());
     if(PC) PC->CloseShoppingUI();
 }
 
-void UAPShoppingUI::ClickEnhanceList(FShopGoodsData_Enhance EnhanceData, int32 ListNumber)
+void UAPShoppingUI::ClickEnhanceList(const FShopGoodsData_Enhance & EnhanceData, int32 ListNumber)
 {
     SizeBox_Choice->ClearChildren();
     if(ShoppingChoice.IsValid()) 
@@ -97,7 +99,7 @@ void UAPShoppingUI::ClickEnhanceList(FShopGoodsData_Enhance EnhanceData, int32 L
     
 }
 
-void UAPShoppingUI::ClickNewSkillList(FShopGoodsData_NewSkill NewSkillData, int32 ListNumber)
+void UAPShoppingUI::ClickNewSkillList(const FShopGoodsData_NewSkill & NewSkillData, int32 ListNumber)
 {
     SizeBox_Choice->ClearChildren();
     if(ShoppingChoice.IsValid()) 
@@ -116,7 +118,7 @@ void UAPShoppingUI::ClickNewSkillList(FShopGoodsData_NewSkill NewSkillData, int3
 
 }
 
-void UAPShoppingUI::PurchaseEnhance(int32 ChoiceNumber, FShopGoodsData_Enhance EnhanceData, TPair<uint8, uint16> AbilityNestingNum)
+void UAPShoppingUI::PurchaseEnhance(int32 ChoiceNumber, FShopGoodsData_Enhance& EnhanceData, TPair<uint8, uint16> AbilityNestingNum)
 {
     if(!OwnerCharacter.IsValid()) return;
     auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
@@ -161,7 +163,7 @@ void UAPShoppingUI::PurchaseEnhance(int32 ChoiceNumber, FShopGoodsData_Enhance E
     ShopListData.ShopGoodsList_Enhance[ChoiceNumber] = EnhanceData;
 }
 
-void UAPShoppingUI::PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill NewSkillData)
+void UAPShoppingUI::PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill & NewSkillData)
 {
     if(!OwnerCharacter.IsValid()) return;
     auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
@@ -222,6 +224,5 @@ void UAPShoppingUI::PurchaseSkill(int32 ChoiceNumber, FShopGoodsData_NewSkill Ne
 
 void UAPShoppingUI::OnNotEnoughGold_Implementation()
 {
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-    APGI->PlayRejectSound();
+    UAPSoundSubsystem::PlayRejectSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }

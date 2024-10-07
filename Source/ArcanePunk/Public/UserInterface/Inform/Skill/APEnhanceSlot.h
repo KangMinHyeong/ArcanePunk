@@ -8,7 +8,7 @@
 #include "APEnhanceSlot.generated.h"
 
 class AArcanePunkCharacter;
-class UAPGameInstance;
+class UAPDataTableSubsystem;
 class UButton;
 class UImage;
 
@@ -19,15 +19,15 @@ class ARCANEPUNK_API UAPEnhanceSlot : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void InitEnhanceData(UUserWidget* Parent, EEnHanceType UpdateEnhanceType, FName UpdateRowName, uint8 UpdateEnhanceNumber, uint16 UpdateNestingNumber);
+	void InitEnhanceData(UUserWidget* Parent, EEnHanceType UpdateEnhanceType, const FName & UpdateRowName, uint8 UpdateEnhanceNumber, uint16 UpdateNestingNumber);
 private:
 	UFUNCTION()
-	void OnEnhanceInformation();
+	void OnClick_Slot();
 	
 protected:	
 	TWeakObjectPtr<UUserWidget> ParentWidget;
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
-	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPDataTableSubsystem> DataTableGI;
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UButton* Button_Enhance;

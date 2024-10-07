@@ -11,12 +11,13 @@
 DECLARE_MULTICAST_DELEGATE(FOnAutoRecoveryMPDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftMouseClick);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAltRightMouseClick, FVector, ClickPoint);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboAttackStart, uint8, ComboStack);
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboAttackStart, uint8, ComboStack);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginInteract, AArcanePunkCharacter*, PlayerCharacter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndInteract, AArcanePunkCharacter*, PlayerCharacter);
 
 //Minhyeong
 class UParticleSystem;
 class UAPSkillHubComponent;
-class UAPTakeDamageComponent;
 class UAPSpawnFootPrintComponent;
 class APickup;
 class UArcanePunkCharacterAnimInstance;
@@ -41,20 +42,6 @@ class ATextRenderActor;
 
 #define Defense_constant 1000
 
-USTRUCT()
-struct FInteractionData
-{
-	GENERATED_USTRUCT_BODY()
-
-	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f) {};
-
-	UPROPERTY()
-	AActor* CurrentInteractable;
-
-	UPROPERTY()
-	float LastInteractionCheckTime;
-};
-
 UCLASS()
 class ARCANEPUNK_API AArcanePunkCharacter : public AAPCharacterBase
 {
@@ -73,7 +60,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
-	FTransform ReturnCameraTransform();
+	const FTransform & ReturnCameraTransform();
 	FORCEINLINE UAPSpringArmComponent* GetAPSpringArm() {return APSpringArm;};
 	FORCEINLINE UAPCameraComponent* GetAPCameraComponent() {return APCamera;};
 	FORCEINLINE UAPFadeOutTriggerComponent* GetFadeOutTrigger() {return FadeOutTigger;};
@@ -82,10 +69,12 @@ public:
 
 	void UpdateInventoryWidgetPosition(int32 Numbers);
 
-	bool PMCheck(FHitResult& HitResult, FVector OverlapStart, FVector OverlapEnd); // 발 밑 메쉬의 피지컬 머터리얼 체크 // 그외에 캐릭터 근처 히트 체크
+	bool PMCheck(FHitResult& HitResult, const FVector & OverlapStart, const FVector & OverlapEnd); // 발 밑 메쉬의 피지컬 머터리얼 체크 // 그외에 캐릭터 근처 히트 체크
 	
 	virtual float GetCurrentATK() const override; // DefaultATK 반환
 	virtual void UpdateStatus() override;
+
+	void BeginInteract();
 
 	// Attack 관련 함수
 	virtual void SetAttackRotation(float AddSpeed = 0.0f) override; // 마우스 커서 방향으로 플레이어 회전
@@ -102,8 +91,8 @@ public:
 	void SetRSkill(EUltSkillNumber NewSkill); // ESkill 설정
 	FORCEINLINE TMap<uint8, FSkillAbilityNestingData> GetPassiveSkills() const {return PassiveSkills;}; // PassiveSkills 반환	
 	
-	void AddPassive(EPassiveNumber PassiveNum);
-	void AddPassive_Enhance(uint8 PassiveNum, EEnHanceType EnHanceType, uint8 AbilityNum, uint16 AbilityNestingNum);
+	void AddPassive(const EPassiveNumber & PassiveNum);
+	void AddPassive_Enhance(uint8 PassiveNum, const EEnHanceType & EnHanceType, uint8 AbilityNum, uint16 AbilityNestingNum);
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UAPSkillHubComponent* GetAPSkillHubComponent() const {return SkillHubComponent;}; // SkillComp 반환
@@ -127,7 +116,7 @@ public:
 	void SetSkillAbility(EEnhanceCategory EnhanceCategory, EEnHanceType EnHanceType);
 		
 	FORCEINLINE FVector GetHomingPoint() const {return HomingPoint;};
-	FORCEINLINE void SetHomingPoint(FVector NewHomingPoint) {HomingPoint = NewHomingPoint;};
+	FORCEINLINE void SetHomingPoint(const FVector & NewHomingPoint) {HomingPoint = NewHomingPoint;};
 
 	FORCEINLINE USceneComponent* GetLeftBeamPoint() const {return LeftBeamPoint;}; 
 
@@ -162,9 +151,6 @@ public:
 	// Hit, Dead 관련 함수
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	UFUNCTION(BlueprintPure)
-	FORCEINLINE UAPTakeDamageComponent* GetTakeDamageComponent() const {return TakeDamageComp;}; // DamageComp 반환
-	
 	virtual bool IsDead() override; // HP가 0이하인지 반환
 
 	void DeadPenalty(float DeathTime); // DeadPenalty 발동
@@ -183,14 +169,7 @@ public:
 	FORCEINLINE UAPBuffComponent* GetBuffComp() const {return BuffComp;}; // BuffComp 반환
 
 	// Save 관련 함수
-	void SaveStatus(FString PlayerSlotName);
-
-	// Interaction 관련 함수
-	bool IsInteraction() const {return bInteract;};
-	void SetInteraction(bool NewBool) {bInteract = NewBool;};
-
-	void ActivateInteractionSweep();
-	void InteractionActorRemove(AActor* InteractionActor);
+	void SaveStatus(const FString & PlayerSlotName);
 	
 	// Dash
 	void PressedDash();
@@ -201,7 +180,6 @@ public:
 	// Parrying
 	FORCEINLINE void SetbCanParrying(bool NewBool) {bCanParrying = NewBool;};	
 	FORCEINLINE float GetParryingCoolTime() const {return ParryingCoolTime;};	
-	
 
 private:
 	void InitPlayerStatus();
@@ -217,7 +195,6 @@ private:
 	void SkillBase_R();
 	void Release_R() {OnRSkill = false;};
 
-	void Save();
 	void CurrentPlayerLocation();
 
 	void WorldMap();
@@ -245,14 +222,13 @@ private:
 	// 무기 위치 설정
 	void SetWeaponPosition();
 
-	
+	// 데미지 몇번 받았는지
+	bool CheckingDamaged();
+
 private:
 	// 부착 컴포넌트
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPSkillHubComponent* SkillHubComponent;
-
-	UPROPERTY(EditAnywhere, Category = "Component")
-	UAPTakeDamageComponent* TakeDamageComp;
 
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPSpawnFootPrintComponent* APSpawnStepComp;
@@ -385,15 +361,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Drop")
 	TSubclassOf<APickup> DropClass;
 
-	// Interaction
-	bool bInteract = false;
-
-	UPROPERTY(EditAnywhere, Category = "Interact")
-	float InteractionRadius = 60.0f;
 	
-	UPROPERTY()
-	TArray<AActor*> InteractionActors;
-
 public:
 	TArray<ESkillNumber> HavingSkill;
 
@@ -403,7 +371,10 @@ public:
 
 	FOnAltRightMouseClick OnAltRightMouseClick;
 	
-	FOnComboAttackStart OnComboAttackStart;
+	// FOnComboAttackStart OnComboAttackStart;
+
+	FOnBeginInteract OnBeginInteract;
+	FOnEndInteract OnEndInteract;
 
 	UPROPERTY(EditAnywhere, Category = "Skill")
 	UParticleSystem* Skill3_Effect;
@@ -423,30 +394,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
 	UAPInventoryComponent* PlayerInventory;
 
-	float InteractionCheckFrequency;
-
-	float InteractionCheckDistance;
-
-	FTimerHandle TimerHandle_Interaction;
-
-	FInteractionData InteractionData;
-
 	void ToggleMenu();
 
-	// void PerformInteractionCheck();
-	// void FoundInteractable(AActor* NewInteractable);
-	// void NoInteractableFound();
-	// void Interact();
-	void BeginInteract();
-	void EndInteract();
-
 public :
-
-	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); };
-
 	FORCEINLINE UAPInventoryComponent* GetInventory() const { return PlayerInventory; };
-
-	// void UpdateInteractionWidget() const;
 
 	void DropItems(UAPItemBase* ItemToDrop, const int32 QuantityToDrop);
 

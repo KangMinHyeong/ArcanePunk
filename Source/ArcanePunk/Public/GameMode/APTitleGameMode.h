@@ -18,7 +18,7 @@ public:
 	virtual void StartPlay() override;
 
 	UFUNCTION()
-	void OnChangingBGMVolume(float Master, float BGM, float Effect);
+	void OnChangingBGMVolume(float Master, float BGM, float Effect, float UI);
 	
 private:
 	UPROPERTY(EditAnywhere)

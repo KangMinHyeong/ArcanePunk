@@ -74,7 +74,7 @@ void AArcaneWave::SetWaveSize()
     WaveOutSphere->SetSphereRadius(OutRadius, true);
 }
 
-void AArcaneWave::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneWave::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());  if(!OwnerCharacter.IsValid()) return;

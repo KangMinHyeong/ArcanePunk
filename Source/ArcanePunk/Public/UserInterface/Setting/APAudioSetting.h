@@ -10,6 +10,7 @@ class UButton;
 class USlider;
 class UAPGameInstance;
 class UTextBlock;
+class UAPSoundSubsystem;
 
 UCLASS()
 class ARCANEPUNK_API UAPAudioSetting : public UUserWidget
@@ -17,6 +18,7 @@ class ARCANEPUNK_API UAPAudioSetting : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual FReply NativeOnMouseWheel( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
@@ -36,6 +38,8 @@ public:
 	void OnSlide_BGM(float Value);
 	UFUNCTION()
 	void OnSlide_Effect(float Value);
+	UFUNCTION()
+	void OnSlide_UI(float Value);
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
@@ -49,7 +53,8 @@ private:
 	USlider* Slider_BGM;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	USlider* Slider_Effect;
-
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	USlider* Slider_UI;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_Master;
@@ -58,6 +63,8 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_Effect;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
+	UTextBlock* TextBlock_UI;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_Init;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))	
 	UTextBlock* TextBlock_Apply;
@@ -65,6 +72,7 @@ private:
 	float Master;
 	float BGM;
 	float Effect;
+	float UI;
 
-	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPSoundSubsystem> SoundGI;
 };

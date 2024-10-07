@@ -38,9 +38,9 @@ public:
 	void SetEnergyMoveComp(AActor* ManaOwner);
 
 	UFUNCTION()
-	void TimeLineUpdateFunc(FVector Output);
+	void TimeLineUpdateFunc(FVector & Output);
 	UFUNCTION()
-	void SpawnTimeLineUpdateFunc(FVector Output);
+	void SpawnTimeLineUpdateFunc(FVector & Output);
 
 private:
 	UPROPERTY(EditAnywhere)

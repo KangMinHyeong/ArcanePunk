@@ -17,15 +17,13 @@ void UInteractionWidget::NativeConstruct()
 
 }
 
-void UInteractionWidget::UpdateWidget(FInteractData InteractData)
+void UInteractionWidget::UpdateWidget(const FInteractData & InteractData)
 {
-	auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-
     const UEnum* CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EInteractionType"), true); if(!CheckEnum) return;
     FName Name = FName(*(CheckEnum->GetDisplayNameTextByValue((uint8)InteractData.InteractionType)).ToString());
     
 	KeyPressText->SetText(FText::FromString(InteractData.InteractionKeyName));
-	APGI->SetTextBlock_Name(NameText, Name);
+	UAPDataTableSubsystem::SetTextBlock_Name(UAPGameInstance::GetDataTableGI(GetWorld()), NameText, Name);
 	FSlateFontInfo SlateFontInfo = NameText->GetFont(); SlateFontInfo.Size = InteractData.TypeNameSize;
 	NameText->SetFont(SlateFontInfo);
 	

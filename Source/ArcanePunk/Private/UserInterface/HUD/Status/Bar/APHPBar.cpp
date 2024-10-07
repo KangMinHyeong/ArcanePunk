@@ -4,6 +4,7 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
+#include "UserInterface/Common/APShieldHPBar.h"
 
 void UAPHPBar::NativeConstruct()
 {
@@ -11,11 +12,12 @@ void UAPHPBar::NativeConstruct()
 
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
     const auto PD = OwnerCharacter->GetPlayerStatus();
-
+    
     HPBar->SetPercent(PD.StatusData.HP / PD.StatusData.MaxHP); OriginHP = PD.StatusData.HP;
     TEXT_CurrentMaxHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(PD.StatusData.MaxHP))));
     TEXT_CurrentHP->SetText(FText::FromString(FString::FromInt(static_cast<int32>(OriginHP))));
 
+    OwnerCharacter->OnCheckingShield.AddDynamic(ShieldHPBar, &UAPShieldHPBar::CheckShieldHP);
 }
 
 void UAPHPBar::NativeTick(const FGeometry &MyGeometry, float InDeltaTime)

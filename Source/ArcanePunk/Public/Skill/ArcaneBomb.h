@@ -28,8 +28,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
-	void SetTargetPoint(float Radius, FVector Target);
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	void SetTargetPoint(float Radius, const FVector & Target);
 
 protected:
 	UPROPERTY(EditAnywhere)

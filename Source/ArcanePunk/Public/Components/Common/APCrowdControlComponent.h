@@ -43,7 +43,7 @@ public:
 	void UpdateStatus();
 
 	// 플레이어 상태이상 함수
-	void KnockBackState(FVector KnockBackPoint, float KnockBackDist, float KnockBackTime);
+	void KnockBackState(const FVector & KnockBackPoint, float KnockBackDist, float KnockBackTime);
 	void StunState(float StunTime);
 	void FrozenState(float FrozenTime);
 	void SleepState();
@@ -60,7 +60,7 @@ public:
 	void PlayStateEffect(ECharacterState UpdateState, bool IsPlay);
 
 private:
-	bool CalculateStateTime(ECharacterState UpdateState, FTimerHandle& StateTimerHandle,float StateTime);
+	bool CalculateStateTime(ECharacterState UpdateState, FTimerHandle& StateTimerHandle, float StateTime);
 
 	void OnCharacterState(ECharacterState UpdateState, bool IsStop);
 

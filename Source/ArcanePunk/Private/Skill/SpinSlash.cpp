@@ -85,7 +85,7 @@ void ASpinSlash::SetSlashSize()
     SlashEffectComp->SetVariableFloat(TEXT("Time"), DestroyTime);
 }
 
-void ASpinSlash::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ASpinSlash::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner());  if(!OwnerCharacter.IsValid()) return;

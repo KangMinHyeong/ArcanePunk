@@ -22,7 +22,7 @@ void UShoppingListUI::InitParent(UUserWidget * UpdateParentWidget, int32 UpdateL
     ListNumber = UpdateListNumber;
 }
 
-void UShoppingListUI::InitEnhanceData(FShopGoodsData_Enhance ShopGoodsData_Enhance)
+void UShoppingListUI::InitEnhanceData(const FShopGoodsData_Enhance & ShopGoodsData_Enhance)
 {
     EnhanceData = ShopGoodsData_Enhance;
     if(EnhanceData.GoodsNum == 0) {SoldOut(); return;}
@@ -39,7 +39,7 @@ void UShoppingListUI::InitEnhanceData(FShopGoodsData_Enhance ShopGoodsData_Enhan
     bEnhanceList = true;
 }
 
-void UShoppingListUI::InitNewSkillData(FShopGoodsData_NewSkill ShopGoodsData_NewSkill)
+void UShoppingListUI::InitNewSkillData(const FShopGoodsData_NewSkill & ShopGoodsData_NewSkill)
 {
     NewSkillData = ShopGoodsData_NewSkill;
     if(NewSkillData.bSoldOut) {SoldOut(); return;}

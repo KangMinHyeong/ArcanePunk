@@ -67,7 +67,7 @@ void AShouting::CheckSideEffect(TArray<AActor*> Actors) // 증강 부가효과
     }
 }
 
-void AShouting::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AShouting::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 

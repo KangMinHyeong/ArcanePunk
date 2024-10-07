@@ -27,7 +27,7 @@ void AArcaneRain::BeginPlay()
     Super::BeginPlay();
 }
 
-void AArcaneRain::SetRainAttack(FVector CollisionLocation)
+void AArcaneRain::SetRainAttack(const FVector & CollisionLocation)
 {
     if(!OwnerCharacter.IsValid()) return;
     // float Size =  GetActorScale3D().Y / DefaultSize;
@@ -41,7 +41,7 @@ void AArcaneRain::DestroySKill()
     Super::DestroySKill();
 }
 
-void AArcaneRain::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneRain::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

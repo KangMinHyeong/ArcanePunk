@@ -19,11 +19,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
-
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 	void OpenShopUI();
@@ -42,11 +37,11 @@ private:
 	void CheckNewSkill(FShopGoodsData_NewSkill& NewSkillData);
 	void CheckEnhance(FShopGoodsData_Enhance& EnhanceData);
 	bool CheckEnhanceNumber(FShopGoodsData_Enhance& EnhanceData);
-	void AddAlreadyAbility(FShopGoodsData_Enhance EnhanceData);
-	TMap<uint8, uint16> GetCurrentNesting(FShopGoodsData_Enhance EnhanceData);
+	void AddAlreadyAbility(const FShopGoodsData_Enhance & EnhanceData);
+	TMap<uint8, uint16> GetCurrentNesting(const FShopGoodsData_Enhance & EnhanceData);
 
 	TArray<uint8> IndexSuffle(uint8 MaxNumber);
-	FSkillAbilityDataSheet* GetTierData(EEnHanceType EnHanceType, FString CurrentRowName);
+	FSkillAbilityDataSheet* GetTierData(EEnHanceType EnHanceType, const FString & CurrentRowName);
 	void SetEnhanceData(FShopGoodsData_Enhance &EnhanceData, TArray<FString>& RowName, TArray<FString>& AlreadyAbility);
 
 private:	

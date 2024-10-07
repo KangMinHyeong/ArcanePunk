@@ -11,7 +11,7 @@
 #include "Components/ScrollBox.h"
 #include "PlayerController/APTitlePlayerController.h"
 #include "Components/TextBlock.h"
-#include "UserInterface/Common/APCheckUI.h"
+#include "UserInterface/Common/Check/APCheckUI.h"
 #include "GameInstance/APGameInstance.h"
 
 void UAPSaveSlotUI::NativeConstruct()
@@ -21,8 +21,7 @@ void UAPSaveSlotUI::NativeConstruct()
     SetIsFocusable(true);
     SetKeyboardFocus();
 
-    auto GI = Cast<UAPGameInstance>(GetGameInstance()); 
-    if(GI) GI->PlayUIOpenSound();
+    UAPSoundSubsystem::PlayUIOpenSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
 FReply UAPSaveSlotUI::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
@@ -58,9 +57,8 @@ FReply UAPSaveSlotUI::NativeOnKeyDown(const FGeometry &InGeometry, const FKeyEve
 
 void UAPSaveSlotUI::OnValidating(ECheckType UpdateCheckType)
 {
-    UE_LOG(LogTemp, Display, TEXT("Your aa"));
     if(!CurrentSaveSlot.IsValid()) return;
-    UE_LOG(LogTemp, Display, TEXT("Your bb"));
+
     switch (UpdateCheckType)
     {
     case ECheckType::Delete:
@@ -83,6 +81,10 @@ void UAPSaveSlotUI::BindButton()
     Button_Delete->OnClicked.AddDynamic(this, &UAPSaveSlotUI::OnClickButton_Delete);
     Button_Select->OnClicked.AddDynamic(this, &UAPSaveSlotUI::OnClickButton_Select);
 
+    Button_Back->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Button_Delete->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Button_Select->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    
     auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer());
     if(TitlePC) {IsTitle = true;}
     else {IsTitle = false;}
@@ -90,19 +92,17 @@ void UAPSaveSlotUI::BindButton()
 
 void UAPSaveSlotUI::BindSlot()
 {
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return; 
-
     if(IsTitle)
     {
-        APGI->SetTextBlock(TextBlock_Select, EStringRowName::Load);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Select, EStringRowName::Load);
     }
     else
     {
-        APGI->SetTextBlock(TextBlock_Select, EStringRowName::Save);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Select, EStringRowName::Save);
     }
     
-    APGI->SetTextBlock(TextBlock_Delete, EStringRowName::Delete);
-    APGI->SetTextBlock(TextBlock_SaveSlot, EStringRowName::SaveSlotName);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Delete, EStringRowName::Delete);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_SaveSlot, EStringRowName::SaveSlotName);
 
     OnSlot();
 }
@@ -141,6 +141,8 @@ void UAPSaveSlotUI::OnSlot()
 
 void UAPSaveSlotUI::OnClickButton_Back()
 {
+    UAPSoundSubsystem::PlayUICloseSound(UAPGameInstance::GetSoundGI(GetWorld()));
+    
     RemoveFromParent();
 
     auto TitlePC = Cast<AAPTitlePlayerController>(GetOwningPlayer());
@@ -149,11 +151,13 @@ void UAPSaveSlotUI::OnClickButton_Back()
 
 void UAPSaveSlotUI::OnClickButton_Delete()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     OpenCheckUI(ECheckType::Delete);
 }
 
 void UAPSaveSlotUI::OnClickButton_Select()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
     if(!CurrentSaveSlot.IsValid()) return;
     if(IsTitle) 
     {
@@ -165,9 +169,9 @@ void UAPSaveSlotUI::OnClickButton_Select()
 
 void UAPSaveSlotUI::OpenCheckUI(ECheckType UpdateCheckType)
 {
-    auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
 
-    auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), GI->GetCheckUIClass());
+    auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), DataTableGI->GetCheckUIClass());
 	if(CheckUI)
     {
         CheckUI->AddToViewport(1); 

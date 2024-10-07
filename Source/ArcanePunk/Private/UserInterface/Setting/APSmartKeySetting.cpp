@@ -7,28 +7,32 @@
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "GameInstance/APGameInstance.h"
 
+void UAPSmartKeySetting::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    BindSmartKeyButton();
+}
+
 void UAPSmartKeySetting::NativeConstruct()
 {
     Super::NativeConstruct();
 
     InitSmartKey();
-    BindSmartKeyButton();
+    
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Q, EStringRowName::SmartKey_Q);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_E, EStringRowName::SmartKey_E);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_R, EStringRowName::SmartKey_R);
 
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), SmartKeyQ_Text_On, EStringRowName::Button_On);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), SmartKeyE_Text_On, EStringRowName::Button_On);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), SmartKeyR_Text_On, EStringRowName::Button_On);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), SmartKeyQ_Text_Off, EStringRowName::Button_Off);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), SmartKeyE_Text_Off, EStringRowName::Button_Off);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), SmartKeyR_Text_Off, EStringRowName::Button_Off);
 
-    APGI->SetTextBlock(TextBlock_Q, EStringRowName::SmartKey_Q);
-    APGI->SetTextBlock(TextBlock_E, EStringRowName::SmartKey_E);
-    APGI->SetTextBlock(TextBlock_R, EStringRowName::SmartKey_R);
-
-    APGI->SetTextBlock(SmartKeyQ_Text_On, EStringRowName::Button_On);
-    APGI->SetTextBlock(SmartKeyE_Text_On, EStringRowName::Button_On);
-    APGI->SetTextBlock(SmartKeyR_Text_On, EStringRowName::Button_On);
-    APGI->SetTextBlock(SmartKeyQ_Text_Off, EStringRowName::Button_Off);
-    APGI->SetTextBlock(SmartKeyE_Text_Off, EStringRowName::Button_Off);
-    APGI->SetTextBlock(SmartKeyR_Text_Off, EStringRowName::Button_Off);
-
-    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
-    APGI->SetTextBlock(TextBlock_Apply, EStringRowName::Apply);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Init, EStringRowName::Init);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Apply, EStringRowName::Apply);
 }
 
 FReply UAPSmartKeySetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
@@ -45,9 +49,8 @@ FReply UAPSmartKeySetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, 
 
 void UAPSmartKeySetting::InitSmartKey()
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) {return;}
-
-    CopySmartKeyArr = OwnerPC->SmartKeyArr;
+    auto SettingGI = Cast<UAPSettingSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSettingSubsystem::StaticClass())); if(!SettingGI) return;
+    CopySmartKeyArr = SettingGI->GetSmartKey();
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
     auto Off_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
@@ -111,10 +114,21 @@ void UAPSmartKeySetting::BindSmartKeyButton()
 
     Apply_Button->OnClicked.AddDynamic(this, &UAPSmartKeySetting::OnApply);
     RollBack_Button->OnClicked.AddDynamic(this, &UAPSmartKeySetting::OnCancel);
+
+    SmartKeyQ_Button_On->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    SmartKeyE_Button_On->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    SmartKeyR_Button_On->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    SmartKeyQ_Button_Off->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    SmartKeyE_Button_Off->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    SmartKeyR_Button_Off->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Apply_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    RollBack_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 }
 
 void UAPSmartKeySetting::OnSmartKeyQ()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     CopySmartKeyArr[1] = true;
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
@@ -130,6 +144,8 @@ void UAPSmartKeySetting::OnSmartKeyQ()
 
 void UAPSmartKeySetting::OnSmartKeyE()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     CopySmartKeyArr[2] = true;
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
@@ -145,6 +161,8 @@ void UAPSmartKeySetting::OnSmartKeyE()
 
 void UAPSmartKeySetting::OnSmartKeyR()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     CopySmartKeyArr[3] = true;
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
@@ -160,6 +178,8 @@ void UAPSmartKeySetting::OnSmartKeyR()
 
 void UAPSmartKeySetting::OnSmartKeyQ_Off()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     CopySmartKeyArr[1] = false;
 
     auto On_ButtonStyle = SmartKeyQ_Button_On->GetStyle(); 
@@ -175,6 +195,8 @@ void UAPSmartKeySetting::OnSmartKeyQ_Off()
 
 void UAPSmartKeySetting::OnSmartKeyE_Off()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     CopySmartKeyArr[2] = false;
 
     auto On_ButtonStyle = SmartKeyE_Button_On->GetStyle(); 
@@ -190,6 +212,8 @@ void UAPSmartKeySetting::OnSmartKeyE_Off()
 
 void UAPSmartKeySetting::OnSmartKeyR_Off()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+    
     CopySmartKeyArr[3] = false;
 
     auto On_ButtonStyle = SmartKeyR_Button_On->GetStyle(); 
@@ -205,12 +229,16 @@ void UAPSmartKeySetting::OnSmartKeyR_Off()
 
 void UAPSmartKeySetting::OnApply()
 {
-    auto OwnerPC = Cast<AArcanePunkPlayerController>(GetOwningPlayer()); if(!OwnerPC) {return;}
-    OwnerPC->SmartKeyArr = CopySmartKeyArr;
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
+    auto SettingGI = Cast<UAPSettingSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSettingSubsystem::StaticClass())); if(!SettingGI) return;
+    SettingGI->SetSmartKey(CopySmartKeyArr);
 }
 
 void UAPSmartKeySetting::OnCancel()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     OnSmartKeyQ_Off();
     OnSmartKeyE_Off();
     OnSmartKeyR_Off();

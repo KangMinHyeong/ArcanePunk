@@ -144,7 +144,7 @@ void AAPPillarAttack::SkinChange(bool Hitting)
 	bHitting = Hitting;
 }
 
-void AAPPillarAttack::ThrowedPillar(FVector Target)
+void AAPPillarAttack::ThrowedPillar(FVector & Target)
 {
 	bThrowed = true;
 	// auto Impulse = (Target - GetActorLocation()) * ThrowedSpeed;

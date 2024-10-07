@@ -33,7 +33,7 @@ public:
 	void SetMaxHP(float NewValue);
 	UFUNCTION()
 	void SetHPPercent(float Origin);
-	
+
 	UFUNCTION()
 	void AddMaxMP(uint8 NewValue);
 	UFUNCTION()
@@ -64,6 +64,10 @@ public:
 	void AddSkillCoolTime(ESkillKey SkillKey, float AddTime);
 	UFUNCTION()
 	void StartDashTime(float DashTime);
+	
+	
+	UFUNCTION()
+	void SetHiddenGuideBar(bool bVisible);
 
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -89,6 +93,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UAPSkillChargingGauge* SkillChargingGauge;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UImage* GuideBar;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 

@@ -26,12 +26,6 @@ public:
 
 	FORCEINLINE UAPItemBase* GetItemData() { return ItemReference; }
 
-	// for interaction
-
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

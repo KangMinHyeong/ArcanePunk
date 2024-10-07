@@ -17,24 +17,6 @@ void AAPInteraction_Shop::BeginPlay()
     DefaultCategoryPercent = CategoryPercent;
 }
 
-void AAPInteraction_Shop::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-
-}
-
-void AAPInteraction_Shop::BeginFocus()
-{
-    TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
-   	Character->ActivateInteractionSweep();
-
-    GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &AAPInteraction_Shop::BeginFocus, InteractFrequency, true);
-}
-
-void AAPInteraction_Shop::EndFocus()
-{
-    GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
-}
 
 void AAPInteraction_Shop::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
@@ -139,7 +121,7 @@ bool AAPInteraction_Shop::CheckEnhanceNumber(FShopGoodsData_Enhance & EnhanceDat
     return true;
 }
 
-void AAPInteraction_Shop::AddAlreadyAbility(FShopGoodsData_Enhance EnhanceData)
+void AAPInteraction_Shop::AddAlreadyAbility(const FShopGoodsData_Enhance & EnhanceData)
 {
     switch (EnhanceData.GoodsType)
     {
@@ -482,7 +464,7 @@ TArray<uint8> AAPInteraction_Shop::IndexSuffle(uint8 MaxNumber)
     return SkillAbilities;
 }
 
-FSkillAbilityDataSheet* AAPInteraction_Shop::GetTierData(EEnHanceType EnHanceType, FString CurrentRowName)
+FSkillAbilityDataSheet* AAPInteraction_Shop::GetTierData(EEnHanceType EnHanceType, const FString & CurrentRowName)
 {
     FSkillAbilityDataSheet* Data = nullptr;
     switch (EnHanceType)
@@ -524,7 +506,7 @@ void AAPInteraction_Shop::SetEnhanceData(FShopGoodsData_Enhance &EnhanceData, TA
     }
 }
 
-TMap<uint8, uint16> AAPInteraction_Shop::GetCurrentNesting(FShopGoodsData_Enhance EnhanceData)
+TMap<uint8, uint16> AAPInteraction_Shop::GetCurrentNesting(const FShopGoodsData_Enhance & EnhanceData)
 {
     TMap<uint8, uint16> AbilityNestingNum;
     switch (EnhanceData.GoodsType)

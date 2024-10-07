@@ -19,7 +19,7 @@ protected:
 	virtual void BeginPlay() override;	
 
 public:
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	
 private:
 	virtual void DestroySKill() override;

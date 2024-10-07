@@ -37,6 +37,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAddingCoolTime, ESkillKey, float); // �
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDashTime, float); // 쿨타임 빼기
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHiddenGuideBar, bool); // 쿨타임 빼기
+
 UCLASS()
 class ARCANEPUNK_API AAPHUD : public AHUD
 {
@@ -168,4 +170,6 @@ public:
 	FOnAddingCoolTime OnAddingCoolTime;
 
 	FOnDashTime OnDashTime;
+
+	FOnHiddenGuideBar OnHiddenGuideBar;
 };

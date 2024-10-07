@@ -26,13 +26,13 @@ void UAPManaDropComponent::SpawnManaDrop(AActor* ManaOwner)
 	float Check = FMath::RandRange(0.0f, 100.0f);
 	if(Check >= DropPercent) return;
 
-	auto GI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!GI) return;
+	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetWorld()->GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
 
 	uint8 Amount = ManaAmount;
 	while(Amount >= 1)
 	{
 		Amount--;
-		auto ManaDrop = GetWorld()->SpawnActor<AAPManaEnergy>(GI->GetManaEnergyClass(), GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+		auto ManaDrop = GetWorld()->SpawnActor<AAPManaEnergy>(DataTableGI->GetManaEnergyClass(), GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
 		if(!ManaDrop) continue;;
 		ManaDrop->SetOwner(GetOwner());
 		ManaDrop->SetEnergyMoveComp(ManaOwner);

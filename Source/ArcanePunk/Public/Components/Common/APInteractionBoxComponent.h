@@ -8,7 +8,8 @@
 #include "APInteractionBoxComponent.generated.h"
 
 class AArcanePunkCharacter;
-class UUserWidget;
+class UInteractionWidget;
+class UWidgetComponent;
 
 UCLASS()
 class ARCANEPUNK_API UAPInteractionBoxComponent : public UBoxComponent
@@ -25,10 +26,21 @@ protected:
 	UFUNCTION()
 	void OnInteractionTriggerEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
+	UFUNCTION()
+	void BeginInteract(AArcanePunkCharacter* PlayerCharacter);
+	UFUNCTION()
+	void EndInteract(AArcanePunkCharacter* PlayerCharacter);
+
+	void InitInteractUI();
+
 private:
 	UPROPERTY(EditAnywhere)
 	FInteractData InteractionData;
 
-public:
-	TWeakObjectPtr<AArcanePunkCharacter> Character;
+	UPROPERTY(EditAnywhere)
+	UWidgetComponent* InteractWidgetComp;
+
+	TWeakObjectPtr<UInteractionWidget> InteractUI;
+
+	bool bFirstInteract = true;
 };

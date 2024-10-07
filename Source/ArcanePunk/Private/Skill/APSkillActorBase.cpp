@@ -39,8 +39,9 @@ void AAPSkillActorBase::OnCharging()
 
 void AAPSkillActorBase::PlaySkillSound()
 {
-    auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
+    auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    
+    float Volume = 5.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
     if(SkillSound) UGameplayStatics::SpawnSoundAttached(SkillSound, GetRootComponent(), TEXT("SkillSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume, 1.0f, StartTime);
 }
 
@@ -56,7 +57,7 @@ void AAPSkillActorBase::DestroySKill()
 	GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 }
 
-void AAPSkillActorBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AAPSkillActorBase::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
 	// SkillAbilityComp->SetSkillAbility(SkillAbility, SkillCategory);
 
@@ -65,8 +66,9 @@ void AAPSkillActorBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingDat
 	SkillAbilityData = SkillAbilityNestingData;
     SkillComp = SkillComponent;
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-	RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityData.SkillName, SkillAbilityData.SkillName.ToString());
+
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!DataTableGI) return;
+	RowDataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillAbilityData.SkillName, SkillAbilityData.SkillName.ToString());
 }
 
 void AAPSkillActorBase::SetDeadTime(float DeadTime)
@@ -193,22 +195,25 @@ void AAPSkillActorBase::CheckSilverEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
 	AbilityNum--;
 	auto RowName = RowDataTable->SilverRowName;
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-    AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
+    
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!DataTableGI) return;
+    AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
 }
 
 void AAPSkillActorBase::CheckGoldEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
 	AbilityNum--;
     auto RowName = RowDataTable->GoldRowName;
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-    AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
+
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!DataTableGI) return;
+    AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
 }
 
 void AAPSkillActorBase::CheckPlatinumEnhance(uint8 AbilityNum, uint16 NestingNum)
 {
 	AbilityNum--;
     auto RowName = RowDataTable->PlatinumRowName;
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-    AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
+
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;
+    AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>( FName(*RowName[AbilityNum]), RowName[AbilityNum]);
 }

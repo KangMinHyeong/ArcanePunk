@@ -22,7 +22,7 @@ public:
 	virtual FReply NativeOnMouseButtonDoubleClick( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 
 	void SetSlotData(UAPSaveGame* SavedData);
-	void SetSlotName(FString PlayerSlot, UUserWidget* Parent);
+	void SetSlotName(const FString & PlayerSlot, UUserWidget* Parent);
 	void SetSlotNumber(uint8 NewSlotNumber);
 
 	void TurnOnSlot();

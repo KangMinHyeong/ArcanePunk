@@ -9,6 +9,10 @@
 #include "NiagaraComponent.h"
 #include "GameInstance/APGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Engine/DamageEvents.h"
 
 AAPCharacterBase::AAPCharacterBase()
 {
@@ -28,14 +32,15 @@ void AAPCharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    auto DataTable = GI->GetStatusData()->FindRow<FStatusData>(CharacterName, CharacterName.ToString()); 
-    if(DataTable) TotalStatus_Origin.StatusData = * DataTable;  
 }
 
 void AAPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
+    auto DataTable = DataTableGI->GetStatusDataTable()->FindRow<FStatusData>(CharacterName, CharacterName.ToString()); 
+    if(DataTable) TotalStatus_Origin.StatusData = * DataTable;  
+
 	CrowdControlComp->BindCrowdComp();
 	MoveComponent->SetBind();
 	DefaultMaterial = GetMesh()->GetMaterials();
@@ -80,21 +85,21 @@ float AAPCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &Damag
 
 	if(bBlockMode) return 0.0f;
 
-	bHitting = true;
-
 	if(DamageApplied > KINDA_SMALL_NUMBER)
 	{
+		bHitting = true;
+
 		int32 Index = 0;
 		for(auto Mat : DefaultMaterial)
 		{GetMesh()->SetMaterial(Index, HitMaterial); Index++;}
 
 		if(IsDead()) {SpawnVoiceSound(DeadVoiceSound);}
 		else {SpawnVoiceSound(HitVoiceSound);}
+		
+		GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AAPCharacterBase::OnHittingEnd, HitMotionTime, false);
+		GetWorldTimerManager().SetTimer(HitMaterialTimerHandle, this, &AAPCharacterBase::ResetDefaultMaterial, HitMaterailTime, false);
 	}
-
-	GetWorldTimerManager().SetTimer(HitTimerHandle, this, &AAPCharacterBase::OnHittingEnd, HitMotionTime, false);
-	GetWorldTimerManager().SetTimer(HitMaterialTimerHandle, this, &AAPCharacterBase::ResetDefaultMaterial, HitMaterailTime, false);
-
+	
     return DamageAmount;
 }
 
@@ -106,12 +111,17 @@ void AAPCharacterBase::OnHittingEnd()
 	GetWorldTimerManager().ClearTimer(HitTimerHandle);
 }
 
+float AAPCharacterBase::DamageMath(float Damage)
+{
+    return Damage * Defense_constant * (1/(Defense_constant + TotalStatus.StatusData.DEF));
+}
+
 void AAPCharacterBase::SpawnVoiceSound(USoundBase *VoiceSound)
 {
 	if(!VoiceSound) return;
 
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Volume = 5.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
     
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), VoiceSound, GetActorLocation(), GetActorRotation(), Volume);
 }
@@ -120,21 +130,52 @@ void AAPCharacterBase::SpawnAttackVoiceSound()
 {
 	if(!AttackVoiceSound) return;
 
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
-    
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Volume = 5.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
+        
 	UGameplayStatics::SpawnSoundAttached(AttackVoiceSound, GetMesh(), TEXT("AttackVoiceSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume);
 }
 
-void AAPCharacterBase::SpawnAttackSound()
+void AAPCharacterBase::SpawnAttackSound(uint8 AttackNum)
 {
 	if(!AttackVoiceSound) return;
 
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    float Volume = 5.0f; Volume *= GI->GetGameSoundVolume().EffectVolume;
-    
-	UGameplayStatics::SpawnSoundAttached(AttackSound, GetMesh(), TEXT("AttackVoiceSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume);
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Volume = 5.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
+
+	if(AttackNum > AttackSound.Num()) return;
+	UGameplayStatics::SpawnSoundAttached(AttackSound[AttackNum-1], GetMesh(), TEXT("AttackSound"), GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false, Volume);
 }
+
+bool AAPCharacterBase::CheckShieldHP(float & DamageApplied, FDamageEvent const &DamageEvent) // if true, DamageApplied < ShieldHP
+{
+	float& ShieldHP = TotalStatus.StatusData.ShieldHP;
+	DamageApplied -= ShieldHP;
+
+	bool bShield = ShieldHP > KINDA_SMALL_NUMBER ? true : false;
+	bool bResult = false;
+	
+
+	ShieldHP = FMath::Max(-DamageApplied, 0.0f);
+	DamageApplied = FMath::Max(DamageApplied, 0.0f);
+
+	if(ShieldHP > KINDA_SMALL_NUMBER)
+	{
+		bResult = true;
+		if(DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+		{
+			FPointDamageEvent* const PointDamageEvent = (FPointDamageEvent*) &DamageEvent;
+			FVector HitLoc = PointDamageEvent->HitInfo.ImpactPoint - GetActorLocation(); HitLoc.Z = 0.0f;
+			FRotator HitRot = FRotationMatrix::MakeFromX(HitLoc).Rotator();  HitRot.Yaw -= 90.0f;
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ShieldHitEffect, PointDamageEvent->HitInfo.ImpactPoint, HitRot);
+		}
+	}
+
+	if(bShield && !bResult) OnCheckingShield.Broadcast(this);
+
+    return bResult;	
+}
+
 
 float AAPCharacterBase::CriticalCalculate()
 {
@@ -147,3 +188,30 @@ float AAPCharacterBase::CriticalCalculate()
 	else {bCriticalAttack= false;}
     return 1.0f;
 }
+
+void AAPCharacterBase::SetHitPoint(float Forward, float Right)
+{
+	HitForward = Forward;
+	HitRight = Right;
+}
+
+void AAPCharacterBase::SetHitEffect(FVector HitLocation)
+{
+	if(HitForward > 0)
+	{
+		if(HitRight > 0)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_R, GetMesh(), TEXT("HitLocation"), FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true);
+		}
+		else
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_L, GetMesh(), TEXT("HitLocation"), FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true);
+		}
+	}
+	else
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_B, GetMesh(), TEXT("HitLocation"), FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true);
+	}
+}
+
+

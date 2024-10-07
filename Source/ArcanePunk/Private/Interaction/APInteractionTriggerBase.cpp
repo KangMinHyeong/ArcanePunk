@@ -6,7 +6,7 @@
 
 AAPInteractionTriggerBase::AAPInteractionTriggerBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	InteractionTrigger = CreateDefaultSubobject<UAPInteractionBoxComponent>(TEXT("InteractionTrigger"));
 	InteractionCamera =  CreateDefaultSubobject<UCameraComponent>(TEXT("InteractionCamera"));
@@ -26,19 +26,6 @@ void AAPInteractionTriggerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-FInteractData AAPInteractionTriggerBase::GetInteractData()
-{
-    return InteractionTrigger->GetInteractionData();
-}
-
-void AAPInteractionTriggerBase::Interact(AArcanePunkCharacter *PlayerCharacter)
-{
-    if(!PlayerCharacter) return;
-    
-    PlayerCharacter->SetInteraction(false);
-    PlayerCharacter->InteractionActorRemove(this);
 }
 
 

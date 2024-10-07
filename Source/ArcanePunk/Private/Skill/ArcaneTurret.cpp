@@ -137,7 +137,7 @@ void AArcaneTurret::SpawnDamageText(AController *EventInstigator, float Damage)
 	
 }
 
-void AArcaneTurret::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneTurret::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

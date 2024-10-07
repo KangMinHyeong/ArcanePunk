@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UserInterface/Common/CheckingWidgetInterface.h"
+#include "UserInterface/Common/Check/CheckingWidgetInterface.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Blueprint/UserWidget.h"
@@ -25,8 +25,8 @@ public:
 	virtual void OnValidating(ECheckType UpdateCheckType) override;
 
 	void InitParent(UUserWidget* UpdateParentWidget, int32 UpdateChoiceNumber);
-	void InitInformation_Enhance(FShopGoodsData_Enhance ShopGoodsData_Enhance);
-	void InitInformation_NewSkill(FShopGoodsData_NewSkill ShopGoodsData_NewSkill);
+	void InitInformation_Enhance(const FShopGoodsData_Enhance & ShopGoodsData_Enhance);
+	void InitInformation_NewSkill(const FShopGoodsData_NewSkill & ShopGoodsData_NewSkill);
 
 private:
 	void SwitchingBackgroundColor(EEnHanceType EnHanceType);
@@ -34,6 +34,7 @@ private:
 	void SwitchingAbility(EEnHanceType EnHanceType, FName AbilityName);
 	void SwitchingAddition_Enhance(EEnhanceCategory EnhanceCategory, EEnHanceType EnHanceType, uint8 EnhanceNum);
 	void SwitchingAddition_NewSkill(EEnHanceType EnHanceType);
+	void SwitchingTier(EEnHanceType EnHanceType);
 
 	UFUNCTION()
 	void OnCheckPurchase();
@@ -131,7 +132,7 @@ private:
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<UAPGameInstance> APGI;
-
+	
 	int32 MaxNum = 9;
 
 	int32 ChoiceNumber;

@@ -11,7 +11,7 @@ class UTextBlock;
 class UButton;
 class UImage;
 class AArcanePunkCharacter;
-class UAPGameInstance;
+class UAPDataTableSubsystem;
 class UStackBox;
 
 UCLASS()
@@ -29,7 +29,7 @@ private:
 	void InitEnhance();
 
 	UFUNCTION()
-	void OnSkillInformation();
+	void OnClick_SkillInformation();
 	
 protected:	
 	TWeakObjectPtr<UUserWidget> ParentWidget;
@@ -48,7 +48,7 @@ protected:
 	uint8 SkillNumber = 0;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
-	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPDataTableSubsystem> DataTableGI;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> EnhanceSlotClass;

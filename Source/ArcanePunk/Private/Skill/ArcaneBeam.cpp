@@ -159,7 +159,7 @@ void AArcaneBeam::OnChargingEnhance()
 	ChargeEnhanceEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(ChargeEnhanceEffect, OwnerCharacter->GetMesh(), TEXT("BeamPoint"), OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
 }
 
-void AArcaneBeam::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneBeam::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

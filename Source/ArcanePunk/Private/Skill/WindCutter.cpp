@@ -79,7 +79,7 @@ void AWindCutter::SetWindTrigger(float DeltaTime)
     if(abs(MaxRadius - CurrentRadius) <= KINDA_SMALL_NUMBER) DestroySKill();
 }
 
-void AWindCutter::SetMaxLocation(FVector Location)
+void AWindCutter::SetMaxLocation(const FVector & Location)
 {
     MaxLocation =  Location + GetActorLocation(); MaxLocation.Z = GetActorLocation().Z;
     
@@ -107,7 +107,7 @@ void AWindCutter::OnOverlap(UPrimitiveComponent *OverlappedComp, AActor *OtherAc
 	}
 }
 
-void AWindCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AWindCutter::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;

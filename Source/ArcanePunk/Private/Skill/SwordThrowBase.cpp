@@ -74,7 +74,7 @@ void ASwordThrowBase::OnHitting(UPrimitiveComponent *HitComp, AActor *OtherActor
 	}
 }
 
-void ASwordThrowBase::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ASwordThrowBase::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 	HitTrigger->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);

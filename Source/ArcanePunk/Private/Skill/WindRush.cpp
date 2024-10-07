@@ -74,13 +74,13 @@ void AWindRush::SetWindRushWidth(float Width)
     WindRushTrigger->SetBoxExtent(FVector(5.0f, Width, Width), true);
 }
 
-void AWindRush::SetTargetLocation(FVector Location, float Dist)
+void AWindRush::SetTargetLocation(const FVector & Location, float Dist)
 {
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
     TargetLocation = (Location/Location.Size()) * Dist + OwnerCharacter->GetActorLocation();
 }
 
-void AWindRush::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AWindRush::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

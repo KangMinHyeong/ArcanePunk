@@ -6,10 +6,6 @@
 #include "Character/APCharacterBase.h"
 #include "Enemy_CharacterBase.generated.h"
 
-#define Defense_constant 1000
-
-DECLARE_MULTICAST_DELEGATE(FOnHPChanged);
-
 class ATextRenderActor;
 class UAP_EnemyBaseAnimInstance;
 class UNiagaraComponent;
@@ -80,14 +76,6 @@ public:
 
 	void SetOwnerSection(AActor* BattleSection);
 
-	UFUNCTION(BlueprintPure)
-	float GetForward();
-
-	UFUNCTION(BlueprintPure)
-	float GetRight();
-
-	void SetHitPoint(float Forward, float Right);
-
 	void AddDamageMultiple(float Add, float Time);
 	void OnAttachingDamagedMark(float Time);
 
@@ -105,9 +93,7 @@ public:
 	virtual void SpawnAttackRange(AActor* Target, float WaitTime);
 
 	// HitPoint 관련 함수
-	void DistinctHitPoint(FVector ImpactPoint, AActor* HitActor);
-
-	void SetHitEffect(FVector HitLocation);
+	void DistinctHitPoint(const FVector & ImpactPoint, AActor* HitActor);
 
 	// 몬스터 Anim 관련 함수
 	UFUNCTION()
@@ -121,7 +107,7 @@ public:
 	AActor* IsAggro();
 
 	// 패트롤 위치
-	FVector GetPatrolLocation(FVector Start);
+	FVector GetPatrolLocation(const FVector & Start);
 
 	// Detect Render 스폰
 	void SpawnDetectRender();
@@ -129,12 +115,11 @@ public:
 	// HP UI
 	UFUNCTION(BlueprintPure)
 	virtual bool SetHPUI();
-	void RemoveHPUI();
+	virtual void RemoveHPUI();
 
 protected:
-	float DamageMath(float Damage);
-	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, float Radius, FVector Start, FVector End);
-	void SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation);
+	bool AttackTrace(FHitResult &HitResult, FVector &HitVector, float Radius, const FVector & Start, const FVector & End);
+	void SpawnDamageText(AController* EventInstigator, float Damage, const FVector & AddLocation);
 
 	//Monster 세팅 초기화
 	void InitMonster();
@@ -236,21 +221,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	bool IsAttackPush = true;
 
-	float MonsterIsForward = 0.0f;
-	float MonsterIsRight = 0.0f;
-
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	FVector DamageTextAddLocation = FVector(0,0,0);
-
-	UPROPERTY(EditAnywhere, Category = "Hit")
-	UNiagaraSystem* HitEffect_L;
-
-	UPROPERTY(EditAnywhere, Category = "Hit")
-	UNiagaraSystem* HitEffect_R;
-
-	UPROPERTY(EditAnywhere, Category = "Hit")
-	UNiagaraSystem* HitEffect_B;
-
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	float HitPushDist = 60.0f;
 
@@ -312,7 +284,5 @@ protected:
 	bool bNormalMonster = true;
 
 public:
-	FOnHPChanged OnEnemyHPChanged;
-
 	TWeakObjectPtr<AActor> OwnerSection;
 };

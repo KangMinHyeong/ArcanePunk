@@ -83,7 +83,7 @@ void ACarpetBoom::SetCarpetBoomWidth(float Width)
     CarpetBoomTrigger->SetBoxExtent(FVector(5.0f, Width, Width), true);
 }
 
-void ACarpetBoom::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ACarpetBoom::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

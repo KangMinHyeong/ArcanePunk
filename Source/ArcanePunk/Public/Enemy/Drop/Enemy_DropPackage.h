@@ -18,12 +18,11 @@ public:
 	FORCEINLINE FName GetDropID() const {return DropID;};
 
 	virtual void Tick(float DeltaTime) override;
-
+	virtual bool BeginFocus() override;
+	
 	void AddItem(FName ItemID);
 	void AddEnhance();
 	
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
 	virtual FInteractData GetInteractData() override;
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 

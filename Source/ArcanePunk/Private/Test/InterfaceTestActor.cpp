@@ -30,24 +30,6 @@ void AInterfaceTestActor::Tick(float DeltaTime)
 
 }
 
-void AInterfaceTestActor::BeginFocus()
-{
-	//IInteractionInterface::BeginFocus();
-	if (Mesh)
-	{
-		Mesh->SetRenderCustomDepth(true);
-	}
-}
-
-void AInterfaceTestActor::EndFocus()
-{
-	//IInteractionInterface::EndFocus();
-	if (Mesh)
-	{
-		Mesh->SetRenderCustomDepth(false);
-	}
-}
-
 void AInterfaceTestActor::BeginInteract()
 {
 	//IInteractionInterface::BeginInteract();

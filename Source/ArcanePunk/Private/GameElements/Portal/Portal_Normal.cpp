@@ -24,26 +24,6 @@ APortal_Normal::APortal_Normal()
 	DestinationTrigger->SetupAttachment(Destination);
 }
 
-void APortal_Normal::BeginFocus()
-{
-    TWeakObjectPtr<AArcanePunkCharacter> Character = PortalInteractionTrigger->Character; 
-	if(!Character.IsValid() && BothSides) Character = DestinationTrigger->Character;
-	if(!Character.IsValid()) return;
-	Character->ActivateInteractionSweep();
-
-    GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &APortal_Normal::BeginFocus, InteractFrequency, true);
-}
-
-void APortal_Normal::EndFocus()
-{
-	GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
-}
-
-FInteractData APortal_Normal::GetInteractData()
-{
-    return PortalInteractionTrigger->GetInteractionData();
-}
-
 void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
 	FVector PlayerLocation = PlayerCharacter->GetMesh()->GetComponentLocation();
@@ -103,12 +83,8 @@ void APortal_Normal::BeginPlay()
 
 }
 
-void APortal_Normal::StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint)
+void APortal_Normal::StartTeleport(AArcanePunkCharacter* Character, const FVector & TeleportPoint)
 {
 	Super::StartTeleport(Character, TeleportPoint);	
 }
 
-void APortal_Normal::SpawnSound(FVector Location)
-{
-	Super::SpawnSound(Location);
-} 

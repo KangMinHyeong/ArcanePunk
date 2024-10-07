@@ -427,12 +427,28 @@ void UArcanePunkCharacterAnimInstance::AnimNotify_SwordTrail_3()
     OwnerCharacter->GetAttackComponent()->SpawnSwordTrail(3);
 }
 
-void UArcanePunkCharacterAnimInstance::AnimNotify_SpawnSwordSound()
+void UArcanePunkCharacterAnimInstance::AnimNotify_SpawnSwordSound_1()
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
 
-    OwnerCharacter->SpawnAttackSound();
+    OwnerCharacter->SpawnAttackSound(1);
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_SpawnSwordSound_2()
+{
+    if(IsDead) return;
+    if(!OwnerCharacter.IsValid()) return;
+
+    OwnerCharacter->SpawnAttackSound(2);
+}
+
+void UArcanePunkCharacterAnimInstance::AnimNotify_SpawnSwordSound_3()
+{
+    if(IsDead) return;
+    if(!OwnerCharacter.IsValid()) return;
+
+    OwnerCharacter->SpawnAttackSound(3);
 }
 
 void UArcanePunkCharacterAnimInstance::AnimNotify_AttackVoiceSound()

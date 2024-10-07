@@ -27,3 +27,9 @@ void UAPTrapAnimInstance::AnimNotify_DamageTrigger()
     auto Trap = Cast<AAPTrapBase>(GetOwningActor());
     if(Trap) Trap->OnDamageTrigger();
 }
+
+void UAPTrapAnimInstance::AnimNotify_SpawnTrapOperationSound()
+{
+    auto Trap = Cast<AAPTrapBase>(GetOwningActor());
+    if(Trap) Trap->SpawnTrapOperationSound();
+}

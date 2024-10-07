@@ -27,7 +27,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 	FORCEINLINE bool IsHidden() const {return bHidden;};
 	FORCEINLINE bool IsThrown() const {return bThrowed;};
-	void ThrowedPillar(FVector Target);
+	void ThrowedPillar(FVector & Target);
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE bool IsHitting() const {return bHitting;};

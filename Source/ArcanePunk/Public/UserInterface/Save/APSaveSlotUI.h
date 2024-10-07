@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UserInterface/Common/CheckingWidgetInterface.h"
+#include "UserInterface/Common/Check/CheckingWidgetInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "APSaveSlotUI.generated.h"
 

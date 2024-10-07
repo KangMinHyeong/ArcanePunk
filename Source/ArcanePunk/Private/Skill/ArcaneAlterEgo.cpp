@@ -18,7 +18,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/WidgetComponent.h"
-#include "UserInterface/Common/APHPWidgetComponent.h"
+#include "UserInterface/Common/WidgetComponent/APHPWidgetComponent.h"
 #include "GameInstance/APGameInstance.h"
 
 AArcaneAlterEgo::AArcaneAlterEgo()
@@ -51,16 +51,16 @@ void AArcaneAlterEgo::MoveToMouseClick(FVector ClickPoint)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), ClickPoint);
 }
 
-void AArcaneAlterEgo::CopyAttack(uint8 ComboStack)
-{
-	if(bDoing) return;
-	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
+// void AArcaneAlterEgo::CopyAttack(uint8 ComboStack)
+// {
+// 	if(bDoing) return;
+// 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance()); if(!OwnerAnim) return;
 
-	if(ComboStack == 1) {OwnerAnim->PlayCombo_Montage();}
-	else {OwnerAnim->JumpToComboSection(ComboStack);}
-	bCanMove = false;
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
-}
+// 	if(ComboStack == 1) {OwnerAnim->PlayCombo_Montage();}
+// 	else {OwnerAnim->JumpToComboSection(ComboStack);}
+// 	bCanMove = false;
+// 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
+// }
 
 float AArcaneAlterEgo::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
@@ -118,16 +118,16 @@ void AArcaneAlterEgo::StunExplosion()
 	Destroy();
 }
 
-void AArcaneAlterEgo::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneAlterEgo::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
 	SkillAbilityData = SkillAbilityNestingData;
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
-	auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-
-	RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityData.SkillName, SkillAbilityData.SkillName.ToString());
+	
+	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;
+	RowDataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillAbilityData.SkillName, SkillAbilityData.SkillName.ToString());
 
 	OwnerCharacter->OnAltRightMouseClick.AddDynamic(this, &AArcaneAlterEgo::MoveToMouseClick);
-	OwnerCharacter->OnComboAttackStart.AddDynamic(this, &AArcaneAlterEgo::CopyAttack);
+	// OwnerCharacter->OnComboAttackStart.AddDynamic(this, &AArcaneAlterEgo::CopyAttack);
 
 	TotalStatus = OwnerCharacter->GetPlayerStatus(); // 후에 조정
 

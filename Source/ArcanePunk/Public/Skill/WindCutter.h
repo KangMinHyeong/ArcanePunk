@@ -25,9 +25,9 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	FORCEINLINE void SetMaxWindWitdh(float Width) {MaxWindWitdh =  Width;};
-	void SetMaxLocation(FVector Location);
+	void SetMaxLocation(const FVector & Location);
 	FORCEINLINE void SetMaxRadius(float Radius) {MaxRadius =  Radius;};
 private:
 	UFUNCTION()

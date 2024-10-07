@@ -15,14 +15,10 @@ class ARCANEPUNK_API ALevelPoratl : public APortal_Base
 public:	
 	ALevelPoratl();
 
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
-	virtual FInteractData GetInteractData() override;
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void SpawnSound(FVector Location) override;
 	void StartLoading();
 
 private:

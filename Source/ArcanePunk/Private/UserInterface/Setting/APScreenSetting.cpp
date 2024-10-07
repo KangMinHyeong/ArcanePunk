@@ -11,22 +11,30 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameInstance/APGameInstance.h"
 
-void UAPScreenSetting::NativeConstruct() {
+void UAPScreenSetting::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    BindButtonAndSlider();
+}
+
+void UAPScreenSetting::NativeConstruct() 
+{   
     Super::NativeConstruct();
 
-    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
-    BindButtonAndSlider();
+    SettingGI = Cast<UAPSettingSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSettingSubsystem::StaticClass())); if(!SettingGI.IsValid()) return;
+
     InitSlider();
     InitUIMaterials();
 
-    APGI->SetTextBlock(TextBlock_Saturation, EStringRowName::Grading_Saturation);
-    APGI->SetTextBlock(TextBlock_Contrast, EStringRowName::Grading_Contrast);
-    APGI->SetTextBlock(TextBlock_Gamma, EStringRowName::Grading_Gamma);
-    APGI->SetTextBlock(TextBlock_Gain, EStringRowName::Grading_Gain);
-    APGI->SetTextBlock(TextBlock_Offset, EStringRowName::Grading_Offset);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Saturation, EStringRowName::Grading_Saturation);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Contrast, EStringRowName::Grading_Contrast);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Gamma, EStringRowName::Grading_Gamma);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Gain, EStringRowName::Grading_Gain);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Offset, EStringRowName::Grading_Offset);
 
-    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
-    APGI->SetTextBlock(TextBlock_Apply, EStringRowName::Apply);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Init, EStringRowName::Init);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Apply, EStringRowName::Apply);
 }
 
 void UAPScreenSetting::BindButtonAndSlider()
@@ -34,6 +42,9 @@ void UAPScreenSetting::BindButtonAndSlider()
     Apply_Button->OnClicked.AddDynamic(this, &UAPScreenSetting::OnApply);
     RollBack_Button->OnClicked.AddDynamic(this, &UAPScreenSetting::OnCancel);
 
+    Apply_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    RollBack_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    
     GammaSlider->OnValueChanged.AddDynamic(this, &UAPScreenSetting::OnGammaSlide);
     SaturationSlider->OnValueChanged.AddDynamic(this, &UAPScreenSetting::OnSaturationSlide);
     ContrastSlider->OnValueChanged.AddDynamic(this, &UAPScreenSetting::OnContrastSlide);
@@ -43,11 +54,11 @@ void UAPScreenSetting::BindButtonAndSlider()
 
 void UAPScreenSetting::InitSlider()
 {
-    Saturation = APGI->GetSaturation(); 
-    Contrast = APGI->GetContrast(); 
-    Gamma = APGI->GetGamma(); 
-    Gain = APGI->GetGain(); 
-    Offset = APGI->GetOffset(); 
+    Saturation = SettingGI->GetSaturation(); 
+    Contrast = SettingGI->GetContrast(); 
+    Gamma = SettingGI->GetGamma(); 
+    Gain = SettingGI->GetGain(); 
+    Offset = SettingGI->GetOffset(); 
 
     Text_SaturationNum->SetText(FText::FromString(FString::FromInt(round(FMath::Lerp(0.0f, 100.0f, Saturation)))));
     SaturationSlider->SetValue(Saturation);
@@ -75,8 +86,8 @@ void UAPScreenSetting::InitUIMaterials()
     UIMaterials.Emplace(Image_ColorBG->GetDynamicMaterial());
     UIMaterials.Emplace(Image_ColorSymbol->GetDynamicMaterial());
 
-    SetSaturationUIMaterials(FMath::Lerp(-1.0f, 1.0f, APGI->GetSaturation()));
-    SetContrastUIMaterials(FMath::Lerp(-1.0f, 1.0f, APGI->GetContrast()));
+    SetSaturationUIMaterials(FMath::Lerp(-1.0f, 1.0f, SettingGI->GetSaturation()));
+    SetContrastUIMaterials(FMath::Lerp(-1.0f, 1.0f, SettingGI->GetContrast()));
     
 }
 
@@ -92,12 +103,14 @@ void UAPScreenSetting::SetContrastUIMaterials(float Value)
 
 void UAPScreenSetting::OnApply()
 {
-    if(!APGI.IsValid()) return;
-    APGI->SetSaturation(Saturation);
-    APGI->SetContrast(Contrast);
-    APGI->SetGamma(Gamma);
-    APGI->SetGain(Gain);
-    APGI->SetOffset(Offset);
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
+    if(!SettingGI.IsValid()) return;
+    SettingGI->SetSaturation(Saturation);
+    SettingGI->SetContrast(Contrast);
+    SettingGI->SetGamma(Gamma);
+    SettingGI->SetGain(Gain);
+    SettingGI->SetOffset(Offset);
  
     float SaturationValue = FMath::Lerp(0.0f, 2.0f, Saturation); 
     for (auto PPV : TActorRange<APostProcessVolume>(GetWorld())) {
@@ -123,6 +136,8 @@ void UAPScreenSetting::OnApply()
 
 void UAPScreenSetting::OnCancel()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     OnGammaSlide(0.5f);
     OnSaturationSlide(0.5f);
     OnContrastSlide(0.5f);
@@ -159,8 +174,6 @@ void UAPScreenSetting::OnSaturationSlide(float Value)
     Text_SaturationNum->SetText(FText::FromString(FString::FromInt(round(Num))));
     SetSaturationUIMaterials(FMath::Lerp(-1.0f, 1.0f, Saturation));
 
-    UE_LOG(LogTemp, Display, TEXT("Text_SaturationNum %f"), Saturation);
-    
 }
 
 void UAPScreenSetting::OnContrastSlide(float Value)
@@ -169,8 +182,6 @@ void UAPScreenSetting::OnContrastSlide(float Value)
     float Num = FMath::Lerp(0.0f, 100.0f, Contrast); 
     Text_ContrastNum->SetText(FText::FromString(FString::FromInt(round(Num))));
     SetContrastUIMaterials(FMath::Lerp(-1.0f, 1.0f, Contrast));
-
-    UE_LOG(LogTemp, Display, TEXT("Text_ContrastNum %f"), Saturation);
 }
 
 void UAPScreenSetting::OnGainSlide(float Value)
@@ -186,7 +197,6 @@ void UAPScreenSetting::OnOffsetSlide(float Value)
 {
     Offset = Value;
     float Num = FMath::Lerp(0.0f, 100.0f, Offset); 
-    Text_OffsetNum->SetText(FText::FromString(FString::FromInt(round(Num))));
-
-    
+    Text_OffsetNum->SetText(FText::FromString(FString::FromInt(round(Num))));    
 }
+

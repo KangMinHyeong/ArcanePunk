@@ -24,7 +24,7 @@ void UAPSkillWindow::NativeConstruct()
     InitActiveSkill();
     InitPassiveSkill();
 
-    APGI->PlayUIOpenSound();
+    UAPSoundSubsystem::PlayUIOpenSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
 FReply UAPSkillWindow::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent) // 클릭 아이템 인벤토리로 (오른쪽 마우스)
@@ -56,18 +56,25 @@ FReply UAPSkillWindow::NativeOnKeyDown( const FGeometry& InGeometry, const FKeyE
 
 void UAPSkillWindow::BindButton()
 {
-    Button_Cancel->OnClicked.AddDynamic(this, &UAPSkillWindow::OnCancel);
-    Button_Active->OnClicked.AddDynamic(this, &UAPSkillWindow::OnActive);
-    Button_Passive->OnClicked.AddDynamic(this, &UAPSkillWindow::OnPassive);
+    Button_Cancel->OnClicked.AddDynamic(this, &UAPSkillWindow::OnClick_Cancel);
+    Button_Active->OnClicked.AddDynamic(this, &UAPSkillWindow::OnClick_Active);
+    Button_Passive->OnClicked.AddDynamic(this, &UAPSkillWindow::OnClick_Passive);
+
+    Button_Cancel->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Button_Active->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Button_Passive->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 }
 
-void UAPSkillWindow::OnCancel()
+void UAPSkillWindow::OnClick_Cancel()
 {
+    UAPSoundSubsystem::PlayUICloseSound(UAPGameInstance::GetSoundGI(GetWorld()));
     RemoveFromParent();
 }
 
-void UAPSkillWindow::OnActive()
+void UAPSkillWindow::OnClick_Active()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     Switcher_Change->SetActiveWidget(ScrollBox_Active);
     Text_Active->SetColorAndOpacity(OnColor);
     Text_Passive->SetColorAndOpacity(OffColor);
@@ -80,8 +87,10 @@ void UAPSkillWindow::OnActive()
     Button_Passive->SetStyle(ButtonStyle); 
 }
 
-void UAPSkillWindow::OnPassive()
+void UAPSkillWindow::OnClick_Passive()
 {
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     Switcher_Change->SetActiveWidget(ScrollBox_Passive);
     Text_Active->SetColorAndOpacity(OffColor);
     Text_Passive->SetColorAndOpacity(OnColor);

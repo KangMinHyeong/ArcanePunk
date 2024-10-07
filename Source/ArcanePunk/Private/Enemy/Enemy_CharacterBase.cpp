@@ -14,7 +14,6 @@
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "Components/Character/APSkillHubComponent.h"
 #include "Character/ArcanePunkCharacter.h"
-#include "Components/Character/APTakeDamageComponent.h"
 #include "GameMode/APGameModeBattleStage.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "NiagaraComponent.h"
@@ -32,7 +31,7 @@
 #include "UserInterface/HUD/APHUD.h"
 #include "UserInterface/Enemy/APEnemyHP.h"
 #include "Components/WidgetComponent.h"
-#include "UserInterface/Common/APTextWidgetComponent.h"
+#include "UserInterface/Common/WidgetComponent/APTextWidgetComponent.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -148,16 +147,6 @@ void AEnemy_CharacterBase::SetOwnerSection(AActor * BattleSection)
 	OwnerSection = BattleSection;
 }
 
-float AEnemy_CharacterBase::GetForward()
-{
-    return MonsterIsForward;
-}
-
-float AEnemy_CharacterBase::GetRight()
-{
-    return MonsterIsRight;
-}
-
 bool AEnemy_CharacterBase::AttackPushBack(AActor* DamagedCauser)
 {
 	if(!IsAttackPush) return false;
@@ -173,18 +162,15 @@ bool AEnemy_CharacterBase::AttackPushBack(AActor* DamagedCauser)
 
 float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
-	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	OnEnemyHPChanged.Broadcast();
-	
 	if(IsDead()) return 0.0f;
+	float DamageApplied = DamageAmount;
+
+	float & HP = TotalStatus.StatusData.HP;
+	DamageApplied = DamageMath(DamageApplied * DamageMultiple);	
 	SpawnDamageText(EventInstigator, DamageApplied, DamageTextAddLocation);
 
-	float HP = TotalStatus.StatusData.HP;
-	DamageApplied = DamageApplied * DamageMultiple;
-	DamageApplied = FMath::Min(HP, DamageApplied);
-	
-	HP = HP - DamageMath(DamageApplied);
-	TotalStatus.StatusData.HP = HP;
+	if(CheckShieldHP(DamageApplied, DamageEvent)) return 0.0f;
+	HP = FMath::Clamp<float>(HP - DamageApplied, 0.0f, TotalStatus.StatusData.MaxHP);
 	UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), HP);
 		
 	if(IsDead())
@@ -206,6 +192,8 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 
 		// Checking Section End
 		CheckAllEnemyKilled();
+
+		return DamageApplied;
 	}
 	else 
 	{
@@ -214,7 +202,7 @@ float AEnemy_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const &D
 		if(bNormalMonster) EnemyAnim->PlayHit_Montage();
 	}
 	
-
+	Super::TakeDamage(DamageApplied, DamageEvent, EventInstigator, DamageCauser);
     return DamageApplied;
 }
 
@@ -254,7 +242,7 @@ AActor* AEnemy_CharacterBase::IsAggro()
 	return nullptr;
 }
 
-FVector AEnemy_CharacterBase::GetPatrolLocation(FVector Start)
+FVector AEnemy_CharacterBase::GetPatrolLocation(const FVector & Start)
 {
 	FVector PatrolLocation;
 
@@ -284,12 +272,7 @@ void AEnemy_CharacterBase::SpawnDetectRender()
 	TextUI->SetDetectText();
 }
 
-float AEnemy_CharacterBase::DamageMath(float Damage)
-{
-    return Damage * Defense_constant * (1/(Defense_constant + TotalStatus.StatusData.DEF));
-}
-
-bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, float Radius, FVector Start, FVector End)
+bool AEnemy_CharacterBase::AttackTrace(FHitResult &HitResult, FVector &HitVector, float Radius, const FVector & Start, const FVector & End)
 {
     FRotator Rotation = GetActorRotation();
 
@@ -362,7 +345,7 @@ void AEnemy_CharacterBase::PossessedBy(AController *NewController)
 	Super::PossessedBy(NewController);
 }
 
-void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float Damage, FVector AddLocation)
+void AEnemy_CharacterBase::SpawnDamageText(AController* EventInstigator, float Damage, const FVector & AddLocation)
 {
 	// ADamageText* DamageText = GetWorld()->SpawnActor<ADamageText>(DamageTextClass, GetActorLocation() + AddLocation, FRotator(0.0f, 90.0f, 0.0f));
 	// if(!DamageText) return;
@@ -391,8 +374,8 @@ void AEnemy_CharacterBase::InitMonster()
 		i++;
 	}
 
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    auto DataTable = GI->GetNPCData()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
+	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
+    auto DataTable = DataTableGI->GetDropDataTable()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
     if(DataTable) DropData = * DataTable; 
 	SetManaDrop();
 	SetHPUI();
@@ -418,7 +401,7 @@ void AEnemy_CharacterBase::SetManaDrop()
 
 void AEnemy_CharacterBase::DropChecking(AActor *DamageCauser) 
 {
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
+	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
 
 	float DropPercent = FMath::RandRange(0.0f, 100.0f);
 	if(DropPercent < DropData.DropGold_Percent)
@@ -427,7 +410,7 @@ void AEnemy_CharacterBase::DropChecking(AActor *DamageCauser)
 		float SpawnAdd_X = FMath::RandRange(-150.0f, 150.0f);
 		float SpawnAdd_Y = FMath::RandRange(-150.0f, 150.0f);
 		FVector SpawnLocation = GetMesh()->GetComponentLocation() + FVector(SpawnAdd_X, SpawnAdd_Y, 0.0f);
-		auto DropGold = GetWorld()->SpawnActor<AEnemy_DropBase>(GI->GetDropGoldClass(), SpawnLocation, GetActorRotation());
+		auto DropGold = GetWorld()->SpawnActor<AEnemy_DropBase>(DataTableGI->GetDropGoldClass(), SpawnLocation, GetActorRotation());
 		if(DropGold) DropGold->InitializePickup(DamageCauser, Quantity, true);
 	}
 
@@ -453,7 +436,7 @@ void AEnemy_CharacterBase::CheckAllEnemyKilled()
 	GameMode->MonsterKilled(OwnerSection.Get());
 }
 
-void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActor)
+void AEnemy_CharacterBase::DistinctHitPoint(const FVector & ImpactPoint, AActor *HitActor)
 {
 	FVector HitPoint = ImpactPoint - HitActor->GetActorLocation();
 	FVector HitActorForwardVec = HitActor->GetActorForwardVector(); 
@@ -463,13 +446,7 @@ void AEnemy_CharacterBase::DistinctHitPoint(FVector ImpactPoint, AActor *HitActo
 	float Right = (HitActorRightVec.X * HitPoint.X) + (HitActorRightVec.Y * HitPoint.Y); // 좌 우 Hit 판별
 
 	auto Character = Cast<AArcanePunkCharacter>(HitActor); if(!Character) return;
-	if(!Character->IsBlockMode()) {Character->GetTakeDamageComponent()->SetHitPoint(Forward, Right); Character->GetTakeDamageComponent()->SetHitEffect(ImpactPoint);}
-}
-
-void AEnemy_CharacterBase::SetHitPoint(float Forward, float Right)
-{
-	MonsterIsForward = Forward;
-	MonsterIsRight = Right;
+	if(!Character->IsBlockMode()) {Character->SetHitPoint(Forward, Right); Character->SetHitEffect(ImpactPoint);}
 }
 
 void AEnemy_CharacterBase::AddDamageMultiple(float Add, float Time)
@@ -495,28 +472,6 @@ void AEnemy_CharacterBase::OnDetachingDamagedMark()
 {
 	if(DamagedMark) DamagedMark->DeactivateImmediate();
 	GetWorldTimerManager().ClearTimer(DamagedMarkTimerHandle);
-}
-
-void AEnemy_CharacterBase::SetHitEffect(FVector HitLocation)
-{
-	if(MonsterIsForward > 0)
-	{
-		if(MonsterIsRight > 0)
-		{
-			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_R, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
-			// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect_R, HitLocation, FRotator::ZeroRotator);
-		}
-		else
-		{
-			// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect_L, HitLocation, FRotator::ZeroRotator);
-			UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_L, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
-		}
-	}
-	else
-	{
-		// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect_B, HitLocation, FRotator::ZeroRotator);
-		UNiagaraFunctionLibrary::SpawnSystemAttached(HitEffect_B, GetMesh(), TEXT("HitLocation"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
-	}
 }
 
 void AEnemy_CharacterBase::BindMontageEnded()
@@ -609,7 +564,7 @@ bool AEnemy_CharacterBase::SetHPUI()
 { 
 	HPUI = Cast<UAPEnemyHP>(HealthWidgetComp->GetUserWidgetObject());
 	if(HPUI.IsValid()) HPUI->SetEnemy(this);
-	OnEnemyHPChanged.Broadcast();
+	
     return true;
 }
 

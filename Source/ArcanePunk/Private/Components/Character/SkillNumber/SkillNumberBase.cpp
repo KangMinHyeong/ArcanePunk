@@ -24,7 +24,6 @@ void USkillNumberBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
 	CreateInit();
 	InitSkillData();
 }
@@ -51,6 +50,9 @@ void USkillNumberBase::CreateInit()
 void USkillNumberBase::InitSkillData()
 {
 	auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!APGI) return;
+	auto DataTableGI = Cast<UAPDataTableSubsystem>(APGI->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
+	SettingGI = Cast<UAPSettingSubsystem>(APGI->GetSubsystemBase(UAPSettingSubsystem::StaticClass()));
+
 	switch (SkillKey)
     {
         case ESkillKey::Q:
@@ -67,7 +69,7 @@ void USkillNumberBase::InitSkillData()
     }
 	UpdateSkillData();
 
-	auto DataTable = APGI->GetSkillNameList()->FindRow<FSkillNameList>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString()); if(!DataTable) return;
+	auto DataTable = DataTableGI->GetSkillNameListDataTable()->FindRow<FSkillNameList>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString()); if(!DataTable) return;
 	SkillNameListData = *DataTable;
 	CurrentCoolTime = SkillNameListData.CoolTime;
 	MPConsumption = SkillNameListData.MPConsumption;
@@ -225,28 +227,28 @@ void USkillNumberBase::MarkErase()
 
 void USkillNumberBase::UpdateSkillData()
 {
-	auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!APGI) return;
-	RowDataTable = APGI->GetSkillAbilityRowData()->FindRow<FSkillAbilityRowNameData>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString());
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetWorld()->GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
+	RowDataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillAbilityNestingData.SkillName, SkillAbilityNestingData.SkillName.ToString());
 }
 
 void USkillNumberBase::UpdatAbilityData(EEnHanceType EnHanceType, uint8 AbilityNum)
 {
-	auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance()); if(!APGI) return;
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetWorld()->GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
 	if(AbilityNum == 0) return; 
 	AbilityNum--;
 
 	switch (EnHanceType)
 	{
 		case EEnHanceType::Silver:
-		AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->SilverRowName[AbilityNum]), RowDataTable->SilverRowName[AbilityNum]);
+		AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->SilverRowName[AbilityNum]), RowDataTable->SilverRowName[AbilityNum]);
 		break;
 	
 		case EEnHanceType::Gold:
-		AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->GoldRowName[AbilityNum]), RowDataTable->GoldRowName[AbilityNum]);
+		AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->GoldRowName[AbilityNum]), RowDataTable->GoldRowName[AbilityNum]);
 		break;
 
 		case EEnHanceType::Platinum:
-		AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->PlatinumRowName[AbilityNum]), RowDataTable->PlatinumRowName[AbilityNum]);
+		AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowDataTable->PlatinumRowName[AbilityNum]), RowDataTable->PlatinumRowName[AbilityNum]);
 		break;
 	}
 }
@@ -264,9 +266,8 @@ bool USkillNumberBase::CheckSkillCondition()
 	
 	if(!Check)
 	{
-		OwnerCharacterPC->DisplayNotEnoughMPUI();
-		auto APGI = Cast<UAPGameInstance>(GetOwner()->GetGameInstance());  
-    	if(APGI) APGI->PlayRejectSound();
+		UAPDataTableSubsystem::DisplaySystemMesseage(UAPGameInstance::GetDataTableGI(GetWorld()), EStringRowName::CannotSkill, true, true); 
+		UAPSoundSubsystem::PlayRejectSound(UAPGameInstance::GetSoundGI(GetWorld()));
 	}
 	
     return Check;
@@ -274,9 +275,9 @@ bool USkillNumberBase::CheckSkillCondition()
 
 bool USkillNumberBase::CheckSmartKey(ESkillKey WhichKey)
 {
-	if(!OwnerCharacterPC.IsValid()) return false;
+	if(!SettingGI.IsValid()) return false;
 
-	if(OwnerCharacterPC->SmartKeyArr[(uint8)WhichKey])
+	if(SettingGI->GetSmartKey()[(uint8)WhichKey])
 	{
 		OwnerCharacterPC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 		OwnerCharacter->SetHomingPoint(HitResult.Location);

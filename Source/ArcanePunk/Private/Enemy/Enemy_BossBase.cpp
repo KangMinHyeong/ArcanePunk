@@ -144,6 +144,6 @@ bool AEnemy_BossBase::SetHPUI()
     PlayerHUD->SetBossHPUI();
 	HPUI = Cast<UAPEnemyHP>(PlayerHUD->GetBossHPUI());
 	if(HPUI.IsValid()) HPUI->SetEnemy(this);
-	OnEnemyHPChanged.Broadcast();
+	
     return true;
 }

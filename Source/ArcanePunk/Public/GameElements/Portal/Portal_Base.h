@@ -27,8 +27,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void StartTeleport(AArcanePunkCharacter* Character, FVector TeleportPoint);
-	virtual void SpawnSound(FVector Location);
+	virtual void StartTeleport(AArcanePunkCharacter* Character, const FVector & TeleportPoint);
 
 	void DelayHidden();
 

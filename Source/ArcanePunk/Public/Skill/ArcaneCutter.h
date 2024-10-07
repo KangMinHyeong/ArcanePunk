@@ -26,7 +26,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
+	virtual void SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent) override;
 	FORCEINLINE float GetCutterSpeed() const;
 	FORCEINLINE void SetDist(float Dist) { CutterDist = Dist;};
 	void SetCutterWide(float Wide);

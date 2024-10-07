@@ -10,6 +10,7 @@
 #include "Components/BoxComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameInstance/APGameInstance.h"
 
 // Sets default values
 AEnemy_DropBase::AEnemy_DropBase()
@@ -45,10 +46,6 @@ void AEnemy_DropBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// CurrentAccelerate = FMath::FInterpConstantTo(CurrentAccelerate, GravityAccelerate, DeltaTime, AccelerateSpeed);
-	// DropMesh->AddForce(-GetActorUpVector()*CurrentAccelerate, TEXT("DropMesh"), true);
-
-	// if( GravityAccelerate - CurrentAccelerate <= KINDA_SMALL_NUMBER) OnDestinatingGround();
 }
 
 void AEnemy_DropBase::OnDestinatingGround()
@@ -57,15 +54,17 @@ void AEnemy_DropBase::OnDestinatingGround()
 	
 }
 
-void AEnemy_DropBase::BeginFocus()
+bool AEnemy_DropBase::BeginFocus()
 {
 	TArray<AActor*> Actors;
 	InteractionTrigger->GetOverlappingActors(Actors, AArcanePunkCharacter::StaticClass());
 
-	if(Actors.IsEmpty()) return;
+	if(Actors.IsEmpty()) return false;
 
-	auto PlayerCharacter = Cast<AArcanePunkCharacter>(Actors.Top()); if(!PlayerCharacter) return;
+	auto PlayerCharacter = Cast<AArcanePunkCharacter>(Actors.Top()); if(!PlayerCharacter) return false;
 	OnRooting(PlayerCharacter);	
+
+	return true;
 }
 
 void AEnemy_DropBase::SpawnMovement()
@@ -111,7 +110,10 @@ void AEnemy_DropBase::OnRooting(AArcanePunkCharacter* PlayerCharacter)
 {
 	PlayerCharacter->GetInventory()->HandleAddItem(ItemReference);
 
-	UGameplayStatics::SpawnSound2D(GetWorld(), DropSound, DropSoundVolume);
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Volume = 1.0f; Volume *= SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
+
+	UGameplayStatics::SpawnSound2D(GetWorld(), DropSound, Volume);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DropEffect, GetActorLocation(), GetActorRotation());
 	Destroy();
 }

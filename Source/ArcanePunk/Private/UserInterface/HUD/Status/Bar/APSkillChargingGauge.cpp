@@ -11,8 +11,8 @@ void UAPSkillChargingGauge::NativeConstruct()
     Super::NativeConstruct();
     SetVisibility(ESlateVisibility::Collapsed);
 
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;  
-    auto DataTable = APGI->GetStringData()->FindRow<FStringDataTable>(Charging, Charging.ToString()); if(!DataTable) return;
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
+    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(Charging, Charging.ToString()); if(!DataTable) return;
     Text_Charging->SetText(FText::FromString(DataTable->Content));
 }
 

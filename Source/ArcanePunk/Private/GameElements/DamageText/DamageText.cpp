@@ -62,12 +62,12 @@ void ADamageText::TimeLineUpdateFunc(float Output)
 	MyTextRender->SetYScale(InitScale*Output);
 }
 
-void ADamageText::TimeLineUpdateFunc2(FVector Output)
+void ADamageText::TimeLineUpdateFunc2(const FVector & Output)
 {
 	SetActorLocation(InitLocation + FVector(0,0,Output.Z));
 }
 
-void ADamageText::TimeLineUpdateFunc3(FLinearColor Output)
+void ADamageText::TimeLineUpdateFunc3(const FLinearColor & Output)
 {
 	MyTextRender->SetTextRenderColor(InitColor.WithAlpha(Output.A));
 }

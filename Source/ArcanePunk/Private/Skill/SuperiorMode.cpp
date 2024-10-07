@@ -53,7 +53,7 @@ void ASuperiorMode::SpawnAddtionalAttack(float Dist, float Width)
     } 
 }
 
-void ASuperiorMode::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ASuperiorMode::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

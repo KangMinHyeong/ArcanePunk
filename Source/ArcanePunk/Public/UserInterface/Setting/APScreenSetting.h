@@ -10,13 +10,14 @@ class USlider;
 class UTextBlock;
 class UButton;
 class UImage;
-class UAPGameInstance;
+class UAPSettingSubsystem;
 
 UCLASS()
 class ARCANEPUNK_API UAPScreenSetting : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
@@ -30,6 +31,7 @@ public:
 	UFUNCTION()
 	void OnOffsetSlide(float Value);
 
+	
 private:
 	void BindButtonAndSlider();
 	void InitSlider();
@@ -113,5 +115,5 @@ private:
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> UIMaterials;
 
-	TWeakObjectPtr<UAPGameInstance> APGI;
+	TWeakObjectPtr<UAPSettingSubsystem> SettingGI;
 };

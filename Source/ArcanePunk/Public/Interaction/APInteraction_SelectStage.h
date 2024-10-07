@@ -14,11 +14,6 @@ class ARCANEPUNK_API AAPInteraction_SelectStage : public AAPInteractionTriggerBa
 	GENERATED_BODY()
 
 public:	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void BeginFocus() override;
-	virtual void EndFocus() override;
-
 	virtual void Interact(AArcanePunkCharacter* PlayerCharacter) override;
 
 private:

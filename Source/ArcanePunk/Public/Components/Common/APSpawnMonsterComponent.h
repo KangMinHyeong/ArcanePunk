@@ -20,9 +20,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void PlaySpawnEffect(FVector Location);
-	FVector GetRandomLocation(FVector V_1, FVector V_2, FVector V_3);
-	bool IsPossibleLocation(FVector Location);
+	void PlaySpawnEffect(const FVector & Location);
+	FVector GetRandomLocation(const FVector & V_1, const FVector & V_2, const FVector & V_3) const;
+	bool IsPossibleLocation(const FVector & Location);
 	void SpawnParamsSetting();
 
 public:	
@@ -30,10 +30,10 @@ public:
 
 	void SpawnLocation(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, USceneComponent* SpawnRoot = nullptr);
 	void SpawnMonsterFromLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass, TArray<AActor*>& SpawnLocations, TArray<AEnemy_CharacterBase*>& MonsterArr);
-	void SpawnLocationRandom(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, FVector MinimumRange, FVector MaximumRange);
-	void SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3);
-	void SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector V_1, FVector V_2, FVector V_3, FVector V_4);
-	void SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, FVector SpawnLocation);
+	void SpawnLocationRandom(TSubclassOf<AAPSpawnPointBase> SpawnPointClass, int32 SpawnMonsterNum, TArray<AActor*>& SpawnLocations, const FVector & MinimumRange, const FVector & MaximumRange);
+	void SpawnMonsterRandomWithTriangle(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, const FVector & V_1, const FVector & V_2, const FVector & V_3);
+	void SpawnMonsterRandomWithSquare(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, const FVector & V_1, const FVector & V_2, const FVector & V_3, const FVector & V_4);
+	void SpawnMonsterRandomWithLocation(TSubclassOf<AEnemy_CharacterBase> SpawnMonsterClass,  uint8 SpawnMonsterNum, const FVector & SpawnLocation);
 	FActorSpawnParameters SpawnParams;
 
 private:

@@ -11,23 +11,25 @@
 #include "Items/APItemBase.h"
 #include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "GameInstance/APGameInstance.h"
-#include "UserInterface/Common/APCheckUI.h"
+#include "UserInterface/Common/Check/APCheckUI.h"
 
 void UShoppingChoiceUI::NativeConstruct()
 {
     Super::NativeConstruct();
     
     Button_Purchase->OnClicked.AddDynamic(this, &UShoppingChoiceUI::OnCheckPurchase);
+    Button_Purchase->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 
-    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;  
+    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
 
-    APGI->SetTextBlock(Text_New, EStringRowName::NewSkill);
-    APGI->SetTextBlock(Text_Type, EStringRowName::TypeName);
-    APGI->SetTextBlock(Text_TierName, EStringRowName::TierName);
-    APGI->SetTextBlock(Text_PriceName, EStringRowName::Price);
-    APGI->SetTextBlock(Text_CurrentGold, EStringRowName::CurrentGold);
-    APGI->SetTextBlock(Text_Purchase, EStringRowName::Purchase);
     
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_New, EStringRowName::NewSkill);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Type, EStringRowName::TypeName);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_TierName, EStringRowName::TierName);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_PriceName, EStringRowName::Price);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_CurrentGold, EStringRowName::CurrentGold);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Purchase, EStringRowName::Purchase);
+   
 }
 
 void UShoppingChoiceUI::InitParent(UUserWidget * UpdateParentWidget, int32 UpdateChoiceNumber)
@@ -37,7 +39,7 @@ void UShoppingChoiceUI::InitParent(UUserWidget * UpdateParentWidget, int32 Updat
     OwnerCharacter = Cast<AArcanePunkCharacter>(ParentWidget->GetOwningPlayerPawn());
 }
 
-void UShoppingChoiceUI::InitInformation_Enhance(FShopGoodsData_Enhance ShopGoodsData_Enhance)
+void UShoppingChoiceUI::InitInformation_Enhance(const FShopGoodsData_Enhance & ShopGoodsData_Enhance)
 {
     EnhanceData = ShopGoodsData_Enhance;
     if(EnhanceData.GoodsNum == 0) {RemoveFromParent(); return;}
@@ -45,24 +47,26 @@ void UShoppingChoiceUI::InitInformation_Enhance(FShopGoodsData_Enhance ShopGoods
     SwitchingSkillType(EnhanceData.GoodsCategory);
     SwitchingAbility(EnhanceData.GoodsType, EnhanceData.EnhanceName);
     SwitchingAddition_Enhance(EnhanceData.GoodsCategory, EnhanceData.GoodsType, EnhanceData.EnhanceNumber);
+    SwitchingTier(EnhanceData.GoodsType);
     UpdatePlayerGold(EnhanceData.GoodsPrice);
 
-    APGI->SetTextBlock(Text_GoodsType, EStringRowName::EnhanceSkill);
-    Text_Price->SetText(FText::FromString(FString::FromInt(ShopGoodsData_Enhance.GoodsPrice)));
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_GoodsType, EStringRowName::EnhanceSkill);
+    Text_Price->SetText(FText::FromString(FString::FromInt(ShopGoodsData_Enhance.GoodsPrice))); 
 
     bEnhanceUI = true;
 }
 
-void UShoppingChoiceUI::InitInformation_NewSkill(FShopGoodsData_NewSkill ShopGoodsData_NewSkill)
+void UShoppingChoiceUI::InitInformation_NewSkill(const FShopGoodsData_NewSkill & ShopGoodsData_NewSkill)
 {
     NewSkillData = ShopGoodsData_NewSkill;
     SwitchingBackgroundColor(NewSkillData.GoodsType);
     SwitchingSkillType(NewSkillData.GoodsCategory);
     SwitchingAddition_NewSkill(NewSkillData.GoodsType);
+    SwitchingTier(NewSkillData.GoodsType);
     UpdatePlayerGold(NewSkillData.GoodsPrice);
     Text_New->SetVisibility(ESlateVisibility::Visible);
 
-    APGI->SetTextBlock(Text_GoodsType, EStringRowName::SkillName);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_GoodsType, EStringRowName::SkillName);
     Text_Price->SetText(FText::FromString(FString::FromInt(ShopGoodsData_NewSkill.GoodsPrice)));
 
     auto DataTable = SkillNameListData->FindRow<FSkillNameList>(NewSkillData.NewSkillName, NewSkillData.NewSkillName.ToString()); if(!DataTable) return;
@@ -84,7 +88,7 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        APGI->SetTextBlock(Text_Type, EStringRowName::Tier_3);
+        
         Border_Background->SetBrushColor(SilverColor);
         TierFont.OutlineSettings.OutlineColor = SilverColor;
         CategoryFont.OutlineSettings.OutlineColor = SilverColor;
@@ -92,7 +96,7 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
         GoodsNameFont.OutlineSettings.OutlineColor = SilverColor;
     break;
         case EEnHanceType::Gold:
-        APGI->SetTextBlock(Text_Type, EStringRowName::Tier_2);
+        
         Border_Background->SetBrushColor(GoldColor);
         TierFont.OutlineSettings.OutlineColor = GoldColor;
         CategoryFont.OutlineSettings.OutlineColor = GoldColor;
@@ -100,7 +104,7 @@ void UShoppingChoiceUI::SwitchingBackgroundColor(EEnHanceType EnHanceType)
         GoodsNameFont.OutlineSettings.OutlineColor = GoldColor;
     break;
         case EEnHanceType::Platinum:
-        APGI->SetTextBlock(Text_Type, EStringRowName::Tier_1);
+        
         Border_Background->SetBrushColor(PlatinumColor);
         TierFont.OutlineSettings.OutlineColor = PlatinumColor;
         CategoryFont.OutlineSettings.OutlineColor = PlatinumColor;
@@ -122,16 +126,16 @@ void UShoppingChoiceUI::SwitchingSkillType(EEnhanceCategory EnhanceCategory)
     switch (EnhanceCategory)
     {
         case EEnhanceCategory::Enhance_Q:
-        APGI->SetTextBlock(Text_Category, EStringRowName::Skill_Q);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Category, EStringRowName::Skill_Q);
     break;
         case EEnhanceCategory::Enhance_E:
-        APGI->SetTextBlock(Text_Category, EStringRowName::Skill_E);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Category, EStringRowName::Skill_E);
     break;
         case EEnhanceCategory::Enhance_R:
-        APGI->SetTextBlock(Text_Category, EStringRowName::Skill_R);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Category, EStringRowName::Skill_R);
     break;
         case EEnhanceCategory::Enhance_Passive:
-        APGI->SetTextBlock(Text_Category, EStringRowName::Passive);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Category, EStringRowName::Passive);
     break;
     }
 }
@@ -214,13 +218,13 @@ void UShoppingChoiceUI::SwitchingAddition_Enhance(EEnhanceCategory EnhanceCatego
     
     Text_Addition_Inform->SetText(FText::FromString(FString::FromInt(NestingNum)));
 
-    APGI->SetTextBlock(Text_Addition, EStringRowName::CurrentNesting);
-    APGI->SetTextBlock(Text_Addition_Inform_2, EStringRowName::Count);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Addition, EStringRowName::CurrentNesting);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Addition_Inform_2, EStringRowName::Count);
 }
 
 void UShoppingChoiceUI::SwitchingAddition_NewSkill(EEnHanceType EnHanceType)
 {
-    APGI->SetTextBlock(Text_Addition, EStringRowName::AdditionEnhance);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Addition, EStringRowName::AdditionEnhance);
         
     switch (EnHanceType)
     {
@@ -229,12 +233,29 @@ void UShoppingChoiceUI::SwitchingAddition_NewSkill(EEnHanceType EnHanceType)
         Border_Background->SetBrushColor(SilverColor);
     break;
         case EEnHanceType::Gold:
-        APGI->SetTextBlock(Text_Addition_Inform_2, EStringRowName::Tier_3);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Addition_Inform_2, EStringRowName::Tier_3);
         Border_Background->SetBrushColor(GoldColor);
     break;
         case EEnHanceType::Platinum:
-        APGI->SetTextBlock(Text_Addition_Inform_2, EStringRowName::Tier_2);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Addition_Inform_2, EStringRowName::Tier_2);
         Border_Background->SetBrushColor(PlatinumColor);
+    break;
+    }
+}
+
+void UShoppingChoiceUI::SwitchingTier(EEnHanceType EnHanceType)
+{
+    switch (EnHanceType)
+    {
+        case EEnHanceType::Silver:
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Tier, EStringRowName::Tier_3);
+    break;
+        case EEnHanceType::Gold:
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Tier, EStringRowName::Tier_2);
+
+    break;
+        case EEnHanceType::Platinum:
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Tier, EStringRowName::Tier_1);
     break;
     }
 }
@@ -247,9 +268,10 @@ void UShoppingChoiceUI::OnValidating(ECheckType UpdateCheckType)
     auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")); if(!Item) {Shop->OnNotEnoughGold(); return;} // 골드 부족 UI
     if(Item->Quantity >= CurrentPrice)
     {
-        APGI->PlayChoiceSound();
         OwnerCharacter->GetInventory()->RemoveAmountOfItem(Item, CurrentPrice);
         if(APGI.IsValid()) APGI->OnGettingGold.Broadcast(-CurrentPrice);
+
+        UAPSoundSubsystem::PlayUIChoiceSound(UAPGameInstance::GetSoundGI(GetWorld()));
     }
 
     if(bEnhanceUI)
@@ -269,13 +291,13 @@ void UShoppingChoiceUI::OnCheckPurchase()
 {
     auto Shop = Cast<UAPShoppingUI>(ParentWidget); if(!Shop) return;
 
+    
     // 재화 체크  
     auto Item = OwnerCharacter->GetInventory()->FindItembyId(TEXT("Gold")); if(!Item) {Shop->OnNotEnoughGold(); return;} // 골드 부족 UI
     if(Item->Quantity >= CurrentPrice)
     {
-        if(!APGI.IsValid()) return;
-
-        auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), APGI->GetCheckUIClass());
+        auto DataTableGI = Cast<UAPDataTableSubsystem>(APGI->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;     
+        auto CheckUI = CreateWidget<UAPCheckUI>(GetWorld(), DataTableGI->GetCheckUIClass());
         if(CheckUI)
         {
             CheckUI->AddToViewport(1); 

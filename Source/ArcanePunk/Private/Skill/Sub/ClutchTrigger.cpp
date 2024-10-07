@@ -33,7 +33,7 @@ void AClutchTrigger::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AClutchTrigger::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase *SkillComponent)
+void AClutchTrigger::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase *SkillComponent)
 {
 	Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()->GetOwner()); if(!OwnerCharacter.IsValid()) return;

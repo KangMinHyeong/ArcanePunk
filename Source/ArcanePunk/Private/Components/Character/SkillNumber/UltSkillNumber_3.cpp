@@ -10,6 +10,7 @@
 #include "Skill/ArcaneExecution.h"
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "GameInstance/APGameInstance.h"
 
 UUltSkillNumber_3::UUltSkillNumber_3()
 {
@@ -34,7 +35,7 @@ void UUltSkillNumber_3::PlaySkill()
 	{
         if(bActivate)
         {
-            if(!CheckSkillCool(SkillKey)) {OwnerCharacterPC->DisplayNotEnoughMPUI(); return;}
+            if(!CheckSkillCool(SkillKey)) {UAPDataTableSubsystem::DisplaySystemMesseage(UAPGameInstance::GetDataTableGI(GetWorld()), EStringRowName::CannotSkill, true, true);  return;}
             OwnerCharacter->SetDoing(true);
             Skilling = true;
 

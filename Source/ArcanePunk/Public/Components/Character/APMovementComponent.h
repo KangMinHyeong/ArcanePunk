@@ -37,10 +37,10 @@ public:
 
 	void ComboMovement(); // 콤보어택 Move 시작
 	
-	void StartTickMove(FVector ToLocation);
+	void StartTickMove(const FVector & ToLocation);
 	void StopTickMove(); 
 
-	void SetAttackRotation(FRotator NewTargetRot, float AddSpeed = 0.0f);
+	void SetAttackRotation(const FRotator & NewTargetRot, float AddSpeed = 0.0f);
 	
 	void StartDash();
 	void EndDash();

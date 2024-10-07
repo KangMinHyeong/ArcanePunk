@@ -22,8 +22,8 @@ public:
 	virtual void NativeConstruct() override;
 
 	void InitParent(UUserWidget* UpdateParentWidget, int32 UpdateListNumber);
-	void InitEnhanceData(FShopGoodsData_Enhance ShopGoodsData_Enhance);	
-	void InitNewSkillData(FShopGoodsData_NewSkill ShopGoodsData_NewSkill);
+	void InitEnhanceData(const FShopGoodsData_Enhance & ShopGoodsData_Enhance);	
+	void InitNewSkillData(const FShopGoodsData_NewSkill & ShopGoodsData_NewSkill);
 
 	void SoldOut();
 

@@ -2,7 +2,6 @@
 #include "Enemy/Drop/Enemy_DropPackage.h"
 
 #include "Character/ArcanePunkCharacter.h"
-#include "UserInterface/Drop/APDropPackageUI.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/SphereComponent.h"
 #include "GameInstance/APGameInstance.h"
@@ -30,6 +29,11 @@ void AEnemy_DropPackage::BeginPlay()
 void AEnemy_DropPackage::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+bool AEnemy_DropPackage::BeginFocus()
+{
+    return false;
 }
 
 void AEnemy_DropPackage::AddItem(FName ItemID)
@@ -150,19 +154,6 @@ EEnhanceCategory AEnemy_DropPackage::GetRandCategory()
     return Category;
 }
 
-void AEnemy_DropPackage::BeginFocus()
-{
-	TWeakObjectPtr<AArcanePunkCharacter> Character = InteractionTrigger->Character; if(!Character.IsValid()) return;
-	Character->ActivateInteractionSweep();
-
-	GetWorld()->GetTimerManager().SetTimer(InteractTimerHandle, this, &AEnemy_DropPackage::BeginFocus, InteractFrequency, true);
-}
-
-void AEnemy_DropPackage::EndFocus()
-{
-	GetWorld()->GetTimerManager().ClearTimer(InteractTimerHandle);
-}
-
 FInteractData AEnemy_DropPackage::GetInteractData()
 {
     return InteractionTrigger->GetInteractionData();
@@ -172,13 +163,7 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
 {
 	if(!IsInit) return; if(!PlayerCharacter) return;
     // if(PlayerCharacter->IsDash()) {PlayerCharacter->ReleasedDash();}
-
-	// for(auto DropItems : ItemsInPackage)
-	// {
-    //     if(DropItems->ID == "Gold") {DropItems->SetQuantity(CheckGoldAmount());}
-	// 	PlayerCharacter->GetInventory()->HandleAddItem(DropItems);
-	// 	PlayerCharacter->InteractionActorRemove(this);
-	// }
+    
     for(auto Portal : TActorRange<APortal_Base>(GetWorld()))
     {
         if(GetDropID() == Portal->GetPortalID())
@@ -187,11 +172,8 @@ void AEnemy_DropPackage::Interact(AArcanePunkCharacter *PlayerCharacter)
         }
     }
 
-    PlayerCharacter->InteractionActorRemove(this);
 	if(EnhanceCategory != EEnhanceCategory::None) PlayerCharacter->SetSkillAbility(EnhanceCategory, EnHanceType);
 
-	auto PC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); 
-	if(PC) PC->CloseInteraction(this);
 	Destroy();
 }
 

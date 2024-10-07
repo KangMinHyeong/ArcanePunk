@@ -9,26 +9,32 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameInstance/APGameInstance.h"
 
+void UAPAudioSetting::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    BindButton();
+}
+
 void UAPAudioSetting::NativeConstruct()
 {
     Super::NativeConstruct();
     
     InitSliders();
-    BindButton();
 
-    if(!APGI.IsValid()) return;
-    APGI->SetTextBlock(TextBlock_Master, EStringRowName::Volume_Master);
-    APGI->SetTextBlock(TextBlock_BGM, EStringRowName::Volume_BGM);
-    APGI->SetTextBlock(TextBlock_Effect, EStringRowName::Volume_Effect);
-    APGI->SetTextBlock(TextBlock_Init, EStringRowName::Init);
-    APGI->SetTextBlock(TextBlock_Apply, EStringRowName::Apply);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Master, EStringRowName::Volume_Master);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_BGM, EStringRowName::Volume_BGM);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Effect, EStringRowName::Volume_Effect);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_UI, EStringRowName::Volume_UI);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Init, EStringRowName::Init);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Apply, EStringRowName::Apply);
 }
 
 void UAPAudioSetting::NativeDestruct()
 {
     Super::NativeDestruct();
 
-    APGI->OnChangingSoundVolume.Broadcast(APGI->GetGameSoundVolume().MasterVolume, APGI->GetGameSoundVolume().BGMVolume, APGI->GetGameSoundVolume().EffectVolume);
+    SoundGI->OnChangingSoundVolume.Broadcast(SoundGI->GetGameSoundVolume().MasterVolume, SoundGI->GetGameSoundVolume().BGMVolume, SoundGI->GetGameSoundVolume().EffectVolume, SoundGI->GetGameSoundVolume().UIVolume);
 }
 
 FReply UAPAudioSetting::NativeOnMouseButtonDown(const FGeometry &InGeometry, const FPointerEvent &InMouseEvent)
@@ -45,14 +51,16 @@ FReply UAPAudioSetting::NativeOnMouseWheel(const FGeometry &InGeometry, const FP
 
 void UAPAudioSetting::InitSliders()
 {
-    APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
-    Master = APGI->GetGameSoundVolume().MasterVolume;
-    BGM = APGI->GetGameSoundVolume().BGMVolume;
-    Effect = APGI->GetGameSoundVolume().EffectVolume;
+    SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI.IsValid()) return;
+    Master = SoundGI->GetGameSoundVolume().MasterVolume;
+    BGM = SoundGI->GetGameSoundVolume().BGMVolume;
+    Effect = SoundGI->GetGameSoundVolume().EffectVolume;
+    UI = SoundGI->GetGameSoundVolume().UIVolume;
 
     Slider_Master->SetValue(Master);
     Slider_BGM->SetValue(BGM);
     Slider_Effect->SetValue(Effect);
+    Slider_UI->SetValue(UI);
 }
 
 void UAPAudioSetting::BindButton()
@@ -60,47 +68,65 @@ void UAPAudioSetting::BindButton()
     Button_Back->OnClicked.AddDynamic(this, &UAPAudioSetting::OnClickBack);
     Button_Apply->OnClicked.AddDynamic(this, &UAPAudioSetting::OnClickApply);
 
+    Button_Back->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Button_Apply->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+
     Slider_Master->OnValueChanged.AddDynamic(this, &UAPAudioSetting::OnSlide_Master);
     Slider_BGM->OnValueChanged.AddDynamic(this, &UAPAudioSetting::OnSlide_BGM);
     Slider_Effect->OnValueChanged.AddDynamic(this, &UAPAudioSetting::OnSlide_Effect);
+    Slider_UI->OnValueChanged.AddDynamic(this, &UAPAudioSetting::OnSlide_UI);
 }
 
 void UAPAudioSetting::OnClickBack()
 {
-    Master = 1.0f;
-    BGM = 1.0f;
-    Effect = 1.0f;
+    Master = 0.5f;
+    BGM = 0.5f;
+    Effect = 0.5f;
+    UI = 0.5f;
 
     Slider_Master->SetValue(Master);
     Slider_BGM->SetValue(BGM);
     Slider_Effect->SetValue(Effect);
+    Slider_UI->SetValue(UI);
+    
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
 void UAPAudioSetting::OnClickApply()
 {
-    if(!APGI.IsValid()) return;
-    APGI->SetGameMasterVolume(Master);
-    APGI->SetGameBGMVolume(BGM);
-    APGI->SetGameEffectVolume(Effect);
+    if(!SoundGI.IsValid()) return;
+    SoundGI->SetGameMasterVolume(Master);
+    SoundGI->SetGameBGMVolume(BGM);
+    SoundGI->SetGameEffectVolume(Effect);
+    SoundGI->SetGameUIVolume(UI);
+    
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
 void UAPAudioSetting::OnSlide_Master(float Value)
 {
     Master = Value;
-    UE_LOG(LogTemp, Display, TEXT("Master %f"), Master);
-    if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
+
+    if(SoundGI.IsValid()) SoundGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect, UI);
 }
 
 void UAPAudioSetting::OnSlide_BGM(float Value)
 {
     BGM = Value;
 
-    if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
+    if(SoundGI.IsValid()) SoundGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect, UI);
 }
 
 void UAPAudioSetting::OnSlide_Effect(float Value)
 {
     Effect = Value;
 
-    if(APGI.IsValid()) APGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect);
+    if(SoundGI.IsValid()) SoundGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect, UI);
+}
+
+void UAPAudioSetting::OnSlide_UI(float Value)
+{
+    UI = Value;
+
+    if(SoundGI.IsValid()) SoundGI->OnChangingSoundVolume.Broadcast(Master, BGM, Effect, UI);
 }

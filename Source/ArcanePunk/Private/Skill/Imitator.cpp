@@ -69,7 +69,7 @@ void AImitator::CollisionEnableStart()
     SetActorTickEnabled(true);
 }
 
-void AImitator::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AImitator::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData , SkillComponent);
     if(!OwnerCharacter.IsValid()) return;

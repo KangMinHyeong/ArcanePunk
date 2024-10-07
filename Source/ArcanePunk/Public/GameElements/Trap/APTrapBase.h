@@ -44,6 +44,9 @@ public:
 	virtual void OnDamageTrigger();
 	virtual void Deactivate();
 
+	void SpawnTrapOperationSound();
+	void SpawnTrapEndSound();
+
 protected:
 	// Component
 	UPROPERTY(EditAnywhere)
@@ -95,4 +98,12 @@ protected:
 	float OperationTime = 0.0f;
 
 	bool bActivate = true;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* TrapOperationSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* TrapEndSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	float OperationSoundDelay = 0.0f;
+
 };

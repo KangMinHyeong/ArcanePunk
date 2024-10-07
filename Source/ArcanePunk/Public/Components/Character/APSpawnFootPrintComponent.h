@@ -20,8 +20,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void SpawnSound(USoundBase* Sound, FVector Location);
-
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

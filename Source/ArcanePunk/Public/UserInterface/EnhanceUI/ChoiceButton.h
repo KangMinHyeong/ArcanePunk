@@ -46,9 +46,10 @@ private:
 	void SetSkillName();
 
 	UFUNCTION()
-	void OnClickChoice();
+	void OnClick_Choice();
 	UFUNCTION(BlueprintCallable)
-	void OnReroll();
+	void OnClick_Reroll();
+
 	UFUNCTION(BlueprintCallable)
 	void ApplyChoice();
 

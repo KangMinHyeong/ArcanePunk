@@ -25,9 +25,11 @@ void UAPEnhanceChoice::NativeConstruct()
     SetPauseGame();
 
     APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
-    APGI->SetTextBlock(Text_CurrentReroll, EStringRowName::CurrentReroll); 
-    APGI->SetTextBlock(Text_Count, EStringRowName::Count); 
-    APGI->PlayUIOpenSound();
+
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()),Text_CurrentReroll, EStringRowName::CurrentReroll); 
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()),Text_Count, EStringRowName::Count); 
+    
+    UAPSoundSubsystem::PlayUIOpenSound(UAPGameInstance::GetSoundGI(GetWorld()));
 }
 
 void UAPEnhanceChoice::SetPauseGame()
@@ -68,6 +70,8 @@ void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHance
 {
     OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwningPlayerPawn()); if(!OwnerCharacter.IsValid()) return;
     APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI.IsValid()) return;
+    DataTableGI = Cast<UAPDataTableSubsystem>(APGI->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI.IsValid()) return;   
+    
     OnBackGround_FadeIn();
 
     EnhanceCategory = UpdateEnhanceCategory;
@@ -84,26 +88,27 @@ void UAPEnhanceChoice::InitType(EEnhanceCategory UpdateEnhanceCategory, EEnHance
     SetAbility();
     SetChoiceButton();
     
-    Cancel_Button->OnClicked.AddDynamic(this, &UAPEnhanceChoice::OnCancel);
+    Cancel_Button->OnClicked.AddDynamic(this, &UAPEnhanceChoice::OnClick_Cancel);
+    Cancel_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
 }
 
 void UAPEnhanceChoice::InitTypeSetting()
 {
     if(!OwnerCharacter.IsValid()) return;
-    
+
     if(EnHanceType == EEnHanceType::Silver) 
     {
-        APGI->SetTextBlock(EnHanceType_Text, EStringRowName::Tier_3);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), EnHanceType_Text, EStringRowName::Tier_3);
         ChoiceBorder->SetBrushColor(SilverColor);
     }
     else if(EnHanceType == EEnHanceType::Gold) 
     {
-        APGI->SetTextBlock(EnHanceType_Text, EStringRowName::Tier_2);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), EnHanceType_Text, EStringRowName::Tier_2);
         ChoiceBorder->SetBrushColor(GoldColor);
     }
     else 
     {
-        APGI->SetTextBlock(EnHanceType_Text, EStringRowName::Tier_1);
+        UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), EnHanceType_Text, EStringRowName::Tier_1);
         ChoiceBorder->SetBrushColor(PlatinumColor);
     }
     
@@ -115,6 +120,7 @@ void UAPEnhanceChoice::InitTypeSetting()
 void UAPEnhanceChoice::SetAbility()
 {
     if(!OwnerCharacter.IsValid()) return;
+    if(!DataTableGI.IsValid()) return; 
 
     switch (EnhanceCategory)
     {
@@ -138,7 +144,7 @@ void UAPEnhanceChoice::SetAbility()
         break;
     }
 
-    APGI->SetTextBlock(EnHanceCategory_Text, EStringRowName::Message_EnhanceChoice);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), EnHanceCategory_Text, EStringRowName::Message_EnhanceChoice);
     EnhanceListing();
 }
 
@@ -286,8 +292,9 @@ void UAPEnhanceChoice::InitPassiveSkillName()
 
 void UAPEnhanceChoice::EnhanceSuffle(FName SkillName)
 {  
-    if(!OwnerCharacter.IsValid()) return;
-    auto DataTable = SkillAbilityRowNameData->FindRow<FSkillAbilityRowNameData>(SkillName, SkillName.ToString()); if(!DataTable) return;
+    if(!OwnerCharacter.IsValid()) return; 
+    if(!DataTableGI.IsValid()) return;  
+    auto DataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillName, SkillName.ToString()); if(!DataTable) return;
     
     TArray<FString> RowName;
     uint8 Num = 0;
@@ -338,15 +345,15 @@ void UAPEnhanceChoice::EnhanceSuffle(FName SkillName)
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Gold:
-        AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Platinum:
-        AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
     }
     if(!AbilityData) return;
@@ -474,8 +481,10 @@ void UAPEnhanceChoice::OnReroll(uint8 ChoiceIndexNum)
     } 
 }
 
-void UAPEnhanceChoice::OnCancel()
+void UAPEnhanceChoice::OnClick_Cancel()
 {
+    UAPSoundSubsystem::PlayUICloseSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
     RemoveFromParent();
     auto PC = Cast<AArcanePunkPlayerController>(OwnerCharacter->GetController()); if(!PC) return;
     PC->SetPause(false);

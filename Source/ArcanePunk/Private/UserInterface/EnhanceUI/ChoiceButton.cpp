@@ -20,27 +20,29 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkil
     NestingNumb = UpdateNestingNumb;
 
     SetSkillName();
-    auto DataTable = ParentWidget->GetSkillAbilityRowNameData()->FindRow<FSkillAbilityRowNameData>(SkillNumberName, SkillNumberName.ToString()); if(!DataTable) return;
+
+    auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
+    auto DataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillNumberName, SkillNumberName.ToString()); if(!DataTable) return;
 
     FSkillAbilityDataSheet* AbilityData = nullptr;
     TArray<FString> RowName;
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(ParentWidget->GetOwningPlayerPawn()); if(!OwnerCharacter) return;
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
+    
     switch (ParentWidget->GetEnHanceType())
     {
         case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName;
-        AbilityData = APGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName;
-        AbilityData = APGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName;
-        AbilityData = APGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
     }
     if(!AbilityData) return;
@@ -97,8 +99,8 @@ void UChoiceButton::SetSkillName()
 
 void UChoiceButton::BindButton()
 {   
-    Choice_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnClickChoice);
-    Reroll_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnReroll);
+    Choice_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnClick_Choice);
+    Reroll_Button->OnClicked.AddDynamic(this, &UChoiceButton::OnClick_Reroll);
 
     Choice_Button->OnHovered.AddDynamic(this, &UChoiceButton::OnChoiceButton_Hovered);
     Choice_Button->OnUnhovered.AddDynamic(this, &UChoiceButton::OnChoiceButton_UnHovered);
@@ -106,26 +108,29 @@ void UChoiceButton::BindButton()
     Reroll_Button->OnHovered.AddDynamic(this, &UChoiceButton::OnRerollButton_Hovered);
     Reroll_Button->OnUnhovered.AddDynamic(this, &UChoiceButton::OnRerollButton_UnHovered);
 
+    Reroll_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
+    Choice_Button->OnHovered.AddDynamic(UAPGameInstance::GetSoundGI(GetWorld()), &UAPSoundSubsystem::PlayUIHoverSound);
     
-    auto APGI = Cast<UAPGameInstance>(GetGameInstance()); if(!APGI) return;
-
-    APGI->SetTextBlock(Text_New, EStringRowName::NewSkill);
-    APGI->SetTextBlock(TextBlock_Select, EStringRowName::Select);
-    APGI->SetTextBlock(Text_CurrnetNesting, EStringRowName::CurrentNesting);
-    APGI->SetTextBlock(Text_Count, EStringRowName::Count);
-    
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_New, EStringRowName::NewSkill);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), TextBlock_Select, EStringRowName::Select);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_CurrnetNesting, EStringRowName::CurrentNesting);
+    UAPDataTableSubsystem::SetTextBlock(UAPGameInstance::GetDataTableGI(GetWorld()), Text_Count, EStringRowName::Count);
 }
 
-void UChoiceButton::OnClickChoice()
+void UChoiceButton::OnClick_Choice()
 {
-    Choice_Button->OnClicked.RemoveDynamic(this, &UChoiceButton::OnClickChoice);
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
+    Choice_Button->OnClicked.RemoveDynamic(this, &UChoiceButton::OnClick_Choice);
     OnEnhanceChoice();
     if(ParentWidget.IsValid()) ParentWidget->OnBackGround_FadeOut();
 }
 
-void UChoiceButton::OnReroll()
+void UChoiceButton::OnClick_Reroll()
 {
-    Reroll_Button->OnClicked.RemoveDynamic(this, &UChoiceButton::OnReroll);
+    UAPSoundSubsystem::PlayUIClickSound(UAPGameInstance::GetSoundGI(GetWorld()));
+
+    Reroll_Button->OnClicked.RemoveDynamic(this, &UChoiceButton::OnClick_Reroll);
     if(!ParentWidget.IsValid()) return;
     ParentWidget->OnReroll(ChoiceIndexNum);
     // SetChoiceButton();

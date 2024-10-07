@@ -139,7 +139,7 @@ void AArcaneCutter::BintHit()
     CutterTrigger->SetCollisionResponseToChannel(ECC_Vehicle, ECollisionResponse::ECR_Block); 
 }
 
-void AArcaneCutter::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void AArcaneCutter::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;

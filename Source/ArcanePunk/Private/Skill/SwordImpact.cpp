@@ -119,7 +119,7 @@ void ASwordImpact::OnPenetrating(UPrimitiveComponent *OverlappedComp, AActor *Ot
 	DamageAction(OtherActor, SweepResult);
 }
 
-void ASwordImpact::SetSkill(FSkillAbilityNestingData SkillAbilityNestingData, USkillNumberBase* SkillComponent)
+void ASwordImpact::SetSkill(const FSkillAbilityNestingData & SkillAbilityNestingData, USkillNumberBase* SkillComponent)
 {
     Super::SetSkill(SkillAbilityNestingData, SkillComponent);
 

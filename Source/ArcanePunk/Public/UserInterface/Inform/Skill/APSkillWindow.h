@@ -32,11 +32,11 @@ private:
 	void BindButton();
 
 	UFUNCTION()
-	void OnCancel();
+	void OnClick_Cancel();
 	UFUNCTION()
-	void OnActive();
+	void OnClick_Active();
 	UFUNCTION()
-	void OnPassive();
+	void OnClick_Passive();
 
 	void InitActiveSkill();
 	void InitPassiveSkill();

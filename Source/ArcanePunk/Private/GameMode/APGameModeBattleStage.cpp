@@ -10,6 +10,8 @@
 #include "GameElements/Trap/APTrapBase.h"
 #include "Enemy/Drop/Enemy_DropPackage.h"
 #include "GameElements/Portal/Portal_Base.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerController/ArcanePunkPlayerController.h"
 
 void AAPGameModeBattleStage::MonsterKilled(AActor* BattleSection)
 {
@@ -43,7 +45,7 @@ void AAPGameModeBattleStage::CheckBattleSection(AActor* BattleSection)
 
         GetWorld()->GetWorldSettings()->SetTimeDilation(0.25f);
         FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AAPGameModeBattleStage::PortalSpawn, BS->GetBattleSectionID());
-	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 0.8f, false);
+	    GetWorld()->GetTimerManager().SetTimer(PortalSpawnTimerHandle, TimerDelegate, 0.65f, false);
     }
 }
 
@@ -68,6 +70,12 @@ void AAPGameModeBattleStage::PortalSpawn(FName CurrentClearStage)
         if(CurrentClearStage == Portal->GetPortalID())
             Portal->InitHide(false);
     }
+}
+
+void AAPGameModeBattleStage::OnEndedGame()
+{
+    auto PC = Cast<AArcanePunkPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+    if(PC) PC->DisplayEnding();
 }
 
 void AAPGameModeBattleStage::StartPlay()

@@ -9,6 +9,7 @@
 class UTextBlock;
 class UProgressBar;
 class AArcanePunkCharacter;
+class UAPShieldHPBar;
 
 UCLASS()
 class ARCANEPUNK_API UAPHPBar : public UUserWidget
@@ -32,6 +33,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UTextBlock* TEXT_CurrentMaxHP;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UAPShieldHPBar* ShieldHPBar;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 

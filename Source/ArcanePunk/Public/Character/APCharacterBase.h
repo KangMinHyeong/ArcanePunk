@@ -10,6 +10,8 @@
 #include "GameFramework/Character.h"
 #include "APCharacterBase.generated.h"
 
+#define Defense_constant 1000
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateOriginStatus);
 DECLARE_MULTICAST_DELEGATE(FOnCrowdControlCheck);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSkillTrigger);
@@ -19,12 +21,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSkillChargingTrigger);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSkillEnhanceTrigger);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSkillRotationTrigger);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMaxHPAndHPChanged, float, MaxHP, float, HP);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCheckingShield, AActor*, Owner);
 
 class UAPMovementComponent;
 class UNiagaraComponent;
 class UAPAttackComponent;
 class UAPHitPointComponent;
 class UAPAnimHubComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class ARCANEPUNK_API AAPCharacterBase : public ACharacter
@@ -72,9 +76,9 @@ public:
 
 	//플레이어 스테이터스 관련 함수
 	FORCEINLINE FPlayerTotalData GetPlayerStatus_Origin() const {return TotalStatus_Origin;}; // MyPlayerTotalStatus 반환
-	FORCEINLINE void SetPlayerStatus_Origin(FPlayerTotalData NewPlayerData) {TotalStatus_Origin = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
+	FORCEINLINE void SetPlayerStatus_Origin(const FPlayerTotalData & NewPlayerData) {TotalStatus_Origin = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
 	FORCEINLINE FPlayerTotalData GetPlayerStatus() const {return TotalStatus;}; // MyPlayerTotalStatus 반환
-	FORCEINLINE void SetPlayerStatus(FPlayerTotalData NewPlayerData) {TotalStatus = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
+	FORCEINLINE void SetPlayerStatus(const FPlayerTotalData & NewPlayerData) {TotalStatus = NewPlayerData; UpdateStatus();}; // MyPlayerTotalStatus 설정 
 
 	FORCEINLINE float GetDefaultMaxHP_Origin() const {return TotalStatus_Origin.StatusData.MaxHP;}; // DefaultSpeed 반환;
 	FORCEINLINE float GetDefaultHP_Origin() const {return TotalStatus_Origin.StatusData.HP;}; // DefaultSpeed 반환;
@@ -127,10 +131,17 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 	virtual void OnHittingEnd();
+	bool CheckShieldHP(float & DamageApplied, FDamageEvent const &DamageEvent);
 
 	void SpawnVoiceSound(USoundBase* VoiceSound);
 	void SpawnAttackVoiceSound();
-	void SpawnAttackSound();
+	void SpawnAttackSound(uint8 AttackNum);
+
+	void SetHitPoint(float Forward, float Right);
+	void SetHitEffect(FVector HitLocation);
+	
+protected:
+	float DamageMath(float Damage);
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -201,6 +212,18 @@ protected:
 	float HitMaterailTime = 0.4f;
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	USoundBase* HitVoiceSound;
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_L;
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_R;
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* HitEffect_B;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	UNiagaraSystem* ShieldHitEffect; 
+
+	float HitForward = 0.0f;
+	float HitRight = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Dead")
 	USoundBase* DeadVoiceSound;
@@ -209,7 +232,7 @@ protected:
 	USoundBase* AttackVoiceSound;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	USoundBase* AttackSound;
+	TArray<USoundBase*> AttackSound;
 
 public:
 	TArray<bool> StopState;
@@ -231,6 +254,9 @@ public:
 	FOnSkillRotationTrigger OnSkillRotationTrigger;
 
 	FOnUpdateOriginStatus OnUpdateOriginStatus;
+
+	FOnCheckingShield OnCheckingShield;
+
 
 	// Test 디버그 드로우
 	UPROPERTY(EditAnywhere)

@@ -245,7 +245,6 @@ void AEnemy_Boss::DrainMonster()
             MonsterArr.Top()->Destroy();
             TotalStatus.StatusData.HP = FMath::Min(TotalStatus.StatusData.MaxHP, TotalStatus.StatusData.HP+100.0f);
             UE_LOG(LogTemp, Display, TEXT("Monster HP : %f"), TotalStatus.StatusData.HP);
-            OnEnemyHPChanged.Broadcast();
         }
         MonsterArr.Pop();
     }

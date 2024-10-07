@@ -70,8 +70,8 @@ void AAPManaEnergy::StartTracePlayer(float DeltaTime)
 
 void AAPManaEnergy::PlayEnergySound(bool Start)
 {
-	auto GI = Cast<UAPGameInstance>(GetGameInstance()); if(!GI) return;
-    float Multiple = GI->GetGameSoundVolume().EffectVolume;
+	auto SoundGI = Cast<UAPSoundSubsystem>(GetGameInstance()->GetSubsystemBase(UAPSoundSubsystem::StaticClass())); if(!SoundGI) return;
+    float Multiple = SoundGI->GetGameSoundVolume().MasterVolume * SoundGI->GetGameSoundVolume().EffectVolume;
 
 	if(Start)
 	{
@@ -111,13 +111,13 @@ void AAPManaEnergy::SetEnergyMoveComp(AActor* ManaOwner)
 	// GetWorldTimerManager().SetTimer(TimerHandle, this, &AAPManaEnergy::StartHoming, MaxLength - 0.2f, false);
 }
 
-void AAPManaEnergy::TimeLineUpdateFunc(FVector Output)
+void AAPManaEnergy::TimeLineUpdateFunc(FVector & Output)
 {
 	Output.Y = Output.Y * FMath::RandRange(0.5f, 1.5f);
 	SetActorLocation(GetActorLocation() + Output);
 }
 
-void AAPManaEnergy::SpawnTimeLineUpdateFunc(FVector Output)
+void AAPManaEnergy::SpawnTimeLineUpdateFunc(FVector & Output)
 {
 	Output.X *= SpawnImpulse.X;
 	Output.Y *= SpawnImpulse.Y;
