@@ -41,6 +41,7 @@
 #include "Components/TextRenderComponent.h"
 #include "Test/Pickup.h"
 #include "UserInterface/Tutorial/APTuTorialUserWidget.h"
+#include "Skill/SkillController.h"
 
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -115,6 +116,10 @@ void AArcanePunkCharacter::BeginPlay()
 	PassiveComp->InitPassive();
 
 	SetWeaponPosition();
+
+	ASkillController* NewSkillController = GetWorld()->SpawnActor<ASkillController>();
+	SkillControllers.Add(ESkillKey::Q, NewSkillController);
+	SkillControllers[ESkillKey::Q]->InitializeSkills(FName(TEXT("ArcaneBall")), this);
 }
 
 void AArcanePunkCharacter::Tick(float DeltaTime)
@@ -323,9 +328,10 @@ void AArcanePunkCharacter::SetWeaponPosition()
 
 void AArcanePunkCharacter::SkillBase_Q()
 {
-	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	if( bCanMove && StopState.IsEmpty()) SkillHubComponent->PressQ();	
-	OnQSkill = true;
+	// if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
+	// if( bCanMove && StopState.IsEmpty()) SkillHubComponent->PressQ();	
+	// OnQSkill = true;
+	SkillControllers[ESkillKey::Q]->UseSkill();
 }
 
 void AArcanePunkCharacter::SkillBase_E()

@@ -39,6 +39,7 @@ class UAPItemBase;
 class UAPInventoryComponent;
 class AAPHUD;
 class ATextRenderActor;
+class ASkillController;
 
 #define Defense_constant 1000
 
@@ -403,4 +404,7 @@ public :
 
 	UFUNCTION()
 	void InventorySort();
+
+private:
+	TMap<ESkillKey, ASkillController*> SkillControllers;
 };
