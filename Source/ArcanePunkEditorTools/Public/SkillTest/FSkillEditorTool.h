@@ -37,5 +37,6 @@ private:
 	TMap<ESkillKey, TSharedPtr<SComboBox<TSharedPtr<FName>>>> SkillDropdown;
 	TMap<ESkillKey, TSharedPtr<FName>> SelectedSkills;
 	TSharedPtr<SCheckBox> EnableToolCheckBox;
+	TSharedPtr<SButton> EquipButton;
 };
 

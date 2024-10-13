@@ -61,24 +61,29 @@ void FSkillEditorTool::Construct(const FArguments& InArgs)
         + SVerticalBox::Slot()
         .AutoHeight()
         [
-            SNew(SButton)
+            SAssignNew(EquipButton, SButton)
             .Text(FText::FromString("Equip Skill"))
             .IsEnabled(this, &FSkillEditorTool::IsToolEnabled) 
             .OnClicked(this, &FSkillEditorTool::EquipSelectedSkill)
         ]
     ];
-
-    PopulateSkillDropdown();
 }
 
 void FSkillEditorTool::OnPostPIEStarted(bool bIsSimulating)
 {
     EnableToolCheckBox->SetEnabled(true);
+
+    PopulateSkillDropdown();
+    for(auto DropDownTuple : SkillDropdown)
+    {
+        DropDownTuple.Value->RefreshOptions();
+    }
 }
 
 void FSkillEditorTool::OnPIEEnd(bool bIsSimulating)
 {
     EnableToolCheckBox->SetIsChecked(false);
+    OnToolEnabledToggled(ECheckBoxState::Unchecked);
     EnableToolCheckBox->SetEnabled(false);
 }
 
@@ -106,6 +111,13 @@ void FSkillEditorTool::OnToolEnabledToggled(ECheckBoxState NewState)
         return;
     }
 
+    for(auto DropDownTuple : SkillDropdown)
+    {
+        DropDownTuple.Value->SetEnabled(bIsToolEnabled);
+    }
+
+    EquipButton->SetEnabled(bIsToolEnabled);
+    
     PlayerCharacter->EnableSkillTest(bIsToolEnabled);
 }
 
@@ -121,7 +133,8 @@ bool FSkillEditorTool::IsToolEnabled() const
 
 TSharedRef<SComboBox<TSharedPtr<FName>>> FSkillEditorTool::CreateSkillComboBox(ESkillKey SkillKey)
 {
-    TSharedPtr<SComboBox<TSharedPtr<FName>>> ComboBox = SNew(SComboBox<TSharedPtr<FName>>)
+    TSharedPtr<SComboBox<TSharedPtr<FName>>> ComboBox =
+        SNew(SComboBox<TSharedPtr<FName>>)
         .OptionsSource(&SkillList)
         .IsEnabled(this, &FSkillEditorTool::IsToolEnabled) 
         .OnSelectionChanged(this, &FSkillEditorTool::OnSkillSelected, SkillKey)
@@ -142,6 +155,7 @@ void FSkillEditorTool::PopulateSkillDropdown()
     {
         // 데이터 테이블에서 행의 키 값(스킬 이름)들을 가져옴
         TArray<FName> RowNames = SkillDataTable->GetRowNames();
+        SkillList.Empty();
         for (const FName& Name : RowNames)
         {
             SkillList.Add(MakeShared<FName>(Name));
