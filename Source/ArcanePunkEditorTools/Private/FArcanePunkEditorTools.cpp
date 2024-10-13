@@ -31,10 +31,9 @@ void FArcanePunkEditorTools::RegisterCustomizations()
 
 void FArcanePunkEditorTools::UnregisterCustomizations()
 {
-	UnregisterSkillEditorTool();
-	
 	if (FModuleManager::Get().IsModuleLoaded("LevelEditor"))
 	{
+		UnregisterSkillEditorTool();
 		FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>("LevelEditor");
 
 		LevelEditorModule.GetMenuExtensibilityManager()->RemoveExtender(MenuExtender);
@@ -44,11 +43,10 @@ void FArcanePunkEditorTools::UnregisterCustomizations()
 TSharedPtr<FExtender> FArcanePunkEditorTools::CreateMenuExtender()
 {
 	TSharedPtr<FExtender> Extender = MakeShareable(new FExtender);
-
-	// "Help" 메뉴 옆에 새로운 메뉴 항목을 추가
+	
 	Extender->AddMenuBarExtension(
-		"File",
-		EExtensionHook::After,
+		"Help",
+		EExtensionHook::Before,
 		nullptr,
 		FMenuBarExtensionDelegate::CreateRaw(this, &FArcanePunkEditorTools::AddMenuBarEntry)
 	);
@@ -59,11 +57,11 @@ TSharedPtr<FExtender> FArcanePunkEditorTools::CreateMenuExtender()
 void FArcanePunkEditorTools::AddMenuBarEntry(FMenuBarBuilder& MenuBuilder)
 {
 	MenuBuilder.AddPullDownMenu(
-		FText::FromString("Arcane Punk Tools"),
-		FText::FromString("Open the Skill Editor tool"),
+		FText::FromString("Arcane Punk Tool"),
+		FText::FromString("Arcane Punk Editor Tools"),
 		FNewMenuDelegate::CreateRaw(this, &FArcanePunkEditorTools::FillSkillEditorMenu),
-		"SkillEditorMenu",
-		FName(TEXT("Arcane Punk Tools"))
+		"Arcane Punk Tool",
+		FName(TEXT("Arcane Punk Tool"))
 	);
 }
 
