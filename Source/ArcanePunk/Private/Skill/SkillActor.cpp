@@ -43,6 +43,8 @@ void ASkillActor::UseSkill()
 	SkillEffectComponent->SetHiddenInGame(false);
 	SkillEffectComponent->Activate(true);
 	SkillEffectComponent->SetActive(true); 
+
+	DrawDebugForShapeComponent(CollisionShape);
 	
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
 }
@@ -104,3 +106,63 @@ void ASkillActor::SetActive(bool Active)
 	SetActorHiddenInGame(!Active);
 	CollisionShape->SetActive(Active);
 }	
+
+void ASkillActor::DrawDebugForShapeComponent(UShapeComponent* ShapeComponent)
+{
+	UWorld* World = GetWorld();
+	if (!World || !ShapeComponent)
+	{
+		return;
+	}
+
+	FVector Location = ShapeComponent->GetComponentLocation();
+	FQuat Rotation = ShapeComponent->GetComponentQuat();
+	
+	if (UCapsuleComponent* Capsule = Cast<UCapsuleComponent>(ShapeComponent))
+	{
+		DrawDebugCapsule(
+			World,
+			Location,
+			Capsule->GetScaledCapsuleHalfHeight(),
+			Capsule->GetScaledCapsuleRadius(),
+			Rotation,
+			FColor::Green,
+			false,
+			5.0f,
+			0,
+			2.0f
+		);
+	}
+	else if (USphereComponent* Sphere = Cast<USphereComponent>(ShapeComponent))
+	{
+		DrawDebugSphere(
+			World,
+			Location,
+			Sphere->GetScaledSphereRadius(),
+			12,
+			FColor::Blue,
+			false,
+			5.0f,
+			0,
+			2.0f
+		);
+	}
+	else if (UBoxComponent* Box = Cast<UBoxComponent>(ShapeComponent))
+	{
+		DrawDebugBox(
+			World,
+			Location,
+			Box->GetScaledBoxExtent(),
+			Rotation,
+			FColor::Red,
+			false,
+			5.0f,
+			0,
+			2.0f
+		);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Unsupported UShapeComponent type for debug drawing."));
+	}
+}

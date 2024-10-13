@@ -31,7 +31,8 @@ public:
 	
 private:
 	void SetActive(bool Active);
-	
+	void DrawDebugForShapeComponent(UShapeComponent* ShapeComponent);
+
 private:
 	AArcanePunkCharacter* OwnerCharacter;
 	
