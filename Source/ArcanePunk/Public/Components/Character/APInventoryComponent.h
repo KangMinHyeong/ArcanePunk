@@ -11,7 +11,7 @@ DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 class UAPItemBase;
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ScriptName = "ItemAddResultEnum"))
 enum class EItemAddResult : uint8
 {
 	IAR_NoItemAdded			UMETA(DisplayName = "No item added"),

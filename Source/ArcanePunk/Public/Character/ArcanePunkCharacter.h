@@ -404,6 +404,9 @@ public :
 
 	UFUNCTION()
 	void InventorySort();
+	void SetSkill(ESkillKey SkillKey, FName SkillName);
+	void UseSkill(ESkillKey SkillKey);
+	void EnableSkillTest(bool Enable);
 
 private:
 	TMap<ESkillKey, ASkillController*> SkillControllers;

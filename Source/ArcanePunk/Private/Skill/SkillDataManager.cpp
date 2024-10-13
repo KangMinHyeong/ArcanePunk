@@ -37,7 +37,7 @@ void USkillDataManager::ReadSkillData()
 		if (SkillRow)
 		{
 			CheckForInvalidData(SkillRow, ContextString);
-			SkillDataMap.Add(SkillRow->SkillName, *SkillRow);
+			SkillDataMap.Add(RowName, *SkillRow);
 		}
 		else
 		{

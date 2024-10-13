@@ -45,20 +45,6 @@ void ASkillActor::UseSkill()
 	SkillEffectComponent->SetActive(true); 
 	
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
-	UE_LOG(LogTemp, Log, TEXT("Niagara Component Active: %s"), SkillEffectComponent->IsActive() ? TEXT("True") : TEXT("False"));
-	UE_LOG(LogTemp, Log, TEXT("Niagara Component Location: %s"), *SkillEffectComponent->GetComponentLocation().ToString());
-	if (SkillEffectComponent->GetAsset()) {
-		UE_LOG(LogTemp, Log, TEXT("Niagara Asset is loaded."));
-	} else {
-		UE_LOG(LogTemp, Error, TEXT("Niagara Asset is not loaded."));
-	}
-	if (SkillEffectComponent->IsRegistered()) {
-		UE_LOG(LogTemp, Log, TEXT("Niagara Component registered."));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Niagara Component not registered."));
-	} 
 }
 
 void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerCharacterPtr)

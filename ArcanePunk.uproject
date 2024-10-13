@@ -16,6 +16,10 @@
 				"Niagara",
 				"GeometryCollectionEngine"
 			]
+		},
+		{
+			"Name": "ArcanePunkEditorTools",
+			"Type": "Editor"
 		}
 	],
 	"Plugins": [

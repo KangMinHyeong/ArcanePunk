@@ -116,10 +116,6 @@ void AArcanePunkCharacter::BeginPlay()
 	PassiveComp->InitPassive();
 
 	SetWeaponPosition();
-
-	ASkillController* NewSkillController = GetWorld()->SpawnActor<ASkillController>();
-	SkillControllers.Add(ESkillKey::Q, NewSkillController);
-	SkillControllers[ESkillKey::Q]->InitializeSkills(FName(TEXT("ArcaneBall")), this);
 }
 
 void AArcanePunkCharacter::Tick(float DeltaTime)
@@ -131,35 +127,35 @@ void AArcanePunkCharacter::Tick(float DeltaTime)
 void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
-	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
-
-	PlayerInputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
-
-	PlayerInputComponent->BindAction(TEXT("ComboAttack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::ComboAttack); // 연속 공격
-	PlayerInputComponent->BindAction(TEXT("Parrying"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Parrying); // 차징 공격
-
-	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
-	PlayerInputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_Q);
-
-	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
-	PlayerInputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_E);
-
-	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
-	PlayerInputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
-
-	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::PressedDash);
-
-	PlayerInputComponent->BindAction(TEXT("Block"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::OnBlockMode);
 	
-	PlayerInputComponent->BindAction(TEXT("WorldMap"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::WorldMap);
+	InputComponent->BindAxis(TEXT("MoveForward"), this, &AArcanePunkCharacter::MoveForward);
+	InputComponent->BindAxis(TEXT("MoveRight"), this, &AArcanePunkCharacter::MoveRight);
 
-	PlayerInputComponent->BindAction(TEXT("Alt_RightClick"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Alt_RightClick);
+	InputComponent->BindAxis(TEXT("ZoomInOut"), this, &AArcanePunkCharacter::ZoomInOut);
 
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
+	InputComponent->BindAction(TEXT("ComboAttack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::ComboAttack); // 연속 공격
+	InputComponent->BindAction(TEXT("Parrying"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Parrying); // 차징 공격
+
+	InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
+	InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_Q);
+	
+	InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
+	InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_E);
+	
+	InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
+	InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
+
+	InputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::PressedDash);
+
+	InputComponent->BindAction(TEXT("Block"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::OnBlockMode);
+	
+	InputComponent->BindAction(TEXT("WorldMap"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::WorldMap);
+
+	InputComponent->BindAction(TEXT("Alt_RightClick"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Alt_RightClick);
+
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AArcanePunkCharacter::BeginInteract);
 	// PlayerInputComponent->BindAction("Interact", IE_Released, this, &AArcanePunkCharacter::EndInteract);
-	PlayerInputComponent->BindAction("ToggleMenu", IE_Pressed, this, &AArcanePunkCharacter::ToggleMenu);
+	InputComponent->BindAction("ToggleMenu", IE_Pressed, this, &AArcanePunkCharacter::ToggleMenu);
 }
 
 void AArcanePunkCharacter::PostInitializeComponents()
@@ -328,10 +324,9 @@ void AArcanePunkCharacter::SetWeaponPosition()
 
 void AArcanePunkCharacter::SkillBase_Q()
 {
-	// if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
-	// if( bCanMove && StopState.IsEmpty()) SkillHubComponent->PressQ();	
-	// OnQSkill = true;
-	SkillControllers[ESkillKey::Q]->UseSkill();
+	if (!HUD->TutorialDone) HUD->UpdateTutorialWidget("PressQ");
+	if( bCanMove && StopState.IsEmpty()) SkillHubComponent->PressQ();	
+	OnQSkill = true;
 }
 
 void AArcanePunkCharacter::SkillBase_E()
@@ -831,3 +826,57 @@ void AArcanePunkCharacter::InventorySort()
 	}
 }
 
+void AArcanePunkCharacter::SetSkill(ESkillKey SkillKey, FName SkillName)
+{
+	ASkillController* NewSkillController = GetWorld()->SpawnActor<ASkillController>();
+
+	if(SkillControllers.Contains(SkillKey))
+	{
+		SkillControllers[SkillKey] = NewSkillController;
+	}
+	else
+	{
+		SkillControllers.Add(SkillKey, NewSkillController);
+	}
+
+	SkillControllers[SkillKey]->InitializeSkills(SkillName, this);
+}
+
+void AArcanePunkCharacter::UseSkill(ESkillKey SkillKey)
+{
+	if(SkillControllers.Contains(SkillKey))
+	{
+		SkillControllers[SkillKey]->UseSkill();
+	}
+}
+
+void AArcanePunkCharacter::EnableSkillTest(bool Enable)
+{
+	InputComponent->RemoveActionBinding(TEXT("Skill_Q"), EInputEvent::IE_Pressed);
+	InputComponent->RemoveActionBinding(TEXT("Skill_Q"), EInputEvent::IE_Released);
+
+	InputComponent->RemoveActionBinding(TEXT("Skill_E"), EInputEvent::IE_Pressed);
+	InputComponent->RemoveActionBinding(TEXT("Skill_E"), EInputEvent::IE_Released);
+	
+	InputComponent->RemoveActionBinding(TEXT("Skill_R"), EInputEvent::IE_Pressed);
+	InputComponent->RemoveActionBinding(TEXT("Skill_R"), EInputEvent::IE_Released);
+	
+	if(Enable)
+	{
+		DECLARE_DELEGATE_OneParam(FSkillInputDelegate, const ESkillKey);
+		InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::Q);
+		InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::E);
+		InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::R);
+	}
+	else
+	{
+		InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
+		InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_Q);
+	
+		InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
+		InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_E);
+	
+		InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
+		InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
+	}
+}

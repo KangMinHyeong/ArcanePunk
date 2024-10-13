@@ -24,9 +24,6 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName SkillName;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ESkillType SkillType;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
