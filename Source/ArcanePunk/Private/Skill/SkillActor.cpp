@@ -54,6 +54,8 @@ void ASkillActor::UseSkill()
 	FVector CharacterForwardVector = OwnerCharacter->GetActorForwardVector();
 	FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
 	ProjectileMovementComponent->Velocity = LaunchDirection * ProjectileMovementComponent->InitialSpeed;
+
+	OwnerCharacter->PlaySkillAction(SkillAction);
 	
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
 }
@@ -109,8 +111,12 @@ void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerChara
 
 	// 발사 각 설정
 	LaunchAngle = skillDataRow.LaunchAngle;
-	
+
+	// 생성 위치 소켓 설정
 	SocketName = skillDataRow.SocketName;
+
+	// 스킬 몽타주 설정
+	SkillAction = skillDataRow.SkillAction;
 	
 	this->OwnerCharacter = OwnerCharacterPtr;
 

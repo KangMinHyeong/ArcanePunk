@@ -55,4 +55,7 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString SpecialEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* SkillAction;
 };

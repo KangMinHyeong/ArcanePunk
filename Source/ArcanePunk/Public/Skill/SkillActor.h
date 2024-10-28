@@ -47,6 +47,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	UShapeComponent* CollisionShape;
 	FName SocketName;
+	UAnimMontage* SkillAction = nullptr;
 
 private:
 	// 움직임 컴포넌트
