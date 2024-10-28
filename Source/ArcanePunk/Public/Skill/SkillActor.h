@@ -31,7 +31,7 @@ public:
 	
 private:
 	void SetActive(bool Active);
-	void DrawDebugForShapeComponent(UShapeComponent* ShapeComponent);
+	void DrawDebugForShapeComponent() const;
 
 private:
 	AArcanePunkCharacter* OwnerCharacter;
@@ -39,6 +39,7 @@ private:
 private:
 	FName SkillName;
 	ESkillType SkillType;
+	float LaunchAngle;
 	float Range;
 	float Damage;
 	UPROPERTY(EditAnywhere)
@@ -46,4 +47,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	UShapeComponent* CollisionShape;
 	FName SocketName;
+
+private:
+	// 움직임 컴포넌트
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	UProjectileMovementComponent* ProjectileMovementComponent;
 };

@@ -9,27 +9,34 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/ShapeComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Skill/SkillDataManager.h"
 
 
 ASkillActor::ASkillActor()
 {
 	USceneComponent* SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 	RootComponent = SceneComp;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
 void ASkillActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+#if WITH_EDITOR
+	// 에디터에서만 틱 활성화
+	SetActorTickEnabled(true);
+#endif
 }
 
 // Called every frame
 void ASkillActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	DrawDebugForShapeComponent();
 }
 
 void ASkillActor::UseSkill()
@@ -44,7 +51,9 @@ void ASkillActor::UseSkill()
 	SkillEffectComponent->Activate(true);
 	SkillEffectComponent->SetActive(true); 
 
-	DrawDebugForShapeComponent(CollisionShape);
+	FVector CharacterForwardVector = OwnerCharacter->GetActorForwardVector();
+	FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
+	ProjectileMovementComponent->Velocity = LaunchDirection * ProjectileMovementComponent->InitialSpeed;
 	
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
 }
@@ -54,9 +63,9 @@ void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerChara
 	SkillName = SkillNameKey;
 	auto skillDataRow = USkillDataManager::GetInstance()->GetSkillData(SkillName);
 	SkillType = skillDataRow.SkillType;
-	
+
+	// 스킬 이펙트 설정
 	SkillEffectComponent = Cast<UNiagaraComponent>(AddComponentByClass(UNiagaraComponent::StaticClass(), false, FTransform::Identity, true));
-	
 	if (SkillEffectComponent)
 	{
 		UNiagaraSystem* NiagaraSystem = skillDataRow.SkillEffect.LoadSynchronous();
@@ -65,7 +74,8 @@ void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerChara
 		SkillEffectComponent->SetAutoActivate(true);
 		SkillEffectComponent->RegisterComponent();
 	}
-	
+
+	// 충돌체 설정
 	CollisionShape = Cast<UShapeComponent>(AddComponentByClass(skillDataRow.CollisionShapeClass, false, FTransform::Identity, true));
 	if (CollisionShape)
 	{
@@ -94,6 +104,12 @@ void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerChara
 		}
 	}
 
+	// 발사 속도 설정
+	ProjectileMovementComponent->InitialSpeed = skillDataRow.ProjectileSpeed;
+
+	// 발사 각 설정
+	LaunchAngle = skillDataRow.LaunchAngle;
+	
 	SocketName = skillDataRow.SocketName;
 	
 	this->OwnerCharacter = OwnerCharacterPtr;
@@ -107,18 +123,18 @@ void ASkillActor::SetActive(bool Active)
 	CollisionShape->SetActive(Active);
 }	
 
-void ASkillActor::DrawDebugForShapeComponent(UShapeComponent* ShapeComponent)
+void ASkillActor::DrawDebugForShapeComponent() const
 {
 	UWorld* World = GetWorld();
-	if (!World || !ShapeComponent)
+	if (!World || !CollisionShape || !CollisionShape->IsActive())
 	{
 		return;
 	}
 
-	FVector Location = ShapeComponent->GetComponentLocation();
-	FQuat Rotation = ShapeComponent->GetComponentQuat();
+	FVector Location = CollisionShape->GetComponentLocation();
+	FQuat Rotation = CollisionShape->GetComponentQuat();
 	
-	if (UCapsuleComponent* Capsule = Cast<UCapsuleComponent>(ShapeComponent))
+	if (UCapsuleComponent* Capsule = Cast<UCapsuleComponent>(CollisionShape))
 	{
 		DrawDebugCapsule(
 			World,
@@ -128,12 +144,12 @@ void ASkillActor::DrawDebugForShapeComponent(UShapeComponent* ShapeComponent)
 			Rotation,
 			FColor::Green,
 			false,
-			5.0f,
+			0,
 			0,
 			2.0f
 		);
 	}
-	else if (USphereComponent* Sphere = Cast<USphereComponent>(ShapeComponent))
+	else if (USphereComponent* Sphere = Cast<USphereComponent>(CollisionShape))
 	{
 		DrawDebugSphere(
 			World,
@@ -142,12 +158,12 @@ void ASkillActor::DrawDebugForShapeComponent(UShapeComponent* ShapeComponent)
 			12,
 			FColor::Blue,
 			false,
-			5.0f,
+			0,
 			0,
 			2.0f
 		);
 	}
-	else if (UBoxComponent* Box = Cast<UBoxComponent>(ShapeComponent))
+	else if (UBoxComponent* Box = Cast<UBoxComponent>(CollisionShape))
 	{
 		DrawDebugBox(
 			World,
@@ -156,7 +172,7 @@ void ASkillActor::DrawDebugForShapeComponent(UShapeComponent* ShapeComponent)
 			Rotation,
 			FColor::Red,
 			false,
-			5.0f,
+			0,
 			0,
 			2.0f
 		);

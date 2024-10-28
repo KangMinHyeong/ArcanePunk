@@ -37,6 +37,12 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString SkillSoundPath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ProjectileSpeed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LaunchAngle;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Range;
