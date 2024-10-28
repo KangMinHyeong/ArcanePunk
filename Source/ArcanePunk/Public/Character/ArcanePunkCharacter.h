@@ -407,6 +407,8 @@ public :
 	void SetSkill(ESkillKey SkillKey, FName SkillName);
 	void UseSkill(ESkillKey SkillKey);
 	void EnableSkillTest(bool Enable);
+	void PlaySkillAction(UAnimMontage* Montage);
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 private:
 	TMap<ESkillKey, ASkillController*> SkillControllers;

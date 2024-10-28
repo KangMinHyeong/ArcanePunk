@@ -880,3 +880,37 @@ void AArcanePunkCharacter::EnableSkillTest(bool Enable)
 		InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
 	}
 }
+
+void AArcanePunkCharacter::PlaySkillAction(UAnimMontage* SkillAction)
+{
+
+	if (SkillAction != nullptr)
+	{
+		auto PlayerController = PC.Get();
+		if(PlayerController != nullptr)
+		{
+			DisableInput(PlayerController);
+		}
+		
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			// 몽타주 재생
+			AnimInstance->Montage_Play(SkillAction);
+            
+			// 몽타주가 끝났을 때 입력을 다시 활성화
+			FOnMontageEnded MontageEndedDelegate;
+			MontageEndedDelegate.BindUObject(this, &AArcanePunkCharacter::OnMontageEnded);
+			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate);
+		}
+	}
+}
+
+void AArcanePunkCharacter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	auto PlayerController = PC.Get();
+	if(PlayerController != nullptr)
+	{
+		EnableInput(PlayerController);
+	}
+}
