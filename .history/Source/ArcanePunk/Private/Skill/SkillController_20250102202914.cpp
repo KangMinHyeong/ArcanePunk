@@ -28,7 +28,7 @@ void ASkillController::InitializeSkills(FName skillName, AArcanePunkCharacter* O
 	if(SkillRange_Target.IsValid()) SkillRange_Target->AttachToComponent(OwnerPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
 	
 	// 스킬 범위 액터 초기화 및 비활성화
-	SkillRange_Target->SetActorHiddenInGame(true);
+	SkillRange_Target->SetHiddenInGame(true);
 	SkillRange_Target->SetActive(false);
 	SkillRange_Target->SetOwner(OwnerPlayer.Get());
 	SkillRange_Target->SetSkillRangeType(ESkillRangeType::Arrow);

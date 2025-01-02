@@ -77,11 +77,10 @@ void ASkillActor::UseSkill()
 	// 사거리에 도달하면 비활성화, 상황에 따라 이펙트 재생 추가
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &ASkillActor::SetActive, false);
 	
-	float Time = (Range * RangeCoefficient) / ProjectileMovementComponent->InitialSpeed;
-	Time *= bDrag ? DragSpeed : 1.0f;
-	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, TimerDelegate, Time, false);
-
-	UE_LOG(LogTemp, Display, TEXT("Your Time %f"), Time);
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, TimerDelegate, (Range * RangeCoefficient * DragSpeed) / ProjectileMovementComponent->InitialSpeed, false);
+	Range
+	UE_LOG(LogTemp, Display, TEXT("Your Range %f"), Range);
+	UE_LOG(LogTemp, Display, TEXT("Your time %f"), (Range * RangeCoefficient * DragSpeed * 2.0f) / ProjectileMovementComponent->InitialSpeed);
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
 }
 

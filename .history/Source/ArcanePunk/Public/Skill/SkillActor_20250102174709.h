@@ -40,7 +40,6 @@ public:
 private:
 	void SetActive(bool Active);
 	void DrawDebugForShapeComponent() const;
-	void DragSkill(float DeltaTime);
 
 private:
 	AArcanePunkCharacter* OwnerCharacter;
@@ -75,7 +74,6 @@ private:
 
 	float DamageCoefficient = 1.0f; 
 	TMap<int32, uint8> EnhanceNestingData;
-	float DragSpeed;
 
 private:
 	// 움직임 컴포넌트

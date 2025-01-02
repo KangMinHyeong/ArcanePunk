@@ -78,7 +78,6 @@ void ASkillActor::UseSkill()
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &ASkillActor::SetActive, false);
 	
 	float Time = (Range * RangeCoefficient) / ProjectileMovementComponent->InitialSpeed;
-	Time *= bDrag ? DragSpeed : 1.0f;
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, TimerDelegate, Time, false);
 
 	UE_LOG(LogTemp, Display, TEXT("Your Time %f"), Time);

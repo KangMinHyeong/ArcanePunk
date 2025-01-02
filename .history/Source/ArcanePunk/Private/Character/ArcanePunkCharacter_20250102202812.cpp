@@ -840,7 +840,6 @@ void AArcanePunkCharacter::UseSkill(ESkillKey SkillKey)
 	if(SkillControllers.Contains(SkillKey))
 	{
 		SkillControllers[SkillKey]->UseSkill(SkillKey);
-		LastSkillKey = SkillKey;
 	}
 }
 

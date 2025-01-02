@@ -50,17 +50,25 @@ void ASkillActor::PlaySkillAction(ESkillKey SkillKey)
 
 void ASkillActor::UseSkill()
 {
+	SetActive(true);
 	SetActorLocation(OwnerCharacter->GetMesh()->GetSocketLocation(SocketName));
+	// SkillEffectComponent->SetActive(true);
+	// SkillEffectComponent->Activate(true);
 	
+	SkillEffectComponent->SetVisibility(true);
+	SkillEffectComponent->SetHiddenInGame(false);
+	// SkillEffectComponent->SetActive(true); 
+
+	SkillEffectComponent->DeactivateImmediate();
 	if(!bAttachedEffect)
 	{
 		SkillEffectComponent->SetRelativeLocation(GetActorLocation()); 
 		SkillEffectComponent->SetRelativeRotation(OwnerCharacter->GetActorRotation()); 
 		SkillEffectComponent->SetUsingAbsoluteRotation(true);
 	}
-	
-	SetActive(true);
+	SkillEffectComponent->Activate();	
 
+	UE_LOG(LogTemp, Display, TEXT("Your GetWorldRotation %f, %f, %f"), SkillEffectComponent->GetComponentRotation().Yaw, SkillEffectComponent->GetComponentRotation().Roll, SkillEffectComponent->GetComponentRotation().Pitch);
 	FVector CharacterForwardVector = OwnerCharacter->GetActorForwardVector();
 	FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
 	ProjectileMovementComponent->Velocity = LaunchDirection * ProjectileMovementComponent->InitialSpeed;
@@ -76,12 +84,8 @@ void ASkillActor::UseSkill()
 
 	// 사거리에 도달하면 비활성화, 상황에 따라 이펙트 재생 추가
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &ASkillActor::SetActive, false);
-	
-	float Time = (Range * RangeCoefficient) / ProjectileMovementComponent->InitialSpeed;
-	Time *= bDrag ? DragSpeed : 1.0f;
-	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, TimerDelegate, Time, false);
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, TimerDelegate, (Range * RangeCoefficient) / ProjectileMovementComponent->InitialSpeed, false);
 
-	UE_LOG(LogTemp, Display, TEXT("Your Time %f"), Time);
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
 }
 
@@ -119,6 +123,7 @@ void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerChara
 	if (SkillEffectComponent)
 	{
 		UNiagaraSystem* NiagaraSystem = skillDataRow.SkillEffect.LoadSynchronous();
+		SkillEffectComponent->DeactivateImmediate();
 		SkillEffectComponent->SetAsset(NiagaraSystem);
 		if(bAttachedEffect) SkillEffectComponent->SetupAttachment(RootComponent); 
 		SkillEffectComponent->SetAutoActivate(true);
@@ -189,7 +194,7 @@ void ASkillActor::InitSkill(FName SkillNameKey, AArcanePunkCharacter* OwnerChara
 
 	// Drag On, Off
 	bDrag = skillDataRow.bDrag;
-	DragSpeed = ProjectileMovementComponent->InitialSpeed / Range;
+	DragSpeed = Range / ProjectileMovementComponent->InitialSpeed;
 	SkillEffectComponent->SetVariableFloat(TEXT("Drag"),  DragSpeed);
 	
 	this->OwnerCharacter = OwnerCharacterPtr;
@@ -201,9 +206,6 @@ void ASkillActor::SetActive(bool Active)
 {
 	SetActorHiddenInGame(!Active);
 	CollisionShape->SetActive(Active);
-
-	if(Active) {SkillEffectComponent->Activate();}
-	else {SkillEffectComponent->DeactivateImmediate();}	
 
 	if(bSkilling && !Active)
 	{
