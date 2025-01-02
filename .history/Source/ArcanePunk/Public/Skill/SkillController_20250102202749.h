@@ -24,14 +24,13 @@ public:
 
 	void ShowSkillRange(float Range, FVector Location);
 
-	void Restore();
-	
 private:
 	UFUNCTION()
 	void ActivateSkill();
 
 	bool CheckSkillCondition(ESkillKey SkillKey);
 	bool CheckSkillCool(ESkillKey SkillKey);
+
 
 private:
 	UPROPERTY()

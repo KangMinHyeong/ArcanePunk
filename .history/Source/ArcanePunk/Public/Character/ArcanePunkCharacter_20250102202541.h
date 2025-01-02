@@ -413,5 +413,4 @@ public :
 
 private:
 	TMap<ESkillKey, ASkillController*> SkillControllers;
-	ESkillKey LastSkillKey;
 };

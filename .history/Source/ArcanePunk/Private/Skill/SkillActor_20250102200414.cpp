@@ -78,10 +78,11 @@ void ASkillActor::UseSkill()
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &ASkillActor::SetActive, false);
 	
 	float Time = (Range * RangeCoefficient) / ProjectileMovementComponent->InitialSpeed;
-	Time *= bDrag ? DragSpeed : 1.0f;
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, TimerDelegate, Time, false);
 
-	UE_LOG(LogTemp, Display, TEXT("Your Time %f"), Time);
+	UE_LOG(LogTemp, Display, TEXT("Your Range %f"), Range);
+	UE_LOG(LogTemp, Display, TEXT("Your Drag %f"), DragSpeed);
+	UE_LOG(LogTemp, Display, TEXT("Your time %f"), Time);
 	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
 }
 

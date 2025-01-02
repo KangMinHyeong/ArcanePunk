@@ -49,18 +49,12 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Range;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CoolTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAttachedEffect = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bDrag = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 MPConsumption;

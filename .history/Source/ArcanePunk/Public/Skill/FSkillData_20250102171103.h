@@ -51,6 +51,9 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 	float Range;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Drag = 0.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -58,9 +61,6 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttachedEffect = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bDrag = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 MPConsumption;
