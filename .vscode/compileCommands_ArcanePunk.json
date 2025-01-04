@@ -1112,6 +1112,14 @@
 		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
 	},
 	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\Enemy_TutorialDummy.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Private\\Enemy\\SkillActor\\APEnemyAmmo.cpp",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
@@ -3465,6 +3473,14 @@
 	},
 	{
 		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_SwordSoldier.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Source"
+	},
+	{
+		"file": "C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\Source\\ArcanePunk\\Public\\Enemy\\Enemy_TutorialDummy.h",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe",
 			"@C:\\ArcanePunk\\ArcanePunk\\ArcanePunk\\.vscode\\compileCommands_ArcanePunk\\ArcanePunk.1.rsp"
