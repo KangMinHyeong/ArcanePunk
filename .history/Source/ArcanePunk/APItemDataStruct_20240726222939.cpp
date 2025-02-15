@@ -5,10 +5,8 @@
 
 UAPItemDataStruct::UAPItemDataStruct()
 {
-
 }
 
 UAPItemDataStruct::~UAPItemDataStruct()
 {
-    
 }
