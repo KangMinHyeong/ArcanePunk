@@ -117,8 +117,6 @@ void FSkillEditorTool::OnToolEnabledToggled(ECheckBoxState NewState)
     }
 
     EquipButton->SetEnabled(bIsToolEnabled);
-    
-    PlayerCharacter->EnableSkillTest(bIsToolEnabled);
 }
 
 ECheckBoxState FSkillEditorTool::IsToolEnabledChecked() const
