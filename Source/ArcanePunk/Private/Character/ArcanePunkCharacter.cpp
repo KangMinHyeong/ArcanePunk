@@ -109,9 +109,25 @@ void AArcanePunkCharacter::InitPlayer()
 	UpdateStatus();
 
 	SetHavingSkills();
-	SkillHubComponent->UpdatingSkill_Q();
-	SkillHubComponent->UpdatingSkill_E();
-	SkillHubComponent->UpdatingSkill_R();
+	// SkillHubComponent->UpdatingSkill_Q();
+	// SkillHubComponent->UpdatingSkill_E();
+	// SkillHubComponent->UpdatingSkill_R();
+
+	// TODO: 임시 초기 스킬 설정(테이블의 첫 내용들로 사용) => 추후 설정 방식 지정 필요
+	auto SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/Skill/SkillDataTable.SkillDataTable"));
+	if (SkillDataTable)
+	{
+		// 데이터 테이블에서 행의 키 값(스킬 이름)들을 가져옴
+		TArray<FName> RowNames = SkillDataTable->GetRowNames();
+
+		int numToIterate = std::min(RowNames.Num(), 3);
+		for(int i = 0; i < numToIterate; i++)
+		{
+			int enumSkillKey = static_cast<int>(ESkillKey::Q) + i;
+			SetSkill(static_cast<ESkillKey>(enumSkillKey), RowNames[i]);
+		}
+	}
+	
 	PassiveComp->InitPassive();
 
 	SetWeaponPosition();
@@ -135,14 +151,10 @@ void AArcanePunkCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	InputComponent->BindAction(TEXT("ComboAttack"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::ComboAttack); // 연속 공격
 	InputComponent->BindAction(TEXT("Parrying"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::Parrying); // 차징 공격
 
-	InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
-	InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_Q);
-	
-	InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
-	InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_E);
-	
-	InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
-	InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Released, this, &AArcanePunkCharacter::Release_R);
+	DECLARE_DELEGATE_OneParam(FSkillInputDelegate, const ESkillKey);
+	InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::Q);
+	InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::E);
+	InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::R);
 
 	InputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::PressedDash);
 
@@ -815,6 +827,7 @@ void AArcanePunkCharacter::InventorySort()
 
 void AArcanePunkCharacter::SetSkill(ESkillKey SkillKey, FName SkillName)
 {
+    // TODO: 스킬 아이콘 등에 대한 처리도 같이 할 수 있도록 구현하기
 	ASkillController* NewSkillController = GetWorld()->SpawnActor<ASkillController>();
 
 	if(SkillControllers.Contains(SkillKey))
@@ -861,31 +874,6 @@ void AArcanePunkCharacter::EnhanceSkill(ESkillKey SkillKey, int32 EnhanceNumber)
 	if(SkillControllers.Contains(SkillKey))
 	{
 		SkillControllers[SkillKey]->GetSkillActor()->EnhanceSkill(EnhanceNumber);
-	}
-}
-
-void AArcanePunkCharacter::EnableSkillTest(bool Enable)
-{
-	InputComponent->RemoveActionBinding(TEXT("Skill_Q"), EInputEvent::IE_Pressed);
-
-	InputComponent->RemoveActionBinding(TEXT("Skill_E"), EInputEvent::IE_Pressed);
-	
-	InputComponent->RemoveActionBinding(TEXT("Skill_R"), EInputEvent::IE_Pressed);
-	
-	if(Enable)
-	{
-		DECLARE_DELEGATE_OneParam(FSkillInputDelegate, const ESkillKey);
-		InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::Q);
-		InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::E);
-		InputComponent->BindAction<FSkillInputDelegate>(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::UseSkill, ESkillKey::R);
-	}
-	else
-	{
-		InputComponent->BindAction(TEXT("Skill_Q"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_Q);
-	
-		InputComponent->BindAction(TEXT("Skill_E"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_E);
-	
-		InputComponent->BindAction(TEXT("Skill_R"), EInputEvent::IE_Pressed, this, &AArcanePunkCharacter::SkillBase_R);
 	}
 }
 
