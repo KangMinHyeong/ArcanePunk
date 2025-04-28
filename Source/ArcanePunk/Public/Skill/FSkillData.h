@@ -1,15 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/Common/APCrowdControlComponent.h"
 #include "Engine/DataTable.h"
 #include "FSkillData.generated.h"
 
-class AAPSkillRange;
-class UNiagaraSystem;
-class UTexture2D;
+UENUM(BlueprintType)
+enum class ESkillGrade : uint8
+{
+	Normal = 0,
+	Rare = 1,
+	Epic = 2,
+	Legendary = 3
+};
 
 UENUM(BlueprintType)
 enum class ESkillType : uint8
@@ -19,6 +21,10 @@ enum class ESkillType : uint8
 	Installation = 2,
 	Buff = 3,
 	Charging = 4,
+	Normal = 0,
+	Rare = 1,
+	Epic = 2,
+	Legendary = 3
 };
 
 USTRUCT(BlueprintType)
@@ -26,118 +32,43 @@ struct ARCANEPUNK_API FSkillData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
+	// 메모 컬럼(코드에서 사용 X)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient)
+	FString Memo;
+
+	// 스킬 고유 ID
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SkillID;
+
+	// 스킬 고유 ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ESkillType SkillType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ECharacterState CrowdControl  = ECharacterState::None;
 	
+	// 스킬 명
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<UNiagaraSystem> SkillEffect;
+	FString SkillName;
 
+	// 스킬 설명
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<UNiagaraSystem> SkillOffEffect; // 사라지거나 파괴될 때 스폰되는 이펙트
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UShapeComponent> CollisionShapeClass;
+	FString SkillDescription;
 
+	// 스킬 등급
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AAPSkillRange> SkillTargetRangeClass;
+	ESkillGrade SkillGrade;
 
+	// 애니메이션 몽타주 ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AAPSkillRange> SkillGroundRangeClass;
+	FName AniMontageID;
 
+	// 스택형 스킬 여부
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> InstallActorClass;
+	bool bIsStack;
 
+	// 스택 값 (한 쿨타임 동안 사용 가능한 횟수)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* SkillImage;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector CollisionSize;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SkillSoundPath;
+	int32 StackValue;
 
+	// 스킬 쿨타임 (밀리초 단위)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ProjectileSpeed;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LaunchAngle;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Range;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MaxCharging = 2.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float CoolTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float CC_Duration = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAttachedEffect = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bDrag = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 MPConsumption;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 PenetrateCount = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName SocketName;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SpecialEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimMontage* SkillAction;
+	int32 CoolDownTimeMsec;
 };
-
-USTRUCT(BlueprintType)
-struct ARCANEPUNK_API FSkillAbilityData : public FTableRowBase // 스킬 강화 데이터
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName  AbilityName; // Ability 중첩 수
-	
-	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
-	FString  AbilityInformation; // Ability 설명명
-
-	UPROPERTY(EditAnywhere)
-	UTexture2D* AbilitySlotImage;
-
-	UPROPERTY(EditAnywhere)
-	uint8 MaxNesting = 1;
-	
-	UPROPERTY(EditAnywhere)
-	int32 Price = 0;
-	
-};
-
-// USTRUCT(BlueprintType)
-// struct ARCANEPUNK_API FSkillAbilityNestingData : public FTableRowBase // 스킬 강화 중첩 데이터터
-// {
-// 	GENERATED_USTRUCT_BODY()
-
-// 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-// 	TMap<FName, uint8>  SkillAbilityNestingData; // Ability 이름 / 중첩 수수
-	
-	
-// };
-
-
-
-// 추가해야하는 목록
-// 데미지 계수
-// 이펙트 Attach인지 아닌지
-// 즉발인지 아닌지

@@ -27,13 +27,14 @@ void UChoiceButton::InitChoice(UUserWidget* UpdateParentWidget)
         
     // 인덱스에 해당하는 RowName으로 Row 가져오기
     FName RowName = RowNames[AbilityIndex];
-    
-    auto SkillAbilityData = DataTable->FindRow<FSkillAbilityData>(RowName, RowName.ToString()); if(!SkillAbilityData) return;
 
-    SkillNumber_Text->SetText(FText::FromName(SkillAbilityData->AbilityName));  
-    SkillAbility_Text->SetText(FText::FromString(SkillAbilityData->AbilityInformation));
-    SkillAbility_Nesting->SetText(FText::FromString(FString::FromInt(SkillAbilityData->MaxNesting)));
-    SkillNumber_Image->SetBrushFromTexture(SkillAbilityData->AbilitySlotImage); 
+    // TODO: AbilityData 삭제 후 처리 어떻게 할 지 고려 필요
+    // auto SkillAbilityData = DataTable->FindRow<FSkillAbilityData>(RowName, RowName.ToString()); if(!SkillAbilityData) return;
+    //
+    // SkillNumber_Text->SetText(FText::FromName(SkillAbilityData->AbilityName));  
+    // SkillAbility_Text->SetText(FText::FromString(SkillAbilityData->AbilityInformation));
+    // SkillAbility_Nesting->SetText(FText::FromString(FString::FromInt(SkillAbilityData->MaxNesting)));
+    // SkillNumber_Image->SetBrushFromTexture(SkillAbilityData->AbilitySlotImage); 
 
     BindButton();
 }

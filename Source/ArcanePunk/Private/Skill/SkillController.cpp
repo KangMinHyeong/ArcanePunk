@@ -17,40 +17,42 @@ ASkillController::ASkillController()
 {
 }
 
-void ASkillController::InitializeSkills(ESkillKey SkillKey, FName skillName, AArcanePunkCharacter* OwnerCharacter)
+void ASkillController::InitializeSkills(ESkillKey SkillKey, FName SkillId, AArcanePunkCharacter* OwnerCharacter)
 {
 	if(!SkillActor)
 	{
-		SkillActor = GetWorld()->SpawnActor<ASkillActor>(ASkillActor::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
+		SkillActor = TSharedPtr<ASkillActor>(GetWorld()->SpawnActor<ASkillActor>(ASkillActor::StaticClass(), SpawnLocation, FRotator::ZeroRotator));
 	}
+
+	CurSkillData = USkillDataManager::GetInstance()->GetSkillData(SkillId);
 	
-	SkillActor->InitSkill(SkillKey, skillName, OwnerCharacter, this);
+	SkillActor->InitSkill(SkillKey, SkillId, OwnerCharacter, this);
 
 	OwnerPlayer = OwnerCharacter;
 
-	// 스킬 타겟 범위 액터 스폰
-	if(!SkillRange_Target.IsValid() && SkillActor->GetSkillTargetRangeClass())
-	{
-		SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(SkillActor->GetSkillTargetRangeClass(), OwnerPlayer->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
-	
-		// 스킬 타겟 범위 액터 초기화 및 비활성화
-		SkillRange_Target->AttachToComponent(OwnerPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);	
-		SkillRange_Target->SetActorHiddenInGame(true);
-		SkillRange_Target->SetActive(false);
-		SkillRange_Target->SetOwner(OwnerPlayer.Get());
-	}
-	
-	if(!SkillRange_Ground.IsValid() && SkillActor->GetSkillGroundRangeClass())
-	{
-		// 스킬 사거리 범위 액터 초기화 및 비활성화
-		SkillRange_Ground = GetWorld()->SpawnActor<AAPSkillRange>(SkillActor->GetSkillGroundRangeClass(), OwnerPlayer->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
-		
-		// 스킬 사거리 범위 액터 초기화 및 비활성화
-		SkillRange_Ground->AttachToComponent(OwnerPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
-		SkillRange_Ground->SetActorHiddenInGame(true);
-		SkillRange_Ground->SetActive(false);
-		SkillRange_Ground->SetOwner(OwnerPlayer.Get());
-	}
+	// // 스킬 타겟 범위 액터 스폰
+	// if(!SkillRange_Target.IsValid() && SkillActor->GetSkillTargetRangeClass())
+	// {
+	// 	SkillRange_Target = GetWorld()->SpawnActor<AAPSkillRange>(SkillActor->GetSkillTargetRangeClass(), OwnerPlayer->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
+	//
+	// 	// 스킬 타겟 범위 액터 초기화 및 비활성화
+	// 	SkillRange_Target->AttachToComponent(OwnerPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);	
+	// 	SkillRange_Target->SetActorHiddenInGame(true);
+	// 	SkillRange_Target->SetActive(false);
+	// 	SkillRange_Target->SetOwner(OwnerPlayer.Get());
+	// }
+	//
+	// if(!SkillRange_Ground.IsValid() && SkillActor->GetSkillGroundRangeClass())
+	// {
+	// 	// 스킬 사거리 범위 액터 초기화 및 비활성화
+	// 	SkillRange_Ground = GetWorld()->SpawnActor<AAPSkillRange>(SkillActor->GetSkillGroundRangeClass(), OwnerPlayer->GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
+	// 	
+	// 	// 스킬 사거리 범위 액터 초기화 및 비활성화
+	// 	SkillRange_Ground->AttachToComponent(OwnerPlayer->GetMesh(), FAttachmentTransformRules::KeepWorldTransform);
+	// 	SkillRange_Ground->SetActorHiddenInGame(true);
+	// 	SkillRange_Ground->SetActive(false);
+	// 	SkillRange_Ground->SetOwner(OwnerPlayer.Get());
+	// }
 }
 
 void ASkillController::UseSkill(ESkillKey SkillKey, AArcanePunkCharacter* OwnerCharacter)
@@ -79,22 +81,22 @@ void ASkillController::UseSkill(ESkillKey SkillKey, AArcanePunkCharacter* OwnerC
 	}
 
 	// 스킬 범위 액터 활성화 및 크기 조절
-	auto X = SkillDataRow.CollisionSize.X;
-	auto Y = SkillDataRow.CollisionSize.Y;
-	auto Range = SkillDataRow.Range * SkillActor->RangeCoefficient * 0.5f;
-
-	if(SkillRange_Target.IsValid())
-	{
-		SkillRange_Target->SetScale_Target(SkillDataRow.SkillType, X, Y, Range);
-		SkillRange_Target->SetMaxDist(Range);
-		SkillRange_Target->SetActive(true);
-
-	}
-	if(SkillRange_Ground.IsValid())
-	{
-		SkillRange_Ground->SetScale(Range);
-		SkillRange_Ground->SetActive(true);
-	}
+	// auto X = SkillDataRow.CollisionSize.X;
+	// auto Y = SkillDataRow.CollisionSize.Y;
+	// auto Range = SkillDataRow.Range * SkillActor->RangeCoefficient * 0.5f;
+	//
+	// if(SkillRange_Target.IsValid())
+	// {
+	// 	SkillRange_Target->SetScale_Target(SkillDataRow.SkillType, X, Y, Range);
+	// 	SkillRange_Target->SetMaxDist(Range);
+	// 	SkillRange_Target->SetActive(true);
+	//
+	// }
+	// if(SkillRange_Ground.IsValid())
+	// {
+	// 	SkillRange_Ground->SetScale(Range);
+	// 	SkillRange_Ground->SetActive(true);
+	// }
 
 	// 커서 비활성화
 	auto PC = Cast<APlayerController>(OwnerPlayer->GetController()); if(!PC) return;

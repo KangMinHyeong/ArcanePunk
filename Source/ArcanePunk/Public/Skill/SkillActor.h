@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "FSkillData.h"
 #include "Character/SkillDataTable/SkillDataTable.h"
+#include "Components/Common/APCrowdControlComponent.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraSystem.h"
 #include "SkillActor.generated.h"
 
 class AAPSkillRange;
@@ -22,7 +24,7 @@ class ARCANEPUNK_API ASkillActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ASkillActor();
-	FORCEINLINE FName GetSkillName() const {return SkillName;};
+	FORCEINLINE FName GetSkillName() const {return SkillId;};
 	FORCEINLINE TSubclassOf<AAPSkillRange> GetSkillTargetRangeClass() const {return SkillTargetRangeClass;};
 	FORCEINLINE TSubclassOf<AAPSkillRange> GetSkillGroundRangeClass() const {return SkillGroundRangeClass;};
 	FORCEINLINE uint8 GetMPConsumption() const {return MPConsumption;};
@@ -69,8 +71,10 @@ private:
 	ASkillController* OwnerController;
 
 private:
-	FName SkillName;
-	ESkillType SkillType;
+	FName SkillId;
+	FSkillData CurSkillData;
+
+	// TODO: 개별 변수는 모두 삭제하고 구조체로 들고 있을 에정
 	ECharacterState CrowdControl;
 	float LaunchAngle;
 	float Range;

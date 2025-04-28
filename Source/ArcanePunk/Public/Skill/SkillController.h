@@ -18,13 +18,13 @@ class ARCANEPUNK_API ASkillController : public APlayerController
 public:
 	ASkillController();
 
-	FORCEINLINE ASkillActor* GetSkillActor() {return SkillActor;};
+	FORCEINLINE TSharedPtr<ASkillActor> GetSkillActor() {return SkillActor;};
 	FORCEINLINE AAPSkillRange* GetSkillTargetRange() {return SkillRange_Target.Get();};
 	FORCEINLINE bool IsReady() const {return bReady;};
 	
 	virtual void UseSkill(ESkillKey SkillKey, AArcanePunkCharacter* OwnerCharacter);
 
-	void InitializeSkills(ESkillKey SkillKey, FName skillName, AArcanePunkCharacter* OwnerCharacter);
+	void InitializeSkills(ESkillKey SkillKey, FName SkillId, AArcanePunkCharacter* OwnerCharacter);
 
 	void ShowSkillRange(float Range, FVector Location);
 
@@ -42,7 +42,8 @@ private:
 
 private:
 	UPROPERTY()
-	ASkillActor* SkillActor;
+	FSkillData CurSkillData;
+	TSharedPtr<ASkillActor> SkillActor;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerPlayer;
 
