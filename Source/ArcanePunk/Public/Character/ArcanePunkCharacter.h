@@ -8,6 +8,8 @@
 #include "Interfaces/InteractionInterface.h"
 #include "ArcanePunkCharacter.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCharacter, Log, All)
+
 DECLARE_MULTICAST_DELEGATE(FOnAutoRecoveryMPDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftMouseClick);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAltRightMouseClick, FVector, ClickPoint);

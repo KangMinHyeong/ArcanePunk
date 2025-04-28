@@ -43,6 +43,11 @@
 #include "UserInterface/Tutorial/APTuTorialUserWidget.h"
 #include "Skill/SkillController.h"
 
+//YS
+#include "Logging/StructuredLog.h"
+
+DEFINE_LOG_CATEGORY(LogCharacter)
+
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
@@ -400,33 +405,122 @@ void AArcanePunkCharacter::SetWeaponPosition()
 	}
 }
 
+/*
+*	@breif: 대시/회피
+*	@writer: YS
+*/
 void AArcanePunkCharacter::PressedDash()
 {
-	if(!bMainPlayer || !bCanMove || !StopState.IsEmpty() || IsDead()) return;
-	if(bDoing && !AttackComponent->IsComboAttack() && !AttackComponent->IsParrying()) return;
-	if(!bCanDash) return;
-	
-	bDoing = true; bCanDash = false; bCanMove = false;
-	
+	//@입력 유효성 검사
+	if (!bMainPlayer)
+	{
+		UE_LOGFMT(LogCharacter, Log, "메인 플레이어가 아니므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@움직임 가능성 여부
+	if (!bCanMove)
+	{
+		UE_LOGFMT(LogCharacter, Log, "이동이 불가능한 상태이므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@멈춤 상태?
+	if (!StopState.IsEmpty())
+	{
+		UE_LOGFMT(LogCharacter, Log, "중단 상태가 있으므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@죽음 여부
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@행동 상태 검사
+	if (bDoing && !AttackComponent->IsComboAttack() && !AttackComponent->IsParrying())
+	{
+		UE_LOGFMT(LogCharacter, Log, "다른 행동 중이고 콤보 공격이나 패링 중이 아니므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@대시 가능 여부 확인
+	if (!bCanDash)
+	{
+		UE_LOGFMT(LogCharacter, Log, "대시가 불가능한 상태입니다. 쿨다운 중일 수 있습니다.");
+		return;
+	}
+
+	//@대시 실행 상태 설정
+	bDoing = true;
+	bCanDash = false;
+	bCanMove = false;
+
+	UE_LOGFMT(LogCharacter, Log, "캐릭터 대시를 시작합니다.");
+
+	//@충돌 응답 변경
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+	//@대시 관련 컴포넌트 설정
 	MoveComponent->StartDash();
 	GhostTrailSpawnComp->SetRunTrail(true);
-	if(HUD) HUD->GetStatusWidget(this)->StartDashTime(MoveComponent->GetDashTime());
+
+	//@HUD
+	if (!HUD)
+	{
+		UE_LOGFMT(LogCharacter, Warning, "HUD가 유효하지 않아 대시 타이머를 업데이트할 수 없습니다.");
+		return;
+	}
+
+	//@Dash 타이머 시작
+	HUD->GetStatusWidget(this)->StartDashTime(MoveComponent->GetDashTime());
+	UE_LOGFMT(LogCharacter, Log, "HUD 대시 타이머를 {0}초로 설정했습니다.", MoveComponent->GetDashTime());
 }
 
 void AArcanePunkCharacter::ReleasedDash()
 {
-	if(!bMainPlayer || IsDead()) return;
+	//@입력 유효성 검사
+	if (!bMainPlayer)
+	{
+		UE_LOGFMT(LogCharacter, Log, "메인 플레이어가 아니므로 대시 해제를 처리하지 않습니다.");
+		return;
+	}
 
-	bDoing = false; bCanMove = true;
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 대시 해제를 처리하지 않습니다.");
+		return;
+	}
+
+
+	//@캐릭터 상태 복원
+	bDoing = false;
+	bCanMove = true;
+
+	//@공격 상태 초기화
 	AttackComponent->SetComboAttack(false);
 	AttackComponent->SetParrying(false);
 
+	//@충돌 응답 복원
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+
+	//@대시 관련 컴포넌트 설정 해제
 	MoveComponent->EndDash();
 	GhostTrailSpawnComp->SetRunTrail(false);
-	
-	if(HUD) HUD->GetStatusWidget(this)->StartCoolTimeSlot(ESkillKey::Dash, DashCoolTime);	
+
+	//@HUD
+	if (HUD)
+	{
+		UE_LOGFMT(LogCharacter, Warning, "HUD가 유효하지 않아 대시 쿨타임을 설정할 수 없습니다.");
+	}
+
+	//@대시 쿨타임 설정
+	HUD->GetStatusWidget(this)->StartCoolTimeSlot(ESkillKey::Dash, DashCoolTime);
+	UE_LOGFMT(LogCharacter, Log, "대시 쿨타임을 {0}초로 설정했습니다.", DashCoolTime);
+
+	UE_LOGFMT(LogCharacter, Log, "캐릭터 대시를 종료합니다.");
 }
 
 
@@ -576,55 +670,122 @@ void AArcanePunkCharacter::SetHavingSkills()
 	HavingSkill.Add(QSkill); HavingSkill.Add(ESkill);
 }
 
-float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
+float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if(AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator)) return 0.0f;
-	float DamageApplied = DamageAmount;
-
-	if(ReflectingModeGauge > 0) {AttackComponent->ReflectDamage(DamageApplied, DamageCauser); return DamageApplied;}
-
-	float OriginHP = TotalStatus.StatusData.HP;
-	if(bBlockMode) return 0.0f;
+	//@무적 상태 체크
 	
-	bool Check = false;
-	if(GetAPPassiveComp()->IsDamagedPassive()) Check = CheckingDamaged();
-	if(Check) return 0.0f;
-
-	float & HP = TotalStatus.StatusData.HP;
-	DamageApplied = DamageMath(DamageApplied);
-
-	if(CheckShieldHP(DamageApplied, DamageEvent)) return 0.0f;
-
-	if(DamageApplied >= HP && GetRageMode()) {HP = 1.0f;}
-	else
-	{	
-		HP = FMath::Clamp<float>(HP - DamageApplied, 0.0f, TotalStatus.StatusData.MaxHP);
-	}
-	
-	if(IsDead())
+	//@패링 체크
+	if (AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator))
 	{
+		UE_LOGFMT(LogCharacter, Log, "패링 성공으로 데미지가 무시되었습니다.");
+		return 0.0f;
+	}
+
+	//@초기 변수 설정
+	float DamageApplied = DamageAmount;
+	float OriginHP = TotalStatus.StatusData.HP;
+
+	//@리플렉팅 모드 체크
+	if (ReflectingModeGauge > 0)
+	{
+		UE_LOGFMT(LogCharacter, Log, "리플렉팅 모드로 {0} 데미지를 반사합니다.", DamageApplied);
+		AttackComponent->ReflectDamage(DamageApplied, DamageCauser);
+		return DamageApplied;
+	}
+
+	//@블록 모드 체크
+	if (bBlockMode)
+	{
+		UE_LOGFMT(LogCharacter, Log, "블록 모드로 데미지가 무시되었습니다.");
+		return 0.0f;
+	}
+
+	//@패시브 데미지 체크
+	bool Check = false;
+	if (GetAPPassiveComp()->IsDamagedPassive())
+	{
+		Check = CheckingDamaged();
+	}
+
+	if (Check)
+	{
+		UE_LOGFMT(LogCharacter, Log, "패시브 효과로 데미지가 무시되었습니다.");
+		return 0.0f;
+	}
+
+	//@데미지 계산
+	DamageApplied = DamageMath(DamageApplied);
+	UE_LOGFMT(LogCharacter, Log, "계산된 데미지: {0}", DamageApplied);
+
+	//@방패 HP 체크
+	if (CheckShieldHP(DamageApplied, DamageEvent))
+	{
+		UE_LOGFMT(LogCharacter, Log, "방패가 데미지를 흡수했습니다.");
+		return 0.0f;
+	}
+
+	//@HP 감소 처리
+	float& HP = TotalStatus.StatusData.HP;
+
+	if (DamageApplied >= HP && GetRageMode())
+	{
+		HP = 1.0f;
+		UE_LOGFMT(LogCharacter, Log, "분노 모드로 HP가 1로 유지됩니다.");
+	}
+	else
+	{
+		HP = FMath::Clamp<float>(HP - DamageApplied, 0.0f, TotalStatus.StatusData.MaxHP);
+		UE_LOGFMT(LogCharacter, Log, "현재 HP: {0}/{1}", HP, TotalStatus.StatusData.MaxHP);
+	}
+
+	//@사망 처리
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망했습니다.");
 		SetCanMove(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// OwnerCharacter->DetachFromControllerPendingDestroy();
 		DeadPenalty(3.0f);
-		auto BattleGM = Cast<AAPGameModeBattleStage>(GM); 
-		if(BattleGM) BattleGM->PlayerKilled();
+
+		auto BattleGM = Cast<AAPGameModeBattleStage>(GM);
+		if (BattleGM)
+		{
+			BattleGM->PlayerKilled();
+		}
 	}
 	else
-	{ 
-		if(GetRageMode()) return 0.0f;
-		if(PC.IsValid() && DamageApplied > KINDA_SMALL_NUMBER) PC->HitUI();
-		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), HP);
+	{
+		//@분노 모드 체크
+		if (GetRageMode())
+		{
+			UE_LOGFMT(LogCharacter, Log, "분노 모드로 데미지가 무시되었습니다.");
+			return 0.0f;
+		}
+
+		//@히트 UI 표시
+		if (PC.IsValid() && DamageApplied > KINDA_SMALL_NUMBER)
+		{
+			PC->HitUI();
+			UE_LOGFMT(LogCharacter, Log, "히트 UI를 표시합니다.");
+		}
 	}
 
+	//@상태 업데이트
 	UpdateStatus();
-	if(HUD) HUD->GetStatusWidget(this)->SetHPPercent(this, OriginHP);
 
+	//@HUD 업데이트
+	if (HUD)
+	{
+		HUD->GetStatusWidget(this)->SetHPPercent(this, OriginHP);
+		UE_LOGFMT(LogCharacter, Log, "HUD에 HP 정보를 업데이트했습니다.");
+	}
+
+	//@패시브 효과 체크
 	PassiveComp->CheckDamagedGold();
 
 	Super::TakeDamage(DamageApplied, DamageEvent, EventInstigator, DamageCauser);
-    return DamageApplied;
+	return DamageApplied;
 }
 
 bool AArcanePunkCharacter::CheckingDamaged()

@@ -10,6 +10,10 @@
 #include "GameMode/APGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Logging/StructuredLog.h"
+
+DEFINE_LOG_CATEGORY(LogAnimInstance)
+
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
 {
     CurrentPawnSpeed = 0.0f;
@@ -81,10 +85,24 @@ void UArcanePunkCharacterAnimInstance::PlayParryingSuccess_Montage()
 
 void UArcanePunkCharacterAnimInstance::PlayDash_Montage()
 {
-    if(IsDead) return;
-    if(!OwnerCharacter.IsValid()) return;
-    
+    //@캐릭터 사망 여부 확인
+    if (IsDead)
+    {
+        UE_LOGFMT(LogAnimInstance, Log, "캐릭터가 사망 상태이므로 대시 몽타주를 재생하지 않습니다.");
+        return;
+    }
+
+    //@소유 캐릭터 유효성 검사
+    if (!OwnerCharacter.IsValid())
+    {
+        UE_LOGFMT(LogAnimInstance, Error, "유효한 소유 캐릭터가 없어 대시 몽타주를 재생할 수 없습니다.");
+        return;
+    }
+
+    //@대시 몽타주 재생
     Montage_Play(Dash_Montage);
+
+    UE_LOGFMT(LogAnimInstance, Log, "대시 몽타주 재생을 시작합니다.");
 }
 
 void UArcanePunkCharacterAnimInstance::StopDash_Montage()

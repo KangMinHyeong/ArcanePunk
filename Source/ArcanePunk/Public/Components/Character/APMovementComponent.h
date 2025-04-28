@@ -6,12 +6,16 @@
 #include "Components/ActorComponent.h"
 #include "APMovementComponent.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogMovementComp, Log, All)
+
 class AAPCharacterBase;
 class APlayerController;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
 {
+
+
 	GENERATED_BODY()
 
 public:	
@@ -96,11 +100,18 @@ private:
 	UPROPERTY(EditAnywhere)
 	float PushSpeed = 500.0f;
 
+	//@대시 여부
 	bool bDash = false;
+
+	//@대시 속도
 	UPROPERTY(EditAnywhere)
 	float DashSpeed = 500.0f;
+
+	//@대시 거리
 	UPROPERTY(EditAnywhere)
 	float DashLength = 1000.0f;
+
+	//@대시 목표 위치
 	FVector DashLocation;
 
 	bool bLookAt = false;
@@ -110,5 +121,13 @@ private:
 	TWeakObjectPtr<APlayerController> OwnerPC;
 
 	FTimerHandle DashTimerHandle;
+
+
+public:
+	//@Dash 속도
+	FORCEINLINE float GetDashSpeed() const { return DashSpeed; };
+
+	//@Dash 거리
+	FORCEINLINE float GetDashLength() const { return DashLength; };
 
 };
