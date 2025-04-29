@@ -43,6 +43,9 @@ class AAPHUD;
 class ATextRenderActor;
 class ASkillController;
 
+// ys
+class UMotionWarpingComponent;
+
 #define Defense_constant 1000
 
 UCLASS()
@@ -185,7 +188,8 @@ public:
 	void SavePlayerData(const FString & PlayerSlotName);
 	void SaveGameData(const FString & PlayerSlotName);
 
-	// Dash
+	// ys
+	//@Dash
 	void PressedDash();
 	void ReleasedDash();
 
@@ -254,6 +258,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPPassiveComponent* PassiveComp;
 	
+	//@모션 워프 컴포넌트
+	UPROPERTY(EditAnywhere, Category = "Component | 모션 워프")
+	UMotionWarpingComponent* MotionWarpingComp;
+
 	//PlayerController 변수
 	TWeakObjectPtr<AArcanePunkPlayerController> PC;
 	//GameMode 변수
@@ -379,8 +387,8 @@ public:
 	uint8 CharacterUIID = 0;
 
 	uint8 PlayerIndex = 0;
-// prodo
 
+// prodo
 protected:
 	UPROPERTY()
 	AAPHUD* HUD;

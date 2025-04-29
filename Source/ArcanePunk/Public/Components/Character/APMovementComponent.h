@@ -15,7 +15,6 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
 {
 
-
 	GENERATED_BODY()
 
 public:	

@@ -45,6 +45,7 @@
 
 //YS
 #include "Logging/StructuredLog.h"
+#include "MotionWarpingComponent.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter)
 
@@ -99,6 +100,9 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	// set capacity of inventory
 	PlayerInventory->SetSlotsCapacity(15);
 	PlayerInventory->SetWeightCapacity(50.0f);
+
+	// ys
+	MotionWarpingComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Component"));
 }
 
 void AArcanePunkCharacter::BeginPlay()
@@ -507,7 +511,7 @@ void AArcanePunkCharacter::ReleasedDash()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 
 	//@대시 관련 컴포넌트 설정 해제
-	MoveComponent->EndDash();
+	//MoveComponent->EndDash();
 	GhostTrailSpawnComp->SetRunTrail(false);
 
 	//@HUD

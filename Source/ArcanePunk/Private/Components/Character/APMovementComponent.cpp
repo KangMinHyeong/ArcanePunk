@@ -226,16 +226,16 @@ void UAPMovementComponent::StartDash()
 	UE_LOGFMT(LogMovementComp, Log, "대시 시작을 처리합니다.");
 
 	//@캐릭터 회전 설정
-	OwnerCharacter->SetActorRotation(PlayerRot);
+	//OwnerCharacter->SetActorRotation(PlayerRot);
 
 	//@대시 목적지 계산
-	DashLocation = GetOwner()->GetActorLocation() + PlayerRot.Vector() * DashLength;
-	UE_LOGFMT(LogMovementComp, Log, "대시 목적지 계산: {0}, {1}, {2}", DashLocation.X, DashLocation.Y, DashLocation.Z);
+	//DashLocation = GetOwner()->GetActorLocation() + PlayerRot.Vector() * DashLength;
+	//UE_LOGFMT(LogMovementComp, Log, "대시 목적지 계산: {0}, {1}, {2}", DashLocation.X, DashLocation.Y, DashLocation.Z);
 
 	//@대시 상태 설정
 	bDash = true;
 	bMove = false;
-	SetComponentTickEnabled(true);
+	//SetComponentTickEnabled(true);
 
 	//@애니메이션 처리
 	auto OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());

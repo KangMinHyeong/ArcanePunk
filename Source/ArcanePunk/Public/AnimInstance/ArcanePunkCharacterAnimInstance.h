@@ -13,11 +13,12 @@ DECLARE_MULTICAST_DELEGATE(FOnUltChargeEnd);
 
 class AArcanePunkCharacter;
 class AAPCharacterBase;
+class UMotionWarpingComponent;
 
 UCLASS()
 class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
 {
-//@Ä£±¸ Å¬·¡½º
+//@ì¹œêµ¬ í´ë˜ìŠ¤
 #pragma region Freind Class
 	friend class UAPMovementComponent;
 #pragma endregion
@@ -36,10 +37,14 @@ public:
 	void StopComboAttack();
 
 protected:
-	//@´ë½Ã Àç»ı
+	//@ëŒ€ì‹œ ì¬ìƒ
 	void PlayDash_Montage();
-	//@´ë½Ã Àç»ı ÁßÁö
+	//@ëŒ€ì‹œ ì¬ìƒ ì¤‘ì§€
 	void StopDash_Montage();
+
+protected:
+	UFUNCTION()
+	void OnDashMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 public:
 	void PlaySwapSkill_Retreat();
