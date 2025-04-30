@@ -153,11 +153,11 @@ void UArcanePunkCharacterAnimInstance::PlayDash_Montage()
     WarpTarget.Location = DashLocation;
     MotionWarpComp->AddOrUpdateWarpTarget(WarpTarget);
 
-    //@몽타주 재생
-    Montage_Play(Dash_Montage, 10.f);
-
     //@몽타주 종료 델리게이트 바인딩
     OnMontageEnded.AddDynamic(this, &UArcanePunkCharacterAnimInstance::OnDashMontageEnded);
+
+    //@몽타주 재생
+    Montage_Play(Dash_Montage);
 
     UE_LOGFMT(LogAnimInstance, Log, "워프 타겟이 설정된 대시 몽타주 재생을 시작합니다.");
 

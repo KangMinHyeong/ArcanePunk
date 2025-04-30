@@ -46,6 +46,7 @@
 //YS
 #include "Logging/StructuredLog.h"
 #include "MotionWarpingComponent.h"
+#include "GameInstance/Subsystem/APTimeManipulationSubsystem.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter)
 
@@ -492,12 +493,12 @@ void AArcanePunkCharacter::ReleasedDash()
 		return;
 	}
 
+	//@죽음 여부 
 	if (IsDead())
 	{
 		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 대시 해제를 처리하지 않습니다.");
 		return;
 	}
-
 
 	//@캐릭터 상태 복원
 	bDoing = false;
@@ -553,6 +554,144 @@ void AArcanePunkCharacter::EndSwapDash()
 		UseSwapSkill_Sally();
 	}
 }
+
+void AArcanePunkCharacter::HandleGameplayEvent(const FGameplayTag& EventTag)
+{
+	//@이벤트 태그 유효성 검사
+	if (!EventTag.IsValid())
+	{
+		UE_LOGFMT(LogCharacter, Warning, "게임플레이 이벤트 처리 실패 - 유효하지 않은 태그");
+		return;
+	}
+
+	UE_LOGFMT(LogCharacter, Log, "게임플레이 이벤트 처리 시작 - 태그: {0}", *EventTag.ToString());
+
+	//@저스트 닷지 태그 확인
+	static const FGameplayTag JustDodgeTag = FGameplayTag::RequestGameplayTag("Ability.Chain.JustDodge");
+
+	if (EventTag == JustDodgeTag)
+	{
+		UE_LOGFMT(LogCharacter, Log, "저스트 닷지 이벤트 감지 - 닷지 시작");
+		StartJustDodge();
+	}
+	else
+	{
+		UE_LOGFMT(LogCharacter, Log, "처리할 수 없는 이벤트 태그: {0}", *EventTag.ToString());
+	}
+}
+
+void AArcanePunkCharacter::StartChainWindow(const FChainActionInfo& ChainInfo)
+{
+	//@유효성 검사
+	if (!ChainInfo.EventTag.IsValid() || !ChainInfo.ActivationEventTag.IsValid())
+	{
+		UE_LOGFMT(LogCharacter, Warning, "체인 윈도우 시작 실패 - 유효하지 않은 태그");
+		return;
+	}
+
+	//@체인 윈도우 활성화
+	CurrentChainActionInfo = ChainInfo;
+	bChainWindowActive = true;
+	bCanChainAction = false;
+
+	UE_LOGFMT(LogCharacter, Log, "체인 윈도우 시작 - 이벤트 태그: {0}, 활성화 태그: {1}, 모드: {2}",
+		*ChainInfo.EventTag.ToString(),
+		*ChainInfo.ActivationEventTag.ToString(),
+		ChainInfo.ChainActionMode == EChainActionMode::Delayed ? TEXT("지연 실행") : TEXT("즉시 실행"));
+}
+
+void AArcanePunkCharacter::EndChainWindow()
+{
+	//@체인 윈도우 체크
+	if (!bChainWindowActive)
+	{
+		UE_LOGFMT(LogCharacter, Log, "체인 윈도우 종료 - 체인 윈도우가 활성화되지 않음");
+		return;
+	}
+
+	//@지연 실행 모드 처리
+	if (CurrentChainActionInfo.ChainActionMode == EChainActionMode::Delayed && bCanChainAction)
+	{
+		UE_LOGFMT(LogCharacter, Log, "지연 실행 모드로 이벤트 처리: {0}",
+			*CurrentChainActionInfo.ActivationEventTag.ToString());
+
+		HandleGameplayEvent(CurrentChainActionInfo.ActivationEventTag);
+	}
+
+	//@체인 윈도우 비활성화
+	bChainWindowActive = false;
+	bCanChainAction = false;
+	CurrentChainActionInfo = FChainActionInfo();
+
+	UE_LOGFMT(LogCharacter, Log, "체인 윈도우 종료 완료");
+}
+
+void AArcanePunkCharacter::StartJustDodge()
+{
+	//@입력 유효성 검사
+	if (!bMainPlayer)
+	{
+		UE_LOGFMT(LogCharacter, Log, "메인 플레이어가 아니므로 저스트 닷지를 실행하지 않습니다.");
+		return;
+	}
+
+	//@움직임 가능성 여부
+	//if (!bCanMove)
+	//{
+	//	UE_LOGFMT(LogCharacter, Log, "이동이 불가능한 상태이므로 저스트 닷지를 실행하지 않습니다.");
+	//	return;
+	//}
+
+	//@죽음 여부
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 저스트 닷지를 실행하지 않습니다.");
+		return;
+	}
+
+	//@대시 캔슬
+	MoveComponent->EndDash();
+
+	//@저스트 닷지 실행
+	UE_LOGFMT(LogCharacter, Log, "저스트 닷지 실행 - 체인 윈도우로부터 성공적인 회피");
+
+	//@TODO: 애니메이션 제작 완료 될 경우, ANS로 옮김 처리.
+	//@시간 조작 - 슬로모션 적용, 중간 강도, 0.2초간 적용
+	UAPTimeManipulationSubsystem* TimeSubsystem = GetGameInstance()->GetSubsystem<UAPTimeManipulationSubsystem>();
+	if (TimeSubsystem)
+	{
+		//@슬로모션 설정
+		FTimeDilationSettings SlowMotionSettings;
+		SlowMotionSettings.DilationMode = ETimeDilationMode::SlowMotion;
+		SlowMotionSettings.DilationIntensity = ETimeDilationIntensity::High;
+		SlowMotionSettings.bSmoothTransition = false;
+
+		//@글로벌 슬로모션 시작
+		TimeSubsystem->StartGlobalTimeDilation(SlowMotionSettings);
+
+		UE_LOGFMT(LogCharacter, Log, "저스트 닷지 - 중간 강도의 글로벌 슬로모션 적용");
+
+		//@일정 시간 후 슬로모션 해제 타이머 설정 (예: 0.5초)
+		FTimerHandle SlowMotionTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			SlowMotionTimerHandle,
+			FTimerDelegate::CreateLambda([TimeSubsystem]()
+				{
+					if (TimeSubsystem)
+					{
+						TimeSubsystem->StopGlobalTimeDilation(false);
+					}
+				}),
+			0.3f,
+			false
+		);
+	}
+	else
+	{
+		UE_LOGFMT(LogCharacter, Warning, "시간 조작 서브시스템을 찾을 수 없어 슬로모션을 적용할 수 없습니다.");
+	}
+}
+
 
 void AArcanePunkCharacter::OnBlockMode()
 { 
@@ -676,8 +815,40 @@ void AArcanePunkCharacter::SetHavingSkills()
 
 float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	//@무적 상태 체크
 	
+	//@체인 윈도우 체크
+	if (bChainWindowActive)
+	{
+		//@데미지 이벤트와 체인 이벤트가 일치하는지 확인
+		static const FGameplayTag DamageEventTag = FGameplayTag::RequestGameplayTag("EventTag.OnDamaged");
+
+		if (CurrentChainActionInfo.EventTag == DamageEventTag)
+		{
+			UE_LOGFMT(LogCharacter, Log, "데미지 발생으로 체인 액션 감지: {0}",
+				*CurrentChainActionInfo.ActivationEventTag.ToString());
+
+			//@체인 액션 가능 상태로 설정
+			bCanChainAction = true;
+
+			//@모드에 따른 처리
+			if (CurrentChainActionInfo.ChainActionMode == EChainActionMode::Immediate)
+			{
+				UE_LOGFMT(LogCharacter, Log, "즉시 실행 모드로 이벤트 처리");
+				HandleGameplayEvent(CurrentChainActionInfo.ActivationEventTag);
+				EndChainWindow(); // 즉시 체인 윈도우 종료
+			}
+			else
+			{
+				UE_LOGFMT(LogCharacter, Log, "지연 실행 모드로 체인 액션 활성화");
+				// EndChainWindow() 호출 시 처리됨
+			}
+
+			return 0.0f; // 데미지를 무시하고 체인 액션 처리
+		}
+	}
+
+	//@무적 상태 체크
+
 	//@패링 체크
 	if (AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator))
 	{

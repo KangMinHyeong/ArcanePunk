@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "Character/ArcanePunkCharacter.h"
 
 #include "APANS_AllowChainAction.generated.h"
 
@@ -50,6 +51,10 @@ protected:
 
 //@Property/Info...etc
 #pragma region Property or Subwidgets or Infos...etc
+protected:
+	//@연결할 연쇄 동작 정보
+	UPROPERTY(EditAnywhere, Category = "연쇄 동작")
+		FChainActionInfo ChainActionInfo;
 #pragma endregion
 
 //@Delegates
@@ -62,6 +67,11 @@ protected:
 
 //@Utility(Setter, Getter,...etc)
 #pragma region Utility
+public:
+	virtual FString GetNotifyName_Implementation() const override
+	{
+		return TEXT("연쇄 동작 허용 구간");
+	}
 #pragma endregion
 	
 };
