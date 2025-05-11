@@ -242,11 +242,7 @@ void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool 
 
 	if(bMainPlayer)
 	{		
-		if(bPrioritySkilling)
-		{
-			PlayerState = EPlayerState::EntryMode_Only;
-		}
-		if(bEnhanceSwap)
+		if(bEnhanceSwap || bPrioritySkilling)
 		{
 			PlayerState = EPlayerState::EntryMode;
 		}
@@ -263,7 +259,7 @@ void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool 
 		}
 	}
 
-	SwitchPlayerState();
+	SwitchPlayerState()
 }
 
 void AArcanePunkCharacter::SwitchPlayerState()
@@ -280,11 +276,6 @@ void AArcanePunkCharacter::SwitchPlayerState()
 		SwitchPlayerState();
 		break;
 	
-	case EPlayerState::EntryMode_Only:
-		PlaySwapDash();
-		MoveComponent->StartLookAtEnemy();
-		break;	
-
 	case EPlayerState::EntryMode:
 		PlaySwapDash();
 		MoveComponent->StartLookAtEnemy();
@@ -477,12 +468,13 @@ void AArcanePunkCharacter::EndSwapDash()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 	MoveComponent->EndSwapDash();
 	GhostTrailSpawnComp->SetSkillTrail(false);
+
 	
-	if(PlayerState == EPlayerState::EntryMode) 
+	if(EnhanceSwap)
 	{
 		PlayerState = EPlayerState::EntrySkillPlaying;
 	}
-	else 
+	else
 	{
 		PlayerState = EPlayerState::Idle;
 	}
@@ -978,7 +970,7 @@ void AArcanePunkCharacter::UseSwapSkill_Exit()
 	{
 		SetDoing(true);
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		Anim->PlaySwapSkill_Exit();
+		Anim->PlaySwapSkill_Retreat();
 	}
 }
 
@@ -989,6 +981,6 @@ void AArcanePunkCharacter::UseSwapSkill_Entry()
 	{
 		SetDoing(true);
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		Anim->PlaySwapSkill_Entry();
+		Anim->PlaySwapSkill_Sally();
 	}
 }

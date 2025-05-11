@@ -26,7 +26,7 @@ void UAPAnimHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UAPAnimHubComponent::BindAttackCheck()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 
 	// MontageEnd
@@ -132,7 +132,8 @@ void UAPAnimHubComponent::OnEntrySkill_MontageEnded()
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
-	
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
 	OwnerCharacter->PlayerState = EPlayerState::Idle;
 	OwnerCharacter->SwitchPlayerState();
 }

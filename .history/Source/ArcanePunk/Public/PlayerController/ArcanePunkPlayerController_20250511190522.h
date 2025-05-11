@@ -104,6 +104,7 @@ protected:
 
 	void SwapPlayer(const FVector & Loc, const FRotator & Rot);
 	bool CheckSwapPlayerCondition(uint8 Index);
+	AActor* DetectEnemy(AArcanePunkCharacter* CurrentPlayer);
 
 private:
 	void LookStatus();

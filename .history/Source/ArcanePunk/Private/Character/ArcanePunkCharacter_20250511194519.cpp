@@ -244,7 +244,7 @@ void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool 
 	{		
 		if(bPrioritySkilling)
 		{
-			PlayerState = EPlayerState::EntryMode_Only;
+			PlayerState = EPlayerState::EntryMode_Only
 		}
 		if(bEnhanceSwap)
 		{
@@ -478,14 +478,8 @@ void AArcanePunkCharacter::EndSwapDash()
 	MoveComponent->EndSwapDash();
 	GhostTrailSpawnComp->SetSkillTrail(false);
 	
-	if(PlayerState == EPlayerState::EntryMode) 
-	{
-		PlayerState = EPlayerState::EntrySkillPlaying;
-	}
-	else 
-	{
-		PlayerState = EPlayerState::Idle;
-	}
+	if(PlayerState == EPlayerState::EntryMode) {PlayerState = EPlayerState::EntrySkillPlaying;}
+	else {PlayerState = EPlayerState::Idle;}
 
 	SwitchPlayerState();
 }

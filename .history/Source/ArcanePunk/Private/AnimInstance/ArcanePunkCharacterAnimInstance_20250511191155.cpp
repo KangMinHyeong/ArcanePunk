@@ -103,7 +103,7 @@ void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Exit()
     Montage_Play(SwapSkill_Retreat);
 }
 
-void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Entry()
+void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Sally()
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;

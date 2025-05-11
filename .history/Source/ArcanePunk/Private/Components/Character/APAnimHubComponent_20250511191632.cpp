@@ -26,7 +26,7 @@ void UAPAnimHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UAPAnimHubComponent::BindAttackCheck()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 
 	// MontageEnd
@@ -51,7 +51,7 @@ void UAPAnimHubComponent::ComboCheck()
 
 void UAPAnimHubComponent::PlayerMontageEnded(UAnimMontage *Montage, bool bInterrupted)
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 	
 	if(Montage == OwnerAnim->Combo_Montage) OnCombo_Montage();
@@ -117,24 +117,12 @@ void UAPAnimHubComponent::OnParrying_Montage()
 	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
-void UAPAnimHubComponent::OnExitSkill_MontageEnded()
+void UAPAnimHubComponent::OnSwapSkill_MontageEnded()
 {
 	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
 
 	OwnerCharacter->SetDoing(false);
-
-	OwnerCharacter->PlayerState = EPlayerState::Inactive;
-	OwnerCharacter->SwitchPlayerState();
-}
-
-void UAPAnimHubComponent::OnEntrySkill_MontageEnded()
-{
-	if(!OwnerCharacter.IsValid()) return; if(!OwnerAnim.IsValid()) return;
-
-	OwnerCharacter->SetDoing(false);
-	
-	OwnerCharacter->PlayerState = EPlayerState::Idle;
-	OwnerCharacter->SwitchPlayerState();
+	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void UAPAnimHubComponent::OnSkill_1_MontageEnded()

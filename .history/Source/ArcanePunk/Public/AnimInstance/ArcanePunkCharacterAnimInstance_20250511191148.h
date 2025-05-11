@@ -32,7 +32,7 @@ public:
 	void StopDash_Montage();
 
 	void PlaySwapSkill_Exit();
-	void PlaySwapSkill_Entry();
+	void PlaySwapSkill_Sally();
 
 	void PlaySkill_1_Montage();
 	void PlaySkill_2_Montage();

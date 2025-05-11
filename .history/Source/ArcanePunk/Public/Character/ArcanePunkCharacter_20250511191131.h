@@ -49,12 +49,11 @@ enum class EPlayerState : uint8 // Player 상태태
     None      			    = 0,
     Idle	 			    = 1, // 플레이어 입력을 받을 수 있는 일반 상태
     Spawn 					= 2, // 스폰된 직 후 상태
-	EntryMode_Only			= 3, // 플레이어 스왑 대쉬 상태
-	EntryMode				= 4, // 플레이어 스왑 대쉬 상태 (이 후 출격스킬)
-    EntrySkillPlaying       = 5, // 출격 스킬 플레이 상태
-	ExitSkillPlaying 		= 6, // 퇴각 스킬 플레이 상태
-	ActiveSkillPlaying 		= 7, // 일반 액티브 스킬 플레이 상태
-	Inactive				= 8, // 비활성화 상태
+	EntryMode				= 3, // 플레이어 스왑 대쉬 상태
+    EntrySkillPlaying       = 4, // 출격 스킬 플레이 상태
+	ExitSkillPlaying 		= 5, // 퇴각 스킬 플레이 상태
+	ActiveSkillPlaying 		= 6, // 일반 액티브 스킬 플레이 상태
+	Inactive				= 7, // 비활성화 상태
 };
 
 UCLASS()
@@ -241,7 +240,7 @@ private:
 	bool CheckingDamaged();
 
 	void UseSwapSkill_Exit(); // 퇴격
-	void UseSwapSkill_Entry(); // 출격
+	void UseSwapSkill_Sally(); // 출격
 
 private:
 	bool bMainPlayer = false;
@@ -349,6 +348,8 @@ private:
 	bool bCanSkill_Q = true;  // Q쿨타임 체크
 	bool bCanSkill_E = true;  // E쿨타임 체크
 	bool bCanSkill_R = true;  // R쿨타임 체크
+
+	bool EnhanceSwap = false;
 
 	uint8 ReflectingModeGauge = 0;
 

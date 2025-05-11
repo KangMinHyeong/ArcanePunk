@@ -84,13 +84,13 @@ void AAPCharacterBase::DissolveCharacterMesh_Immediate(bool bFadeOut)
 
 	if(bFadeOut)
 	{
-		ApperenceTarget = 0.0f;
-		Apperence = 0.0f;
+		ApperenceTarget = 1.0f;
+		Apperence = 1.0f;		
 	}
 	else
 	{
-		ApperenceTarget = 1.0f;
-		Apperence = 1.0f;	
+		ApperenceTarget = 0.0f;
+		Apperence = 0.0f;	
 	}
 
 	for (auto Mat : SkinMesh)

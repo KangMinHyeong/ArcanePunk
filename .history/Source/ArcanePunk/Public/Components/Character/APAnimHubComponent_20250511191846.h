@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "APAnimHubComponent.generated.h"
 
-class AArcanePunkCharacter;
+class AAPCharacterBase;
 class UArcanePunkCharacterAnimInstance;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
