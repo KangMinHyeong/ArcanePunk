@@ -241,67 +241,66 @@ void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool 
 	CharacterAura->SetAuraActive(bMainPlayer);
 
 	if(bMainPlayer)
-	{		
-		if(bPrioritySkilling)
+	{
+		ApperenceTarget = 1.0f;
+		Apperence = 1.0f;
+		int32 index = 0;
+		for (auto Mat : SkinMesh)
 		{
-			PlayerState = EPlayerState::EntryMode_Only;
+			Mat->SetScalarParameterValue(TEXT("Apperence"), Apperence);
+			GetMesh()->SetMaterial(index, Mat);
+			index++;
 		}
-		if(bEnhanceSwap)
+		
+		if(bEnhanceSwap || bPrioritySkilling)
 		{
 			PlayerState = EPlayerState::EntryMode;
 		}
+			
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
 	else
 	{
+		
+		PlayerState = EPlayerState::Inactive;
+
 		if(bEnhanceSwap)
 		{
-			PlayerState = EPlayerState::ExitSkillPlaying;			
+			PlayerState = EPlayerState::ExitSkillPlaying;
+			
+			
 		}
 		else
 		{
-			PlayerState = EPlayerState::Inactive;
+
 		}
+
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
 
-	SwitchPlayerState();
+	SwitchPlayerState()
 }
 
 void AArcanePunkCharacter::SwitchPlayerState()
 {
 	switch (PlayerState)
 	{
-	case EPlayerState::Idle:
-		DissolveCharacterMesh_Immediate(false);
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		break;
-
 	case EPlayerState::Spawn:
 		PlayerState = EPlayerState::Idle;
-		SwitchPlayerState();
 		break;
 	
-	case EPlayerState::EntryMode_Only:
-		PlaySwapDash();
-		MoveComponent->StartLookAtEnemy();
-		break;	
-
 	case EPlayerState::EntryMode:
 		PlaySwapDash();
 		MoveComponent->StartLookAtEnemy();
+		break;
+	
+	case EPlayerState::Inactive:
+		
 		break;
 
 	case EPlayerState::ExitSkillPlaying:
 		UseSwapSkill_Exit();	
 		break;
-	
-	case EPlayerState::EntrySkillPlaying:
-		UseSwapSkill_Entry();	
-		break;
-
-	case EPlayerState::Inactive:
-		ApperenceTarget = 0.0f;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		break;	
 	}
 }
 
@@ -477,17 +476,11 @@ void AArcanePunkCharacter::EndSwapDash()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 	MoveComponent->EndSwapDash();
 	GhostTrailSpawnComp->SetSkillTrail(false);
-	
-	if(PlayerState == EPlayerState::EntryMode) 
-	{
-		PlayerState = EPlayerState::EntrySkillPlaying;
-	}
-	else 
-	{
-		PlayerState = EPlayerState::Idle;
-	}
 
-	SwitchPlayerState();
+	if(EnhanceSwap)
+	{
+		UseSwapSkill_Entry();
+	}
 }
 
 void AArcanePunkCharacter::OnBlockMode()
@@ -973,12 +966,14 @@ void AArcanePunkCharacter::RestoreSkills()
 
 void AArcanePunkCharacter::UseSwapSkill_Exit()
 {
+	ApperenceTarget = 0.0f;
+	
 	auto Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	if(Anim)
 	{
 		SetDoing(true);
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		Anim->PlaySwapSkill_Exit();
+		Anim->PlaySwapSkill_Retreat();
 	}
 }
 
@@ -989,6 +984,6 @@ void AArcanePunkCharacter::UseSwapSkill_Entry()
 	{
 		SetDoing(true);
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		Anim->PlaySwapSkill_Entry();
+		Anim->PlaySwapSkill_Sally();
 	}
 }

@@ -244,7 +244,7 @@ void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool 
 	{		
 		if(bPrioritySkilling)
 		{
-			PlayerState = EPlayerState::EntryMode_Only;
+			PlayerState = EPlayerState::EntryMode_Only
 		}
 		if(bEnhanceSwap)
 		{

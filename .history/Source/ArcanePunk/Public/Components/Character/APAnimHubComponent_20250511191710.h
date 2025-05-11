@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "APAnimHubComponent.generated.h"
 
-class AArcanePunkCharacter;
+class AAPCharacterBase;
 class UArcanePunkCharacterAnimInstance;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -80,6 +80,6 @@ private:
 	void OnUltSkill_Fire_MontageEnded();
 
 private:
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
 	TWeakObjectPtr<UArcanePunkCharacterAnimInstance> OwnerAnim;
 };

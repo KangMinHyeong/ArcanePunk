@@ -26,7 +26,7 @@ void UAPAnimHubComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UAPAnimHubComponent::BindAttackCheck()
 {
-	OwnerCharacter = Cast<AArcanePunkCharacter>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
+	OwnerCharacter = Cast<AAPCharacterBase>(GetOwner()); if(!OwnerCharacter.IsValid()) return;
 	OwnerAnim = Cast<UArcanePunkCharacterAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance()); if(!OwnerAnim.IsValid()) return;
 
 	// MontageEnd

@@ -78,21 +78,10 @@ void AAPCharacterBase::DissolveCharacterMesh(float DeltaTime)
 	}
 }
 
-void AAPCharacterBase::DissolveCharacterMesh_Immediate(bool bFadeOut)
+void AAPCharacterBase::DissolveCharacterMesh_Immediate(float DeltaTime)
 {
+	Apperence = FMath::FInterpConstantTo(Apperence, ApperenceTarget, DeltaTime, FadeOutSpeed);
 	int32 index = 0;
-
-	if(bFadeOut)
-	{
-		ApperenceTarget = 0.0f;
-		Apperence = 0.0f;
-	}
-	else
-	{
-		ApperenceTarget = 1.0f;
-		Apperence = 1.0f;	
-	}
-
 	for (auto Mat : SkinMesh)
 	{
 		Mat->SetScalarParameterValue(TEXT("Apperence"), Apperence);
@@ -101,7 +90,15 @@ void AAPCharacterBase::DissolveCharacterMesh_Immediate(bool bFadeOut)
 	}
 }
 
-
+ApperenceTarget = 1.0f;
+		Apperence = 1.0f;
+		int32 index = 0;
+		for (auto Mat : SkinMesh)
+		{
+			Mat->SetScalarParameterValue(TEXT("Apperence"), Apperence);
+			GetMesh()->SetMaterial(index, Mat);
+			index++;
+		}
 
 bool AAPCharacterBase::IsDead()
 {

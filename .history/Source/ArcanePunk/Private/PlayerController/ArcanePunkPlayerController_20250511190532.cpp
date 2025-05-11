@@ -136,6 +136,22 @@ void AArcanePunkPlayerController::SwapMainPlayerByIndex(uint8 Index)
     SwapPlayer(PriorCharacter->GetActorLocation(), PriorCharacter->GetActorRotation());
 }
 
+AActor* AArcanePunkPlayerController::DetectEnemy(AArcanePunkCharacter* CurrentPlayer)
+{
+    TArray<AActor*> Enemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_CharacterBase::StaticClass(), Enemies);
+
+    float Dist;
+    auto Enemy = UGameplayStatics::FindNearestActor(CurrentPlayer->GetActorLocation(), Enemies, Dist);
+
+    float AttackRange = CurrentPlayer->GetAttackComponent()->GetBaseAttackDist();
+    if(Dist <= AttackRange)
+    {
+        return Enemy;
+    }
+
+    return nullptr;
+}
 
 bool AArcanePunkPlayerController::CheckSwapPlayerCondition(uint8 Index)
 {
