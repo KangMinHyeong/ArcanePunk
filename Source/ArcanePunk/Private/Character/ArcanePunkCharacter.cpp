@@ -528,7 +528,6 @@ void AArcanePunkCharacter::ReleasedDash()
 	UE_LOGFMT(LogCharacter, Log, "캐릭터 대시를 종료합니다.");
 }
 
-
 void AArcanePunkCharacter::PlaySwapDash()
 {
 	bDoing = true; bCanMove = false;
@@ -656,7 +655,7 @@ void AArcanePunkCharacter::StartJustDodge()
 	UE_LOGFMT(LogCharacter, Log, "저스트 닷지 실행 - 체인 윈도우로부터 성공적인 회피");
 
 	//@TODO: 애니메이션 제작 완료 될 경우, ANS로 옮김 처리.
-	//@시간 조작 - 슬로모션 적용, 중간 강도, 0.2초간 적용
+	//@시간 조작 - 슬로모션 적용, 중간 강도, 0.3초간 적용
 	UAPTimeManipulationSubsystem* TimeSubsystem = GetGameInstance()->GetSubsystem<UAPTimeManipulationSubsystem>();
 	if (TimeSubsystem)
 	{
@@ -671,7 +670,7 @@ void AArcanePunkCharacter::StartJustDodge()
 
 		UE_LOGFMT(LogCharacter, Log, "저스트 닷지 - 중간 강도의 글로벌 슬로모션 적용");
 
-		//@일정 시간 후 슬로모션 해제 타이머 설정 (예: 0.5초)
+		//@일정 시간 후 슬로모션 해제 타이머 설정 (예: 0.3초)
 		FTimerHandle SlowMotionTimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(
 			SlowMotionTimerHandle,
@@ -682,7 +681,7 @@ void AArcanePunkCharacter::StartJustDodge()
 						TimeSubsystem->StopGlobalTimeDilation(false);
 					}
 				}),
-			0.3f,
+			0.2f,
 			false
 		);
 	}
