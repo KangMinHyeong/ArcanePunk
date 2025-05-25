@@ -11,7 +11,7 @@
 #include "Components/ShapeComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Skill/SkillDataManager.h"
+#include "Skill/SkillActorDataManager.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Skill/SkillController.h"
 #include "Character/SkillRange/APSkillRange.h"
@@ -23,8 +23,9 @@
 ASkillActor::ASkillActor()
 {
 	USceneComponent* SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
+	// TODO: ProjectileActor로 옮기기
+	// ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	// ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 	RootComponent = SceneComp;
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -45,44 +46,34 @@ void ASkillActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	// DrawDebugForShapeComponent();
-	if(bDrag) DragSkill(DeltaTime);
-	if(bCharging) ChargindCheck(DeltaTime);
 }
 
-void ASkillActor::PlaySkillAction(ESkillKey SkillKey)
+void ASkillActor::PlaySkillAction()
 {
-	CurrentSkillKey = SkillKey;
-	OwnerCharacter->PlaySkillAction(SkillAction);
-	TargetLoc = OwnerController->GetSkillTargetRange()->GetActorLocation();
-
 	OwnerCharacter->OnSkillTrigger.AddDynamic(this, &ASkillActor::UseSkill);
-	OwnerCharacter->OnSkillChargingTrigger.AddDynamic(this, &ASkillActor::ChargingSkill);
 }
 
 void ASkillActor::UseSkill()
 {
-	SetActorLocation(OwnerCharacter->GetMesh()->GetSocketLocation(SocketName));
+	SetActorLocation(OwnerCharacter->GetMesh()->GetSocketLocation(SkillActorData.SocketName));
 	
-	if(!bAttachedEffect)
-	{
-		SkillEffectComponent->SetRelativeLocation(GetActorLocation()); 
-		SkillEffectComponent->SetRelativeRotation(OwnerCharacter->GetActorRotation()); 
-		SkillEffectComponent->SetUsingAbsoluteRotation(true);
-	}
+	// if(!bAttachedEffect)
+	// {
+	// 	SkillEffectComponent->SetRelativeLocation(GetActorLocation()); 
+	// 	SkillEffectComponent->SetRelativeRotation(OwnerCharacter->GetActorRotation()); 
+	// 	SkillEffectComponent->SetUsingAbsoluteRotation(true);
+	// }
 	
 	FVector CharacterForwardVector = OwnerCharacter->GetActorForwardVector();
-	FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
+	FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(SkillActorData.LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
 	ProjectileMovementComponent->Velocity = LaunchDirection * ProjectileMovementComponent->InitialSpeed;
 	
 	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &ASkillActor::UseSkill);
-	OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &ASkillActor::ChargingSkill);
+	// OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &ASkillActor::ChargingSkill);
 
-	OwnerCharacter->GetAPHUD()->GetStatusWidget()->UpdateMPBar(MPConsumption, true);
-	OwnerCharacter->GetAPHUD()->GetStatusWidget()->OperateSkillSlot(CurrentSkillKey);
-
-	bSkilling = true;
-	CurrentPenetrateCount = PenetrateCount;
-	CheckSet.Empty();
+	// TODO: SkillController 쪽으로 옮기기
+	// OwnerCharacter->GetAPHUD()->GetStatusWidget()->UpdateMPBar(MPConsumption, true);
+	// OwnerCharacter->GetAPHUD()->GetStatusWidget()->OperateSkillSlot(CurrentSkillKey);
 
 	// TODO: if문 없애고 상속받아 타입별 클래스 구분
 	// 사거리에 도달하면 비활성화, 상황에 따라 이펙트 재생 추가
@@ -150,37 +141,17 @@ void ASkillActor::UseSkill()
 	// 	}
 	// }
 	//
-	SetActive(true);
+	// SetActive(true);
 
-	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SocketName).ToString());
+	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SkillActorData.SocketName).ToString());
 }
 
-void ASkillActor::EnhanceSkill(int32 EnhanceNumber)
+void ASkillActor::InitSkill(FName SkillID, TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacterPtr, TWeakObjectPtr<ASkillController> OwnerControllerPtr)
 {
-	uint8 CurrentNestingNumber = 0;
-	if(EnhanceNestingData.Contains(EnhanceNumber))
-	{
-		CurrentNestingNumber = EnhanceNestingData[EnhanceNumber];
-	}
-	CurrentNestingNumber++;
-
-	switch (EnhanceNumber)
-	{
-	case 1: // Damege Module
-		DamageCoefficient = 1.0f + ((float)CurrentNestingNumber * 0.1f);
-		break;
 	
-	case 2: // Range Module - Test
-		RangeCoefficient = 1.0f + ((float)CurrentNestingNumber * 0.3f);
-		break;
-	}
-}
-
-void ASkillActor::InitSkill(ESkillKey SkillKey, FName SkillID, AArcanePunkCharacter* OwnerCharacterPtr, ASkillController* OwnerControllerPtr)
-{
-	CurrentSkillKey = SkillKey;
 	SkillId = SkillID;
 
+	SkillActorData = USkillActorDataManager::GetInstance()->GetSkillData(SkillId);
 
 	// TODO: FSkillData에 들어가는 데이터만 처리하고, 나머지는 상속받는 타입별 스킬 액터 클래스에서 처리
 	// CrowdControl = skillDataRow.CrowdControl;
@@ -287,31 +258,31 @@ void ASkillActor::InitSkill(ESkillKey SkillKey, FName SkillID, AArcanePunkCharac
 	//
 	// // Drag On, Off
 	// bDrag = skillDataRow.bDrag;
-	DragSpeed = ProjectileMovementComponent->InitialSpeed / Range;
-	SkillEffectComponent->SetVariableFloat(TEXT("Drag"),  DragSpeed);
+	// DragSpeed = ProjectileMovementComponent->InitialSpeed / Range;
+	// SkillEffectComponent->SetVariableFloat(TEXT("Drag"),  DragSpeed);
 	
 	this->OwnerCharacter = OwnerCharacterPtr;
 	this->OwnerController = OwnerControllerPtr;
 
-	SetActive(false);
+	// SetActive(false);
 }
 
-void ASkillActor::SetActive(bool Active)
-{
-	// SetActorHiddenInGame(!Active); // SetHiddenInGame으로 처리하기기
-	CollisionShape->SetActive(Active);
-
-	if(Active) {SkillEffectComponent->Activate();}
-	else {SkillEffectComponent->DeactivateImmediate();}	
-
-	if(bSkilling && !Active)
-	{
-		// Skill Off Effect
-		ProjectileMovementComponent->Velocity = FVector(0.0f, 0.0f, 0.0f);
-		bSkilling = false;
-		auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SkillOffEffect, GetActorLocation(), GetActorRotation());
-	}
-}	
+// void ASkillActor::SetActive(bool Active)
+// {
+// 	// SetActorHiddenInGame(!Active); // SetHiddenInGame으로 처리하기기
+// 	CollisionShape->SetActive(Active);
+//
+// 	if(Active) {SkillEffectComponent->Activate();}
+// 	else {SkillEffectComponent->DeactivateImmediate();}	
+//
+// 	if(bSkilling && !Active)
+// 	{
+// 		// Skill Off Effect
+// 		ProjectileMovementComponent->Velocity = FVector(0.0f, 0.0f, 0.0f);
+// 		bSkilling = false;
+// 		auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SkillOffEffect, GetActorLocation(), GetActorRotation());
+// 	}
+// }	
 
 void ASkillActor::DrawDebugForShapeComponent() const
 {
@@ -373,103 +344,39 @@ void ASkillActor::DrawDebugForShapeComponent() const
 	}
 }
 
-void ASkillActor::OnOverlap_Projectile(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+// void ASkillActor::OnOverlap_Projectile(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+// {
+// 	if(!bSkilling) return;
+// 	if(!OwnerCharacter || CurrentPenetrateCount == 0) return;
+// 	if(!OtherActor || OtherActor == this || OtherActor == OwnerCharacter) return;
+// 	if(OtherActor->ActorHasTag("Player")) return;
+// 	if(OverlappedComp->GetCollisionObjectType() == ECC_GameTraceChannel3) return;
+// 	if(CheckSet.Contains(OtherActor)) return;
+// 	
+// 	float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, CalculateDamage(), SweepResult, true, CrowdControl, CC_Duration);
+// 	// OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
+//
+// 	if(OtherActor->ActorHasTag("Enemy"))
+// 	{
+// 		CurrentPenetrateCount--;
+// 		CheckSet.Emplace(OtherActor);
+// 		if(CurrentPenetrateCount == 0) SetActive(false);
+// 	}
+// 	else 
+// 	{
+// 		SetActive(false);
+// 	}
+// }
+
+float ASkillActor::CalculateDamage() const
 {
-	if(!bSkilling) return;
-	if(!OwnerCharacter || CurrentPenetrateCount == 0) return;
-	if(!OtherActor || OtherActor == this || OtherActor == OwnerCharacter) return;
-	if(OtherActor->ActorHasTag("Player")) return;
-	if(OverlappedComp->GetCollisionObjectType() == ECC_GameTraceChannel3) return;
-	if(CheckSet.Contains(OtherActor)) return;
-	
-	float DamageApplied = OwnerCharacter->GetAttackComponent()->ApplyDamageToActor(OtherActor, CalculateDamage(), SweepResult, true, CrowdControl, CC_Duration);
-	// OwnerCharacter->GetAttackComponent()->DrainCheck(OtherActor, DamageApplied, OwnerCharacter->GetAttackComponent()->GetSkillDrainCoefficient());
-
-	if(OtherActor->ActorHasTag("Enemy"))
-	{
-		CurrentPenetrateCount--;
-		CheckSet.Emplace(OtherActor);
-		if(CurrentPenetrateCount == 0) SetActive(false);
-	}
-	else 
-	{
-		SetActive(false);
-	}
-}
-
-void ASkillActor::DragSkill(float DeltaTime)
-{
-	ProjectileMovementComponent->Velocity = FMath::VInterpTo(
-		ProjectileMovementComponent->Velocity, 
-		FVector::ZeroVector, 
-		DeltaTime, 
-		DragSpeed
-	);
-}
-
-void ASkillActor::ChargindCheck(float DeltaTime)
-{
-	bool Check = false;
-	switch (CurrentSkillKey)
-    {
-    case ESkillKey::Q:
-        Check = OwnerCharacter->GetOnQSkill();
-        break;
-    case ESkillKey::E:
-        Check = OwnerCharacter->GetOnESkill();
-        break;
-    case ESkillKey::R:
-        Check = OwnerCharacter->GetOnRSkill();
-        break;
-    }
-
-	if(Check)
-	{
-		OwnerCharacter->GetAPHUD()->GetStatusWidget()->ChargeGauge(ChargingCoefficient - 1.0f , MaxCharging - 1.0f);
-    	ChargingCoefficient = FMath::FInterpConstantTo(ChargingCoefficient, MaxCharging, DeltaTime, 0.7f);
-		OwnerController->GetSkillTargetRange()->SetLength(ChargingCoefficient * HalfHeight);
-	}
-	else
-	{
-		auto Anim = OwnerCharacter->GetMesh()->GetAnimInstance();
-		Anim->Montage_JumpToSection(TEXT("Fire"), SkillAction);		
-	}
-}
-
-void ASkillActor::StartCoolDown()
-{
-	OwnerCharacter->GetAPHUD()->GetStatusWidget()->StartCoolTimeSlot(CurrentSkillKey, CoolTime);
-}
-
-void ASkillActor::ChargingSkill()
-{
-	OwnerCharacter->GetAPHUD()->GetStatusWidget()->ChargeEnd(true);
-	bCharging = true;
-	ChargingCoefficient = 1.0f;
-	ChargingEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SkillOffEffect, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation());
-
-	OwnerCharacter->OnSkillChargingEndTrigger.AddDynamic(this, &ASkillActor::ChargingEnd);
-}
-
-void ASkillActor::ChargingEnd()
-{
-	OwnerCharacter->OnSkillChargingEndTrigger.RemoveDynamic(this, &ASkillActor::ChargingEnd);
-
-	ChargingEffect->DeactivateImmediate();
-	bCharging = false;
-	OwnerCharacter->GetAPHUD()->GetStatusWidget()->ChargeEnd(false);
-	OwnerController->RotatePlayer();
-}
-
-float ASkillActor::CalculateDamage()
-{
-    return OwnerCharacter->GetCurrentATK() * DamageCoefficient * ChargingCoefficient;
+    return OwnerCharacter->GetCurrentATK();
 }
 
 FActorSpawnParameters ASkillActor::InitSpawnParams()
 {
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerCharacter;
+	SpawnParams.Owner = OwnerCharacter.Get();
 	SpawnParams.bNoFail = true;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -478,8 +385,9 @@ FActorSpawnParameters ASkillActor::InitSpawnParams()
 
 void ASkillActor::UpdateSkillSlotImage()
 {
-	if(OwnerCharacter->GetAPHUD())
-	{
-		OwnerCharacter->GetAPHUD()->GetStatusWidget()->UpdateSkillSlotImage(CurrentSkillKey, SkillSlotImage);
-	}
+	// TODO: 이런건 SkillController에서 처리하는게 좋을듯
+	// if(OwnerCharacter->GetAPHUD())
+	// {
+	// 	OwnerCharacter->GetAPHUD()->GetStatusWidget()->UpdateSkillSlotImage(CurrentSkillKey, SkillSlotImage);
+	// }
 }

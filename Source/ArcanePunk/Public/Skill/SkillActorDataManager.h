@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "FSkillData.h"
-#include "SkillDataManager.generated.h"
+#include "FSkillActorData.h"
+#include "SkillActorDataManager.generated.h"
 
 class AAPSkillRange;
 class AAPSkillRange_Target;
@@ -14,14 +14,14 @@ class AAPSkillRange_Circle;
 class AAPSkillRange_TwoCircle;
 
 UCLASS()
-class ARCANEPUNK_API USkillDataManager : public UObject
+class ARCANEPUNK_API USkillActorDataManager : public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	USkillDataManager();
+	USkillActorDataManager();
 
-	static USkillDataManager* GetInstance();
+	static USkillActorDataManager* GetInstance();
 
 	static void CursorImmediately();
 
@@ -36,7 +36,7 @@ public:
 	
 private:
 	// 스킬 데이터 맵
-	TMap<FName, FSkillData> SkillDataMap;
+	TMap<FName, FSkillActorData> SkillDataMap;
 
 	UDataTable* AbilityDataTable;
 
@@ -61,9 +61,9 @@ public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 public:
-	FSkillData GetSkillData(FName skillName);
+	FSkillActorData GetSkillData(FName skillName);
 	FORCEINLINE UDataTable* GetAbilityDataTable() const {return AbilityDataTable;};
 	
 private:
-	void CheckForInvalidData(FSkillData* SkillRow, const FString& Context);
+	void CheckForInvalidData(FSkillActorData* SkillRow, const FString& Context);
 };

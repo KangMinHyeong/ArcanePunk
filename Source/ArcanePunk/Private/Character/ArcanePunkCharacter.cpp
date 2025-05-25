@@ -878,17 +878,17 @@ void AArcanePunkCharacter::UseSkill(ESkillKey SkillKey)
 
 	if(SkillControllers.Contains(SkillKey))
 	{
-		SkillControllers[SkillKey]->UseSkill(SkillKey, this);
+		SkillControllers[SkillKey]->UseSkill(SkillKey);
 		LastSkillKey = SkillKey;
 	}
 }
 
 void AArcanePunkCharacter::EnhanceSkill(ESkillKey SkillKey, int32 EnhanceNumber)
 {
-	if(SkillControllers.Contains(SkillKey))
-	{
-		SkillControllers[SkillKey]->GetSkillActor()->EnhanceSkill(EnhanceNumber);
-	}
+	// if(SkillControllers.Contains(SkillKey))
+	// {
+	// 	SkillControllers[SkillKey]->GetSkillActor()->EnhanceSkill(EnhanceNumber);
+	// }
 }
 
 void AArcanePunkCharacter::PlaySkillAction(UAnimMontage* SkillAction)

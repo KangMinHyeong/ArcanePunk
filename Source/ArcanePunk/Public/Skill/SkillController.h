@@ -22,9 +22,9 @@ public:
 	FORCEINLINE AAPSkillRange* GetSkillTargetRange() {return SkillRange_Target.Get();};
 	FORCEINLINE bool IsReady() const {return bReady;};
 	
-	virtual void UseSkill(ESkillKey SkillKey, AArcanePunkCharacter* OwnerCharacter);
+	virtual void UseSkill(ESkillKey SkillKey);
 
-	void InitializeSkills(ESkillKey SkillKey, FName SkillId, AArcanePunkCharacter* OwnerCharacter);
+	void InitializeSkills(ESkillKey SkillKey, FName SkillId, TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter);
 
 	void ShowSkillRange(float Range, FVector Location);
 
@@ -40,13 +40,15 @@ private:
 	bool CheckSkillCondition(ESkillKey SkillKey);
 	bool CheckSkillCool(ESkillKey SkillKey);
 
+	void StartCoolDown();
 private:
 	UPROPERTY()
-	FSkillData CurSkillData;
+	FSkillControllerData CurSkillData;
 	TSharedPtr<ASkillActor> SkillActor;
 
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerPlayer;
-
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<UAnimMontage> SkillAction;
+	
 	TWeakObjectPtr<AAPSkillRange> SkillRange_Target;
 	TWeakObjectPtr<AAPSkillRange> SkillRange_Ground;
 
@@ -55,6 +57,5 @@ private:
 	FVector TargetLocation;
 
 	ESkillKey CurrentSkillKey;
-	
 };
 

@@ -46,8 +46,8 @@ void AAPTurret::DestroySKill()
     if(DestroyEffect) auto NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DestroyEffect, GetActorLocation(), GetActorRotation());
 	if(OwnerSkillActor.IsValid())
     {
-        OwnerSkillActor->SetSkilling(false);
-        OwnerSkillActor->StartCoolDown();  
+        // OwnerSkillActor->SetSkilling(false);
+        // OwnerSkillActor->StartCoolDown();  
     }
       
     // if(bDeadStun && OwnerCharacter.IsValid()) OwnerCharacter->GetAttackComponent()->MultiAttack_OnlyCC(GetActorLocation(), GetActorLocation() + GetActorUpVector() * 25.0f, DeadStunRadius, ECharacterState::Stun, StateTime);

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "FSkillData.generated.h"
+#include "FSkillControllerData.generated.h"
 
 UENUM(BlueprintType)
 enum class ESkillGrade : uint8
@@ -28,7 +28,7 @@ enum class ESkillType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct ARCANEPUNK_API FSkillData : public FTableRowBase
+struct ARCANEPUNK_API FSkillControllerData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 

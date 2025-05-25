@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/SkillDataTable/SkillDataTable.h"
 #include "Interfaces/SkillInterface.h"
-#include "Skill/FSkillData.h"
+#include "Skill/FSkillControllerData.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/Actor.h"
 #include "APSkillRange.generated.h"

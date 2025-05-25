@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FSkillData.h"
+#include "FSkillControllerData.h"
+#include "FSkillActorData.h"
 #include "Character/SkillDataTable/SkillDataTable.h"
-#include "Components/Common/APCrowdControlComponent.h"
 #include "GameFramework/Actor.h"
 #include "NiagaraSystem.h"
 #include "SkillActor.generated.h"
@@ -27,10 +27,6 @@ public:
 	FORCEINLINE FName GetSkillName() const {return SkillId;};
 	FORCEINLINE TSubclassOf<AAPSkillRange> GetSkillTargetRangeClass() const {return SkillTargetRangeClass;};
 	FORCEINLINE TSubclassOf<AAPSkillRange> GetSkillGroundRangeClass() const {return SkillGroundRangeClass;};
-	FORCEINLINE uint8 GetMPConsumption() const {return MPConsumption;};
-	
-	FORCEINLINE bool IsSkilling() const {return bSkilling;};
-	FORCEINLINE void SetSkilling(bool NewBool) {bSkilling = NewBool;};
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,49 +40,27 @@ public:
 	UFUNCTION()
 	virtual void UseSkill();
 	UFUNCTION()
-	void ChargingSkill();
-	UFUNCTION()
-	void ChargingEnd();
-	virtual void EnhanceSkill(int32 EnhanceNumber);
-	virtual void InitSkill(ESkillKey SkillKey, FName SkillName, AArcanePunkCharacter* OwnerCharacter, ASkillController* OwnerController);
-	void PlaySkillAction(ESkillKey SkillKey);
-	void StartCoolDown();
+	virtual void InitSkill(FName SkillName, TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter, TWeakObjectPtr<ASkillController> OwnerController);
+	void PlaySkillAction();
 	void UpdateSkillSlotImage();
-	
-	UFUNCTION()
-	void OnOverlap_Projectile(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 		
 private:
-	void SetActive(bool Active);
 	void DrawDebugForShapeComponent() const;
-	void DragSkill(float DeltaTime);
-	void ChargindCheck(float DeltaTime);
 	
-	float CalculateDamage();
+	float CalculateDamage() const;
 
 	FActorSpawnParameters InitSpawnParams();
 
 private:
-	AArcanePunkCharacter* OwnerCharacter;
-	ASkillController* OwnerController;
-
-private:
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<ASkillController> OwnerController;
+	
 	FName SkillId;
-	FSkillData CurSkillData;
+	FSkillControllerData SkillControllerData;
+	FSkillActorData SkillActorData;
 
-	// TODO: 개별 변수는 모두 삭제하고 구조체로 들고 있을 에정
-	ECharacterState CrowdControl;
-	float LaunchAngle;
-	float Range;
-	float Width;
-	float Damage;
-	float MaxCharging;
-	float CoolTime;
-	float CC_Duration;
-	uint8 MPConsumption;
-	uint8 PenetrateCount;
-	bool bDrag;
-	bool bAttachedEffect;
+	UPROPERTY(EditAnywhere)
+	UProjectileMovementComponent* ProjectileMovementComponent;
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* SkillEffectComponent;
 	UPROPERTY(EditAnywhere)
@@ -99,36 +73,9 @@ private:
 	TSubclassOf<AAPSkillRange> SkillGroundRangeClass;
 	UPROPERTY()
 	TSubclassOf<AActor> InstallActorClass;
-	FName SocketName;
-	UAnimMontage* SkillAction = nullptr;
 	UPROPERTY()
 	UTexture2D* SkillSlotImage;
-
-	ESkillKey CurrentSkillKey;
-
-	bool bSkilling = false;
-	bool bCharging = false;
-	uint8 CurrentPenetrateCount = 0;
-
-	TSet<AActor*> CheckSet;
-
-	float DamageCoefficient = 1.0f; 
-	float ChargingCoefficient = 1.0f;
-	TMap<int32, uint8> EnhanceNestingData;
-	float DragSpeed;
-
-	float HalfHeight;
-
-	FVector TargetLoc;
-
-	UPROPERTY()
-	UNiagaraComponent* ChargingEffect;
-
-private:
-	// 움직임 컴포넌트
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	UProjectileMovementComponent* ProjectileMovementComponent;
-
+	
 	FTimerHandle DestroyTimerHandle;
 
 public:

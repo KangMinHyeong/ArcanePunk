@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Skill/SkillDataManager.h"
+#include "Skill/SkillActorDataManager.h"
 #include "Engine/DataTable.h"
 #include "UObject/UnrealType.h"
 #include "Character/SkillRange/APSkillRange.h"
@@ -10,7 +10,7 @@
 #include "Character/SkillRange/APSkillRange_Circle.h"
 #include "Character/SkillRange/APSkillRange_Arrow.h"
 
-USkillDataManager::USkillDataManager()
+USkillActorDataManager::USkillActorDataManager()
 {
 	static ConstructorHelpers::FClassFinder<AAPSkillRange> SkillRangeClass(TEXT("/Game/Blueprints/Character/SkillRange/BP_SkilRange"));
 	if(SkillRangeClass.Succeeded()) SkillRange = SkillRangeClass.Class;
@@ -38,12 +38,12 @@ USkillDataManager::USkillDataManager()
 	
 }
 
-USkillDataManager* USkillDataManager::GetInstance()
+USkillActorDataManager* USkillActorDataManager::GetInstance()
 {
-	static USkillDataManager* Instance = nullptr;
+	static USkillActorDataManager* Instance = nullptr;
 	if (!Instance)
 	{
-		Instance = NewObject<USkillDataManager>();
+		Instance = NewObject<USkillActorDataManager>();
 		Instance->AddToRoot();
 	}
 
@@ -51,14 +51,14 @@ USkillDataManager* USkillDataManager::GetInstance()
 }
 
 // Unreal Runtime에서 마우스 커서 변경시 변경이 되지 않거나 커서 이동을 해야 변경되는 오류를 수정해주는 코드
-void USkillDataManager::CursorImmediately()
+void USkillActorDataManager::CursorImmediately()
 {
 	auto& App = FSlateApplication::Get();
 	App.SetAllUserFocusToGameViewport();
 	App.QueryCursor();
 }
 
-void USkillDataManager::ReadSkillData()
+void USkillActorDataManager::ReadSkillData()
 {
 	FString dataTablePath = TEXT("/Game/DataTable/Skill/SkillDataTable.SkillDataTable");
 
@@ -74,8 +74,7 @@ void USkillDataManager::ReadSkillData()
 	TArray<FName> RowNames = skillDataTable->GetRowNames();
 	for (const FName& RowName : RowNames)
 	{
-		FSkillData* SkillRow = skillDataTable->FindRow<FSkillData>(RowName, ContextString);
-		if (SkillRow)
+		if (FSkillActorData* SkillRow = skillDataTable->FindRow<FSkillActorData>(RowName, ContextString))
 		{
 			CheckForInvalidData(SkillRow, ContextString);
 			SkillDataMap.Add(RowName, *SkillRow);
@@ -87,12 +86,12 @@ void USkillDataManager::ReadSkillData()
 	}
 }
 
-void USkillDataManager::CheckForInvalidData(FSkillData* SkillRow, const FString& Context)
+void USkillActorDataManager::CheckForInvalidData(FSkillActorData* SkillRow, const FString& Context)
 {
 	
 }
 
-void USkillDataManager::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void USkillActorDataManager::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
@@ -100,11 +99,11 @@ void USkillDataManager::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 	ReadSkillData();
 }
 
-FSkillData USkillDataManager::GetSkillData(FName skillName)
+FSkillActorData USkillActorDataManager::GetSkillData(FName skillName)
 {
 	if(!SkillDataMap.Contains(skillName))
 	{
-		FSkillData emptySkillData;
+		FSkillActorData emptySkillData;
 		return emptySkillData;
 	}
 	

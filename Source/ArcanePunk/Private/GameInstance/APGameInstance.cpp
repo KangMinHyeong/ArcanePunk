@@ -3,7 +3,7 @@
 
 #include "Save/APSaveGame.h"
 #include "Kismet/GameplayStatics.h"
-#include "Skill/SkillDataManager.h"
+#include "Skill/SkillActorDataManager.h"
 
 void UAPGameInstance::Init()
 {
@@ -14,7 +14,7 @@ void UAPGameInstance::Init()
     OnSkillEnhanceDataUpdate.AddUObject(this, &UAPGameInstance::UpdateSkillEnhanceData);
     OnSkillEnhanceDataClear.AddUObject(this, &UAPGameInstance::ClearSkillEnhanceData);
 
-    USkillDataManager::GetInstance()->ReadSkillData();
+    USkillActorDataManager::GetInstance()->ReadSkillData();
 }
 
 void UAPGameInstance::UpdateSkillEnhanceData(ESkillKey UpdateSkillKey, FSkillAbilityNestingData UpdateSkillAbilityNestingData)
