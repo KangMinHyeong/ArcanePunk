@@ -19,16 +19,16 @@ void UChoiceButton::InitChoice(UUserWidget* UpdateParentWidget)
     ParentWidget = Cast<UAPEnhanceChoice>(UpdateParentWidget);
 
     // DataTable의 RowName 목록 가져오기
-    auto DataTable = USkillActorDataManager::GetInstance()->GetAbilityDataTable();
-    TArray<FName> RowNames = DataTable->GetRowNames();
+    // auto DataTable = USkillActorDataManager::GetInstance()->GetAbilityDataTable();
+    // TArray<FName> RowNames = DataTable->GetRowNames();
 
     // 유효한 인덱스인지 확인
-    AbilityIndex = FMath::RandRange(0, RowNames.Num()-1);
-        
-    // 인덱스에 해당하는 RowName으로 Row 가져오기
-    FName RowName = RowNames[AbilityIndex];
+    // AbilityIndex = FMath::RandRange(0, RowNames.Num()-1);
+    //     
+    // // 인덱스에 해당하는 RowName으로 Row 가져오기
+    // FName RowName = RowNames[AbilityIndex];
 
-    // TODO: AbilityData 삭제 후 처리 어떻게 할 지 고려 필요w
+    // TODO: AbilityData 삭제 후 처리 어떻게 할 지 고려 필요
     // auto SkillAbilityData = DataTable->FindRow<FSkillAbilityData>(RowName, RowName.ToString()); if(!SkillAbilityData) return;
     //
     // SkillNumber_Text->SetText(FText::FromName(SkillAbilityData->AbilityName));  

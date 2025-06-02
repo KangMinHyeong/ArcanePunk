@@ -52,13 +52,15 @@ private:
 	FActorSpawnParameters InitSpawnParams();
 
 private:
+	
+	FName SkillId;
+	FSkillActorData SkillActorData;
+
+protected:
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<ASkillController> OwnerController;
 	
-	FName SkillId;
 	FSkillControllerData SkillControllerData;
-	FSkillActorData SkillActorData;
-
 	UPROPERTY(EditAnywhere)
 	UProjectileMovementComponent* ProjectileMovementComponent;
 	UPROPERTY(EditAnywhere)

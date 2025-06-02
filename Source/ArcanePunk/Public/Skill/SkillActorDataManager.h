@@ -14,14 +14,12 @@ class AAPSkillRange_Circle;
 class AAPSkillRange_TwoCircle;
 
 UCLASS()
-class ARCANEPUNK_API USkillActorDataManager : public UObject
+class ARCANEPUNK_API USkillActorDataManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	
 public:
-	USkillActorDataManager();
-
-	static USkillActorDataManager* GetInstance();
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 	static void CursorImmediately();
 
@@ -37,8 +35,6 @@ public:
 private:
 	// 스킬 데이터 맵
 	TMap<FName, FSkillActorData> SkillDataMap;
-
-	UDataTable* AbilityDataTable;
 
 	UPROPERTY()
 	TSubclassOf<AAPSkillRange> SkillRange;
@@ -57,12 +53,7 @@ private:
 
 public:
 	void ReadSkillData();
-	
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-public:
 	FSkillActorData GetSkillData(FName skillName);
-	FORCEINLINE UDataTable* GetAbilityDataTable() const {return AbilityDataTable;};
 	
 private:
 	void CheckForInvalidData(FSkillActorData* SkillRow, const FString& Context);

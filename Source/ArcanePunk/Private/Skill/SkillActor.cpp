@@ -151,7 +151,7 @@ void ASkillActor::InitSkill(FName SkillID, TWeakObjectPtr<AArcanePunkCharacter> 
 	
 	SkillId = SkillID;
 
-	SkillActorData = USkillActorDataManager::GetInstance()->GetSkillData(SkillId);
+	SkillActorData = GetGameInstance()->GetSubsystem<USkillActorDataManager>()->GetSkillData(SkillId);
 
 	// TODO: FSkillData에 들어가는 데이터만 처리하고, 나머지는 상속받는 타입별 스킬 액터 클래스에서 처리
 	// CrowdControl = skillDataRow.CrowdControl;
