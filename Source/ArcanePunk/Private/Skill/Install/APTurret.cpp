@@ -9,7 +9,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameElements/DamageText/DamageText.h"
 #include "Enemy/Enemy_CharacterBase.h"
-#include "Skill/SkillActor.h"
 
 AAPTurret::AAPTurret()
 {

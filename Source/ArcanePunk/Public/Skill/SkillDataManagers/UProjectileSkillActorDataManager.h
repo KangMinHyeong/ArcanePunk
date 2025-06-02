@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "FSkillActorData.h"
-#include "SkillActorDataManager.generated.h"
+#include "Skill/SkillDataStructs/FProjectileSkillActorData.h"
+#include "UProjectileSkillActorDataManager.generated.h"
 
 class AAPSkillRange;
 class AAPSkillRange_Target;
@@ -14,7 +14,7 @@ class AAPSkillRange_Circle;
 class AAPSkillRange_TwoCircle;
 
 UCLASS()
-class ARCANEPUNK_API USkillActorDataManager : public UGameInstanceSubsystem
+class ARCANEPUNK_API UProjectileSkillActorDataManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	

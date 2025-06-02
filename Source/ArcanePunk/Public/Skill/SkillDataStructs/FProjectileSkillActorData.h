@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "Components/Common/APCrowdControlComponent.h"
 #include "Engine/DataTable.h"
-#include "FSkillActorData.generated.h"
+#include "Skill/SkillDataStructs/FSkillActorData.h"
+#include "FProjectileSkillActorData.generated.h"
 
 class AAPSkillRange;
 class UNiagaraSystem;
 class UTexture2D;
 
 USTRUCT(BlueprintType)
-struct ARCANEPUNK_API FSkillActorData : public FTableRowBase
+struct ARCANEPUNK_API FProjectileSkillActorData : public FSkillActorData
 {
 	GENERATED_USTRUCT_BODY()
 

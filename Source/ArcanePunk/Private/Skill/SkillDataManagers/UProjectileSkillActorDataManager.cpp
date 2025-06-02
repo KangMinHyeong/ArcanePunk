@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Skill/SkillActorDataManager.h"
+#include "Skill/SkillDataManagers/UProjectileSkillActorDataManager.h"
 #include "Engine/DataTable.h"
 #include "UObject/UnrealType.h"
 #include "Character/SkillRange/APSkillRange.h"
@@ -9,7 +9,7 @@
 #include "Character/SkillRange/APSkillRange_Circle.h"
 #include "Character/SkillRange/APSkillRange_Arrow.h"
 
-void USkillActorDataManager::Initialize(FSubsystemCollectionBase& Collection)
+void UProjectileSkillActorDataManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
@@ -38,21 +38,21 @@ void USkillActorDataManager::Initialize(FSubsystemCollectionBase& Collection)
 }
 
 // Unreal Runtime에서 마우스 커서 변경시 변경이 되지 않거나 커서 이동을 해야 변경되는 오류를 수정해주는 코드
-void USkillActorDataManager::CursorImmediately()
+void UProjectileSkillActorDataManager::CursorImmediately()
 {
 	auto& App = FSlateApplication::Get();
 	App.SetAllUserFocusToGameViewport();
 	App.QueryCursor();
 }
 
-void USkillActorDataManager::ReadSkillData()
+void UProjectileSkillActorDataManager::ReadSkillData()
 {
-	FString dataTablePath = TEXT("/Game/DataTable/Skill/SkillActorDataTable.SkillActorDataTable");
+	FString dataTablePath = TEXT("/Game/DataTable/Skill/ProjectileSkillActorDataTable.ProjectileSkillActorDataTable");
 
 	UDataTable* skillDataTable = LoadObject<UDataTable>(nullptr, *dataTablePath);
 	if (!skillDataTable)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SkillActorDataTable is not set."));
+		UE_LOG(LogTemp, Error, TEXT("ProjectileSkillActorDataTable is not set."));
 		return;
 	}
 	
@@ -73,12 +73,12 @@ void USkillActorDataManager::ReadSkillData()
 	}
 }
 
-void USkillActorDataManager::CheckForInvalidData(FSkillActorData* SkillRow, const FString& Context)
+void UProjectileSkillActorDataManager::CheckForInvalidData(FSkillActorData* SkillRow, const FString& Context)
 {
 	
 }
 
-FSkillActorData USkillActorDataManager::GetSkillData(FName skillName)
+FSkillActorData UProjectileSkillActorDataManager::GetSkillData(FName skillName)
 {
 	if(!SkillDataMap.Contains(skillName))
 	{

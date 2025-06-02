@@ -3,7 +3,7 @@
 
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Enemy/Enemy_CharacterBase.h"
-#include "Skill/SkillActor.h"
+#include "Skill/SkillActors/SkillActor.h"
 #include "Components/CapsuleComponent.h"
 
 AAPInstallBase::AAPInstallBase()

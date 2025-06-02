@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FSkillControllerData.h"
-#include "FSkillActorData.h"
+#include "Skill/SkillDataStructs/FSkillControllerData.h"
+#include "Skill/SkillDataStructs/FSkillActorData.h"
 #include "Character/SkillDataTable/SkillDataTable.h"
 #include "GameFramework/Actor.h"
 #include "NiagaraSystem.h"

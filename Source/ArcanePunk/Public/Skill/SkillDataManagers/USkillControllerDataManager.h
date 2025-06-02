@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FSkillControllerData.h"
+#include "Skill/SkillDataStructs/FSkillControllerData.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "USkillControllerDataManager.generated.h"
 

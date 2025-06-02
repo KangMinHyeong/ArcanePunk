@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Skill/SkillActor.h"
+#include "Skill/SkillActors/SkillActor.h"
 
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -11,7 +11,6 @@
 #include "Components/ShapeComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Skill/SkillActorDataManager.h"
 #include "Enemy/Enemy_CharacterBase.h"
 #include "Skill/SkillController.h"
 #include "Character/SkillRange/APSkillRange.h"
@@ -55,7 +54,7 @@ void ASkillActor::PlaySkillAction()
 
 void ASkillActor::UseSkill()
 {
-	SetActorLocation(OwnerCharacter->GetMesh()->GetSocketLocation(SkillActorData.SocketName));
+	// SetActorLocation(OwnerCharacter->GetMesh()->GetSocketLocation(SkillActorData.SocketName));
 	
 	// if(!bAttachedEffect)
 	// {
@@ -64,11 +63,11 @@ void ASkillActor::UseSkill()
 	// 	SkillEffectComponent->SetUsingAbsoluteRotation(true);
 	// }
 	
-	FVector CharacterForwardVector = OwnerCharacter->GetActorForwardVector();
-	FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(SkillActorData.LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
-	ProjectileMovementComponent->Velocity = LaunchDirection * ProjectileMovementComponent->InitialSpeed;
-	
-	OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &ASkillActor::UseSkill);
+	// FVector CharacterForwardVector = OwnerCharacter->GetActorForwardVector();
+	// FVector LaunchDirection = CharacterForwardVector.RotateAngleAxis(SkillActorData.LaunchAngle, FVector(0, 0, 1)); // Z축을 기준으로 회전
+	// ProjectileMovementComponent->Velocity = LaunchDirection * ProjectileMovementComponent->InitialSpeed;
+	// 
+	// OwnerCharacter->OnSkillTrigger.RemoveDynamic(this, &ASkillActor::UseSkill);
 	// OwnerCharacter->OnSkillChargingTrigger.RemoveDynamic(this, &ASkillActor::ChargingSkill);
 
 	// TODO: SkillController 쪽으로 옮기기
@@ -143,7 +142,7 @@ void ASkillActor::UseSkill()
 	//
 	// SetActive(true);
 
-	UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SkillActorData.SocketName).ToString());
+	// UE_LOG(LogTemp, Warning, TEXT("SpawnLocation: %s"), *OwnerCharacter->GetMesh()->GetSocketLocation(SkillActorData.SocketName).ToString());
 }
 
 void ASkillActor::InitSkill(FName SkillID, TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacterPtr, TWeakObjectPtr<ASkillController> OwnerControllerPtr)
@@ -151,7 +150,7 @@ void ASkillActor::InitSkill(FName SkillID, TWeakObjectPtr<AArcanePunkCharacter> 
 	
 	SkillId = SkillID;
 
-	SkillActorData = GetGameInstance()->GetSubsystem<USkillActorDataManager>()->GetSkillData(SkillId);
+	// SkillActorData = GetGameInstance()->GetSubsystem<USkillActorDataManager>()->GetSkillData(SkillId);
 
 	// TODO: FSkillData에 들어가는 데이터만 처리하고, 나머지는 상속받는 타입별 스킬 액터 클래스에서 처리
 	// CrowdControl = skillDataRow.CrowdControl;

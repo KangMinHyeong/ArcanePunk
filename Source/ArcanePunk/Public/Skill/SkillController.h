@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "SkillActor.h"
+#include "Skill/SkillActors/SkillActor.h"
 #include "CoreMinimal.h"
 #include "SkillController.generated.h"
 

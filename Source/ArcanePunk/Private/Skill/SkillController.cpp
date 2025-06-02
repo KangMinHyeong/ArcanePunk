@@ -8,7 +8,6 @@
 #include "Character/SkillRange/APSkillRange_Target.h"
 #include "Character/SkillRange/APSkillRange_Circle.h"
 #include "Character/SkillRange/APSkillRange_Arrow.h"
-#include "Skill/SkillActorDataManager.h"
 #include "GameInstance/APGameInstance.h"
 #include "Components/Character/APMovementComponent.h"
 #include "Character/ArcanePunkCharacter.h"
@@ -101,7 +100,7 @@ void ASkillController::UseSkill(ESkillKey SkillKey)
 	// 커서 비활성화
 	auto PC = Cast<APlayerController>(OwnerCharacter->GetController()); if(!PC) return;
 	PC->bShowMouseCursor = false;
-	USkillActorDataManager::CursorImmediately();
+	// USkillActorDataManager::CursorImmediately();
 
 	if(CurSkillData.SkillType == ESkillType::Charging)
 	{
@@ -131,7 +130,7 @@ void ASkillController::Restore()
 	// 커서 활성화
 	auto PC = Cast<APlayerController>(OwnerCharacter->GetController()); if(!PC) return;
 	PC->bShowMouseCursor = true;
-	USkillActorDataManager::CursorImmediately();
+	// USkillActorDataManager::CursorImmediately();
 
 	FHitResult HitResult; PC->GetHitResultUnderCursor(ECC_GameTraceChannel3, false, HitResult);
 	TargetLocation = HitResult.ImpactPoint;

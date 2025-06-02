@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Skill/USkillControllerDataManager.h"
+#include "Skill/SkilldataManagers/USkillControllerDataManager.h"
 
-#include "Skill/SkillActorDataManager.h"
 #include "Engine/DataTable.h"
 #include "UObject/UnrealType.h"
 #include "Character/SkillRange/APSkillRange.h"

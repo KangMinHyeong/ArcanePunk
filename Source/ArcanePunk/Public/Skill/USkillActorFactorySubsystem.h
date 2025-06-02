@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SkillActor.h"
+#include "Skill/SkillActors/SkillActor.h"
+#include "Skill/SkillDataManagers/USkillControllerDataManager.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "USkillActorFactorySubsystem.generated.h"
 
@@ -19,7 +20,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 	// 등록된 스킬 데이터와 클래스 접근용
-	TSharedPtr<ASkillActor> GetSkillClass(FName SkillId) const;
+	TSharedPtr<ASkillActor> GetSkillActorClass(FName SkillId) const;
 
 private:
 	void RegisterAll(); // Map 초기화
