@@ -46,7 +46,7 @@ public:
 
 	void SetAttackRotation(const FRotator & NewTargetRot, float AddSpeed = 0.0f);
 	
-	void StartLookAt(const FVector & ToLocation);
+	void StartLookAtEnemy();
 
 	void StartDash();
 	void EndDash();

@@ -171,6 +171,7 @@ void UArcanePunkCharacterAnimInstance::StopDash_Montage()
     Montage_Stop(0.05f, Dash_Montage);
 }
 
+<<<<<<< HEAD
 void UArcanePunkCharacterAnimInstance::OnDashMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
     //@Dash Montage
@@ -205,6 +206,9 @@ void UArcanePunkCharacterAnimInstance::OnDashMontageEnded(UAnimMontage* Montage,
 }
 
 void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Retreat()
+=======
+void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Exit()
+>>>>>>> origin
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;
@@ -212,7 +216,7 @@ void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Retreat()
     Montage_Play(SwapSkill_Retreat);
 }
 
-void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Sally()
+void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Entry()
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;

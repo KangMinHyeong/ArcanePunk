@@ -7,6 +7,7 @@
 #include "AnimInstance/ArcanePunkCharacterAnimInstance.h"
 #include "Components/Character/APAttackComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 //YS
 #include "Logging/StructuredLog.h"
@@ -333,8 +334,17 @@ void UAPMovementComponent::EndedAttackCancelTime()
 	Cast<AArcanePunkCharacter>(OwnerCharacter)->SetAttackCancelTime(0.0f);
 }
 
-void UAPMovementComponent::StartLookAt(const FVector &ToLocation)
+void UAPMovementComponent::StartLookAtEnemy()
 {
-	bLookAt = true;
-	TargetLookAt = ToLocation;
+    TArray<AActor*> Enemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_CharacterBase::StaticClass(), Enemies);
+
+    float Dist;
+    auto Enemy = UGameplayStatics::FindNearestActor(OwnerCharacter->GetActorLocation(), Enemies, Dist);
+
+    if(Dist <= OwnerCharacter->GetAttackComponent()->GetBaseAttackDist())
+    {
+		bLookAt = true;
+        TargetLookAt = Enemy->GetActorLocation();
+    }	
 }

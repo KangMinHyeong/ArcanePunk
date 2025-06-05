@@ -156,8 +156,9 @@ void AArcanePunkCharacter::InitSkill()
 
 void AArcanePunkCharacter::ChangePlayer(AArcanePunkPlayerController* NewController)
 {
+	PlayerState = EPlayerState::Spawn;
 	ApperenceTarget = 1.0f;
-
+	
 	PC = Cast<AArcanePunkPlayerController>(NewController);
 	if(PC.IsValid()) HUD = Cast<AAPHUD>(PC->GetHUD());
 	
@@ -244,46 +245,73 @@ bool AArcanePunkCharacter::CheckSwapPlayerCondition()
     return true;
 }
 
-void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, AActor* SwapEnemy, bool bPrioritySkilling)
+void AArcanePunkCharacter::SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool bPrioritySkilling)
 {
 	bMainPlayer = NewBool;
 	CharacterAura->SetAuraActive(bMainPlayer);
-	EnhanceSwap = bEnhanceSwap;
 
 	if(bMainPlayer)
-	{
-		ApperenceTarget = 1.0f;
-		Apperence = 1.0f;
-		int32 index = 0;
-		for (auto Mat : SkinMesh)
+	{		
+		if(bPrioritySkilling)
 		{
-			Mat->SetScalarParameterValue(TEXT("Apperence"), Apperence);
-			GetMesh()->SetMaterial(index, Mat);
-			index++;
+			PlayerState = EPlayerState::EntryMode_Only;
 		}
-		
-		if(EnhanceSwap || bPrioritySkilling)
+		if(bEnhanceSwap)
 		{
-			PlaySwapDash();
-			
-			if(SwapEnemy)
-			{				
-				MoveComponent->StartLookAt(SwapEnemy->GetActorLocation());
-			}
+			PlayerState = EPlayerState::EntryMode;
 		}
-			
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
 	else
 	{
-		ApperenceTarget = 0.0f;
-
-		if(EnhanceSwap)
+		if(bEnhanceSwap)
 		{
-			UseSwapSkill_Retreat();
+			PlayerState = EPlayerState::ExitSkillPlaying;			
 		}
+		else
+		{
+			PlayerState = EPlayerState::Inactive;
+		}
+	}
 
+	SwitchPlayerState();
+}
+
+void AArcanePunkCharacter::SwitchPlayerState()
+{
+	switch (PlayerState)
+	{
+	case EPlayerState::Idle:
+		DissolveCharacterMesh_Immediate(false);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		break;
+
+	case EPlayerState::Spawn:
+		PlayerState = EPlayerState::Idle;
+		SwitchPlayerState();
+		break;
+	
+	case EPlayerState::EntryMode_Only:
+		PlaySwapDash();
+		MoveComponent->StartLookAtEnemy();
+		break;	
+
+	case EPlayerState::EntryMode:
+		PlaySwapDash();
+		MoveComponent->StartLookAtEnemy();
+		break;
+
+	case EPlayerState::ExitSkillPlaying:
+		UseSwapSkill_Exit();	
+		break;
+	
+	case EPlayerState::EntrySkillPlaying:
+		UseSwapSkill_Entry();	
+		break;
+
+	case EPlayerState::Inactive:
+		ApperenceTarget = 0.0f;
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		break;	
 	}
 }
 
@@ -547,11 +575,17 @@ void AArcanePunkCharacter::EndSwapDash()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
 	MoveComponent->EndSwapDash();
 	GhostTrailSpawnComp->SetSkillTrail(false);
-
-	if(EnhanceSwap)
+	
+	if(PlayerState == EPlayerState::EntryMode) 
 	{
-		UseSwapSkill_Sally();
+		PlayerState = EPlayerState::EntrySkillPlaying;
 	}
+	else 
+	{
+		PlayerState = EPlayerState::Idle;
+	}
+
+	SwitchPlayerState();
 }
 
 void AArcanePunkCharacter::HandleGameplayEvent(const FGameplayTag& EventTag)
@@ -1234,12 +1268,7 @@ void AArcanePunkCharacter::PlaySkillAction(UAnimMontage* SkillAction)
 {
 	if (SkillAction != nullptr)
 	{
-		// auto PlayerController = PC.Get();
-		// if(PlayerController != nullptr)
-		// {
-		// 	DisableInput(PlayerController);
-		// }
-		// SetDoing(true);
+		PlayerState = EPlayerState::ActiveSkillPlaying;
 		bSkilling = true;
 		bCanMove = false;
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -1260,17 +1289,10 @@ void AArcanePunkCharacter::PlaySkillAction(UAnimMontage* SkillAction)
 
 void AArcanePunkCharacter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	PlayerState = EPlayerState::Idle;
 	bSkilling = false;
 	bCanMove = true;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
-	// auto PlayerController = PC.Get();
-	// if(PlayerController != nullptr)
-	// {
-	// 	// EnableInput(PlayerController);
-	// 	// SetDoing(false);
-		
-	// }
 }
 
 void AArcanePunkCharacter::RestoreSkills()
@@ -1284,24 +1306,24 @@ void AArcanePunkCharacter::RestoreSkills()
 	}
 }
 
-void AArcanePunkCharacter::UseSwapSkill_Retreat()
+void AArcanePunkCharacter::UseSwapSkill_Exit()
 {
 	auto Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	if(Anim)
 	{
 		SetDoing(true);
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		Anim->PlaySwapSkill_Retreat();
+		Anim->PlaySwapSkill_Exit();
 	}
 }
 
-void AArcanePunkCharacter::UseSwapSkill_Sally()
+void AArcanePunkCharacter::UseSwapSkill_Entry()
 {
 	auto Anim = Cast<UArcanePunkCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	if(Anim)
 	{
 		SetDoing(true);
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		Anim->PlaySwapSkill_Sally();
+		Anim->PlaySwapSkill_Entry();
 	}
 }

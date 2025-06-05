@@ -42,6 +42,7 @@ protected:
 	//@대시 재생 중지
 	void StopDash_Montage();
 
+<<<<<<< HEAD
 protected:
 	UFUNCTION()
 	void OnDashMontageEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -49,6 +50,10 @@ protected:
 public:
 	void PlaySwapSkill_Retreat();
 	void PlaySwapSkill_Sally();
+=======
+	void PlaySwapSkill_Exit();
+	void PlaySwapSkill_Entry();
+>>>>>>> origin
 
 	void PlaySkill_1_Montage();
 	void PlaySkill_2_Montage();

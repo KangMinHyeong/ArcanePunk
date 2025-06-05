@@ -49,6 +49,7 @@ class UMotionWarpingComponent;
 
 #define Defense_constant 1000
 
+<<<<<<< HEAD
 /**
  *	@brief 체인 액션 처리 방식을 정의하는 열거형
  *
@@ -95,6 +96,20 @@ struct FChainActionInfo
 		, ActivationEventTag(InActivationEventTag)
 	{
 	}
+=======
+UENUM()
+enum class EPlayerState : uint8 // Player 상태태
+{
+    None      			    = 0,
+    Idle	 			    = 1, // 플레이어 입력을 받을 수 있는 일반 상태
+    Spawn 					= 2, // 스폰된 직 후 상태
+	EntryMode_Only			= 3, // 플레이어 스왑 대쉬 상태
+	EntryMode				= 4, // 플레이어 스왑 대쉬 상태 (이 후 출격스킬)
+    EntrySkillPlaying       = 5, // 출격 스킬 플레이 상태
+	ExitSkillPlaying 		= 6, // 퇴각 스킬 플레이 상태
+	ActiveSkillPlaying 		= 7, // 일반 액티브 스킬 플레이 상태
+	Inactive				= 8, // 비활성화 상태
+>>>>>>> origin
 };
 
 UCLASS()
@@ -196,7 +211,8 @@ public:
 	void ChangePlayer(AArcanePunkPlayerController* NewController);
 
 	bool CheckSwapPlayerCondition();
-	void SwapMainPlayer(bool NewBool, bool bEnhanceSwap, AActor* SwapEnemy, bool bPrioritySkilling = false);
+	void SwapMainPlayer(bool NewBool, bool bEnhanceSwap, bool bPrioritySkilling = false);
+	void SwitchPlayerState();
 
 	virtual void UpdateSwapGauge(float Add = 10.0f) override;
 
@@ -313,8 +329,8 @@ private:
 	// 데미지 몇번 받았는지
 	bool CheckingDamaged();
 
-	void UseSwapSkill_Retreat(); // 퇴격
-	void UseSwapSkill_Sally(); // 출격
+	void UseSwapSkill_Exit(); // 퇴격
+	void UseSwapSkill_Entry(); // 출격
 
 private:
 	bool bMainPlayer = false;
@@ -427,8 +443,6 @@ private:
 	bool bCanSkill_E = true;  // E쿨타임 체크
 	bool bCanSkill_R = true;  // R쿨타임 체크
 
-	bool EnhanceSwap = false;
-
 	uint8 ReflectingModeGauge = 0;
 
 	// Foot Print 변수
@@ -469,6 +483,12 @@ public:
 	uint8 CharacterUIID = 0;
 
 	uint8 PlayerIndex = 0;
+<<<<<<< HEAD
+=======
+
+	EPlayerState PlayerState = EPlayerState::Inactive;
+// prodo
+>>>>>>> origin
 
 // prodo
 protected:
