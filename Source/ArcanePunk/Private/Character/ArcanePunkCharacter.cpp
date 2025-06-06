@@ -43,6 +43,8 @@
 #include "UserInterface/Tutorial/APTuTorialUserWidget.h"
 #include "Skill/SkillController.h"
 
+#include "GameInstance/Subsystem/APSystemMessageSubsystem.h"
+
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
 {
@@ -101,6 +103,31 @@ void AArcanePunkCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InitPlayer();
+
+	// GameInstance 가져오기
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	// SystemMessageSubsystem 가져오기
+	UAPSystemMessageSubsystem* SystemMessageSubsystem = GameInstance->GetSubsystem<UAPSystemMessageSubsystem>();
+	if (!SystemMessageSubsystem)
+	{
+		return;
+	}
+
+	// 즉시 호출 테스트
+	SystemMessageSubsystem->TryShowSystemMessage(1001);
+
+	// 3초 후 재시도
+	FTimerHandle DelayedTestTimer;
+	GetWorld()->GetTimerManager().SetTimer(DelayedTestTimer, [this, SystemMessageSubsystem]()
+		{
+			SystemMessageSubsystem->TryShowSystemMessage(1001);
+		}, 3.0f, false);
+
 }
 
 void AArcanePunkCharacter::InitPlayer()

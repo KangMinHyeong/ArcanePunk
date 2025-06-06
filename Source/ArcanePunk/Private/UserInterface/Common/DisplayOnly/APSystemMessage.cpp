@@ -75,7 +75,7 @@ void UAPSystemMessage::ApplyConfigSettings()
         return;
     }
 
-    //@폰트 크기 설정
+    // 폰트 크기 설정
     if (Text_High)
     {
         FSlateFontInfo FontInfo = Text_High->GetFont();
@@ -83,19 +83,20 @@ void UAPSystemMessage::ApplyConfigSettings()
         Text_High->SetFont(FontInfo);
     }
 
-    //@Content_High 크기 설정 (임의로 한 글자당 20픽셀, 한 줄당 40픽셀로 계산)
+    // Content_High 초기 크기를 최소 크기로 설정
     if (Content_High)
     {
-        const float Width = CachedMessageConfig->GetMaxRowSize() * 20.0f;
-        const float Height = CachedMessageConfig->GetMaxColumnSize() * 40.0f;
-        Content_High->SetWidthOverride(Width);
-        Content_High->SetHeightOverride(Height);
+        Content_High->SetWidthOverride(CachedMessageConfig->GetMinWidth());
+        Content_High->SetHeightOverride(CachedMessageConfig->GetMinHeight());
     }
 
-    UE_LOGFMT(LogSystemMessageUI, Log, "Config 설정 적용 완료 - 폰트크기: {0}, 최대크기: {1}x{2}",
+    UE_LOGFMT(LogSystemMessageUI, Log,
+        "Config 적용 완료 - 폰트: {0}pt, 최소크기: {1}x{2}, 최대크기: {3}x{4}",
         CachedMessageConfig->GetFontSize(),
-        CachedMessageConfig->GetMaxRowSize(),
-        CachedMessageConfig->GetMaxColumnSize());
+        CachedMessageConfig->GetMinWidth(),
+        CachedMessageConfig->GetMinHeight(),
+        CachedMessageConfig->GetMaxWidth(),
+        CachedMessageConfig->GetMaxHeight());
 }
 
 void UAPSystemMessage::UpdateFadeOpacity()
@@ -243,15 +244,28 @@ void UAPSystemMessage::DisplaySystemMesseage(const FString& SystemMessageText)
         return;
     }
 
-    //@텍스트 처리 및 개행
+    if (bIsActive)
+    {
+        bIsBlocked = true;
+        UE_LOGFMT(LogSystemMessageUI, Warning, "시스템 메시지가 이미 활성화됨 - 요청 차단");
+        return;
+    }
+
+    bIsActive = true;
+    bIsBlocked = false;
+    SystemMessageActivated.Broadcast();
+
+    // FText 처리 및 개행
     FString ProcessedText = ProcessTextForDisplay(SystemMessageText);
     Text_High->SetText(FText::FromString(ProcessedText));
 
-    //@Content_High 표시 및 페이드 시작
     Content_High->SetVisibility(ESlateVisibility::Visible);
     StartFadeIn();
+
+    UE_LOGFMT(LogSystemMessageUI, Log, "시스템 메시지 시작: {0}", *SystemMessageText);
 }
 
+// ProcessTextForDisplay 함수 수정 - \n만 처리
 FString UAPSystemMessage::ProcessTextForDisplay(const FString& InputText)
 {
     if (!CachedMessageConfig) return InputText;
@@ -259,15 +273,18 @@ FString UAPSystemMessage::ProcessTextForDisplay(const FString& InputText)
     const int32 MaxRowSize = CachedMessageConfig->GetMaxRowSize();
     const int32 MaxColumnSize = CachedMessageConfig->GetMaxColumnSize();
 
+    // \n을 실제 개행으로 변환
+    FString ProcessedInput = InputText.Replace(TEXT("\\n"), TEXT("\n"));
+
     TArray<FString> Lines;
     FString CurrentLine;
 
-    //@문자별 처리
-    for (int32 i = 0; i < InputText.Len(); ++i)
+    // 문자별 처리
+    for (int32 i = 0; i < ProcessedInput.Len(); ++i)
     {
-        TCHAR CurrentChar = InputText[i];
+        TCHAR CurrentChar = ProcessedInput[i];
 
-        //@명시적 개행 처리
+        // 명시적 개행 처리
         if (CurrentChar == TEXT('\n'))
         {
             Lines.Add(CurrentLine);
@@ -275,10 +292,10 @@ FString UAPSystemMessage::ProcessTextForDisplay(const FString& InputText)
             continue;
         }
 
-        //@현재 줄에 문자 추가
+        // 현재 줄에 문자 추가
         CurrentLine += CurrentChar;
 
-        //@자동 개행 조건 체크 (30자 또는 MaxRowSize 도달)
+        // 자동 개행 조건 체크 (30자 또는 MaxRowSize 도달)
         if (CurrentLine.Len() >= 30 || CurrentLine.Len() >= MaxRowSize)
         {
             Lines.Add(CurrentLine);
@@ -286,22 +303,22 @@ FString UAPSystemMessage::ProcessTextForDisplay(const FString& InputText)
         }
     }
 
-    //@마지막 줄 추가
+    // 마지막 줄 추가
     if (!CurrentLine.IsEmpty())
     {
         Lines.Add(CurrentLine);
     }
 
-    //@최대 줄 수 제한
+    // 최대 줄 수 제한
     if (Lines.Num() > MaxColumnSize)
     {
         Lines.SetNum(MaxColumnSize);
     }
 
-    //@Content_High 크기 업데이트
+    // Content_High 크기 업데이트
     UpdateContentHighSize(Lines);
 
-    //@최종 텍스트 생성
+    // 최종 텍스트 생성
     return FString::Join(Lines, TEXT("\n"));
 }
 
@@ -309,22 +326,30 @@ void UAPSystemMessage::UpdateContentHighSize(const TArray<FString>& Lines)
 {
     if (!Content_High || !CachedMessageConfig) return;
 
-    int32 MaxLineLength = 0;
+    // 한글 고려 최대 표시 길이 계산
+    int32 MaxDisplayLength = 0;
     for (const FString& Line : Lines)
     {
-        MaxLineLength = FMath::Max(MaxLineLength, Line.Len());
+        int32 DisplayLength = 0;
+        for (int32 i = 0; i < Line.Len(); ++i)
+        {
+            TCHAR Char = Line[i];
+            if ((Char >= 0x1100 && Char <= 0xD7AF) || // 한글 범위
+                (Char >= 0x4E00 && Char <= 0x9FFF))   // 한자 범위
+            {
+                DisplayLength += 2;
+            }
+            else
+            {
+                DisplayLength += 1;
+            }
+        }
+        MaxDisplayLength = FMath::Max(MaxDisplayLength, DisplayLength);
     }
 
-    //@기본 크기 계산
-    const float FontScale = CachedMessageConfig->GetFontSize() / 24.0f;
-    float Width = MaxLineLength * CachedMessageConfig->GetWidthScale() * FontScale;
-    float Height = Lines.Num() * CachedMessageConfig->GetHeightScale() * FontScale;
+    float Width = CachedMessageConfig->CalculateWidth(MaxDisplayLength);
+    float Height = CachedMessageConfig->CalculateHeight(Lines.Num());
 
-    //@최소/최대 크기 제한 적용
-    Width = FMath::Clamp(Width, CachedMessageConfig->GetMinWidth(), CachedMessageConfig->GetMaxWidth());
-    Height = FMath::Clamp(Height, CachedMessageConfig->GetMinHeight(), CachedMessageConfig->GetMaxHeight());
-
-    // SizeBox의 부모 슬롯 크기 조정
     if (UPanelSlot* ParentSlot = Content_High->Slot)
     {
         if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ParentSlot))
@@ -333,13 +358,28 @@ void UAPSystemMessage::UpdateContentHighSize(const TArray<FString>& Lines)
         }
     }
 
-    UE_LOGFMT(LogSystemMessageUI, Log, "SizeBox 부모 슬롯 크기: {0}x{1}", Width, Height);
+    UE_LOGFMT(LogSystemMessageUI, Log,
+        "크기 계산 - 표시길이: {0}, 줄수: {1}, 크기: {2}x{3}",
+        MaxDisplayLength, Lines.Num(), Width, Height);
 }
 
 void UAPSystemMessage::HideSystemMessage()
 {
     SetVisibility(ESlateVisibility::Collapsed);
     GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+
+    //@생명주기 종료
+    bIsActive = false;
+    SystemMessageDeactivated.Broadcast();
+
+    UE_LOGFMT(LogSystemMessageUI, Log, "시스템 메시지 종료");
+
+    //@차단된 요청이 있다면 처리
+    if (bIsBlocked)
+    {
+        bIsBlocked = false;
+        UE_LOGFMT(LogSystemMessageUI, Log, "차단된 요청 해제 - 새 메시지 허용");
+    }
 }
 #pragma endregion
 

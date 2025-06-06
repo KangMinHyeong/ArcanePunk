@@ -31,7 +31,7 @@ struct ARCANEPUNK_API FTextData_SystemMessage : public FTableRowBase
 public:
     FTextData_SystemMessage()
         : ID(0)
-        , Text(TEXT(""))
+        , Text("")
     {}
 
     //@System Mesage 고유의 ID
@@ -85,7 +85,7 @@ private:
     //@Text Data 캐싱
     void CacheSystemMessageTextData();
 
-protected:
+public:
     //@System Message 표시 시도
     UFUNCTION(BlueprintCallable, Category = "System Message")
     void TryShowSystemMessage(int64 MessageID);

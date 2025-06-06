@@ -33,17 +33,17 @@ void UAPSystemMessageSubsystem::LoadSystemMessageDataTable()
 
 void UAPSystemMessageSubsystem::TryShowSystemMessage(int64 MessageID)
 {
-    // Text Data 찾기
-    if (FTextData_SystemMessage* MessageData = SystemMessageTextDataMap.Find(MessageID))
-    {
-        //이벤트 브로드캐스트
-        RequestShowSystemMessage.ExecuteIfBound(MessageData->GetText());
-        UE_LOGFMT(LogSystemMessageSubsystem, Log, "시스템 메시지 표시 요청: {0}", *MessageData->GetText());
-    }
-    else
+    auto* MessageData = SystemMessageTextDataMap.Find(MessageID);
+
+    //@Text Data 찾기
+    if (!MessageData)
     {
         UE_LOGFMT(LogSystemMessageSubsystem, Warning, "ID {0}번 시스템 메시지를 찾을 수 없음", MessageID);
     }
+
+    //@System Message 그리기 요청 이벤트
+    RequestShowSystemMessage.ExecuteIfBound(MessageData->GetText());
+    UE_LOGFMT(LogSystemMessageSubsystem, Log, "시스템 메시지 표시 요청: {0}", MessageData->GetText());
 }
 
 void UAPSystemMessageSubsystem::OnSomeGameplayStateEventOccurred(uint8 ID)

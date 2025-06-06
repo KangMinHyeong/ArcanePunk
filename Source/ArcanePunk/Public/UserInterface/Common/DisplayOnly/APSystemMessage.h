@@ -26,6 +26,9 @@ class UWidgetAnimation;
 
 //@이벤트/델리게이트
 #pragma region Delegates
+//@이벤트
+DECLARE_MULTICAST_DELEGATE(FSystemMessageActivated);
+DECLARE_MULTICAST_DELEGATE(FSystemMessageDeactivated);
 #pragma endregion
 
 /**
@@ -43,77 +46,87 @@ public:
         : FontSize(24)
         , MaxRowSize(30)
         , MaxColumnSize(2)
-        , LifeSpan(3)
+        , LifeSpan(2)
         , FadeInTime(1)
         , FadeOutTime(1)
-        , WidthScale(50.0f)
-        , HeightScale(70.0f)
-        , MinWidth(200.0f)
-        , MaxWidth(1000.0f)
-        , MinHeight(60.0f)
-        , MaxHeight(100.0f)
+        , MinWidthScale(10.f)     
+        , MaxWidthScale(43.f)     
+        , MinHeightScale(2.5f)    
+        , MaxHeightScale(5.f)     
+        , CharWidthMultiplier(1.2f) 
     {
     }
 
 protected:
-    //@폰트 사이즈
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
-        int32 FontSize;
+    //@폰트 사이즈 (12~24)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config",
+        meta = (ClampMin = "12", ClampMax = "24"))
+    int32 FontSize;
 
-    //@최대 행 길이
+    //@최대 행/열 길이
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
     int32 MaxRowSize;
-    //@최대 열 길이
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
     int32 MaxColumnSize;
-   
-    //@최소/최대 크기
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Size")
-    float MinWidth;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Size")
-    float MaxWidth;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Size")
-    float MinHeight;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Size")
-    float MaxHeight;
-
-    //@가로 배율 (폰트 크기 기준)
+    //@지속 시간
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
-    float WidthScale;
+    int32 LifeSpan;
 
-    //@세로 배율 (폰트 크기 기준)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
-    float HeightScale;
+    int32 FadeInTime;
 
-    //@지속 시간 (초 단위)
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
-        int32 LifeSpan;
-    
-    //@페이드 인 소요 시간 (초 단위)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
-        int32 FadeInTime;
+    int32 FadeOutTime;
 
-    //@페이드 아웃 소요 시간 (초 단위)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
-        int32 FadeOutTime;
+    //@최소/최대 크기 배율 (폰트 크기 기준)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    float MinWidthScale;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    float MaxWidthScale;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    float MinHeightScale;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    float MaxHeightScale;
+
+    //@글자 길이 고려 가로 배율
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale",
+        meta = (ClampMin = "0.5", ClampMax = "3.0"))
+    float CharWidthMultiplier;
 
 public:
     FORCEINLINE int32 GetFontSize() const { return FontSize; }
     FORCEINLINE int32 GetMaxRowSize() const { return MaxRowSize; }
     FORCEINLINE int32 GetMaxColumnSize() const { return MaxColumnSize; }
-    FORCEINLINE float GetMinWidth() const { return MinWidth; }
-    FORCEINLINE float GetMaxWidth() const { return MaxWidth; }
-    FORCEINLINE float GetMinHeight() const { return MinHeight; }
-    FORCEINLINE float GetMaxHeight() const { return MaxHeight; }
-    FORCEINLINE float GetWidthScale() const { return WidthScale; }
-    FORCEINLINE float GetHeightScale() const { return HeightScale; }
     FORCEINLINE int32 GetLifeSpan() const { return LifeSpan; }
     FORCEINLINE int32 GetFadeInTime() const { return FadeInTime; }
     FORCEINLINE int32 GetFadeOutTime() const { return FadeOutTime; }
     FORCEINLINE float GetTotalLifeTime() const { return static_cast<float>(FadeInTime + LifeSpan + FadeOutTime); }
+
+    //@최소/최대 크기 계산 (폰트 기준)
+    FORCEINLINE float GetMinWidth() const { return FontSize * MinWidthScale; }
+    FORCEINLINE float GetMaxWidth() const { return FontSize * MaxWidthScale; }
+    FORCEINLINE float GetMinHeight() const { return FontSize * MinHeightScale; }
+    FORCEINLINE float GetMaxHeight() const { return FontSize * MaxHeightScale; }
+
+    //@동적 크기 계산
+    FORCEINLINE float CalculateWidth(int32 MaxLineLength) const
+    {
+        float DynamicWidth = MaxLineLength * FontSize * CharWidthMultiplier;
+        return FMath::Clamp(DynamicWidth, GetMinWidth(), GetMaxWidth());
+    }
+
+    FORCEINLINE float CalculateHeight(int32 LineCount) const
+    {
+        // 세로는 줄 수에 따라 최소~최대 사이 비례 배분
+        float HeightRange = GetMaxHeight() - GetMinHeight();
+        float HeightRatio = static_cast<float>(LineCount - 1) / static_cast<float>(MaxColumnSize - 1);
+        return GetMinHeight() + (HeightRange * FMath::Clamp(HeightRatio, 0.0f, 1.0f));
+    }
 };
 
 /*
@@ -188,16 +201,24 @@ private:
     FTimerHandle FadeTimerHandle;
 
 private:
+    //@생명주기 상태
+    bool bIsActive = false;
+    bool bIsBlocked = false;
+
+private:
     //@보간 관련
     float CurrentOpacity;
     float TargetOpacity;
     float FadeSpeed;
-
-
 #pragma endregion
 
 //@Delegates
 #pragma region Delegates
+public:
+    //@System Message 활성화 이벤트
+    FSystemMessageActivated SystemMessageActivated;
+    //@System Message 비활성화 이벤트
+    FSystemMessageDeactivated SystemMessageDeactivated;
 #pragma endregion
 
 //@Callbacks
