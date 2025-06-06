@@ -100,13 +100,36 @@ void UAPDataTableSubsystem::SetTextBlock_Name(UAPDataTableSubsystem* DataTableGI
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));  
 }
 
-const FString &UAPDataTableSubsystem::GetStringContent(const EStringRowName &RowName)
+//@오류 발생
+//const FString &UAPDataTableSubsystem::GetStringContent(const EStringRowName &RowName)
+//{
+//    FString Name = "";
+//    if(!CheckEnum) CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
+//    if(!CheckEnum) return Name;
+//    Name = CheckEnum->GetNameStringByValue((uint8)RowName);
+//
+//    auto DataTable = StringDataTable->FindRow<FStringDataTable>(FName(*Name), Name); 
+//    return DataTable->Content;
+//}
+
+//@수정 버전
+const FString& UAPDataTableSubsystem::GetStringContent(const EStringRowName& RowName)
 {
+<<<<<<< HEAD
     FString Name = "";
     if(!CheckEnum) CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
+=======
+    static FString EmptyString = "";
+    if (!CheckEnum) CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
+    if (!CheckEnum) return EmptyString;
+
+    static FString Name;
+>>>>>>> origin
     Name = CheckEnum->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = StringDataTable->FindRow<FStringDataTable>(FName(*Name), Name); 
+    auto DataTable = StringDataTable->FindRow<FStringDataTable>(FName(*Name), Name);
+    if (!DataTable) return EmptyString;
+
     return DataTable->Content;
 }
 

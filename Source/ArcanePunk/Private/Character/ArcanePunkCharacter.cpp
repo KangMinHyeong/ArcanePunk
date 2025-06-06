@@ -43,7 +43,16 @@
 #include "UserInterface/Tutorial/APTuTorialUserWidget.h"
 #include "Skill/SkillController.h"
 
+<<<<<<< HEAD
 #include "GameInstance/Subsystem/APSystemMessageSubsystem.h"
+=======
+//YS
+#include "Logging/StructuredLog.h"
+#include "MotionWarpingComponent.h"
+#include "GameInstance/Subsystem/APTimeManipulationSubsystem.h"
+
+DEFINE_LOG_CATEGORY(LogCharacter)
+>>>>>>> origin
 
 // Minhyeong
 AArcanePunkCharacter::AArcanePunkCharacter()
@@ -96,6 +105,9 @@ AArcanePunkCharacter::AArcanePunkCharacter()
 	// set capacity of inventory
 	PlayerInventory->SetSlotsCapacity(15);
 	PlayerInventory->SetWeightCapacity(50.0f);
+
+	// ys
+	MotionWarpingComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Component"));
 }
 
 void AArcanePunkCharacter::BeginPlay()
@@ -455,35 +467,123 @@ void AArcanePunkCharacter::SetWeaponPosition()
 	}
 }
 
+/*
+*	@breif: 대시/회피
+*	@writer: YS
+*/
 void AArcanePunkCharacter::PressedDash()
 {
-	if(!bMainPlayer || !bCanMove || !StopState.IsEmpty() || IsDead()) return;
-	if(bDoing && !AttackComponent->IsComboAttack() && !AttackComponent->IsParrying()) return;
-	if(!bCanDash) return;
-	
-	bDoing = true; bCanDash = false; bCanMove = false;
-	
+	//@입력 유효성 검사
+	if (!bMainPlayer)
+	{
+		UE_LOGFMT(LogCharacter, Log, "메인 플레이어가 아니므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@움직임 가능성 여부
+	if (!bCanMove)
+	{
+		UE_LOGFMT(LogCharacter, Log, "이동이 불가능한 상태이므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@멈춤 상태?
+	if (!StopState.IsEmpty())
+	{
+		UE_LOGFMT(LogCharacter, Log, "중단 상태가 있으므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@죽음 여부
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@행동 상태 검사
+	if (bDoing && !AttackComponent->IsComboAttack() && !AttackComponent->IsParrying())
+	{
+		UE_LOGFMT(LogCharacter, Log, "다른 행동 중이고 콤보 공격이나 패링 중이 아니므로 대시를 실행하지 않습니다.");
+		return;
+	}
+
+	//@대시 가능 여부 확인
+	if (!bCanDash)
+	{
+		UE_LOGFMT(LogCharacter, Log, "대시가 불가능한 상태입니다. 쿨다운 중일 수 있습니다.");
+		return;
+	}
+
+	//@대시 실행 상태 설정
+	bDoing = true;
+	bCanDash = false;
+	bCanMove = false;
+
+	UE_LOGFMT(LogCharacter, Log, "캐릭터 대시를 시작합니다.");
+
+	//@충돌 응답 변경
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+	//@대시 관련 컴포넌트 설정
 	MoveComponent->StartDash();
 	GhostTrailSpawnComp->SetRunTrail(true);
-	if(HUD) HUD->GetStatusWidget(this)->StartDashTime(MoveComponent->GetDashTime());
+
+	//@HUD
+	if (!HUD)
+	{
+		UE_LOGFMT(LogCharacter, Warning, "HUD가 유효하지 않아 대시 타이머를 업데이트할 수 없습니다.");
+		return;
+	}
+
+	//@Dash 타이머 시작
+	HUD->GetStatusWidget(this)->StartDashTime(MoveComponent->GetDashTime());
+	UE_LOGFMT(LogCharacter, Log, "HUD 대시 타이머를 {0}초로 설정했습니다.", MoveComponent->GetDashTime());
 }
 
 void AArcanePunkCharacter::ReleasedDash()
 {
-	if(!bMainPlayer || IsDead()) return;
+	//@입력 유효성 검사
+	if (!bMainPlayer)
+	{
+		UE_LOGFMT(LogCharacter, Log, "메인 플레이어가 아니므로 대시 해제를 처리하지 않습니다.");
+		return;
+	}
 
-	bDoing = false; bCanMove = true;
+	//@죽음 여부 
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 대시 해제를 처리하지 않습니다.");
+		return;
+	}
+
+	//@캐릭터 상태 복원
+	bDoing = false;
+	bCanMove = true;
+
+	//@공격 상태 초기화
 	AttackComponent->SetComboAttack(false);
 	AttackComponent->SetParrying(false);
 
+	//@충돌 응답 복원
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
-	MoveComponent->EndDash();
-	GhostTrailSpawnComp->SetRunTrail(false);
-	
-	if(HUD) HUD->GetStatusWidget(this)->StartCoolTimeSlot(ESkillKey::Dash, DashCoolTime);	
-}
 
+	//@대시 관련 컴포넌트 설정 해제
+	//MoveComponent->EndDash();
+	GhostTrailSpawnComp->SetRunTrail(false);
+
+	//@HUD
+	if (HUD)
+	{
+		UE_LOGFMT(LogCharacter, Warning, "HUD가 유효하지 않아 대시 쿨타임을 설정할 수 없습니다.");
+	}
+
+	//@대시 쿨타임 설정
+	HUD->GetStatusWidget(this)->StartCoolTimeSlot(ESkillKey::Dash, DashCoolTime);
+	UE_LOGFMT(LogCharacter, Log, "대시 쿨타임을 {0}초로 설정했습니다.", DashCoolTime);
+
+	UE_LOGFMT(LogCharacter, Log, "캐릭터 대시를 종료합니다.");
+}
 
 void AArcanePunkCharacter::PlaySwapDash()
 {
@@ -516,6 +616,144 @@ void AArcanePunkCharacter::EndSwapDash()
 
 	SwitchPlayerState();
 }
+
+void AArcanePunkCharacter::HandleGameplayEvent(const FGameplayTag& EventTag)
+{
+	//@이벤트 태그 유효성 검사
+	if (!EventTag.IsValid())
+	{
+		UE_LOGFMT(LogCharacter, Warning, "게임플레이 이벤트 처리 실패 - 유효하지 않은 태그");
+		return;
+	}
+
+	UE_LOGFMT(LogCharacter, Log, "게임플레이 이벤트 처리 시작 - 태그: {0}", *EventTag.ToString());
+
+	//@저스트 닷지 태그 확인
+	static const FGameplayTag JustDodgeTag = FGameplayTag::RequestGameplayTag("Ability.Chain.JustDodge");
+
+	if (EventTag == JustDodgeTag)
+	{
+		UE_LOGFMT(LogCharacter, Log, "저스트 닷지 이벤트 감지 - 닷지 시작");
+		StartJustDodge();
+	}
+	else
+	{
+		UE_LOGFMT(LogCharacter, Log, "처리할 수 없는 이벤트 태그: {0}", *EventTag.ToString());
+	}
+}
+
+void AArcanePunkCharacter::StartChainWindow(const FChainActionInfo& ChainInfo)
+{
+	//@유효성 검사
+	if (!ChainInfo.EventTag.IsValid() || !ChainInfo.ActivationEventTag.IsValid())
+	{
+		UE_LOGFMT(LogCharacter, Warning, "체인 윈도우 시작 실패 - 유효하지 않은 태그");
+		return;
+	}
+
+	//@체인 윈도우 활성화
+	CurrentChainActionInfo = ChainInfo;
+	bChainWindowActive = true;
+	bCanChainAction = false;
+
+	UE_LOGFMT(LogCharacter, Log, "체인 윈도우 시작 - 이벤트 태그: {0}, 활성화 태그: {1}, 모드: {2}",
+		*ChainInfo.EventTag.ToString(),
+		*ChainInfo.ActivationEventTag.ToString(),
+		ChainInfo.ChainActionMode == EChainActionMode::Delayed ? TEXT("지연 실행") : TEXT("즉시 실행"));
+}
+
+void AArcanePunkCharacter::EndChainWindow()
+{
+	//@체인 윈도우 체크
+	if (!bChainWindowActive)
+	{
+		UE_LOGFMT(LogCharacter, Log, "체인 윈도우 종료 - 체인 윈도우가 활성화되지 않음");
+		return;
+	}
+
+	//@지연 실행 모드 처리
+	if (CurrentChainActionInfo.ChainActionMode == EChainActionMode::Delayed && bCanChainAction)
+	{
+		UE_LOGFMT(LogCharacter, Log, "지연 실행 모드로 이벤트 처리: {0}",
+			*CurrentChainActionInfo.ActivationEventTag.ToString());
+
+		HandleGameplayEvent(CurrentChainActionInfo.ActivationEventTag);
+	}
+
+	//@체인 윈도우 비활성화
+	bChainWindowActive = false;
+	bCanChainAction = false;
+	CurrentChainActionInfo = FChainActionInfo();
+
+	UE_LOGFMT(LogCharacter, Log, "체인 윈도우 종료 완료");
+}
+
+void AArcanePunkCharacter::StartJustDodge()
+{
+	//@입력 유효성 검사
+	if (!bMainPlayer)
+	{
+		UE_LOGFMT(LogCharacter, Log, "메인 플레이어가 아니므로 저스트 닷지를 실행하지 않습니다.");
+		return;
+	}
+
+	//@움직임 가능성 여부
+	//if (!bCanMove)
+	//{
+	//	UE_LOGFMT(LogCharacter, Log, "이동이 불가능한 상태이므로 저스트 닷지를 실행하지 않습니다.");
+	//	return;
+	//}
+
+	//@죽음 여부
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망 상태이므로 저스트 닷지를 실행하지 않습니다.");
+		return;
+	}
+
+	//@대시 캔슬
+	MoveComponent->EndDash();
+
+	//@저스트 닷지 실행
+	UE_LOGFMT(LogCharacter, Log, "저스트 닷지 실행 - 체인 윈도우로부터 성공적인 회피");
+
+	//@TODO: 애니메이션 제작 완료 될 경우, ANS로 옮김 처리.
+	//@시간 조작 - 슬로모션 적용, 중간 강도, 0.3초간 적용
+	UAPTimeManipulationSubsystem* TimeSubsystem = GetGameInstance()->GetSubsystem<UAPTimeManipulationSubsystem>();
+	if (TimeSubsystem)
+	{
+		//@슬로모션 설정
+		FTimeDilationSettings SlowMotionSettings;
+		SlowMotionSettings.DilationMode = ETimeDilationMode::SlowMotion;
+		SlowMotionSettings.DilationIntensity = ETimeDilationIntensity::High;
+		SlowMotionSettings.bSmoothTransition = false;
+
+		//@글로벌 슬로모션 시작
+		TimeSubsystem->StartGlobalTimeDilation(SlowMotionSettings);
+
+		UE_LOGFMT(LogCharacter, Log, "저스트 닷지 - 중간 강도의 글로벌 슬로모션 적용");
+
+		//@일정 시간 후 슬로모션 해제 타이머 설정 (예: 0.3초)
+		FTimerHandle SlowMotionTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			SlowMotionTimerHandle,
+			FTimerDelegate::CreateLambda([TimeSubsystem]()
+				{
+					if (TimeSubsystem)
+					{
+						TimeSubsystem->StopGlobalTimeDilation(false);
+					}
+				}),
+			0.2f,
+			false
+		);
+	}
+	else
+	{
+		UE_LOGFMT(LogCharacter, Warning, "시간 조작 서브시스템을 찾을 수 없어 슬로모션을 적용할 수 없습니다.");
+	}
+}
+
 
 void AArcanePunkCharacter::OnBlockMode()
 { 
@@ -637,55 +875,154 @@ void AArcanePunkCharacter::SetHavingSkills()
 	HavingSkill.Add(QSkill); HavingSkill.Add(ESkill);
 }
 
-float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
+float AArcanePunkCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if(AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator)) return 0.0f;
-	float DamageApplied = DamageAmount;
-
-	if(ReflectingModeGauge > 0) {AttackComponent->ReflectDamage(DamageApplied, DamageCauser); return DamageApplied;}
-
-	float OriginHP = TotalStatus.StatusData.HP;
-	if(bBlockMode) return 0.0f;
 	
-	bool Check = false;
-	if(GetAPPassiveComp()->IsDamagedPassive()) Check = CheckingDamaged();
-	if(Check) return 0.0f;
-
-	float & HP = TotalStatus.StatusData.HP;
-	DamageApplied = DamageMath(DamageApplied);
-
-	if(CheckShieldHP(DamageApplied, DamageEvent)) return 0.0f;
-
-	if(DamageApplied >= HP && GetRageMode()) {HP = 1.0f;}
-	else
-	{	
-		HP = FMath::Clamp<float>(HP - DamageApplied, 0.0f, TotalStatus.StatusData.MaxHP);
-	}
-	
-	if(IsDead())
+	//@체인 윈도우 체크
+	if (bChainWindowActive)
 	{
+		//@데미지 이벤트와 체인 이벤트가 일치하는지 확인
+		static const FGameplayTag DamageEventTag = FGameplayTag::RequestGameplayTag("EventTag.OnDamaged");
+
+		if (CurrentChainActionInfo.EventTag == DamageEventTag)
+		{
+			UE_LOGFMT(LogCharacter, Log, "데미지 발생으로 체인 액션 감지: {0}",
+				*CurrentChainActionInfo.ActivationEventTag.ToString());
+
+			//@체인 액션 가능 상태로 설정
+			bCanChainAction = true;
+
+			//@모드에 따른 처리
+			if (CurrentChainActionInfo.ChainActionMode == EChainActionMode::Immediate)
+			{
+				UE_LOGFMT(LogCharacter, Log, "즉시 실행 모드로 이벤트 처리");
+				HandleGameplayEvent(CurrentChainActionInfo.ActivationEventTag);
+				EndChainWindow(); // 즉시 체인 윈도우 종료
+			}
+			else
+			{
+				UE_LOGFMT(LogCharacter, Log, "지연 실행 모드로 체인 액션 활성화");
+				// EndChainWindow() 호출 시 처리됨
+			}
+
+			return 0.0f; // 데미지를 무시하고 체인 액션 처리
+		}
+	}
+
+	//@무적 상태 체크
+
+	//@패링 체크
+	if (AttackComponent->CheckParryingCondition(DamageEvent, EventInstigator))
+	{
+		UE_LOGFMT(LogCharacter, Log, "패링 성공으로 데미지가 무시되었습니다.");
+		return 0.0f;
+	}
+
+	//@초기 변수 설정
+	float DamageApplied = DamageAmount;
+	float OriginHP = TotalStatus.StatusData.HP;
+
+	//@리플렉팅 모드 체크
+	if (ReflectingModeGauge > 0)
+	{
+		UE_LOGFMT(LogCharacter, Log, "리플렉팅 모드로 {0} 데미지를 반사합니다.", DamageApplied);
+		AttackComponent->ReflectDamage(DamageApplied, DamageCauser);
+		return DamageApplied;
+	}
+
+	//@블록 모드 체크
+	if (bBlockMode)
+	{
+		UE_LOGFMT(LogCharacter, Log, "블록 모드로 데미지가 무시되었습니다.");
+		return 0.0f;
+	}
+
+	//@패시브 데미지 체크
+	bool Check = false;
+	if (GetAPPassiveComp()->IsDamagedPassive())
+	{
+		Check = CheckingDamaged();
+	}
+
+	if (Check)
+	{
+		UE_LOGFMT(LogCharacter, Log, "패시브 효과로 데미지가 무시되었습니다.");
+		return 0.0f;
+	}
+
+	//@데미지 계산
+	DamageApplied = DamageMath(DamageApplied);
+	UE_LOGFMT(LogCharacter, Log, "계산된 데미지: {0}", DamageApplied);
+
+	//@방패 HP 체크
+	if (CheckShieldHP(DamageApplied, DamageEvent))
+	{
+		UE_LOGFMT(LogCharacter, Log, "방패가 데미지를 흡수했습니다.");
+		return 0.0f;
+	}
+
+	//@HP 감소 처리
+	float& HP = TotalStatus.StatusData.HP;
+
+	if (DamageApplied >= HP && GetRageMode())
+	{
+		HP = 1.0f;
+		UE_LOGFMT(LogCharacter, Log, "분노 모드로 HP가 1로 유지됩니다.");
+	}
+	else
+	{
+		HP = FMath::Clamp<float>(HP - DamageApplied, 0.0f, TotalStatus.StatusData.MaxHP);
+		UE_LOGFMT(LogCharacter, Log, "현재 HP: {0}/{1}", HP, TotalStatus.StatusData.MaxHP);
+	}
+
+	//@사망 처리
+	if (IsDead())
+	{
+		UE_LOGFMT(LogCharacter, Log, "캐릭터가 사망했습니다.");
 		SetCanMove(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// OwnerCharacter->DetachFromControllerPendingDestroy();
 		DeadPenalty(3.0f);
-		auto BattleGM = Cast<AAPGameModeBattleStage>(GM); 
-		if(BattleGM) BattleGM->PlayerKilled();
+
+		auto BattleGM = Cast<AAPGameModeBattleStage>(GM);
+		if (BattleGM)
+		{
+			BattleGM->PlayerKilled();
+		}
 	}
 	else
-	{ 
-		if(GetRageMode()) return 0.0f;
-		if(PC.IsValid() && DamageApplied > KINDA_SMALL_NUMBER) PC->HitUI();
-		UE_LOG(LogTemp, Display, TEXT("Character HP : %f"), HP);
+	{
+		//@분노 모드 체크
+		if (GetRageMode())
+		{
+			UE_LOGFMT(LogCharacter, Log, "분노 모드로 데미지가 무시되었습니다.");
+			return 0.0f;
+		}
+
+		//@히트 UI 표시
+		if (PC.IsValid() && DamageApplied > KINDA_SMALL_NUMBER)
+		{
+			PC->HitUI();
+			UE_LOGFMT(LogCharacter, Log, "히트 UI를 표시합니다.");
+		}
 	}
 
+	//@상태 업데이트
 	UpdateStatus();
-	if(HUD) HUD->GetStatusWidget(this)->SetHPPercent(this, OriginHP);
 
+	//@HUD 업데이트
+	if (HUD)
+	{
+		HUD->GetStatusWidget(this)->SetHPPercent(this, OriginHP);
+		UE_LOGFMT(LogCharacter, Log, "HUD에 HP 정보를 업데이트했습니다.");
+	}
+
+	//@패시브 효과 체크
 	PassiveComp->CheckDamagedGold();
 
 	Super::TakeDamage(DamageApplied, DamageEvent, EventInstigator, DamageCauser);
-    return DamageApplied;
+	return DamageApplied;
 }
 
 bool AArcanePunkCharacter::CheckingDamaged()

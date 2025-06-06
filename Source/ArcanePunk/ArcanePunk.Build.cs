@@ -15,7 +15,18 @@ public class ArcanePunk : ModuleRules
 			"InputCore", 
 			"SlateCore", 
 			"Slate", 
+<<<<<<< HEAD
 			"UMG" , "GameplayTasks", "Niagara", "NavigationSystem", "GeometryCollectionEngine", "FieldSystemEngine"});
+=======
+			"UMG" , 
+			"GameplayTasks", 
+			"Niagara", 
+			"NavigationSystem", 
+			"GeometryCollectionEngine", 
+			"FieldSystemEngine", 
+			"MotionWarping",
+			"GameplayTags",});
+>>>>>>> origin
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Niagara" });
 
