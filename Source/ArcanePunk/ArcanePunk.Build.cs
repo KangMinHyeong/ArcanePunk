@@ -8,7 +8,25 @@ public class ArcanePunk : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "SlateCore", "Slate", "UMG" , "GameplayTasks", "Niagara", "NavigationSystem", "GeometryCollectionEngine", "FieldSystemEngine"});
+		PublicDependencyModuleNames.AddRange(new string[] { 
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"SlateCore", 
+			"Slate", 
+<<<<<<< HEAD
+			"UMG" , "GameplayTasks", "Niagara", "NavigationSystem", "GeometryCollectionEngine", "FieldSystemEngine"});
+=======
+			"UMG" , 
+			"GameplayTasks", 
+			"Niagara", 
+			"NavigationSystem", 
+			"GeometryCollectionEngine", 
+			"FieldSystemEngine", 
+			"MotionWarping",
+			"GameplayTags",});
+>>>>>>> origin
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Niagara" });
 

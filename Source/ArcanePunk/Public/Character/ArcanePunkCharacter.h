@@ -6,7 +6,10 @@
 #include "Components/Character/APCharacterAuraComponent.h"
 #include "Components/Common/APBuffComponent.h"
 #include "Interfaces/InteractionInterface.h"
+#include "GameplayTagContainer.h"
 #include "ArcanePunkCharacter.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogCharacter, Log, All)
 
 DECLARE_MULTICAST_DELEGATE(FOnAutoRecoveryMPDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftMouseClick);
@@ -41,8 +44,59 @@ class AAPHUD;
 class ATextRenderActor;
 class ASkillController;
 
+// ys
+class UMotionWarpingComponent;
+
 #define Defense_constant 1000
 
+<<<<<<< HEAD
+/**
+ *	@brief 체인 액션 처리 방식을 정의하는 열거형
+ *
+ *	Delayed: 체인 윈도우 종료 시 이벤트 처리
+ *	Immediate: 이벤트 매칭 즉시 이벤트 처리
+ */
+UENUM(BlueprintType)
+enum class EChainActionMode : uint8
+{
+	Delayed    UMETA(DisplayName = "지연 실행"),
+	Immediate  UMETA(DisplayName = "즉시 실행")
+};
+
+/**
+ * @FChainActionInfo
+ * Chain Action 시스템에서 이벤트 매핑에 사용되는 구조체입니다.
+ * 특정 이벤트가 발생했을 때 다른 이벤트를 활성화하는 매핑 정보를 저장합니다.
+ */
+USTRUCT(BlueprintType)
+struct FChainActionInfo
+{
+	GENERATED_BODY()
+
+	//@체인 액션 실행 모드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chain Action")
+		EChainActionMode ChainActionMode = EChainActionMode::Delayed;
+
+	//@체인 액션 시스템이 감지하기를 기다리는 이벤트 태그
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chain Action")
+	FGameplayTag EventTag;
+
+	//@매칭 성공 시 활성화될 이벤트 태그
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Chain Action")
+	FGameplayTag ActivationEventTag;
+
+	FChainActionInfo()
+		: EventTag(FGameplayTag::EmptyTag)
+		, ActivationEventTag(FGameplayTag::EmptyTag)
+	{
+	}
+
+	FChainActionInfo(FGameplayTag InEventTag, FGameplayTag InActivationEventTag)
+		: EventTag(InEventTag)
+		, ActivationEventTag(InActivationEventTag)
+	{
+	}
+=======
 UENUM()
 enum class EPlayerState : uint8 // Player 상태태
 {
@@ -55,11 +109,15 @@ enum class EPlayerState : uint8 // Player 상태태
 	ExitSkillPlaying 		= 6, // 퇴각 스킬 플레이 상태
 	ActiveSkillPlaying 		= 7, // 일반 액티브 스킬 플레이 상태
 	Inactive				= 8, // 비활성화 상태
+>>>>>>> origin
 };
 
 UCLASS()
 class ARCANEPUNK_API AArcanePunkCharacter : public AAPCharacterBase
 {
+//@친구 클래스
+	friend class UAPANS_AllowChainAction;
+
 	GENERATED_BODY()
 
 public:
@@ -198,13 +256,44 @@ public:
 	void SavePlayerData(const FString & PlayerSlotName);
 	void SaveGameData(const FString & PlayerSlotName);
 
-	// Dash
+	// ys
+	//@Dash
 	void PressedDash();
 	void ReleasedDash();
 
+	//@Swap Dash
 	void PlaySwapDash();
 	void EndSwapDash();
-		
+	
+private:
+	//@체인 윈도우 관련 변수
+	bool bChainWindowActive = false;
+	bool bCanChainAction = false;
+	FChainActionInfo CurrentChainActionInfo;
+
+protected:
+	//@체인 윈도우 시작
+	void StartChainWindow(const FChainActionInfo& ChainInfo);
+
+	//@체인 윈도우 종료
+	void EndChainWindow();
+
+	//@게임플레이 이벤트 처리
+	void HandleGameplayEvent(const FGameplayTag& EventTag);
+
+	//@회피 시작
+	void StartJustDodge();
+
+public:
+	//@체인 윈도우 상태 확인
+	FORCEINLINE bool IsChainWindowActive() const { return bChainWindowActive; }
+	FORCEINLINE bool CanChainAction() const { return bCanChainAction; }
+	FORCEINLINE const FChainActionInfo& GetCurrentChainActionInfo() const { return CurrentChainActionInfo; }
+
+protected:
+
+
+public:
 	// Skill 관련 함수
 	void RestoreSkills();
 	
@@ -267,6 +356,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Component")
 	UAPPassiveComponent* PassiveComp;
 	
+	//@모션 워프 컴포넌트
+	UPROPERTY(EditAnywhere, Category = "Component | 모션 워프")
+	UMotionWarpingComponent* MotionWarpingComp;
+
 	//PlayerController 변수
 	TWeakObjectPtr<AArcanePunkPlayerController> PC;
 	//GameMode 변수
@@ -390,10 +483,14 @@ public:
 	uint8 CharacterUIID = 0;
 
 	uint8 PlayerIndex = 0;
+<<<<<<< HEAD
+=======
 
 	EPlayerState PlayerState = EPlayerState::Inactive;
 // prodo
+>>>>>>> origin
 
+// prodo
 protected:
 	UPROPERTY()
 	AAPHUD* HUD;

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,6 +7,8 @@
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "APHUD.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogHUD, Log, All)
+
 struct FInteractableData;
 class UInteractionWidget;
 class UMainMenu;
@@ -17,6 +17,7 @@ class UAPStageInformationUI;
 class UImitatorSkillSlot;
 class AArcanePunkPlayerController;
 class UAPSwapBarUI;
+class UAPSystemMessage;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateMaxHPBar, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
@@ -113,6 +114,9 @@ private:
 	UPROPERTY()
 	TArray<UAPStatusBar*> StatusBarWidgets;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UAPSystemMessage> SystemMessageClass;
+
 	UPROPERTY()
 	AArcanePunkPlayerController* PC;
 	
@@ -121,6 +125,9 @@ private:
 	TWeakObjectPtr<UImitatorSkillSlot> ImitatorSlotUI;
 
 	TWeakObjectPtr<UAPSwapBarUI> SwapBar;
+
+	UPROPERTY()
+	TWeakObjectPtr<UAPSystemMessage> SystemMessageWidget;
 	
 public:
 	uint8 MainPlayerIndex = 0;

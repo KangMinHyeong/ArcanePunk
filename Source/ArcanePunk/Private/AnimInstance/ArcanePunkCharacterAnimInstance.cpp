@@ -10,6 +10,13 @@
 #include "GameMode/APGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
+// ys
+#include "Logging/StructuredLog.h"
+#include "MotionWarpingComponent.h"
+
+
+DEFINE_LOG_CATEGORY(LogAnimInstance)
+
 UArcanePunkCharacterAnimInstance::UArcanePunkCharacterAnimInstance()
 {
     CurrentPawnSpeed = 0.0f;
@@ -79,12 +86,81 @@ void UArcanePunkCharacterAnimInstance::PlayParryingSuccess_Montage()
     Montage_Play(ParryingSuccess_Montage);
 }
 
+//void UArcanePunkCharacterAnimInstance::PlayDash_Montage()
+//{
+//    //@캐릭터 사망 여부 확인
+//    if (IsDead)
+//    {
+//        UE_LOGFMT(LogAnimInstance, Log, "캐릭터가 사망 상태이므로 대시 몽타주를 재생하지 않습니다.");
+//        return;
+//    }
+//
+//    //@소유 캐릭터 유효성 검사
+//    if (!OwnerCharacter.IsValid())
+//    {
+//        UE_LOGFMT(LogAnimInstance, Error, "유효한 소유 캐릭터가 없어 대시 몽타주를 재생할 수 없습니다.");
+//        return;
+//    }
+//
+//    //@대시 몽타주 재생
+//    Montage_Play(Dash_Montage);
+//
+//    UE_LOGFMT(LogAnimInstance, Log, "대시 몽타주 재생을 시작합니다.");
+//}
+
 void UArcanePunkCharacterAnimInstance::PlayDash_Montage()
 {
-    if(IsDead) return;
-    if(!OwnerCharacter.IsValid()) return;
-    
+    //@캐릭터 사망 여부 확인
+    if (IsDead)
+    {
+        UE_LOGFMT(LogAnimInstance, Log, "캐릭터가 사망 상태이므로 대시 몽타주를 재생하지 않습니다.");
+        return;
+    }
+
+    //@OwnerCharacter
+    if (!OwnerCharacter.IsValid())
+    {
+        UE_LOGFMT(LogAnimInstance, Error, "유효한 소유 캐릭터가 없어 대시 몽타주를 재생할 수 없습니다.");
+        return;
+    }
+
+    //@MovementComponent
+    UAPMovementComponent* MovementComp = OwnerCharacter->FindComponentByClass<UAPMovementComponent>();
+    if (!MovementComp)
+    {
+        UE_LOGFMT(LogAnimInstance, Error, "APMovementComponent를 찾을 수 없어 워프 타겟을 설정할 수 없습니다.");
+        return;
+    }
+
+    //@MotionWarpingComponent
+    UMotionWarpingComponent* MotionWarpComp = OwnerCharacter->FindComponentByClass<UMotionWarpingComponent>();
+    if (!MotionWarpComp)
+    {
+        UE_LOGFMT(LogAnimInstance, Error, "MotionWarpingComponent를 찾을 수 없어 워프 타겟을 설정할 수 없습니다.");
+        return;
+    }
+
+    //@대시 목적지 계산 - MovementComponent의 로직과 동일하게 구현
+    FRotator PlayerRot = OwnerCharacter->GetActorRotation();
+    FVector DashLocation = OwnerCharacter->GetActorLocation() + PlayerRot.Vector() * MovementComp->GetDashLength();
+
+    UE_LOGFMT(LogAnimInstance, Log, "대시 워프 타겟 위치 계산: {0}, {1}, {2}",
+        DashLocation.X, DashLocation.Y, DashLocation.Z);
+
+    //@워프 타겟 설정 - "DashTarget"이라는 이름으로 위치만 지정
+    FMotionWarpingTarget WarpTarget;
+    WarpTarget.Name = FName("DashTarget");
+    WarpTarget.Location = DashLocation;
+    MotionWarpComp->AddOrUpdateWarpTarget(WarpTarget);
+
+    //@몽타주 종료 델리게이트 바인딩
+    OnMontageEnded.AddDynamic(this, &UArcanePunkCharacterAnimInstance::OnDashMontageEnded);
+
+    //@몽타주 재생
     Montage_Play(Dash_Montage);
+
+    UE_LOGFMT(LogAnimInstance, Log, "워프 타겟이 설정된 대시 몽타주 재생을 시작합니다.");
+
 }
 
 void UArcanePunkCharacterAnimInstance::StopDash_Montage()
@@ -95,7 +171,44 @@ void UArcanePunkCharacterAnimInstance::StopDash_Montage()
     Montage_Stop(0.05f, Dash_Montage);
 }
 
+<<<<<<< HEAD
+void UArcanePunkCharacterAnimInstance::OnDashMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+    //@Dash Montage
+    if (Montage != Dash_Montage)
+    {
+        return;
+    }
+
+    //@Owner Character
+    if (!OwnerCharacter.IsValid())
+    {
+        UE_LOGFMT(LogAnimInstance, Error, "대시 몽타주 종료 시 유효한 소유 캐릭터가 없습니다.");
+        OnMontageEnded.RemoveDynamic(this, &UArcanePunkCharacterAnimInstance::OnDashMontageEnded);
+        return;
+    }
+
+    //@MovementComponent
+    UAPMovementComponent* MovementComp = OwnerCharacter->FindComponentByClass<UAPMovementComponent>();
+    if (!MovementComp)
+    {
+        UE_LOGFMT(LogAnimInstance, Error, "대시 몽타주 종료 시 APMovementComponent를 찾을 수 없습니다.");
+        OnMontageEnded.RemoveDynamic(this, &UArcanePunkCharacterAnimInstance::OnDashMontageEnded);
+        return;
+    }
+
+    // 대시 종료 처리 호출
+    UE_LOGFMT(LogAnimInstance, Log, "대시 몽타주 종료: MovementComponent의 EndDash 호출");
+    MovementComp->EndDash();
+
+    // 델리게이트 바인딩 해제
+    OnMontageEnded.RemoveDynamic(this, &UArcanePunkCharacterAnimInstance::OnDashMontageEnded);
+}
+
+void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Retreat()
+=======
 void UArcanePunkCharacterAnimInstance::PlaySwapSkill_Exit()
+>>>>>>> origin
 {
     if(IsDead) return;
     if(!OwnerCharacter.IsValid()) return;

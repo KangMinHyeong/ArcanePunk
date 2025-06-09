@@ -6,15 +6,23 @@
 #include "Animation/AnimInstance.h"
 #include "ArcanePunkCharacterAnimInstance.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogAnimInstance, Log, All)
+
 DECLARE_MULTICAST_DELEGATE(FOnComboCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnUltChargeEnd);
 
 class AArcanePunkCharacter;
 class AAPCharacterBase;
+class UMotionWarpingComponent;
 
 UCLASS()
 class ARCANEPUNK_API UArcanePunkCharacterAnimInstance : public UAnimInstance
 {
+//@친구 클래스
+#pragma region Freind Class
+	friend class UAPMovementComponent;
+#pragma endregion
+
 	GENERATED_BODY()
 public:
 	UArcanePunkCharacterAnimInstance();
@@ -28,11 +36,24 @@ public:
 	void PlayParryingSuccess_Montage();
 	void StopComboAttack();
 
+protected:
+	//@대시 재생
 	void PlayDash_Montage();
+	//@대시 재생 중지
 	void StopDash_Montage();
 
+<<<<<<< HEAD
+protected:
+	UFUNCTION()
+	void OnDashMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+public:
+	void PlaySwapSkill_Retreat();
+	void PlaySwapSkill_Sally();
+=======
 	void PlaySwapSkill_Exit();
 	void PlaySwapSkill_Entry();
+>>>>>>> origin
 
 	void PlaySkill_1_Montage();
 	void PlaySkill_2_Montage();
