@@ -32,8 +32,8 @@ struct ARCANEPUNK_API FSkillControllerData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	// 메모 컬럼(코드에서 사용 X)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient)
+	// 메모용 필드 (작업자 설명 등)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Memo;
 
 	// 스킬 고유 ID
@@ -43,8 +43,8 @@ struct ARCANEPUNK_API FSkillControllerData : public FTableRowBase
 	// 스킬 고유 ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ESkillType SkillType;
-	
-	// 스킬 명
+
+	// 스킬 이름 (UI에 표시되는 이름)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString SkillName;
 
@@ -56,19 +56,35 @@ struct ARCANEPUNK_API FSkillControllerData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ESkillGrade SkillGrade;
 
-	// 애니메이션 몽타주 ID
+	// 사용할 애니메이션 몽타주 ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName AniMontageID;
+
+	// 사용할 스킬 이펙트 ID
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SkillEffectID;
 
 	// 스택형 스킬 여부
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsStack;
 
-	// 스택 값 (한 쿨타임 동안 사용 가능한 횟수)
+	// 스택 수 (0 이상)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0"))
+	int32 StackCount;
+
+	// 콤보 스킬 여부
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsCombo;
+
+	// 콤보로 연결될 다음 스킬 ID
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName NextComboSkillID;
+
+	// 한 쿨타임 동안 사용 가능한 횟수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0"))
 	int32 StackValue;
 
-	// 스킬 쿨타임 (밀리초 단위)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CoolDownTimeMsec;
+	// 쿨타임 (밀리초 단위, 0 이상)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0"))
+	int32 CoolDownTime_msec;
 };
