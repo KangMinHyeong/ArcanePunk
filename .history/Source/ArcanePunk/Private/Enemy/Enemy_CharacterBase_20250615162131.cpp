@@ -27,10 +27,10 @@
 #include "NavigationSystem.h"
 #include "Components/Common/APManaDropComponent.h"
 #include "Enemy/SkillActor/APEnemyAttackRange.h"
-#include "GameElements/Trigger/BattleSection/APBattleSectionBase.h"
 #include "Components/WidgetComponent.h"
 #include "UserInterface/Common/WidgetComponent/APEnemyHPWidgetComponent.h"
 #include "UserInterface/Common/WidgetComponent/APEnemyTextWidgetComponent.h"
+#include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -136,9 +136,9 @@ void AEnemy_CharacterBase::CrowdControlCheck()
 // 	GetWorldTimerManager().ClearTimer(TeleportTimerHandle);
 // }
 
-void AEnemy_CharacterBase::SetOwnerSection(AActor * BattleSection)
+void AEnemy_CharacterBase::SetOwnerSpawnVolume(AActor * SpawnVolume)
 {
-	OwnerSection = BattleSection;
+	OwnerSpawnVolume = Cast<AAPSpawnVolume>(SpawnVolume);
 }
 
 bool AEnemy_CharacterBase::AttackPushBack(AActor* DamagedCauser)
@@ -411,9 +411,13 @@ void AEnemy_CharacterBase::EnemyDestroyed()
 
 void AEnemy_CharacterBase::CheckAllEnemyKilled()
 {
-	auto GameMode = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
-	if(!GameMode) return;
-	GameMode->MonsterKilled(OwnerSection.Get());
+	// auto GameMode = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
+	// if(!GameMode) return;
+	// GameMode->MonsterKilled(OwnerSpawnVolume.Get());
+	if(OwnerSpawnVolume.IsValid())
+	{
+		OwnerSpawnVolume->MonsterKilled(this);
+	}
 }
 
 void AEnemy_CharacterBase::DistinctHitPoint(const FVector & ImpactPoint, AActor *HitActor)
