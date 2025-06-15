@@ -414,8 +414,10 @@ void AEnemy_CharacterBase::CheckAllEnemyKilled()
 	// auto GameMode = Cast<AAPGameModeBattleStage>(UGameplayStatics::GetGameMode(GetWorld()));
 	// if(!GameMode) return;
 	// GameMode->MonsterKilled(OwnerSpawnVolume.Get());
-
-	OwnerSpawnVolume->MonsterKilled(this);
+	if(OwnerSpawnVolume.IsValid())
+	{
+		OwnerSpawnVolume->MonsterKilled(this);
+	}
 }
 
 void AEnemy_CharacterBase::DistinctHitPoint(const FVector & ImpactPoint, AActor *HitActor)
