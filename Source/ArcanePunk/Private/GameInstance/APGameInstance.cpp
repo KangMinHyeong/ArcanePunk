@@ -3,6 +3,8 @@
 
 #include "Save/APSaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "Skill/SkillDataManager.h"
+#include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
 
 void UAPGameInstance::Init()
 {
@@ -12,6 +14,11 @@ void UAPGameInstance::Init()
 
     OnSkillEnhanceDataUpdate.AddUObject(this, &UAPGameInstance::UpdateSkillEnhanceData);
     OnSkillEnhanceDataClear.AddUObject(this, &UAPGameInstance::ClearSkillEnhanceData);
+}
+
+void UAPGameInstance::InitData()
+{
+    SpawnVolumes.Empty();
 }
 
 void UAPGameInstance::UpdateSkillEnhanceData(ESkillKey UpdateSkillKey, FSkillAbilityNestingData UpdateSkillAbilityNestingData)
@@ -96,3 +103,16 @@ UAPSettingSubsystem *UAPGameInstance::GetSettingGI(UObject *WorldContextObject)
     return nullptr;
 }
 
+void UAPGameInstance::RegisterSpawnVolume(FName SpawnDataID, AAPSpawnVolume* SpawnVolume)
+{
+    SpawnVolumes.Add({SpawnDataID, SpawnVolume});
+}
+
+AAPSpawnVolume* UAPGameInstance::FindSpawnVolume(FName SpawnDataID)
+{
+    if(SpawnVolumes.Contains(SpawnDataID))
+    {
+        return SpawnVolumes[SpawnDataID];
+    }
+    return nullptr;
+}

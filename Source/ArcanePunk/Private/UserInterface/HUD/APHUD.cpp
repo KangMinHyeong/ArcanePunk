@@ -1,7 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UserInterface/HUD/APHUD.h"
+#include "Logging/StructuredLog.h"
+
 #include "UserInterface/Inventory/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/Tutorial/APTuTorialUserWidget.h"
@@ -11,21 +10,46 @@
 #include "UserInterface/HUD/Status/Bar/ImitatorSkillSlot.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "UserInterface/HUD/Status/Bar/APSwapBarUI.h"
+#include "UserInterface/Common/DisplayOnly/APSystemMessage.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "GameInstance/Subsystem/APSystemMessageSubsystem.h"
+
+
+DEFINE_LOG_CATEGORY(LogHUD)
 
 AAPHUD::AAPHUD()
-{
-}
+{}
 
 void AAPHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//@메인 메뉴
 	if (MainMenuClass)
 	{
 		MainMenuWidget = CreateWidget<UMainMenu>(GetWorld(), MainMenuClass);
 		MainMenuWidget->AddToViewport(-4);
 		MainMenuWidget->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	//@시스템 메시지 위젯 생성
+	if (!SystemMessageClass)
+	{
+		UE_LOGFMT(LogHUD, Warning, "시스템 메시지 위젯 클래스가 설정되지 않음");
+		return;
+	}
+
+	SystemMessageWidget = CreateWidget<UAPSystemMessage>(GetWorld(), SystemMessageClass);
+	if (!SystemMessageWidget.Get())
+	{
+		UE_LOGFMT(LogHUD, Error, "시스템 메시지 위젯 생성 실패: SystemMessageClass가 유효하지만 CreateWidget 실패");
+		return;
+	}
+
+	SystemMessageWidget->AddToViewport(500);
+	SystemMessageWidget->SetVisibility(ESlateVisibility::Collapsed);
+	UE_LOGFMT(LogHUD, Log, "시스템 메시지 위젯 생성 완료");
 
 	APlayerController* PlayerController = GetOwningPlayerController();
 	if (PlayerController)
@@ -66,10 +90,10 @@ void AAPHUD::ActivateStatusBar(uint8 Index)
 	SwapBar->Active(Index);
 }
 
-void AAPHUD::DeactivateStatusBar(uint8 Index)
+void AAPHUD::DeactivateStatusBar(uint8 Index, float Gauge)
 {
 	StatusBarWidgets[Index]->RemoveFromParent();
-	SwapBar->Deactive(Index);
+	SwapBar->Deactive(Index, Gauge);
 }
 
 void AAPHUD::DisplayMenu()
@@ -148,23 +172,6 @@ void AAPHUD::OpenWorldMap()
 	}
 }
 
-// void AAPHUD::StartImitatorSlot()
-// {
-// 	ImitatorSlotUI = CreateWidget<UImitatorSkillSlot>(GetWorld(), ImitatorSlotUIClass);
-// 	if(ImitatorSlotUI.IsValid()) ImitatorSlotUI->AddToViewport();
-// }
-
-// void AAPHUD::EndImitatorSlot()
-// {
-// 	if(ImitatorSlotUI.IsValid()) ImitatorSlotUI->RemoveFromParent();
-// }
-
-// void AAPHUD::UpdateImitatorSlot(uint8 SkillNumber)
-// {
-// 	if(!ImitatorSlotUI.IsValid()) return;
-// 	ImitatorSlotUI->UpdateSkillSlot(SkillNumber);
-// }
-
 void AAPHUD::SetStatusVisibility(bool bHide)
 {
 	auto StatusBarWidget = StatusBarWidgets[PC->MainPlayerIndex];
@@ -179,17 +186,22 @@ void AAPHUD::SetStatusVisibility(bool bHide)
 	}
 }
 
-UAPStatusBar *AAPHUD::GetStatusWidget()
+UAPStatusBar *AAPHUD::GetStatusWidget(AArcanePunkCharacter* Player)
 {
-	return StatusBarWidgets[MainPlayerIndex];
+	return StatusBarWidgets[Player->PlayerIndex];
 }
 
-bool AAPHUD::CheckSwitchingCoolDown(uint8 Index)
+bool AAPHUD::CheckSwapCoolDown(uint8 Index)
 {
     return SwapBar->CheckSwapCoolDown(Index);
 }
 
-void AAPHUD::UpdateSwapGauge(float Add)
+float AAPHUD::UpdateSwapGauge(uint8 Index, float Add)
 {
-	SwapBar->UpdateSwapGauge(MainPlayerIndex, Add);
+	return StatusBarWidgets[Index]->UpdateSwapGauge(Add);
+}
+
+void AAPHUD::ClearSwapGauge(uint8 PlayerIndex)
+{
+	StatusBarWidgets[PlayerIndex]->ClearSwapGauge();
 }

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,6 +7,8 @@
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "APHUD.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogHUD, Log, All)
+
 struct FInteractableData;
 class UInteractionWidget;
 class UMainMenu;
@@ -17,6 +17,7 @@ class UAPStageInformationUI;
 class UImitatorSkillSlot;
 class AArcanePunkPlayerController;
 class UAPSwapBarUI;
+class UAPSystemMessage;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateMaxHPBar, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUpdateHPBar, float);
@@ -50,7 +51,7 @@ public:
 	void Init(TArray<uint8> UI_ID);
 	void BindStatusBar(AArcanePunkCharacter* OwnerPlayer, uint8 Index);
 	void ActivateStatusBar(uint8 Index);
-	void DeactivateStatusBar(uint8 Index);
+	void DeactivateStatusBar(uint8 Index, float Gauge);
 
 	void DisplayMenu();
 	void HideMenu();
@@ -64,7 +65,7 @@ public:
 	UUserWidget* GetBossHPUI() {return BossHPWidget.Get();};
 	void SetBossHPUI();
 
-	UAPStatusBar* GetStatusWidget();
+	UAPStatusBar* GetStatusWidget(AArcanePunkCharacter* Player);
 
 	void DisplayEnhanceChoice(EEnhanceCategory EnhanceCategory, EEnHanceType UpdateEnHanceType, bool bOnlyEnhance = false, uint8 EnhanceSkillNum = 0);
 	void DisplayEnhanceGauge(int32 TargetNum, int32 MaxNum);
@@ -72,8 +73,9 @@ public:
 	void OpenWorldMap();
 	void SetStatusVisibility(bool bHide);
 	
-	bool CheckSwitchingCoolDown(uint8 Index);
-	void UpdateSwapGauge(float Add);
+	bool CheckSwapCoolDown(uint8 Index);
+	float UpdateSwapGauge(uint8 Index, float Add);
+	void ClearSwapGauge(uint8 PlayerIndex);
 
 protected:
 	UPROPERTY()
@@ -112,6 +114,9 @@ private:
 	UPROPERTY()
 	TArray<UAPStatusBar*> StatusBarWidgets;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UAPSystemMessage> SystemMessageClass;
+
 	UPROPERTY()
 	AArcanePunkPlayerController* PC;
 	
@@ -120,6 +125,9 @@ private:
 	TWeakObjectPtr<UImitatorSkillSlot> ImitatorSlotUI;
 
 	TWeakObjectPtr<UAPSwapBarUI> SwapBar;
+
+	UPROPERTY()
+	TWeakObjectPtr<UAPSystemMessage> SystemMessageWidget;
 	
 public:
 	uint8 MainPlayerIndex = 0;

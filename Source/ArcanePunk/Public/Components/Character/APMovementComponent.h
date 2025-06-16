@@ -6,12 +6,15 @@
 #include "Components/ActorComponent.h"
 #include "APMovementComponent.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogMovementComp, Log, All)
+
 class AAPCharacterBase;
 class APlayerController;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARCANEPUNK_API UAPMovementComponent : public UActorComponent
 {
+
 	GENERATED_BODY()
 
 public:	
@@ -19,6 +22,7 @@ public:
 	
 	FORCEINLINE void SetTickMove(bool NewBool) {bMove = NewBool;};
 	FORCEINLINE float GetDashTime() const {return DashLength / DashSpeed;};
+	FORCEINLINE float GetSwapDashTime() const {return (DashLength * 0.5f) / DashSpeed;};
 	FORCEINLINE FRotator GetTargetRot() const {return TargetRot;};
 	
 protected:
@@ -42,14 +46,20 @@ public:
 
 	void SetAttackRotation(const FRotator & NewTargetRot, float AddSpeed = 0.0f);
 	
+	void StartLookAtEnemy();
+
 	void StartDash();
 	void EndDash();
+
+	void PlaySwapDash();
+	void EndSwapDash();
 
 private:
 	void TickCheck();
 	void TickRotate(float DeltaTime); // 틱 회전 함수
 	void TickMove(float DeltaTime); // 틱 이동 함수
 	void TickDash(float DeltaTime); // 틱 대쉬 함수
+	void TickLookAt(float DeltaTime); // 틱 룩앳앳 함수
 
 	void EndedAttackCancelTime();
 	
@@ -89,16 +99,34 @@ private:
 	UPROPERTY(EditAnywhere)
 	float PushSpeed = 500.0f;
 
+	//@대시 여부
 	bool bDash = false;
+
+	//@대시 속도
 	UPROPERTY(EditAnywhere)
 	float DashSpeed = 500.0f;
+
+	//@대시 거리
 	UPROPERTY(EditAnywhere)
 	float DashLength = 1000.0f;
+
+	//@대시 목표 위치
 	FVector DashLocation;
+
+	bool bLookAt = false;
+	FVector TargetLookAt;
 
 	TWeakObjectPtr<AAPCharacterBase> OwnerCharacter;
 	TWeakObjectPtr<APlayerController> OwnerPC;
 
 	FTimerHandle DashTimerHandle;
+
+
+public:
+	//@Dash 속도
+	FORCEINLINE float GetDashSpeed() const { return DashSpeed; };
+
+	//@Dash 거리
+	FORCEINLINE float GetDashLength() const { return DashLength; };
 
 };
