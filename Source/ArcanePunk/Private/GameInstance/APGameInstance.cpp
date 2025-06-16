@@ -14,8 +14,6 @@ void UAPGameInstance::Init()
 
     OnSkillEnhanceDataUpdate.AddUObject(this, &UAPGameInstance::UpdateSkillEnhanceData);
     OnSkillEnhanceDataClear.AddUObject(this, &UAPGameInstance::ClearSkillEnhanceData);
-
-    USkillDataManager::GetInstance()->ReadSkillData();
 }
 
 void UAPGameInstance::InitData()
