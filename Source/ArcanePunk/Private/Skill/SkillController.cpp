@@ -205,5 +205,5 @@ void ASkillController::UpdateSkillSlotImage()
 
 void ASkillController::StartCoolDown()
 {
-	OwnerCharacter->GetAPHUD()->GetStatusWidget()->StartCoolTimeSlot(CurrentSkillKey, CurSkillData.CoolDownTime_msec);
+	// OwnerCharacter->GetAPHUD()->GetStatusWidget()->StartCoolTimeSlot(CurrentSkillKey, CurSkillData.CoolDownTime_msec);
 }
