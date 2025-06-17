@@ -16,8 +16,10 @@ body:
       description: 발생한 이슈를 가능한 한 구체적으로 설명해주세요.
       placeholder: |
         예시:
-        - 로그인 시 빈 화면이 출력됩니다.
-        - 특정 버튼을 눌러도 반응이 없습니다.
+        - 오브젝트 투명화 구현
+        - 타격 시 넉백 구현
+        - 데모 전투 테스트를 위한 가레벨을 제작
+        - 이펙트 추가
     validations:
       required: true
 
@@ -33,8 +35,8 @@ body:
       label: 요청 작업
       description: 해결을 위해 필요한 작업을 항목별로 정리해주세요.
       placeholder: |
-        - [ ] 로그인 오류 해결
-        - [ ] 버튼 클릭 이벤트 연결
+        - [ ] 신규 기능 구현
+        - [ ] 검기 이펙트 추가
     validations:
       required: true
 
@@ -50,6 +52,7 @@ body:
       label: 담당자
       description: '(파트) : (@GitHub ID) 형식으로 작성'
       placeholder: |
-        - Frontend : @alice
-        - Backend : @bob
+        - 클라 : @alice
+        - 기획 : @bob
+        - 애니 : @charlie
     validations: {}
