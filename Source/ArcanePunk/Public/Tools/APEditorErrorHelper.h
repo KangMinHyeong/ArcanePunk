@@ -4,5 +4,5 @@
 class APEditorErrorHelper
 {
 public:
-    static void ReportErrorAndExitIfEditor(const FString& ErrorMessage, UObject* WorldContext = nullptr);
+    static void ReportErrorAndExitIfEditor(const FString& ErrorMessage);
 }; 
