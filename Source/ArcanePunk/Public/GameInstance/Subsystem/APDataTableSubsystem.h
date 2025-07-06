@@ -53,6 +53,8 @@ public:
 
 	const TArray<FDialogueDataTable> GetDialogues(const int32 GroupID) const;
 
+	void CollectDataTablesByStruct();
+
 private:
 	UPROPERTY()
 	UDataTable* SkillNameListDataTable;
@@ -93,4 +95,7 @@ private:
 
 	UPROPERTY()
 	TMap<int32, FDialogueGroupData> GroupedDialogueRows;
+
+	UPROPERTY()
+	TMap<const UScriptStruct*, TSoftObjectPtr<UDataTable>> AllDataTablesByStruct;
 };

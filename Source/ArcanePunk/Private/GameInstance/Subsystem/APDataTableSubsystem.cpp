@@ -2,6 +2,7 @@
 
 #include "GameInstance/Subsystem/APDataTableSubsystem.h"
 
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
 #include "GameElements/Drop/APManaEnergy.h"
@@ -57,9 +58,35 @@ UAPDataTableSubsystem::UAPDataTableSubsystem()
 	if(SystemMessage.Succeeded()) SystemMessageClass = SystemMessage.Class;
 }
 
+void UAPDataTableSubsystem::CollectDataTablesByStruct()
+{
+    // /Game/DataTable 폴더(및 하위 폴더)에서만 DataTable 애셋을 찾음
+    FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+    TArray<FAssetData> DataTableAssets;
+    FName DataTablePath(TEXT("/Game/DataTable"));
+    AssetRegistryModule.Get().GetAssetsByPath(DataTablePath, DataTableAssets, true);
+    // DataTable 애셋만 필터링
+    FTopLevelAssetPath DataTableClassPath(TEXT("/Script/Engine"), TEXT("DataTable"));
+
+    for (const FAssetData& Asset : DataTableAssets)
+    {
+        if (Asset.AssetClassPath == DataTableClassPath)
+        {
+            UDataTable* DataTable = Cast<UDataTable>(Asset.GetAsset());
+            if (DataTable && DataTable->GetRowStruct())
+            {
+                AllDataTablesByStruct.Add(DataTable->GetRowStruct(), DataTable);
+            }
+        }
+    }
+}
+
 void UAPDataTableSubsystem::Initialize(FSubsystemCollectionBase &Collection)
 {
     Super::Initialize(Collection);
+
+    CollectDataTablesByStruct();
+
     CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
     InitDialogueData();
 }
