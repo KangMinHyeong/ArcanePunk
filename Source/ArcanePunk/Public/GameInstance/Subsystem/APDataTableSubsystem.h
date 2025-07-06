@@ -55,6 +55,22 @@ public:
 
 	void CollectDataTablesByStruct();
 
+	template<typename T>
+	const UDataTable* GetDataTableByStruct() const
+	{
+		static_assert(TIsDerivedFrom<T, FTableRowBase>::IsDerived, "T must be derived from FTableRowBase");
+		const TSoftObjectPtr<UDataTable>* Found = AllDataTablesByStruct.Find(T::StaticStruct());
+		return Found ? Found->Get() : nullptr;
+	}
+
+	template<typename T>
+	const T* GetRowByStruct(const FName& RowName, const FString& ContextString = TEXT("")) const
+	{
+		static_assert(TIsDerivedFrom<T, FTableRowBase>::IsDerived, "T must be derived from FTableRowBase");
+		const UDataTable* Table = GetDataTableByStruct<T>();
+		return Table ? Table->FindRow<T>(RowName, ContextString) : nullptr;
+	}
+
 private:
 	UPROPERTY()
 	UDataTable* SkillNameListDataTable;
