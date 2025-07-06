@@ -1,0 +1,1 @@
+CharacterUIData = DataTableGI->GetDataTableByStruct<FCharaterUIData>(); 

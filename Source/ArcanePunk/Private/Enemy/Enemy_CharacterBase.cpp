@@ -1,4 +1,3 @@
-
 #include "Enemy/Enemy_CharacterBase.h"
 
 #include "Components/CapsuleComponent.h"
@@ -358,7 +357,7 @@ void AEnemy_CharacterBase::InitMonster()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
-    auto DataTable = DataTableGI->GetDropDataTable()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
+    auto DataTable = DataTableGI->GetRowByStruct<FDropData>(CharacterName, CharacterName.ToString()); 
     if(DataTable) DropData = * DataTable; 
 	SetManaDrop();
 	SetHPUI();

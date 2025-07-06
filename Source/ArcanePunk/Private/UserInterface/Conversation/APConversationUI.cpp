@@ -102,7 +102,7 @@ void UAPConversationUI::InitOrder(const int32 & NewGroupID, bool bTutorial)
     
     GroupID = NewGroupID; 
     Dialogues = DataTableGI->GetDialogues(GroupID);
-    CharacterUIData = DataTableGI->GetCharacterUIDataTable();
+    CharacterUIData = DataTableGI->GetDataTableByStruct<FCharaterUIData>();
 
     Message_Sort = 0;
     Message_Num = Dialogues.Num();

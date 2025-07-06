@@ -17,7 +17,7 @@ void UAPSwapBarUI::Init(TArray<uint8> UI_ID)
         UE_LOG(LogTemp, Display, TEXT("Your KeyNum %d"), UI);
         auto SwapUI = CreateWidget<UChangeCharacterUI>(GetWorld(), SwapUIClass);
 
-        auto CharacterUIData = DataTableGI->GetCharacterUIDataTable()->FindRow<FCharaterUIData>(FName(*FString::FromInt(UI)), TEXT("None")); 
+        auto CharacterUIData = DataTableGI->GetRowByStruct<FCharaterUIData>(FName(*FString::FromInt(UI)), TEXT("None")); 
         if(CharacterUIData)
         {
             SwapUI->Init(KeyNum, CharacterUIData->Portraits[1]);

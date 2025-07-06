@@ -52,7 +52,7 @@ private:
 	UPROPERTY()
 	TArray<FDialogueDataTable> Dialogues;
 	UPROPERTY()
-	UDataTable* CharacterUIData;
+	const UDataTable* CharacterUIData;
 
 	bool bKeyPress = false;
 	bool bCanSkip = false;

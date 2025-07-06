@@ -1,4 +1,3 @@
-
 #include "UserInterface/Inform/Skill/APSkillWindowSlot.h"
 
 #include "Character/ArcanePunkCharacter.h"
@@ -69,7 +68,7 @@ void UAPSkillWindowSlot::InitPassiveCategory(UUserWidget* Parent, uint8 UpdatePa
 
     const UEnum* SkillNum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EPassiveNumber"), true); if(!SkillNum) return;
     SkillRowName = SkillNum->GetNameStringByValue(SkillNumber);
-    SkillNameTable = DataTableGI->GetSkillNameListDataTable()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
+    SkillNameTable = DataTableGI->GetRowByStruct<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
 
     Text_SkillName->SetText(FText::FromString(SkillNameTable->SkillName_Korean));
 
@@ -79,7 +78,7 @@ void UAPSkillWindowSlot::InitPassiveCategory(UUserWidget* Parent, uint8 UpdatePa
 
 void UAPSkillWindowSlot::InitSkillImage()
 {   
-    SkillNameTable = DataTableGI->GetSkillNameListDataTable()->FindRow<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
+    SkillNameTable = DataTableGI->GetRowByStruct<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return;
     auto SkillImage = SkillNameTable->SkillSlotImage;
 
     auto ButtonStyle = Button_Skill->GetStyle(); 

@@ -11,39 +11,6 @@
 
 UAPDataTableSubsystem::UAPDataTableSubsystem()
 {
-    static ConstructorHelpers::FObjectFinder<UDataTable> SkillNameListData(TEXT("/Game/DataTable/Skill/SkillListData"));
-	if(SkillNameListData.Succeeded()) SkillNameListDataTable = SkillNameListData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> SkillAbilityRowData(TEXT("/Game/DataTable/Skill/SkillAbilityRowNameData"));
-	if(SkillAbilityRowData.Succeeded()) SkillAbilityRowDataTable = SkillAbilityRowData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> SilverAbilityData(TEXT("/Game/DataTable/Skill/ArcanePunk_SkillAbilityData_Silver"));
-	if(SilverAbilityData.Succeeded()) SilverAbilityDataTable = SilverAbilityData.Object;
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> GoldAbilityData(TEXT("/Game/DataTable/Skill/ArcanePunk_SkillAbilityData_Gold"));
-	if(GoldAbilityData.Succeeded()) GoldAbilityDataTable = GoldAbilityData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> PlatinumAbilityData(TEXT("/Game/DataTable/Skill/ArcanePunk_SkillAbilityData_Platinum"));
-	if(PlatinumAbilityData.Succeeded()) PlatinumAbilityDataTable = PlatinumAbilityData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> StringData(TEXT("/Game/DataTable/String/StringData"));
-	if(StringData.Succeeded()) StringDataTable = StringData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> DialogueData(TEXT("/Game/DataTable/String/DialogueData"));
-	if(DialogueData.Succeeded()) DialogueDataTable = DialogueData.Object;
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> CharacterData(TEXT("/Game/DataTable/Character/CharacterData"));
-	if(CharacterData.Succeeded()) CharacterDataTable = CharacterData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> DropData(TEXT("/Game/DataTable/Character/DropData"));
-	if(DropData.Succeeded()) DropDataTable = DropData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> CharacterUIData(TEXT("/Game/DataTable/Character/CharacterUIData"));
-	if(CharacterUIData.Succeeded()) CharacterUIDataTable = CharacterUIData.Object;
-    
-    static ConstructorHelpers::FObjectFinder<UDataTable> EquipData(TEXT("/Game/DataTable/Character/ItemData"));
-	if(EquipData.Succeeded()) EquipDataTable = EquipData.Object;
-
     // BP_Class
     static ConstructorHelpers::FClassFinder<AAPManaEnergy> ManaEnergy(TEXT("/Game/Blueprints/GameElement/Drop/BP_APManaEnergy"));
 	if(ManaEnergy.Succeeded()) ManaEnergyClass = ManaEnergy.Class;
@@ -115,7 +82,7 @@ void UAPDataTableSubsystem::SetTextBlock(UAPDataTableSubsystem* DataTableGI, UTe
     if(!DataTableGI->GetCheckEnum()) return;
     FString Name = DataTableGI->GetCheckEnum()->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(FName(*Name), Name); 
+    auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(FName(*Name), Name); 
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));    
 }
 
@@ -123,7 +90,7 @@ void UAPDataTableSubsystem::SetTextBlock_Name(UAPDataTableSubsystem* DataTableGI
 {
     if(!DataTableGI) return;
 
-    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(RowName, RowName.ToString()); 
+    auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(RowName, RowName.ToString()); 
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));  
 }
 
@@ -149,7 +116,7 @@ const FString& UAPDataTableSubsystem::GetStringContent(const EStringRowName& Row
     static FString Name;
     Name = CheckEnum->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = StringDataTable->FindRow<FStringDataTable>(FName(*Name), Name);
+    auto DataTable = this->GetRowByStruct<FStringDataTable>(FName(*Name), Name);
     if (!DataTable) return EmptyString;
 
     return DataTable->Content;

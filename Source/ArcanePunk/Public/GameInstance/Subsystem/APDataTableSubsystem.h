@@ -21,20 +21,7 @@ public:
 	UAPDataTableSubsystem();	
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-
-	// DataTable
-	FORCEINLINE UDataTable* GetSkillNameListDataTable() const {return SkillNameListDataTable;};
-	FORCEINLINE UDataTable* GetSkillAbilityRowDataTable() const {return SkillAbilityRowDataTable;};
-	FORCEINLINE UDataTable* GetSilverAbilityDataTable() const {return SilverAbilityDataTable;};
-	FORCEINLINE UDataTable* GetGoldAbilityDataTable() const {return GoldAbilityDataTable;};
-	FORCEINLINE UDataTable* GetPlatinumAbilityDataTable() const {return PlatinumAbilityDataTable;};
-	FORCEINLINE UDataTable* GetEquipDataTable() const {return EquipDataTable;};
-	FORCEINLINE UDataTable* GetStringDataTable() const {return StringDataTable;};
-	FORCEINLINE UDataTable* GetDialogueDataTable() const {return DialogueDataTable;};
-	FORCEINLINE UDataTable* GetStatusDataTable() const {return CharacterDataTable;};
-	FORCEINLINE UDataTable* GetDropDataTable() const {return DropDataTable;};
-	FORCEINLINE UDataTable* GetCharacterUIDataTable() const {return CharacterUIDataTable;};
-
+	
 	// BP_Class
 	FORCEINLINE TSubclassOf<AAPManaEnergy> GetManaEnergyClass() const {return ManaEnergyClass;};
 	FORCEINLINE TSubclassOf<AEnemy_DropBase> GetDropGoldClass() const {return DropGoldClass;};

@@ -1,4 +1,3 @@
-
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
 
 #include "Components/TextBlock.h"
@@ -128,7 +127,7 @@ void UAPSkillWindow::InitPassiveSkill()
     }
 }
 
-void UAPSkillWindow::OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory, FSkillNameList* SkillNameTable, float CoolTime)
+void UAPSkillWindow::OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory, const FSkillNameList* SkillNameTable, float CoolTime)
 {
     ScrollBox_Information->ClearChildren();
 
@@ -137,7 +136,7 @@ void UAPSkillWindow::OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory
     Information->InitInformationData_Skill(UpdateEnhanceCategory, SkillNameTable, CoolTime);
 }
 
-void UAPSkillWindow::OpenEnhanceInformation(EEnHanceType UpdateEnhanceType,  FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber)
+void UAPSkillWindow::OpenEnhanceInformation(EEnHanceType UpdateEnhanceType, const FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber)
 {
     ScrollBox_Information->ClearChildren();
 

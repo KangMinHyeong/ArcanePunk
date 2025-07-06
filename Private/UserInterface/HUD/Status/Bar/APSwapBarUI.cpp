@@ -1,0 +1,1 @@
+auto CharacterUIData = DataTableGI->GetRowByStruct<FCharaterUIData>(FName(*FString::FromInt(UI)), TEXT("None")); 

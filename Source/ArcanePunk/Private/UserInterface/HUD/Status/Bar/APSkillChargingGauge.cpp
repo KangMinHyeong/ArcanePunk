@@ -1,4 +1,3 @@
-
 #include "UserInterface/HUD/Status/Bar/APSkillChargingGauge.h"
 
 #include "Components/ProgressBar.h"
@@ -12,7 +11,7 @@ void UAPSkillChargingGauge::NativeConstruct()
     SetVisibility(ESlateVisibility::Collapsed);
 
     auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
-    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(Charging, Charging.ToString()); if(!DataTable) return;
+    auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(Charging, Charging.ToString()); if(!DataTable) return;
     Text_Charging->SetText(FText::FromString(DataTable->Content));
 }
 

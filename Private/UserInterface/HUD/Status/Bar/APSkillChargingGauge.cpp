@@ -1,0 +1,1 @@
+auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(Charging, Charging.ToString()); if(!DataTable) return; 

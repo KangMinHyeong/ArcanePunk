@@ -1,0 +1,1 @@
+SkillNameTable = DataTableGI->GetRowByStruct<FSkillNameList>(FName(*SkillRowName), SkillRowName); if(!SkillNameTable) return; 
