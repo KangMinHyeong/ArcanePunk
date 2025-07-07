@@ -8,6 +8,7 @@
 #include "GameElements/Drop/APManaEnergy.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "UserInterface/Common/DisplayOnly/APSystemMessage.h"
+#include "Tools/APEditorErrorHelper.h"
 
 UAPDataTableSubsystem::UAPDataTableSubsystem()
 {
@@ -27,13 +28,13 @@ UAPDataTableSubsystem::UAPDataTableSubsystem()
 
 void UAPDataTableSubsystem::CollectDataTablesByStruct()
 {
-    // /Game/DataTable 폴더(및 하위 폴더)에서만 DataTable 애셋을 찾음
     FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
     TArray<FAssetData> DataTableAssets;
     FName DataTablePath(TEXT("/Game/DataTable"));
     AssetRegistryModule.Get().GetAssetsByPath(DataTablePath, DataTableAssets, true);
-    // DataTable 애셋만 필터링
     FTopLevelAssetPath DataTableClassPath(TEXT("/Script/Engine"), TEXT("DataTable"));
+
+    AllDataTablesByStruct.Empty();
 
     for (const FAssetData& Asset : DataTableAssets)
     {
@@ -42,7 +43,21 @@ void UAPDataTableSubsystem::CollectDataTablesByStruct()
             UDataTable* DataTable = Cast<UDataTable>(Asset.GetAsset());
             if (DataTable && DataTable->GetRowStruct())
             {
-                AllDataTablesByStruct.Add(DataTable->GetRowStruct(), DataTable);
+                const UScriptStruct* RowStruct = DataTable->GetRowStruct();
+                if (AllDataTablesByStruct.Contains(RowStruct))
+                {
+                    UDataTable* ExistingTable = AllDataTablesByStruct[RowStruct].Get();
+                    FString StructName = RowStruct ? RowStruct->GetName() : TEXT("UnknownStruct");
+                    FString ExistingAssetName = ExistingTable ? ExistingTable->GetName() : TEXT("UnknownAsset");
+                    FString CurrentAssetName = DataTable->GetName();
+                    FString ErrorMsg = FString::Printf(TEXT("[UAPDataTableSubsystem] 같은 RowStruct(%s)로 여러 DataTable이 등록되어 있습니다. 중복 애셋 이름: %s, %s"), *StructName, *ExistingAssetName, *CurrentAssetName);
+                    APEditorErrorHelper::ReportErrorAndExitIfEditor(ErrorMsg);
+                    return;
+                }
+                else
+                {
+                    AllDataTablesByStruct.Add(RowStruct, DataTable);
+                }
             }
         }
     }
