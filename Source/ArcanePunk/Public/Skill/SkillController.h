@@ -18,7 +18,9 @@ class ARCANEPUNK_API ASkillController : public APlayerController
 public:
 	ASkillController();
 
-	FORCEINLINE TSharedPtr<ASkillActor> GetSkillActor() {return SkillActor;};
+public:
+	// Getter 함수도 안전하게 수정
+	FORCEINLINE ASkillActor* GetSkillActor() const { return SkillActor; }
 	FORCEINLINE AAPSkillRange* GetSkillTargetRange() {return SkillRange_Target.Get();};
 	FORCEINLINE bool IsReady() const {return bReady;};
 	
@@ -44,7 +46,8 @@ private:
 private:
 	UPROPERTY()
 	FSkillControllerData CurSkillData;
-	TSharedPtr<ASkillActor> SkillActor;
+	UPROPERTY()
+	ASkillActor* SkillActor;
 
 	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
 	TWeakObjectPtr<UAnimMontage> SkillAction;
