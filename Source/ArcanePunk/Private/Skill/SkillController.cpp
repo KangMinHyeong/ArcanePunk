@@ -19,9 +19,10 @@ ASkillController::ASkillController()
 
 void ASkillController::InitializeSkills(ESkillKey SkillKey, FName SkillId, TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacterPtr)
 {
-	if(!SkillActor)
+	if (!SkillActor)
 	{
-		SkillActor = TSharedPtr<ASkillActor>(GetWorld()->SpawnActor<ASkillActor>(ASkillActor::StaticClass(), SpawnLocation, FRotator::ZeroRotator));
+		// TSharedPtr 생성자 호출을 제거하고 직접 할당
+		SkillActor = GetWorld()->SpawnActor<ASkillActor>(ASkillActor::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
 	}
 
 	// TODO: ScillControllerData에 대한 매니저 클래스 구현 후 받아오는 코드 수정
