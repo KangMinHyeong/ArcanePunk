@@ -1,4 +1,3 @@
-
 #include "UserInterface/Shop/ShoppingChoiceUI.h"
 
 #include "Components/Border.h"
@@ -12,6 +11,8 @@
 #include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Common/Check/APCheckUI.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UShoppingChoiceUI::NativeConstruct()
 {

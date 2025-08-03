@@ -38,7 +38,7 @@ enum class EEquipType : uint8
 	Weapon		UMETA(DisplayName = "Weapon")
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemStatistics
 {
 	GENERATED_USTRUCT_BODY()
@@ -81,7 +81,7 @@ struct FItemStatistics
 	EEquipType EquipType;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemTextData
 {
 	GENERATED_USTRUCT_BODY()
@@ -102,7 +102,7 @@ struct FItemTextData
 	FText ConditionText;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemNumericData
 {
 	GENERATED_USTRUCT_BODY()
@@ -126,7 +126,7 @@ struct FItemNumericData
 	int32 RepairCost;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemAssetData
 {
 	GENERATED_USTRUCT_BODY()
@@ -141,33 +141,6 @@ struct FItemAssetData
 	USkeletalMesh* SkelMesh;
 };
 
-USTRUCT()
-struct FItemData : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FName ID;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	EItemQuality ItemQuality;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	EItemType ItemType;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemNumericData ItemNumericData;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemAssetData ItemAssetData;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemStatistics ItemStatistics;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemTextData ItemTextData;
-};
-
 UCLASS()
 class ARCANEPUNK_API UAPItemDataStruct : public UDataTable
 {
@@ -176,4 +149,4 @@ class ARCANEPUNK_API UAPItemDataStruct : public UDataTable
 public:
 	UAPItemDataStruct();
 	~UAPItemDataStruct();
-};
+}; 

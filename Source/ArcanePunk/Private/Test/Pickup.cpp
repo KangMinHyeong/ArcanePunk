@@ -5,6 +5,9 @@
 #include "ArcanePunk/Public/Character/ArcanePunkCharacter.h"
 #include "ArcanePunk/Public/Components/Character/APInventoryComponent.h"
 #include "Items/APItemBase.h"
+#include "DataStructs/Item/FItemData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 // Sets default values
 APickup::APickup()

@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillNameList.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
 #include "SkillDataTable.generated.h"
 
 
@@ -242,90 +245,6 @@ struct FSkillAbilityList
 // 	UPROPERTY(EditAnywhere)
 // 	TMap<uint8, FSkillAbilityList> PlatinumAbilityInformation;
 // };
-
-USTRUCT()
-struct FSkillAbilityDataSheet : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FSkillAbilityDataSheet() {}
-
-	UPROPERTY(EditAnywhere)
-	FString AbilityName;
-
-	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
-	FString AbilityInformation;
-
-	UPROPERTY(EditAnywhere)
-	UTexture2D* EnhanceSlotImage;
-	
-	UPROPERTY(EditAnywhere)
-	bool Nestable = false;
-
-	UPROPERTY(EditAnywhere)
-	int32 MaxNesting = 0;
-
-	UPROPERTY(EditAnywhere)
-	float Coefficient_X = 0.0f;
-
-	UPROPERTY(EditAnywhere)
-	float Coefficient_Y = -1.0f;
-
-	UPROPERTY(EditAnywhere)
-	float Coefficient_Z = -1.0f;
-
-	UPROPERTY(EditAnywhere)
-	int32 Price = 0;
-
-};
-
-
-USTRUCT()
-struct FSkillNameList : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FSkillNameList() {}
-	
-	UPROPERTY(EditAnywhere)
-	FString SkillName_English;
-
-	UPROPERTY(EditAnywhere)
-	FString SkillName_Korean;
-
-	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
-	FString Skill_Information;
-
-	UPROPERTY(EditAnywhere)
-	UTexture2D* SkillSlotImage;
-
-	UPROPERTY(EditAnywhere)
-	int32 Price = 0;
-
-	UPROPERTY(EditAnywhere)
-	float CoolTime = 0.0f;
-
-	UPROPERTY(EditAnywhere)
-	uint8 MPConsumption = 1;
-
-};
-
-USTRUCT()
-struct FSkillAbilityRowNameData : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FSkillAbilityRowNameData() {}
-
-	UPROPERTY(EditAnywhere)
-	TArray<FString> SilverRowName;
-
-	UPROPERTY(EditAnywhere)
-	TArray<FString> GoldRowName;
-
-	UPROPERTY(EditAnywhere)
-	TArray<FString> PlatinumRowName;
-};
 
 USTRUCT()
 struct FSkillAbilityNestingData

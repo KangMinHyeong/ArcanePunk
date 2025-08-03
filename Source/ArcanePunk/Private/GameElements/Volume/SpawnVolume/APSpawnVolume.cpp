@@ -1,5 +1,5 @@
-
 #include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 #include "Enemy/Enemy_BossBase.h"
 #include "Components/BoxComponent.h"

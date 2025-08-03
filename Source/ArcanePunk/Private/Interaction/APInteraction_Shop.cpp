@@ -1,8 +1,10 @@
-
 #include "Interaction/APInteraction_Shop.h"
 
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 AAPInteraction_Shop::AAPInteraction_Shop()
 {

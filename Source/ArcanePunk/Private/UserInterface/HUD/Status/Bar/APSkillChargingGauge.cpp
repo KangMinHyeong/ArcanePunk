@@ -4,6 +4,7 @@
 #include "Components/TextBlock.h"
 #include "GameInstance/APGameInstance.h"
 #include "Interfaces/InteractionInterface.h"
+#include "DataStructs/Common/FStringDataTable.h"
 
 void UAPSkillChargingGauge::NativeConstruct()
 {

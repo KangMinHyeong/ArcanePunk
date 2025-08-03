@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Blueprint/UserWidget.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
 #include "APConversationUI.generated.h"
 
 class UAPConversationText;

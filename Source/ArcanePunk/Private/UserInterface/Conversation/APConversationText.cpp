@@ -1,4 +1,3 @@
-
 #include "UserInterface/Conversation/APConversationText.h"
 
 #include "Components/TextBlock.h"
@@ -9,6 +8,8 @@
 #include "Components/WrapBoxSlot.h"
 #include "PlayerState/APPlayerData.h"
 #include "UserInterface/Conversation/APConversationUI.h"
+#include "DataStructs/Player/FCharaterUIData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
 
 void UAPConversationText::NativeOnInitialized()
 {

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Engine/DataTable.h"
+#include "DataStructs/Common/FTextData_SystemMessage.h"
 
 #include "APSystemMessageSubsystem.generated.h"
 
@@ -23,30 +24,6 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSystemMessageSubsystem, Log, All)
 * 
 *   System Message 정보를 담은 구조체
 */
-USTRUCT(BlueprintType)
-struct ARCANEPUNK_API FTextData_SystemMessage : public FTableRowBase
-{
-    GENERATED_BODY()
-
-public:
-    FTextData_SystemMessage()
-        : ID(0)
-        , Text("")
-    {}
-
-    //@System Mesage 고유의 ID
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "System Message")
-        int64 ID;
-
-    //@System Mesage 텍스트
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "System Message")
-        FString Text;
-
-public:
-    FORCEINLINE int64 GetID() const { return ID; }
-    FORCEINLINE const FString& GetText() const { return Text; }
-};
-
 
 #pragma endregion
 

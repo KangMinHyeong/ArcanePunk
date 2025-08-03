@@ -4,6 +4,7 @@
 #include "GameInstance/APGameInstance.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "DataStructs/Common/FStringDataTable.h"
 
 void UAPEntranceUI::NativeConstruct()
 {

@@ -7,6 +7,8 @@
 #include "Components/SizeBox.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UAPSkillWindowInformation::NativeConstruct()
 {

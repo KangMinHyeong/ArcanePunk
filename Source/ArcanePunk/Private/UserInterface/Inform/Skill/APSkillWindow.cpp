@@ -9,6 +9,8 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Inform/Skill/APSkillWindowInformation.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UAPSkillWindow::NativeConstruct()
 {

@@ -1,4 +1,13 @@
 #include "Components/Character/APPassiveComponent.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
+#include "DataStructs/Player/FDropData.h"
+#include "DataStructs/Player/FCharaterUIData.h"
+#include "DataStructs/Common/FStringDataTable.h"
+#include "DataStructs/Item/FItemData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APSkillHubComponent.h"

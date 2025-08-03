@@ -11,6 +11,9 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameInstance/APGameInstance.h"
+#include "DataStructs/Item/FItemData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 // Sets default values
 AEnemy_DropBase::AEnemy_DropBase()

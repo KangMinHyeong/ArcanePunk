@@ -10,6 +10,8 @@
 #include "UserInterface/Tutorial/APTutorialUI.h"
 #include "GameMode/APGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "DataStructs/Player/FCharaterUIData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
 
 void UAPConversationUI::NativeOnInitialized()
 {

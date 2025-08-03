@@ -9,6 +9,7 @@
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "UserInterface/Common/DisplayOnly/APSystemMessage.h"
 #include "Tools/APEditorErrorHelper.h"
+#include "DataStructs/Common/FStringDataTable.h"
 
 UAPDataTableSubsystem::UAPDataTableSubsystem()
 {

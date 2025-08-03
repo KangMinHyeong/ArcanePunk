@@ -1,4 +1,3 @@
-
 #include "UserInterface/Shop/ShoppingListUI.h"
 
 #include "Components/Border.h"
@@ -8,6 +7,8 @@
 #include "Components/SizeBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "UserInterface/Shop/APShoppingUI.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UShoppingListUI::NativeConstruct()
 {

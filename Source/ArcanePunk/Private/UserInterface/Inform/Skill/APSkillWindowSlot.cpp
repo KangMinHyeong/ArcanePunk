@@ -9,6 +9,7 @@
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
 #include "UserInterface/Inform/Skill/APEnhanceSlot.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UAPSkillWindowSlot::NativeConstruct()
 {

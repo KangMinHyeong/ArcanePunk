@@ -1,4 +1,3 @@
-
 #include "Enemy/Drop/Enemy_DropPackage.h"
 
 #include "Character/ArcanePunkCharacter.h"
@@ -11,6 +10,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameElements/Portal/Portal_Base.h"
 #include "EngineUtils.h"
+#include "DataStructs/Item/FItemData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {

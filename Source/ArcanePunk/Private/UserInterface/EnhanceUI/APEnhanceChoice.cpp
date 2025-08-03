@@ -13,6 +13,8 @@
 #include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
 
 void UAPEnhanceChoice::NativeConstruct()
 {

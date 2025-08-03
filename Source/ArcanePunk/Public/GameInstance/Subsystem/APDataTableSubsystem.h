@@ -6,6 +6,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Character/SkillDataTable/SkillDataTable.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
 #include "APDataTableSubsystem.generated.h"
 
 class UTextBlock;

@@ -1,4 +1,4 @@
- // Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -70,7 +70,7 @@ struct FSpawnEntry
     uint8 EntityQuantity;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSpawnStep
 {
 	GENERATED_USTRUCT_BODY()
@@ -95,21 +95,6 @@ struct FSpawnStep
 	UPROPERTY(EditAnywhere)
 	TArray<FSpawnEntry> SpawnEntry;
 };
-
-USTRUCT()
-struct FSpawnerData : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FSpawnerData() {}
-
-	UPROPERTY(EditAnywhere)
-	FName SpawnerID;
-
-	UPROPERTY(EditAnywhere)
-	TArray<FSpawnStep> SpawnStep;
-};
-
 
 UCLASS()
 class ARCANEPUNK_API UAPBattleStageDataTable : public UDataTable

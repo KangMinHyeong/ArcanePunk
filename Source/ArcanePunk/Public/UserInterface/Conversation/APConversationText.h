@@ -1,14 +1,13 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
 #include "APConversationText.generated.h"
 
 class UImage;
 class UTextBlock;
 class UWrapBox;
-struct FDialogueDataTable;
 struct FCharaterUIData;
 class UWidgetAnimation;
 class UAPConversationUI;

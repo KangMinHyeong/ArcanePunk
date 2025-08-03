@@ -30,6 +30,9 @@
 #include "UserInterface/Common/WidgetComponent/APEnemyHPWidgetComponent.h"
 #include "UserInterface/Common/WidgetComponent/APEnemyTextWidgetComponent.h"
 #include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
+#include "DataStructs/Player/FDropData.h"
+#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {

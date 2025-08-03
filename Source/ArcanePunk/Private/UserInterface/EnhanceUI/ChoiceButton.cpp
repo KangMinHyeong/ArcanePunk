@@ -9,6 +9,9 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "GameInstance/APGameInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
+#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UChoiceButton::InitChoice(UUserWidget* UpdateParentWidget)
 {
