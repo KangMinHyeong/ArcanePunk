@@ -1,9 +1,9 @@
 #pragma once
 #include "DataStructs/FValidatableTableRowBase.h"
-#include "FDialogueDataTable.generated.h"
+#include "FDialogueData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FDialogueDataTable : public FValidatableTableRowBase
+struct FDialogueData : public FValidatableTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -31,5 +31,5 @@ struct FDialogueGroupData
 	FDialogueGroupData() {}
 
 	UPROPERTY()
-	TArray<FDialogueDataTable> DialogueGroupData;
+	TArray<FDialogueData> DialogueGroupData;
 }; 

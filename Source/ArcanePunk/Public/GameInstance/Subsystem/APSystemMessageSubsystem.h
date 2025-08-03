@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Engine/DataTable.h"
-#include "DataStructs/Common/FTextData_SystemMessage.h"
+#include "DataStructs/Common/FSystemMessageData.h"
 
 #include "APSystemMessageSubsystem.generated.h"
 
@@ -74,7 +74,7 @@ protected:
 
     //@System Message Text Data 캐시
     UPROPERTY()
-    TMap<int64, FTextData_SystemMessage> SystemMessageTextDataMap;
+    TMap<int64, FSystemMessageData> SystemMessageTextDataMap;
 #pragma endregion
 
 //@Delegates

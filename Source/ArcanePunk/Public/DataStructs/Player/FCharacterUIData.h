@@ -1,17 +1,17 @@
 #pragma once
 #include "DataStructs/FValidatableTableRowBase.h"
 #include "Engine/DataTable.h"
-#include "FCharaterUIData.generated.h"
+#include "FCharacterUIData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FCharaterUIData : public FValidatableTableRowBase
+struct FCharacterUIData : public FValidatableTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	FCharaterUIData() {}
+	FCharacterUIData() {}
 
 	UPROPERTY(EditAnywhere)
-	FString CharaterName;
+	FString CharacterName;
 
 	UPROPERTY(EditAnywhere)
 	TMap<uint8, UTexture2D*> Portraits;

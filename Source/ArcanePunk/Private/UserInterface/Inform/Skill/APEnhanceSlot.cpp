@@ -29,18 +29,18 @@ void UAPEnhanceSlot::InitEnhanceData(UUserWidget *Parent, EEnHanceType UpdateEnh
     {
     case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName[EnhanceNumber-1];
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName), RowName); 
         break;
     
     case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName[EnhanceNumber-1];
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName), RowName); 
         Image_TierColor->SetColorAndOpacity(GoldColor);
         break;
 
     case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName[EnhanceNumber-1];
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName), RowName); 
         Image_TierColor->SetColorAndOpacity(PlatinumColor);
         break;
     }

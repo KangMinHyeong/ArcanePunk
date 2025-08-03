@@ -18,7 +18,7 @@ void UAPSystemMessageSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UAPSystemMessageSubsystem::LoadSystemMessageDataTable()
 {
     // Text Data Table 로딩
-    static const TCHAR* TextDataTablePath = TEXT("/Game/DataTable/Text/TextData_SystemMessage");
+    static const TCHAR* TextDataTablePath = TEXT("/Game/DataTable/Text/SystemMessageDataTable");
     SystemMessageTextDataTable = LoadObject<UDataTable>(nullptr, TextDataTablePath);
 
     if (!SystemMessageTextDataTable)
@@ -72,7 +72,7 @@ void UAPSystemMessageSubsystem::CacheSystemMessageTextData()
     TArray<FName> RowNames = SystemMessageTextDataTable->GetRowNames();
     for (const FName& RowName : RowNames)
     {
-        FTextData_SystemMessage* RowData = SystemMessageTextDataTable->FindRow<FTextData_SystemMessage>(RowName, "CacheSystemMessageTextData");
+        FSystemMessageData* RowData = SystemMessageTextDataTable->FindRow<FSystemMessageData>(RowName, "CacheSystemMessageTextData");
         if (RowData)
         {
             SystemMessageTextDataMap.Add(RowData->GetID(), *RowData);

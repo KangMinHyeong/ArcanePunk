@@ -1,17 +1,10 @@
 #include "Components/Character/APPassiveComponent.h"
-#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
 #include "DataStructs/Skill/FSkillAbilityRowNameData.h"
-#include "DataStructs/Skill/FSkillNameList.h"
-#include "DataStructs/Player/FDropData.h"
-#include "DataStructs/Player/FCharaterUIData.h"
-#include "DataStructs/Common/FStringDataTable.h"
 #include "DataStructs/Item/FItemData.h"
-#include "DataStructs/Common/FDialogueDataTable.h"
-#include "DataStructs/Stage/FSpawnerData.h"
 
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APSkillHubComponent.h"
-#include "Components/SkillActor/APSkillAbility.h"
 #include "UserInterface/HUD/APHUD.h"
 #include "Components/Common/APBuffComponent.h"
 #include "Components/Common/APCrowdControlComponent.h"
@@ -166,7 +159,7 @@ void UAPPassiveComponent::UpdateMaxHP()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -182,7 +175,7 @@ void UAPPassiveComponent::UpdateMaxHP()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -199,7 +192,7 @@ void UAPPassiveComponent::UpdateMaxHP()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -238,7 +231,7 @@ void UAPPassiveComponent::UpdateATK()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -257,7 +250,7 @@ void UAPPassiveComponent::UpdateATK()
 	RowName = RowDataTable->GoldRowName;
 	for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -276,7 +269,7 @@ void UAPPassiveComponent::UpdateATK()
 	RowName = RowDataTable->PlatinumRowName;
 	for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -319,7 +312,7 @@ void UAPPassiveComponent::UpdateATKSpeed()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -331,7 +324,7 @@ void UAPPassiveComponent::UpdateATKSpeed()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -343,7 +336,7 @@ void UAPPassiveComponent::UpdateATKSpeed()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -374,7 +367,7 @@ void UAPPassiveComponent::UpdateMoveSpeed()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -389,7 +382,7 @@ void UAPPassiveComponent::UpdateMoveSpeed()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -404,7 +397,7 @@ void UAPPassiveComponent::UpdateMoveSpeed()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -439,7 +432,7 @@ void UAPPassiveComponent::UpdateMaxMP()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -451,7 +444,7 @@ void UAPPassiveComponent::UpdateMaxMP()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -464,7 +457,7 @@ void UAPPassiveComponent::UpdateMaxMP()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -505,7 +498,7 @@ void UAPPassiveComponent::UpdateCriticalPercent()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -520,7 +513,7 @@ void UAPPassiveComponent::UpdateCriticalPercent()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -535,7 +528,7 @@ void UAPPassiveComponent::UpdateCriticalPercent()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -571,7 +564,7 @@ void UAPPassiveComponent::UpdateDEF()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -586,7 +579,7 @@ void UAPPassiveComponent::UpdateDEF()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -601,7 +594,7 @@ void UAPPassiveComponent::UpdateDEF()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -720,7 +713,7 @@ void UAPPassiveComponent::UpdateDamaged()
 	DamagedGoldPercent = 0.0f;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -732,7 +725,7 @@ void UAPPassiveComponent::UpdateDamaged()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -744,7 +737,7 @@ void UAPPassiveComponent::UpdateDamaged()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{
@@ -768,7 +761,7 @@ void UAPPassiveComponent::UpdateDrain()
 	auto RowName = RowDataTable->SilverRowName;
 	for(auto It : PassiveNestingData.SilverAbilityNestingNum)
     {
-		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto SilverData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
 		if(!SilverData) return;
 		switch (It.Key)
 		{
@@ -780,7 +773,7 @@ void UAPPassiveComponent::UpdateDrain()
 	RowName = RowDataTable->GoldRowName;
     for(auto It : PassiveNestingData.GoldAbilityNestingNum)
     {
-		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto GoldData = DataTableGI->GetRowByStruct<FSkillAbilityData>( FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!GoldData) return;
 		switch (It.Key)
 		{
@@ -792,7 +785,7 @@ void UAPPassiveComponent::UpdateDrain()
 	RowName = RowDataTable->PlatinumRowName;
     for(auto It : PassiveNestingData.PlatinumAbilityNestingNum)
     {
-		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
+		auto PlatinumData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[It.Key - 1]), RowName[It.Key - 1]);
         if(!PlatinumData) return;
 		switch (It.Key)
 		{

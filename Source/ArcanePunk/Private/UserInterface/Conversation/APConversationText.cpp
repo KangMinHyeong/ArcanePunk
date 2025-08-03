@@ -2,14 +2,12 @@
 
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include "Interfaces/InteractionInterface.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
-#include "PlayerState/APPlayerData.h"
 #include "UserInterface/Conversation/APConversationUI.h"
-#include "DataStructs/Player/FCharaterUIData.h"
-#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Player/FCharacterUIData.h"
+#include "DataStructs/Common/FDialogueData.h"
 
 void UAPConversationText::NativeOnInitialized()
 {
@@ -51,14 +49,14 @@ void UAPConversationText::NativeTick(const FGeometry &MyGeometry, float InDeltaT
     else {FlowTime += InDeltaTime;}     
 }
 
-void UAPConversationText::SetConversation(UAPConversationUI* ParentWidget, const FDialogueDataTable & Dialogues, const FCharaterUIData &  CharacterUIData)
+void UAPConversationText::SetConversation(UAPConversationUI* ParentWidget, const FDialogueData & Dialogues, const FCharacterUIData &  CharacterUIData)
 {
     ParentUI = ParentWidget;
 
     if(CharacterUIData.Portraits.Contains(Dialogues.Portrait_Type))
     {
         ConversationPortrait->SetBrushFromTexture(CharacterUIData.Portraits[Dialogues.Portrait_Type]);
-        ConversationActorName->SetText(FText::FromString(CharacterUIData.CharaterName));
+        ConversationActorName->SetText(FText::FromString(CharacterUIData.CharacterName));
     }
     
     bEmphasize = Dialogues.bEmphasize;

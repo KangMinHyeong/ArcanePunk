@@ -3,8 +3,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameInstance/APGameInstance.h"
-#include "Interfaces/InteractionInterface.h"
-#include "DataStructs/Common/FStringDataTable.h"
+#include "DataStructs/Common/FLocalizationData.h"
 
 void UAPSkillChargingGauge::NativeConstruct()
 {
@@ -12,7 +11,7 @@ void UAPSkillChargingGauge::NativeConstruct()
     SetVisibility(ESlateVisibility::Collapsed);
 
     auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
-    auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(Charging, Charging.ToString()); if(!DataTable) return;
+    auto DataTable = DataTableGI->GetRowByStruct<FLocalizationData>(Charging, Charging.ToString()); if(!DataTable) return;
     Text_Charging->SetText(FText::FromString(DataTable->Content));
 }
 

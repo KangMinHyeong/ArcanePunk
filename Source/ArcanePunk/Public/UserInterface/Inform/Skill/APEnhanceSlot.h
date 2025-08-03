@@ -45,5 +45,5 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FLinearColor PlatinumColor;
 
-	const FSkillAbilityDataSheet* AbilityData;
+	const FSkillAbilityData* AbilityData;
 };

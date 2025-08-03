@@ -1,10 +1,10 @@
 #pragma once
 #include "DataStructs/FValidatableTableRowBase.h"
 #include "Engine/DataTable.h"
-#include "FSkillAbilityDataSheet.generated.h"
+#include "FSkillAbilityData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FSkillAbilityDataSheet : public FValidatableTableRowBase
+struct FSkillAbilityData : public FValidatableTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -31,4 +31,4 @@ struct FSkillAbilityDataSheet : public FValidatableTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Price = 0;
-}; 
+};

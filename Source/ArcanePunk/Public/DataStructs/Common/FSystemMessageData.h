@@ -1,9 +1,9 @@
 #pragma once
 #include "DataStructs/FValidatableTableRowBase.h"
-#include "FTextData_SystemMessage.generated.h"
+#include "FSystemMessageData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FTextData_SystemMessage : public FValidatableTableRowBase
+struct FSystemMessageData : public FValidatableTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 

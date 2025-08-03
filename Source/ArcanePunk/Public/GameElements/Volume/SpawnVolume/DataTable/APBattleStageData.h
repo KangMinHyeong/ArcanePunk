@@ -4,43 +4,43 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "APBattleStageDataTable.generated.h"
+#include "APBattleStageData.generated.h"
 
 class AEnemy_CharacterBase;
 
-// USTRUCT()
-// struct FBattleWaveDataTable
-// {
-// 	GENERATED_USTRUCT_BODY()
+USTRUCT()
+struct FBattleWaveData
+{
+	GENERATED_USTRUCT_BODY()
 
-// 	FBattleWaveDataTable() {}
+	FBattleWaveData() {}
 
-// 	UPROPERTY(EditAnywhere)
-// 	TMap<TSubclassOf<AEnemy_CharacterBase>, uint8> SpawnMonsterData;
-// };
+	UPROPERTY(EditAnywhere)
+	TMap<TSubclassOf<AEnemy_CharacterBase>, uint8> SpawnMonsterData;
+};
 
-// USTRUCT()
-// struct FBattleStageDataTable : public FTableRowBase
-// {
-// 	GENERATED_USTRUCT_BODY()
+USTRUCT()
+struct FBattleStageData : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
 
-// 	FBattleStageDataTable() {}
+	FBattleStageData() {}
 
-// 	UPROPERTY(EditAnywhere)
-// 	FName BattleSectionID;
+	UPROPERTY(EditAnywhere)
+	FName BattleSectionID;
 
-// 	UPROPERTY(EditAnywhere)
-// 	int32 Chapter = 0;
+	UPROPERTY(EditAnywhere)
+	int32 Chapter = 0;
 
-// 	UPROPERTY(EditAnywhere)
-// 	float NextWaveTime = 15.0f;
+	UPROPERTY(EditAnywhere)
+	float NextWaveTime = 15.0f;
 
-// 	UPROPERTY(EditAnywhere)
-// 	TArray<FBattleWaveDataTable> Spawn_OnTime; // On Spawning Monster In Loop
+	UPROPERTY(EditAnywhere)
+	TArray<FBattleWaveData> Spawn_OnTime; // On Spawning Monster In Loop
 
-// 	UPROPERTY(EditAnywhere)
-// 	TArray<FBattleWaveDataTable> Spawn_Complete; // On Killed All Spawn_OnTime Monster
-// };
+	UPROPERTY(EditAnywhere)
+	TArray<FBattleWaveData> Spawn_Complete; // On Killed All Spawn_OnTime Monster
+};
 
 UENUM(BlueprintType)
 enum class ESpawnStepStartCondition : uint8 // 스포너 스탭이 시작되는 조건 
@@ -59,7 +59,7 @@ enum class ESpawnStepType : uint8 // 스포너 스탭의 타입
 };
 
 USTRUCT(BlueprintType)
-struct FSpawnEntry
+struct FSpawnEntryData
 {
     GENERATED_BODY()
 
@@ -71,11 +71,11 @@ struct FSpawnEntry
 };
 
 USTRUCT(BlueprintType)
-struct FSpawnStep
+struct FSpawnStepData
 {
 	GENERATED_USTRUCT_BODY()
 
-	FSpawnStep() {}
+	FSpawnStepData() {}
 
 	UPROPERTY(EditAnywhere)
 	FName SpawnStepID;
@@ -93,11 +93,11 @@ struct FSpawnStep
 	float TimerValue = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
-	TArray<FSpawnEntry> SpawnEntry;
+	TArray<FSpawnEntryData> SpawnEntry;
 };
 
 UCLASS()
-class ARCANEPUNK_API UAPBattleStageDataTable : public UDataTable
+class ARCANEPUNK_API UAPBattleStageData : public UDataTable
 {
 	GENERATED_BODY()
 	

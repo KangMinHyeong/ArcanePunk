@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/InteractionInterface.h"
-#include "Character/SkillDataTable/SkillDataTable.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Common/FDialogueData.h"
 #include "APDataTableSubsystem.generated.h"
 
 class UTextBlock;
@@ -36,10 +35,8 @@ public:
 	static void SetTextBlock(UAPDataTableSubsystem* DataTableGI, UTextBlock *TextBlock, const EStringRowName & RowName);
 	static void SetTextBlock_Name(UAPDataTableSubsystem* DataTableGI, UTextBlock *TextBlock, const FName & RowName);
 	const FString & GetStringContent(const EStringRowName & RowName);
-
-	void InitDialogueData();
-
-	const TArray<FDialogueDataTable> GetDialogues(const int32 GroupID) const;
+	
+	const TArray<FDialogueData> GetDialogues(const int32 GroupID) const;
 
 	void CollectDataTablesByStruct();
 
@@ -59,31 +56,10 @@ public:
 		return Table ? Table->FindRow<T>(RowName, ContextString) : nullptr;
 	}
 
+	bool CheckDuplicateStruct(const UScriptStruct* RowStruct, UDataTable* DataTable);
+	bool ValidateDataTableName(const UScriptStruct* RowStruct, UDataTable* DataTable);
+
 private:
-	UPROPERTY()
-	UDataTable* SkillNameListDataTable;
-	UPROPERTY()
-	UDataTable* SkillAbilityRowDataTable;
-	UPROPERTY()
-	UDataTable* SilverAbilityDataTable;
-	UPROPERTY()
-	UDataTable* GoldAbilityDataTable;
-	UPROPERTY()
-	UDataTable* PlatinumAbilityDataTable;
-	UPROPERTY()
-	UDataTable* StringDataTable;
-	UPROPERTY()
-	UDataTable* DialogueDataTable;
-	UPROPERTY()
-	UDataTable* CharacterDataTable;
-	UPROPERTY()
-	UDataTable* DropDataTable;
-	UPROPERTY()
-	UDataTable* CharacterUIDataTable;
-
-	UPROPERTY()
-	UDataTable* EquipDataTable;
-
 	// BP_Class
 	UPROPERTY()
 	TSubclassOf<AAPManaEnergy> ManaEnergyClass;

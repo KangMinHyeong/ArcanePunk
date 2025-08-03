@@ -3,15 +3,12 @@
 
 #include "UserInterface/Conversation/APConversationUI.h"
 
-#include "Character/ArcanePunkCharacter.h"
-#include "PlayerController/ArcanePunkPlayerController.h"
 #include "UserInterface/Conversation/APConversationText.h"
 #include "GameInstance/APGameInstance.h"
-#include "UserInterface/Tutorial/APTutorialUI.h"
 #include "GameMode/APGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "DataStructs/Player/FCharaterUIData.h"
-#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Player/FCharacterUIData.h"
+#include "DataStructs/Common/FDialogueData.h"
 
 void UAPConversationUI::NativeOnInitialized()
 {
@@ -104,7 +101,7 @@ void UAPConversationUI::InitOrder(const int32 & NewGroupID, bool bTutorial)
     
     GroupID = NewGroupID; 
     Dialogues = DataTableGI->GetDialogues(GroupID);
-    CharacterUIData = DataTableGI->GetDataTableByStruct<FCharaterUIData>();
+    CharacterUIData = DataTableGI->GetDataTableByStruct<FCharacterUIData>();
 
     Message_Sort = 0;
     Message_Num = Dialogues.Num();
@@ -126,7 +123,7 @@ void UAPConversationUI::SetOrder()
     }
     else
     {
-        auto Data = CharacterUIData->FindRow<FCharaterUIData>(FName(*FString::FromInt(Dialogues[Message_Sort].Character_ID)), TEXT("None")); 
+        auto Data = CharacterUIData->FindRow<FCharacterUIData>(FName(*FString::FromInt(Dialogues[Message_Sort].Character_ID)), TEXT("None")); 
         ConversationTextUI->SetConversation(this, Dialogues[Message_Sort], *Data); 
         Message_Sort++;
     }   

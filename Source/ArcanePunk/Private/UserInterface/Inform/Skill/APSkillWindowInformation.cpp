@@ -7,7 +7,7 @@
 #include "Components/SizeBox.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
-#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
 #include "DataStructs/Skill/FSkillNameList.h"
 
 void UAPSkillWindowInformation::NativeConstruct()
@@ -73,7 +73,7 @@ void UAPSkillWindowInformation::DisplayCoolTime(float CoolTime)
     }
 }
 
-void UAPSkillWindowInformation::InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, const FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber)
+void UAPSkillWindowInformation::InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, const FSkillAbilityData* UpdateAbilityData, uint16 UpdateNestingNumber)
 {
     FString CategoryTypeName;
     switch (UpdateEnhanceType)

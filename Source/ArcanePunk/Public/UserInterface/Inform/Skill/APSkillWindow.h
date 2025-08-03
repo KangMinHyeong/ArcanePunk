@@ -26,7 +26,7 @@ public:
 	virtual FReply NativeOnKeyDown( const FGeometry& InGeometry, const FKeyEvent& InKeyEvent ) override;
 
 	void OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory, const FSkillNameList* SkillNameTable, float CoolTime);
-	void OpenEnhanceInformation(EEnHanceType UpdateEnhanceType, const FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber);
+	void OpenEnhanceInformation(EEnHanceType UpdateEnhanceType, const FSkillAbilityData* UpdateAbilityData, uint16 UpdateNestingNumber);
 
 private:
 	void BindButton();

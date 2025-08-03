@@ -20,9 +20,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
-#include "Kismet/KismetMaterialLibrary.h"
 #include "NavigationSystem.h"
 #include "Components/Common/APManaDropComponent.h"
 #include "Enemy/SkillActor/APEnemyAttackRange.h"
@@ -31,8 +29,6 @@
 #include "UserInterface/Common/WidgetComponent/APEnemyTextWidgetComponent.h"
 #include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
 #include "DataStructs/Player/FDropData.h"
-#include "DataStructs/Common/FDialogueDataTable.h"
-#include "DataStructs/Stage/FSpawnerData.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {

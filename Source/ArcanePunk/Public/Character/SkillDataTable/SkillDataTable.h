@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
 #include "DataStructs/Skill/FSkillNameList.h"
 #include "DataStructs/Skill/FSkillAbilityRowNameData.h"
 #include "SkillDataTable.generated.h"

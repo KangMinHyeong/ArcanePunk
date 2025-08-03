@@ -23,7 +23,7 @@ public:
 	virtual void NativeConstruct() override;
 
 	void InitInformationData_Skill(EEnhanceCategory UpdateEnhanceCategory, const FSkillNameList* SkillNameTable, float CoolTime);
-	void InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, const FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber);
+	void InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, const FSkillAbilityData* UpdateAbilityData, uint16 UpdateNestingNumber);
 private:
 	void DisplayCoolTime(float CoolTime);
 	

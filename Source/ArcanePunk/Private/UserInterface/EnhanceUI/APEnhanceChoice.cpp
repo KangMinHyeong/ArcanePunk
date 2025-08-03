@@ -12,8 +12,7 @@
 #include "UserInterface/EnhanceUI/ChoiceButton.h"
 #include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
-#include "Components/HorizontalBoxSlot.h"
-#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
 #include "DataStructs/Skill/FSkillAbilityRowNameData.h"
 
 void UAPEnhanceChoice::NativeConstruct()
@@ -343,19 +342,19 @@ void UAPEnhanceChoice::EnhanceSuffle(FName SkillName)
         }
     }
     
-    const FSkillAbilityDataSheet* AbilityData = nullptr;
+    const FSkillAbilityData* AbilityData = nullptr;
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Gold:
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Platinum:
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
     }
     if(!AbilityData) return;

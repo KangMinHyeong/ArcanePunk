@@ -9,7 +9,7 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "GameInstance/APGameInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
-#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
 #include "DataStructs/Skill/FSkillAbilityRowNameData.h"
 #include "DataStructs/Skill/FSkillNameList.h"
 
@@ -54,7 +54,7 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkil
     auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
     auto DataTable = DataTableGI->GetRowByStruct<FSkillAbilityRowNameData>(SkillNumberName, SkillNumberName.ToString()); if(!DataTable) return;
 
-    const FSkillAbilityDataSheet* AbilityData = nullptr;
+    const FSkillAbilityData* AbilityData = nullptr;
     TArray<FString> RowName;
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(ParentWidget->GetOwningPlayerPawn()); if(!OwnerCharacter) return;
     
@@ -62,17 +62,17 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkil
     {
         case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName;
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName;
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName;
-        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
     }
     if(!AbilityData) return;

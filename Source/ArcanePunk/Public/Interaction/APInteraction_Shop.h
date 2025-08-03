@@ -41,7 +41,7 @@ private:
 	TMap<uint8, uint16> GetCurrentNesting(const FShopGoodsData_Enhance & EnhanceData);
 
 	TArray<uint8> IndexSuffle(uint8 MaxNumber);
-	FSkillAbilityDataSheet* GetTierData(EEnHanceType EnHanceType, const FString & CurrentRowName);
+	FSkillAbilityData* GetTierData(EEnHanceType EnHanceType, const FString & CurrentRowName);
 	void SetEnhanceData(FShopGoodsData_Enhance &EnhanceData, TArray<FString>& RowName, TArray<FString>& AlreadyAbility);
 
 private:	

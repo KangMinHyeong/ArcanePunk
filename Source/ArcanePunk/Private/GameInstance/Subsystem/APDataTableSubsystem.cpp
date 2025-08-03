@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "GameInstance/Subsystem/APDataTableSubsystem.h"
+#include "ArcanePunk/Public/GameInstance/Subsystem/APDataTableSubsystem.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
+#include "DataStructs/Common/FLocalizationData.h"
 #include "GameElements/Drop/APManaEnergy.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "UserInterface/Common/DisplayOnly/APSystemMessage.h"
 #include "Tools/APEditorErrorHelper.h"
-#include "DataStructs/Common/FStringDataTable.h"
 
 UAPDataTableSubsystem::UAPDataTableSubsystem()
 {
@@ -45,23 +45,60 @@ void UAPDataTableSubsystem::CollectDataTablesByStruct()
             if (DataTable && DataTable->GetRowStruct())
             {
                 const UScriptStruct* RowStruct = DataTable->GetRowStruct();
-                if (AllDataTablesByStruct.Contains(RowStruct))
+                // 중복 구조체 검증
+                if (!CheckDuplicateStruct(RowStruct, DataTable))
                 {
-                    UDataTable* ExistingTable = AllDataTablesByStruct[RowStruct].Get();
-                    FString StructName = RowStruct ? RowStruct->GetName() : TEXT("UnknownStruct");
-                    FString ExistingAssetName = ExistingTable ? ExistingTable->GetName() : TEXT("UnknownAsset");
-                    FString CurrentAssetName = DataTable->GetName();
-                    FString ErrorMsg = FString::Printf(TEXT("[UAPDataTableSubsystem] 같은 RowStruct(%s)로 여러 DataTable이 등록되어 있습니다. 중복 애셋 이름: %s, %s"), *StructName, *ExistingAssetName, *CurrentAssetName);
-                    APEditorErrorHelper::ReportErrorAndExitIfEditor(ErrorMsg);
                     return;
                 }
-                else
+                // 이름 규칙 검증
+                if (!ValidateDataTableName(RowStruct, DataTable))
                 {
-                    AllDataTablesByStruct.Add(RowStruct, DataTable);
+                    return;
                 }
+                AllDataTablesByStruct.Add(RowStruct, DataTable);
             }
         }
     }
+}
+
+// 중복 구조체 검증 함수
+bool UAPDataTableSubsystem::CheckDuplicateStruct(const UScriptStruct* RowStruct, UDataTable* DataTable)
+{
+    if (AllDataTablesByStruct.Contains(RowStruct))
+    {
+        UDataTable* ExistingTable = AllDataTablesByStruct[RowStruct].Get();
+        FString StructName = RowStruct ? RowStruct->GetName() : TEXT("UnknownStruct");
+        FString ExistingAssetName = ExistingTable ? ExistingTable->GetName() : TEXT("UnknownAsset");
+        FString CurrentAssetName = DataTable->GetName();
+        FString ErrorMsg = FString::Printf(TEXT("[UAPDataTableSubsystem] 같은 RowStruct(%s)로 여러 DataTable이 등록되어 있습니다. 중복 애셋 이름: %s, %s"), *StructName, *ExistingAssetName, *CurrentAssetName);
+        APEditorErrorHelper::ReportErrorAndExitIfEditor(ErrorMsg);
+        return false;
+    }
+    return true;
+}
+
+// 데이터테이블 이름 규칙 검증 함수
+bool UAPDataTableSubsystem::ValidateDataTableName(const UScriptStruct* RowStruct, UDataTable* DataTable)
+{
+    if (!RowStruct || !DataTable) return true;
+    FString StructName = RowStruct->GetName(); // 예: FCharacterUIData
+    FString ExpectedTableName;
+    if (StructName.StartsWith("F"))
+    {
+        ExpectedTableName = StructName.RightChop(1) + TEXT("Table"); // CharacterUIDataTable
+    }
+    else
+    {
+        ExpectedTableName = StructName + TEXT("Table");
+    }
+    FString ActualTableName = DataTable->GetName();
+    if (ActualTableName != ExpectedTableName)
+    {
+        FString ErrorMsg = FString::Printf(TEXT("[UAPDataTableSubsystem] DataTable 이름 규칙 위반: 구조체(%s)에 대한 DataTable 이름은 %s 이어야 합니다. 현재 이름: %s"), *StructName, *ExpectedTableName, *ActualTableName);
+        APEditorErrorHelper::ReportErrorAndExitIfEditor(ErrorMsg);
+        return false;
+    }
+    return true;
 }
 
 void UAPDataTableSubsystem::Initialize(FSubsystemCollectionBase &Collection)
@@ -71,7 +108,6 @@ void UAPDataTableSubsystem::Initialize(FSubsystemCollectionBase &Collection)
     CollectDataTablesByStruct();
 
     CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
-    InitDialogueData();
 }
 
 void UAPDataTableSubsystem::DisplaySystemMesseage(UAPDataTableSubsystem* DataTableGI, EStringRowName StringRowName, bool bLowMessage, bool bWarning)
@@ -98,7 +134,7 @@ void UAPDataTableSubsystem::SetTextBlock(UAPDataTableSubsystem* DataTableGI, UTe
     if(!DataTableGI->GetCheckEnum()) return;
     FString Name = DataTableGI->GetCheckEnum()->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(FName(*Name), Name); 
+    auto DataTable = DataTableGI->GetRowByStruct<FLocalizationData>(FName(*Name), Name); 
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));    
 }
 
@@ -106,7 +142,7 @@ void UAPDataTableSubsystem::SetTextBlock_Name(UAPDataTableSubsystem* DataTableGI
 {
     if(!DataTableGI) return;
 
-    auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(RowName, RowName.ToString()); 
+    auto DataTable = DataTableGI->GetRowByStruct<FLocalizationData>(RowName, RowName.ToString()); 
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));  
 }
 
@@ -132,44 +168,18 @@ const FString& UAPDataTableSubsystem::GetStringContent(const EStringRowName& Row
     static FString Name;
     Name = CheckEnum->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = this->GetRowByStruct<FStringDataTable>(FName(*Name), Name);
+    auto DataTable = this->GetRowByStruct<FLocalizationData>(FName(*Name), Name);
     if (!DataTable) return EmptyString;
 
     return DataTable->Content;
 }
 
-void UAPDataTableSubsystem::InitDialogueData()
-{
-    if(!DialogueDataTable) return;
-
-    GroupedDialogueRows.Empty();
-
-    for(const FName& RowName : DialogueDataTable->GetRowNames())
-    {
-        FDialogueDataTable* Row = DialogueDataTable->FindRow<FDialogueDataTable>(RowName, TEXT("InitializeDialogueData"));
-        if(!Row) return;
-        
-        // 그룹 ID를 기반으로 TMap에 추가
-        if(GroupedDialogueRows.Contains(Row->Diologue_ID))
-        {
-            GroupedDialogueRows[Row->Diologue_ID].DialogueGroupData.Emplace(*Row);
-        }
-        else
-        {
-            FDialogueGroupData NewGroup;
-            NewGroup.DialogueGroupData.Emplace(*Row);
-            GroupedDialogueRows.Add({Row->Diologue_ID, NewGroup});
-        }
-        
-    }
-}
-
-const TArray<FDialogueDataTable> UAPDataTableSubsystem::GetDialogues(const int32 GroupID) const
+const TArray<FDialogueData> UAPDataTableSubsystem::GetDialogues(const int32 GroupID) const
 {
     if(GroupedDialogueRows.Contains(GroupID))
     {
         return GroupedDialogueRows[GroupID].DialogueGroupData;
     }
     
-    return TArray<FDialogueDataTable>();
+    return TArray<FDialogueData>();
 }

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Blueprint/UserWidget.h"
-#include "DataStructs/Common/FDialogueDataTable.h"
+#include "DataStructs/Common/FDialogueData.h"
 #include "APConversationUI.generated.h"
 
 class UAPConversationText;
@@ -51,7 +51,7 @@ private:
 	int32 Message_Num;
 	
 	UPROPERTY()
-	TArray<FDialogueDataTable> Dialogues;
+	TArray<FDialogueData> Dialogues;
 	UPROPERTY()
 	const UDataTable* CharacterUIData;
 

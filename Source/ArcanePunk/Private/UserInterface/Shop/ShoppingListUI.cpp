@@ -7,7 +7,7 @@
 #include "Components/SizeBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "UserInterface/Shop/APShoppingUI.h"
-#include "DataStructs/Skill/FSkillAbilityDataSheet.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
 #include "DataStructs/Skill/FSkillNameList.h"
 
 void UShoppingListUI::NativeConstruct()
@@ -83,18 +83,18 @@ void UShoppingListUI::SetPrice(int32 Price)
 
 void UShoppingListUI::SwitchingAbility(EEnHanceType EnHanceType, FName AbilityName)
 {
-    FSkillAbilityDataSheet* AbilityTable = nullptr;
+    FSkillAbilityData* AbilityTable = nullptr;
 
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        AbilityTable = SkillAbility_Silver->FindRow<FSkillAbilityDataSheet>(AbilityName, AbilityName.ToString()); 
+        AbilityTable = SkillAbility_Silver->FindRow<FSkillAbilityData>(AbilityName, AbilityName.ToString()); 
     break;
         case EEnHanceType::Gold:
-        AbilityTable = SkillAbility_Gold->FindRow<FSkillAbilityDataSheet>(AbilityName, AbilityName.ToString()); 
+        AbilityTable = SkillAbility_Gold->FindRow<FSkillAbilityData>(AbilityName, AbilityName.ToString()); 
     break;
         case EEnHanceType::Platinum:
-        AbilityTable = SkillAbility_Platinum->FindRow<FSkillAbilityDataSheet>(AbilityName, AbilityName.ToString()); 
+        AbilityTable = SkillAbility_Platinum->FindRow<FSkillAbilityData>(AbilityName, AbilityName.ToString()); 
     break;
     }
     if(!AbilityTable) return;

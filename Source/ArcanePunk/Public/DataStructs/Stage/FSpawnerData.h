@@ -1,6 +1,6 @@
 #pragma once
 #include "DataStructs/FValidatableTableRowBase.h"
-#include "GameElements/Volume/SpawnVolume/DataTable/APBattleStageDataTable.h"
+#include "GameElements/Volume/SpawnVolume/DataTable/APBattleStageData.h"
 #include "FSpawnerData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -15,7 +15,7 @@ struct FSpawnerData : public FValidatableTableRowBase
 	FVector SpawnLocation = FVector::ZeroVector;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FSpawnStep> SpawnStep;
+	TArray<FSpawnStepData> SpawnStep;
 
 	// 필요하다면 SpawnStep 멤버도 추가
 	// 예시:
