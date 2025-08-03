@@ -69,6 +69,7 @@ protected:
     //@System Message Text Data 캐시 - FTextData 타입 사용
     UPROPERTY()
     TMap<int64, FTextData> SystemMessageTextDataMap;
+
 #pragma endregion
 
     //@Delegates

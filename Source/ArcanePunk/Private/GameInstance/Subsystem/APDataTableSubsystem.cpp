@@ -1,48 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "GameInstance/Subsystem/APDataTableSubsystem.h"
+#include "ArcanePunk/Public/GameInstance/Subsystem/APDataTableSubsystem.h"
 
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
+#include "DataStructs/Common/FLocalizationData.h"
 #include "GameElements/Drop/APManaEnergy.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "UserInterface/Common/DisplayOnly/APSystemMessage.h"
 
 UAPDataTableSubsystem::UAPDataTableSubsystem()
 {
-    static ConstructorHelpers::FObjectFinder<UDataTable> SkillNameListData(TEXT("/Game/DataTable/Skill/SkillListData"));
-	if(SkillNameListData.Succeeded()) SkillNameListDataTable = SkillNameListData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> SkillAbilityRowData(TEXT("/Game/DataTable/Skill/SkillAbilityRowNameData"));
-	if(SkillAbilityRowData.Succeeded()) SkillAbilityRowDataTable = SkillAbilityRowData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> SilverAbilityData(TEXT("/Game/DataTable/Skill/ArcanePunk_SkillAbilityData_Silver"));
-	if(SilverAbilityData.Succeeded()) SilverAbilityDataTable = SilverAbilityData.Object;
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> GoldAbilityData(TEXT("/Game/DataTable/Skill/ArcanePunk_SkillAbilityData_Gold"));
-	if(GoldAbilityData.Succeeded()) GoldAbilityDataTable = GoldAbilityData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> PlatinumAbilityData(TEXT("/Game/DataTable/Skill/ArcanePunk_SkillAbilityData_Platinum"));
-	if(PlatinumAbilityData.Succeeded()) PlatinumAbilityDataTable = PlatinumAbilityData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> StringData(TEXT("/Game/DataTable/String/StringData"));
-	if(StringData.Succeeded()) StringDataTable = StringData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> DialogueData(TEXT("/Game/DataTable/String/DialogueData"));
-	if(DialogueData.Succeeded()) DialogueDataTable = DialogueData.Object;
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> CharacterData(TEXT("/Game/DataTable/Character/CharacterData"));
-	if(CharacterData.Succeeded()) CharacterDataTable = CharacterData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> DropData(TEXT("/Game/DataTable/Character/DropData"));
-	if(DropData.Succeeded()) DropDataTable = DropData.Object;
-
-    static ConstructorHelpers::FObjectFinder<UDataTable> CharacterUIData(TEXT("/Game/DataTable/Character/CharacterUIData"));
-	if(CharacterUIData.Succeeded()) CharacterUIDataTable = CharacterUIData.Object;
-    
-    static ConstructorHelpers::FObjectFinder<UDataTable> EquipData(TEXT("/Game/DataTable/Character/ItemData"));
-	if(EquipData.Succeeded()) EquipDataTable = EquipData.Object;
-
     // BP_Class
     static ConstructorHelpers::FClassFinder<AAPManaEnergy> ManaEnergy(TEXT("/Game/Blueprints/GameElement/Drop/BP_APManaEnergy"));
 	if(ManaEnergy.Succeeded()) ManaEnergyClass = ManaEnergy.Class;
@@ -57,11 +26,37 @@ UAPDataTableSubsystem::UAPDataTableSubsystem()
 	if(SystemMessage.Succeeded()) SystemMessageClass = SystemMessage.Class;
 }
 
+void UAPDataTableSubsystem::CollectDataTablesByStruct()
+{
+    FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+    TArray<FAssetData> DataTableAssets;
+    FName DataTablePath(TEXT("/Game/DataTable"));
+    AssetRegistryModule.Get().GetAssetsByPath(DataTablePath, DataTableAssets, true);
+    FTopLevelAssetPath DataTableClassPath(TEXT("/Script/Engine"), TEXT("DataTable"));
+
+    AllDataTablesByStruct.Empty();
+
+    for (const FAssetData& Asset : DataTableAssets)
+    {
+        if (Asset.AssetClassPath == DataTableClassPath)
+        {
+            UDataTable* DataTable = Cast<UDataTable>(Asset.GetAsset());
+            if (DataTable && DataTable->GetRowStruct())
+            {
+                const UScriptStruct* RowStruct = DataTable->GetRowStruct();
+                AllDataTablesByStruct.Add(RowStruct, DataTable);
+            }
+        }
+    }
+}
+
 void UAPDataTableSubsystem::Initialize(FSubsystemCollectionBase &Collection)
 {
     Super::Initialize(Collection);
+
+    CollectDataTablesByStruct();
+
     CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
-    InitDialogueData();
 }
 
 void UAPDataTableSubsystem::DisplaySystemMesseage(UAPDataTableSubsystem* DataTableGI, EStringRowName StringRowName, bool bLowMessage, bool bWarning)
@@ -88,7 +83,7 @@ void UAPDataTableSubsystem::SetTextBlock(UAPDataTableSubsystem* DataTableGI, UTe
     if(!DataTableGI->GetCheckEnum()) return;
     FString Name = DataTableGI->GetCheckEnum()->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(FName(*Name), Name); 
+    auto DataTable = DataTableGI->GetRowByStruct<FLocalizationData>(FName(*Name), Name); 
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));    
 }
 
@@ -96,7 +91,7 @@ void UAPDataTableSubsystem::SetTextBlock_Name(UAPDataTableSubsystem* DataTableGI
 {
     if(!DataTableGI) return;
 
-    auto DataTable = DataTableGI->GetStringDataTable()->FindRow<FStringDataTable>(RowName, RowName.ToString()); 
+    auto DataTable = DataTableGI->GetRowByStruct<FLocalizationData>(RowName, RowName.ToString()); 
     if(DataTable) TextBlock->SetText(FText::FromString(DataTable->Content));  
 }
 
@@ -122,44 +117,18 @@ const FString& UAPDataTableSubsystem::GetStringContent(const EStringRowName& Row
     static FString Name;
     Name = CheckEnum->GetNameStringByValue((uint8)RowName);
 
-    auto DataTable = StringDataTable->FindRow<FStringDataTable>(FName(*Name), Name);
+    auto DataTable = this->GetRowByStruct<FLocalizationData>(FName(*Name), Name);
     if (!DataTable) return EmptyString;
 
     return DataTable->Content;
 }
 
-void UAPDataTableSubsystem::InitDialogueData()
-{
-    if(!DialogueDataTable) return;
-
-    GroupedDialogueRows.Empty();
-
-    for(const FName& RowName : DialogueDataTable->GetRowNames())
-    {
-        FDialogueDataTable* Row = DialogueDataTable->FindRow<FDialogueDataTable>(RowName, TEXT("InitializeDialogueData"));
-        if(!Row) return;
-        
-        // 그룹 ID를 기반으로 TMap에 추가
-        if(GroupedDialogueRows.Contains(Row->Diologue_ID))
-        {
-            GroupedDialogueRows[Row->Diologue_ID].DialogueGroupData.Emplace(*Row);
-        }
-        else
-        {
-            FDialogueGroupData NewGroup;
-            NewGroup.DialogueGroupData.Emplace(*Row);
-            GroupedDialogueRows.Add({Row->Diologue_ID, NewGroup});
-        }
-        
-    }
-}
-
-const TArray<FDialogueDataTable> UAPDataTableSubsystem::GetDialogues(const int32 GroupID) const
+const TArray<FDialogueData> UAPDataTableSubsystem::GetDialogues(const int32 GroupID) const
 {
     if(GroupedDialogueRows.Contains(GroupID))
     {
         return GroupedDialogueRows[GroupID].DialogueGroupData;
     }
     
-    return TArray<FDialogueDataTable>();
+    return TArray<FDialogueData>();
 }

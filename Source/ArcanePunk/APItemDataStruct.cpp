@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "APItemDataStruct.h"
+#include "DataStructs/Item/APItemDataStruct.h"
 
 UAPItemDataStruct::UAPItemDataStruct()
 {

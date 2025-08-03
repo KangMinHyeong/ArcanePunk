@@ -1,4 +1,3 @@
-
 #include "Enemy/Enemy_CharacterBase.h"
 
 #include "Components/CapsuleComponent.h"
@@ -21,9 +20,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/Character/APMovementComponent.h"
 #include "Components/Character/APAttackComponent.h"
-#include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
-#include "Kismet/KismetMaterialLibrary.h"
 #include "NavigationSystem.h"
 #include "Components/Common/APManaDropComponent.h"
 #include "Enemy/SkillActor/APEnemyAttackRange.h"
@@ -31,6 +28,7 @@
 #include "UserInterface/Common/WidgetComponent/APEnemyHPWidgetComponent.h"
 #include "UserInterface/Common/WidgetComponent/APEnemyTextWidgetComponent.h"
 #include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
+#include "DataStructs/Player/FDropData.h"
 
 AEnemy_CharacterBase::AEnemy_CharacterBase()
 {
@@ -358,7 +356,7 @@ void AEnemy_CharacterBase::InitMonster()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
-    auto DataTable = DataTableGI->GetDropDataTable()->FindRow<FDropData>(CharacterName, CharacterName.ToString()); 
+    auto DataTable = DataTableGI->GetRowByStruct<FDropData>(CharacterName, CharacterName.ToString()); 
     if(DataTable) DropData = * DataTable; 
 	SetManaDrop();
 	SetHPUI();

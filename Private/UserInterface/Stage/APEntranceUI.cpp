@@ -1,0 +1,1 @@
+auto DataTable = DataTableGI->GetRowByStruct<FStringDataTable>(FName(*Name), Name); 

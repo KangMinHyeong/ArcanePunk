@@ -1,10 +1,10 @@
-
 #include "UserInterface/HUD/Status/Bar/ImitatorSkillSlot.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UImitatorSkillSlot::NativeConstruct()
 {

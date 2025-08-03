@@ -55,7 +55,7 @@ protected:
 
 	FString SkillRowName;
 
-	FSkillNameList* SkillNameTable;
+	const FSkillNameList* SkillNameTable;
 
 	float CoolTime = -1.0f;
 };

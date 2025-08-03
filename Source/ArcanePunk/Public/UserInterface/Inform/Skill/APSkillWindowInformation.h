@@ -22,8 +22,8 @@ class ARCANEPUNK_API UAPSkillWindowInformation : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	void InitInformationData_Skill(EEnhanceCategory UpdateEnhanceCategory, FSkillNameList* SkillNameTable, float CoolTime);
-	void InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber);
+	void InitInformationData_Skill(EEnhanceCategory UpdateEnhanceCategory, const FSkillNameList* SkillNameTable, float CoolTime);
+	void InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, const FSkillAbilityData* UpdateAbilityData, uint16 UpdateNestingNumber);
 private:
 	void DisplayCoolTime(float CoolTime);
 	

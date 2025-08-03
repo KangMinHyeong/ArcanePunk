@@ -20,7 +20,6 @@ void UAPSystemMessageSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UAPSystemMessageSubsystem::LoadSystemMessageTextDataAsset()
 {
     static const TCHAR* TextDataAssetPath = TEXT("/Game/DataAsset/Text/DA_TextData_SystemMessage");
-
     SystemMessageTextDataAsset = LoadObject<UAPTextDataAsset>(nullptr, TextDataAssetPath);
 
     if (!SystemMessageTextDataAsset)

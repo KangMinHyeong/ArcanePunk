@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameElements/Volume/SpawnVolume/DataTable/APBattleStageDataTable.h"
+#include "GameElements/Volume/SpawnVolume/DataTable/APBattleStageData.h"
 #include "GameFramework/Actor.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 #include "APSpawnVolume.generated.h"
 
 class UBoxComponent;
@@ -71,7 +72,7 @@ private:
 	UDataTable* SpawnDataTable;
 
 	FSpawnerData* SpawnData;
-	FSpawnStep* SpawnStep;
+	FSpawnStepData* SpawnStep;
 
 	TSet<AEnemy_CharacterBase*> Enemies; 
 
@@ -85,5 +86,5 @@ private:
 
 	bool bActive = false;
 
-	TMap<FName, FSpawnStep*> PreviousFinishSteps;
+	TMap<FName, FSpawnStepData*> PreviousFinishSteps;
 };

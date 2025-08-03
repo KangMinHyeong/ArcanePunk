@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ArcanePunk/APItemDataStruct.h"
+#include "DataStructs/Item/APItemDataStruct.h"
 #include "UObject/NoExportTypes.h"
 #include "APItemBase.generated.h"
 

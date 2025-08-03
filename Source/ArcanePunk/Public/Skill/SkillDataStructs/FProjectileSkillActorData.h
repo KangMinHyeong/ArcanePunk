@@ -7,6 +7,7 @@
 #include "Engine/DataTable.h"
 #include "Skill/SkillDataStructs/FSkillActorData.h"
 #include "Skill/EAttackType.h"
+#include "DataStructs/Skill/FSkillActorData.h"
 #include "FProjectileSkillActorData.generated.h"
 
 class AAPSkillRange;

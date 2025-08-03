@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/APCharacterBase.h"
+#include "DataStructs/Player/FDropData.h"
 #include "Enemy_CharacterBase.generated.h"
 
 class ATextRenderActor;

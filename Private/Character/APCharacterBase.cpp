@@ -1,0 +1,1 @@
+auto DataTable = DataTableGI->GetRowByStruct<FStatusData>(CharacterName, CharacterName.ToString()); 

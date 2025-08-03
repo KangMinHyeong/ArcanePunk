@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/InteractionInterface.h"
-#include "Character/SkillDataTable/SkillDataTable.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "DataStructs/Common/FDialogueData.h"
 #include "APDataTableSubsystem.generated.h"
 
 class UTextBlock;
@@ -18,23 +18,10 @@ class ARCANEPUNK_API UAPDataTableSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:	
-	UAPDataTableSubsystem();	
-
+	UAPDataTableSubsystem();
+	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-
-	// DataTable
-	FORCEINLINE UDataTable* GetSkillNameListDataTable() const {return SkillNameListDataTable;};
-	FORCEINLINE UDataTable* GetSkillAbilityRowDataTable() const {return SkillAbilityRowDataTable;};
-	FORCEINLINE UDataTable* GetSilverAbilityDataTable() const {return SilverAbilityDataTable;};
-	FORCEINLINE UDataTable* GetGoldAbilityDataTable() const {return GoldAbilityDataTable;};
-	FORCEINLINE UDataTable* GetPlatinumAbilityDataTable() const {return PlatinumAbilityDataTable;};
-	FORCEINLINE UDataTable* GetEquipDataTable() const {return EquipDataTable;};
-	FORCEINLINE UDataTable* GetStringDataTable() const {return StringDataTable;};
-	FORCEINLINE UDataTable* GetDialogueDataTable() const {return DialogueDataTable;};
-	FORCEINLINE UDataTable* GetStatusDataTable() const {return CharacterDataTable;};
-	FORCEINLINE UDataTable* GetDropDataTable() const {return DropDataTable;};
-	FORCEINLINE UDataTable* GetCharacterUIDataTable() const {return CharacterUIDataTable;};
-
+	
 	// BP_Class
 	FORCEINLINE TSubclassOf<AAPManaEnergy> GetManaEnergyClass() const {return ManaEnergyClass;};
 	FORCEINLINE TSubclassOf<AEnemy_DropBase> GetDropGoldClass() const {return DropGoldClass;};
@@ -48,36 +35,28 @@ public:
 	static void SetTextBlock(UAPDataTableSubsystem* DataTableGI, UTextBlock *TextBlock, const EStringRowName & RowName);
 	static void SetTextBlock_Name(UAPDataTableSubsystem* DataTableGI, UTextBlock *TextBlock, const FName & RowName);
 	const FString & GetStringContent(const EStringRowName & RowName);
+	
+	const TArray<FDialogueData> GetDialogues(const int32 GroupID) const;
 
-	void InitDialogueData();
+	void CollectDataTablesByStruct();
 
-	const TArray<FDialogueDataTable> GetDialogues(const int32 GroupID) const;
+	template<typename T>
+	const UDataTable* GetDataTableByStruct() const
+	{
+		static_assert(TIsDerivedFrom<T, FTableRowBase>::IsDerived, "T must be derived from FTableRowBase");
+		const TSoftObjectPtr<UDataTable>* Found = AllDataTablesByStruct.Find(T::StaticStruct());
+		return Found ? Found->Get() : nullptr;
+	}
+
+	template<typename T>
+	const T* GetRowByStruct(const FName& RowName, const FString& ContextString = TEXT("")) const
+	{
+		static_assert(TIsDerivedFrom<T, FTableRowBase>::IsDerived, "T must be derived from FTableRowBase");
+		const UDataTable* Table = GetDataTableByStruct<T>();
+		return Table ? Table->FindRow<T>(RowName, ContextString) : nullptr;
+	}
 
 private:
-	UPROPERTY()
-	UDataTable* SkillNameListDataTable;
-	UPROPERTY()
-	UDataTable* SkillAbilityRowDataTable;
-	UPROPERTY()
-	UDataTable* SilverAbilityDataTable;
-	UPROPERTY()
-	UDataTable* GoldAbilityDataTable;
-	UPROPERTY()
-	UDataTable* PlatinumAbilityDataTable;
-	UPROPERTY()
-	UDataTable* StringDataTable;
-	UPROPERTY()
-	UDataTable* DialogueDataTable;
-	UPROPERTY()
-	UDataTable* CharacterDataTable;
-	UPROPERTY()
-	UDataTable* DropDataTable;
-	UPROPERTY()
-	UDataTable* CharacterUIDataTable;
-
-	UPROPERTY()
-	UDataTable* EquipDataTable;
-
 	// BP_Class
 	UPROPERTY()
 	TSubclassOf<AAPManaEnergy> ManaEnergyClass;
@@ -93,4 +72,7 @@ private:
 
 	UPROPERTY()
 	TMap<int32, FDialogueGroupData> GroupedDialogueRows;
+
+	UPROPERTY()
+	TMap<const UScriptStruct*, TSoftObjectPtr<UDataTable>> AllDataTablesByStruct;
 };

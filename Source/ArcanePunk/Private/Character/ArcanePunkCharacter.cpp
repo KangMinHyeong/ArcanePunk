@@ -415,7 +415,7 @@ void AArcanePunkCharacter::InitEquipData(TArray<UAPItemBase *> & EquipArr, FName
 		if (!EquipID.IsNone())
 		{
    			auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
-			const FItemData* ItemData = DataTableGI->GetEquipDataTable()->FindRow<FItemData>(EquipID, EquipID.ToString());
+			const FItemData* ItemData = DataTableGI->GetRowByStruct<FItemData>(EquipID, EquipID.ToString());
 
 			auto ItemReference = NewObject<UAPItemBase>(this, UAPItemBase::StaticClass());
 
