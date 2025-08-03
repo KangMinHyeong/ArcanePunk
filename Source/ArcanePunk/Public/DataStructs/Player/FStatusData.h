@@ -55,4 +55,13 @@ struct FStatusData : public FValidatableTableRowBase
 
 	UPROPERTY(EditAnywhere, SaveGame, BlueprintReadWrite)
 	float ShieldHP = 0.0f;
+
+protected:
+	virtual void AddValidationList(TArray<FValidationEntry>& OutValidationList) const override
+	{
+		OutValidationList.Add(FValidationEntry{
+			[this]() { return CharacterGroup == 1 || CharacterGroup == 0; },
+			TEXT("CharacterGroup must be 0 or 1.")
+		});
+	}
 }; 

@@ -1,13 +1,12 @@
 #pragma once
 #include "Engine/DataTable.h"
-#include "Tools/APEditorErrorHelper.h"
 #include "FValidatableTableRowBase.generated.h"
 
-// 개별 검증 항목 구조체
 USTRUCT()
 struct FValidationEntry
 {
-    GENERATED_BODY();
+    GENERATED_BODY()
+
     TFunction<bool()> Validator;
     FString ErrorMessage;
 };
@@ -18,11 +17,10 @@ struct FValidatableTableRowBase : public FTableRowBase
     GENERATED_BODY()
 
 protected:
-    // 자식이 override하여 검증 함수와 메시지를 리스트에 추가
-    virtual void AddValidationList(TArray<FValidationEntry>& OutValidationList) const PURE_VIRTUAL(FValidatableTableRowBase::GetValidationList, );
+    virtual void AddValidationList(TArray<FValidationEntry>& OutValidationList) const {};
 
 public:
-    void ValidateAndCrashOnFailure() const
+    bool ValidateAll(FString& OutErrorMessage) const
     {
         TArray<FValidationEntry> ValidationList;
         AddValidationList(ValidationList);
@@ -31,8 +29,10 @@ public:
         {
             if (!Entry.Validator())
             {
-                APEditorErrorHelper::ReportErrorAndExitIfEditor(Entry.ErrorMessage);
+                OutErrorMessage = Entry.ErrorMessage;
+                return false;
             }
         }
+        return true;
     }
-}; 
+};

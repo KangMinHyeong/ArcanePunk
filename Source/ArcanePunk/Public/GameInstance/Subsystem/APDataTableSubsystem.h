@@ -18,8 +18,8 @@ class ARCANEPUNK_API UAPDataTableSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:	
-	UAPDataTableSubsystem();	
-
+	UAPDataTableSubsystem();
+	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	
 	// BP_Class
@@ -55,9 +55,6 @@ public:
 		const UDataTable* Table = GetDataTableByStruct<T>();
 		return Table ? Table->FindRow<T>(RowName, ContextString) : nullptr;
 	}
-
-	bool CheckDuplicateStruct(const UScriptStruct* RowStruct, UDataTable* DataTable);
-	bool ValidateDataTableName(const UScriptStruct* RowStruct, UDataTable* DataTable);
 
 private:
 	// BP_Class

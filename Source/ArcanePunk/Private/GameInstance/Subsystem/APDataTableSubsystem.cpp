@@ -9,7 +9,6 @@
 #include "GameElements/Drop/APManaEnergy.h"
 #include "Enemy/Drop/Enemy_DropBase.h"
 #include "UserInterface/Common/DisplayOnly/APSystemMessage.h"
-#include "Tools/APEditorErrorHelper.h"
 
 UAPDataTableSubsystem::UAPDataTableSubsystem()
 {
@@ -45,60 +44,10 @@ void UAPDataTableSubsystem::CollectDataTablesByStruct()
             if (DataTable && DataTable->GetRowStruct())
             {
                 const UScriptStruct* RowStruct = DataTable->GetRowStruct();
-                // 중복 구조체 검증
-                if (!CheckDuplicateStruct(RowStruct, DataTable))
-                {
-                    return;
-                }
-                // 이름 규칙 검증
-                if (!ValidateDataTableName(RowStruct, DataTable))
-                {
-                    return;
-                }
                 AllDataTablesByStruct.Add(RowStruct, DataTable);
             }
         }
     }
-}
-
-// 중복 구조체 검증 함수
-bool UAPDataTableSubsystem::CheckDuplicateStruct(const UScriptStruct* RowStruct, UDataTable* DataTable)
-{
-    if (AllDataTablesByStruct.Contains(RowStruct))
-    {
-        UDataTable* ExistingTable = AllDataTablesByStruct[RowStruct].Get();
-        FString StructName = RowStruct ? RowStruct->GetName() : TEXT("UnknownStruct");
-        FString ExistingAssetName = ExistingTable ? ExistingTable->GetName() : TEXT("UnknownAsset");
-        FString CurrentAssetName = DataTable->GetName();
-        FString ErrorMsg = FString::Printf(TEXT("[UAPDataTableSubsystem] 같은 RowStruct(%s)로 여러 DataTable이 등록되어 있습니다. 중복 애셋 이름: %s, %s"), *StructName, *ExistingAssetName, *CurrentAssetName);
-        APEditorErrorHelper::ReportErrorAndExitIfEditor(ErrorMsg);
-        return false;
-    }
-    return true;
-}
-
-// 데이터테이블 이름 규칙 검증 함수
-bool UAPDataTableSubsystem::ValidateDataTableName(const UScriptStruct* RowStruct, UDataTable* DataTable)
-{
-    if (!RowStruct || !DataTable) return true;
-    FString StructName = RowStruct->GetName(); // 예: FCharacterUIData
-    FString ExpectedTableName;
-    if (StructName.StartsWith("F"))
-    {
-        ExpectedTableName = StructName.RightChop(1) + TEXT("Table"); // CharacterUIDataTable
-    }
-    else
-    {
-        ExpectedTableName = StructName + TEXT("Table");
-    }
-    FString ActualTableName = DataTable->GetName();
-    if (ActualTableName != ExpectedTableName)
-    {
-        FString ErrorMsg = FString::Printf(TEXT("[UAPDataTableSubsystem] DataTable 이름 규칙 위반: 구조체(%s)에 대한 DataTable 이름은 %s 이어야 합니다. 현재 이름: %s"), *StructName, *ExpectedTableName, *ActualTableName);
-        APEditorErrorHelper::ReportErrorAndExitIfEditor(ErrorMsg);
-        return false;
-    }
-    return true;
 }
 
 void UAPDataTableSubsystem::Initialize(FSubsystemCollectionBase &Collection)
