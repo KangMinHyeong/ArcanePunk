@@ -59,6 +59,19 @@ void UAPDataTableSubsystem::Initialize(FSubsystemCollectionBase &Collection)
     CheckEnum = FindObject<UEnum>(nullptr, TEXT("/Script/ArcanePunk.EStringRowName"));
 }
 
+UAPDataTableSubsystem* UAPDataTableSubsystem::GetSubsystemSafe(UObject* WorldContextObject)
+{
+    if (!WorldContextObject) return nullptr;
+
+    UWorld* World = WorldContextObject->GetWorld();
+    if (!World) return nullptr;
+
+    UGameInstance* GI = World->GetGameInstance();
+    if (!GI) return nullptr;
+
+    return GI->GetSubsystem<UAPDataTableSubsystem>();
+}
+
 void UAPDataTableSubsystem::DisplaySystemMesseage(UAPDataTableSubsystem* DataTableGI, EStringRowName StringRowName, bool bLowMessage, bool bWarning)
 {
     if(!DataTableGI || !DataTableGI->GetSystemMessageClass()) return;

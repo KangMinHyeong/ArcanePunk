@@ -289,7 +289,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Async Level Generation")
 	FProceduralLevelGenerationConfig LevelGenerationConfig;
 
-	// 마지막 비동기 벤치마크 결과 
+	// 마지막 비동기 벤치마크 결과 (포트폴리오용)
 	// Config로 PIE 세션 간 유지됨
 	UPROPERTY(Config, BlueprintReadOnly, Category = "Async Level Generation")
 	FLevelGenerationBenchmark LastAsyncBenchmark;

@@ -5,50 +5,91 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
+
 AAPLevelStreamTrigger::AAPLevelStreamTrigger()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
-	LoadTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("LoadTrigger"));
+	LoadTriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("LoadTriggerVolume"));
 
-	SetRootComponent(LoadTrigger);
+	SetRootComponent(LoadTriggerVolume);
 }
 
 void AAPLevelStreamTrigger::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	LoadTrigger->OnComponentBeginOverlap.AddDynamic(this, &AAPLevelStreamTrigger::LevelLoad);
-	LoadTrigger->OnComponentEndOverlap.AddDynamic(this, &AAPLevelStreamTrigger::LeveUnlLoad);
+	LoadTriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AAPLevelStreamTrigger::LevelLoad);
+	LoadTriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AAPLevelStreamTrigger::LeveUnlLoad);
+
+	
 }
 
-void AAPLevelStreamTrigger::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
+#pragma region Level Streaming Trigger Func
 void AAPLevelStreamTrigger::LevelLoad(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if(IsLevelLoad) return;
+	if(IsLevelLoaded) return;
 	auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
-	// FString levelName = TEXT("/Script/Engine.World'/Game/Maps/TestMap1_Sub/TestMap1_Stream2.TestMap1_Stream2'");
-	FString levelName = TEXT("/Game/Maps/TestMap1_Sub/TestMap1_Stream");
+	// Memory profiling - capture before load
+	MemoryBeforeLoad = GetCurrentMemoryUsageMB();
 
-	FLatentActionInfo LatentInfo;
-	UGameplayStatics::LoadStreamLevel(this, LoadLevelName, true, false, LatentInfo);
-	IsLevelLoad = true;
+	IsLevelLoaded = true;
+
+	if(StreamingLevel.IsValid())
+	{
+		StreamingLevel.Get()->SetShouldBeVisible(IsLevelLoaded);
+
+		// Log loading state
+		LogLoadingState(TEXT("LOAD"));
+	}
+
 }
 
 void AAPLevelStreamTrigger::LeveUnlLoad(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(!IsLevelLoad) return;
+	if(!IsLevelLoaded) return;
 	auto Character = Cast<AArcanePunkCharacter>(OtherActor); if(!Character) return;
 
-	FString levelName = TEXT("/Game/Maps/TestMap1_Sub/TestMap1_Stream1");
+	IsLevelLoaded = false;
 
-	FLatentActionInfo LatentInfo;
-	UGameplayStatics::UnloadStreamLevel(this, LoadLevelName, LatentInfo, false);
-	IsLevelLoad = false;
+	if(StreamingLevel.IsValid())
+	{
+		StreamingLevel.Get()->SetShouldBeVisible(IsLevelLoaded);
+
+		// Log unloading state
+		LogLoadingState(TEXT("UNLOAD"));
+	}
+}
+
+float AAPLevelStreamTrigger::GetCurrentMemoryUsageMB() const
+{
+	FPlatformMemoryStats MemoryStats = FPlatformMemory::GetStats();
+	return MemoryStats.UsedPhysical / (1024.0f * 1024.0f);
+}
+
+void AAPLevelStreamTrigger::LogLoadingState(const FString& Action) const
+{
+	if (!StreamingLevel.IsValid()) return;
+
+	const float CurrentMemory = GetCurrentMemoryUsageMB();
+	const float MemoryDelta = CurrentMemory - MemoryBeforeLoad;
+	const FString LevelName = StreamingLevel->GetWorldAssetPackageFName().ToString();
+
+	UE_LOG(LogTemp, Log, TEXT("[LevelStreaming] %s: %s | Priority: %d | Memory: %.2f MB (Delta: %+.2f MB)"),
+		*Action, *LevelName, LoadingPriority, CurrentMemory, MemoryDelta);
+}
+#pragma endregion
+
+void AAPLevelStreamTrigger::SetStreamingLevel(ULevelStreamingDynamic* Level)
+{
+	StreamingLevel = Level;
+	
+	TArray<AActor*> Players;
+	LoadTriggerVolume->GetOverlappingActors(Players, AArcanePunkCharacter::StaticClass());
+	
+	if(StreamingLevel.IsValid() && Players.Num() > 0)
+	{
+		StreamingLevel.Get()->SetShouldBeVisible(true);
+	}
 }

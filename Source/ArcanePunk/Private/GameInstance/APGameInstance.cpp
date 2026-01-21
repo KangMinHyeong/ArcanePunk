@@ -102,6 +102,26 @@ UAPSettingSubsystem *UAPGameInstance::GetSettingGI(UObject *WorldContextObject)
     return nullptr;
 }
 
+UAPLevelSubsystem *UAPGameInstance::GetLevelGI(UObject *WorldContextObject)
+{
+    if (UAPGameInstance* GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject)))
+    {
+        return Cast<UAPLevelSubsystem>(GI->GetSubsystemBase(UAPLevelSubsystem::StaticClass()));
+    }
+
+    return nullptr;
+}
+
+UAPUserWidgetSubsystem *UAPGameInstance::GetUserWidgetGI(UObject *WorldContextObject)
+{
+    if (UAPGameInstance* GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject)))
+    {
+        return Cast<UAPUserWidgetSubsystem>(GI->GetSubsystemBase(UAPUserWidgetSubsystem::StaticClass()));
+    }
+
+    return nullptr;
+}
+
 void UAPGameInstance::RegisterSpawnVolume(FName SpawnDataID, AAPSpawnVolume* SpawnVolume)
 {
     SpawnVolumes.Add({SpawnDataID, SpawnVolume});

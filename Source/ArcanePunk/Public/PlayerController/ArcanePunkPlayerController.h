@@ -46,10 +46,6 @@ public:
 	FORCEINLINE void SwapPlayer_2() {SwapMainPlayerByIndex(2);};
 	void SwapMainPlayerByIndex(uint8 Index);
 
-	void StartFadeIn(float MultipleSpeed = 1.0f, bool bEntrance = true);
-	void StartFadeOut(float MultipleSpeed = 1.0f, bool bEntrance = true);
-	void StartLoading();	
-
 	void SetMouseCursor();
 	
 	// Save UI
@@ -159,17 +155,6 @@ private:
 	FInputModeGameOnly GameInputMode;
 	FInputModeGameAndUI GameAndUIInputMode;
 	FInputModeUIOnly UIInputMode;
-
-	// Loading
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UUserWidget> LoadingWidgetClass;
-
-	TWeakObjectPtr<UUserWidget> LoadingWidget;
-
-	FTimerHandle LoadTimerHandle;
-
-	UPROPERTY(EditAnywhere)
-	float LoadingTime = 2.0f;
 
 	// Save
 	UPROPERTY(EditAnywhere)

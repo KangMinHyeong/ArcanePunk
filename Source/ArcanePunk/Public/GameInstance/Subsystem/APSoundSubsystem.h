@@ -33,6 +33,9 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
+	// Safe getter with null checks
+	static UAPSoundSubsystem* GetSubsystemSafe(UObject* WorldContextObject);
+
 	FORCEINLINE const FGameSoundVolume & GetGameSoundVolume() {return GameSoundVolume;};
 
 	// 후에 값이 변할때마다 업데이트

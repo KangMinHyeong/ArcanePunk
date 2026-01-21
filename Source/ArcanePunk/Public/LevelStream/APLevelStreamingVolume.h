@@ -23,12 +23,29 @@ public:
 	UFUNCTION()
 	void OnLevelLoadComplete();
 
-	void HideLoadingScreen();
+	/** Get loading progress (0.0 ~ 1.0) */
+	UFUNCTION(BlueprintPure, Category = "Streaming")
+	float GetLoadingProgress() const;
+
+	/** Log memory usage for profiling */
+	void LogMemoryUsage() const;
 
 private:
 	UPROPERTY()
 	TArray<TWeakObjectPtr<ULevelStreaming>> StreamingLevels;
 
-	FTimerHandle CheckActorsHandle; 
+	FTimerHandle CheckActorsHandle;
+
+	/** Memory before loading */
+	UPROPERTY()
+	float MemoryBeforeLoad = 0.0f;
+
+	/** Total actors to check */
+	UPROPERTY()
+	int32 TotalActorsToCheck = 0;
+
+	/** Actors completed */
+	UPROPERTY()
+	int32 ActorsCompleted = 0; 
 
 };
