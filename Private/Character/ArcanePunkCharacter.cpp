@@ -1,0 +1,1 @@
+const FItemData* ItemData = DataTableGI->GetRowByStruct<FItemData>(EquipID, EquipID.ToString()); 
