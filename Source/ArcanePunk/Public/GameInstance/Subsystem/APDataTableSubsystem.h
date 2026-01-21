@@ -17,10 +17,13 @@ UCLASS()
 class ARCANEPUNK_API UAPDataTableSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-public:	
-	UAPDataTableSubsystem();	
+public:
+	UAPDataTableSubsystem();
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	// Safe getter with null checks
+	static UAPDataTableSubsystem* GetSubsystemSafe(UObject* WorldContextObject);
 
 	// DataTable
 	FORCEINLINE UDataTable* GetSkillNameListDataTable() const {return SkillNameListDataTable;};

@@ -43,10 +43,7 @@ void ALevelPoratl::Interact(AArcanePunkCharacter *PlayerCharacter)
 void ALevelPoratl::StartLoading()
 {
     if(!CharacterPC.IsValid()) return;
-    CharacterPC->StartFadeOut();
-
-    auto FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(CharacterPC.Get(), FadeLoadingWidgetClass));
-    if(!FadeLoadingWidget) return;
+    UAPUserWidgetSubsystem::CreateFadeUI(this, true);
 
     GetWorldTimerManager().SetTimer(LoadTimerHandle, this, &ALevelPoratl::Loading, 1.1f, false);
 
@@ -55,8 +52,7 @@ void ALevelPoratl::StartLoading()
 
 void ALevelPoratl::Loading()
 {
-    if(!CharacterPC.IsValid()) return;
-    CharacterPC->StartLoading();
+    UAPUserWidgetSubsystem::CreateLoadingUI(this);
 
     auto GI = Cast<UAPGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); if(!GI) return;
     GI->OpenLevel(CharacterPC.Get(), NextLevel);

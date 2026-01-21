@@ -35,6 +35,19 @@ void UAPSoundSubsystem::Deinitialize()
     Super::Deinitialize();
 }
 
+UAPSoundSubsystem* UAPSoundSubsystem::GetSubsystemSafe(UObject* WorldContextObject)
+{
+    if (!WorldContextObject) return nullptr;
+
+    UWorld* World = WorldContextObject->GetWorld();
+    if (!World) return nullptr;
+
+    UGameInstance* GI = World->GetGameInstance();
+    if (!GI) return nullptr;
+
+    return GI->GetSubsystem<UAPSoundSubsystem>();
+}
+
 void UAPSoundSubsystem::PlayUIClickSound(UAPSoundSubsystem* SoundGI)
 {
     if(SoundGI)

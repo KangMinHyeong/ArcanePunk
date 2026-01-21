@@ -6,11 +6,12 @@
 #include "GameInstance/Subsystem/APSoundSubsystem.h"
 #include "GameInstance/Subsystem/APSettingSubsystem.h"
 #include "GameInstance/Subsystem/APDataTableSubsystem.h"
+#include "GameInstance/Subsystem/APLevelSubsystem.h"
+#include "GameInstance/Subsystem/APUserWidgetSubsystem.h"
 #include "Engine/GameInstance.h"
 #include "APGameInstance.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartFadeIn);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndedFadeOut);
+
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSkillEnhanceDataUpdate, ESkillKey, FSkillAbilityNestingData);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillEnhanceDataClear, ESkillKey);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGettingGold, int32);
@@ -58,6 +59,8 @@ public:
 	static UAPSoundSubsystem* GetSoundGI(UObject* WorldContextObject);
 	static UAPDataTableSubsystem* GetDataTableGI(UObject* WorldContextObject);
 	static UAPSettingSubsystem* GetSettingGI(UObject* WorldContextObject);
+	static UAPLevelSubsystem* GetLevelGI(UObject* WorldContextObject);
+	static UAPUserWidgetSubsystem* GetUserWidgetGI(UObject* WorldContextObject);
 
 private:
 	UPROPERTY()
@@ -96,6 +99,5 @@ public:
 	FOnSkillEnhanceDataClear OnSkillEnhanceDataClear;
 	FOnGettingGold OnGettingGold;
 	
-	FOnStartFadeIn OnStartFadeIn;
-	FOnEndedFadeOut OnEndedFadeOut;
+
 };

@@ -47,12 +47,17 @@ void APortal_Normal::Interact(AArcanePunkCharacter *PlayerCharacter)
 	}
 	
 	CharacterPC = Cast<AArcanePunkPlayerController>(PlayerCharacter->GetController()); if(!CharacterPC.IsValid()) return;
-	CharacterPC->StartFadeOut(1.5f, false);
-	APGI->OnEndedFadeOut.AddDynamic(this, &APortal_Normal::OnEndedFadeOut);
-	APGI->OnStartFadeIn.AddDynamic(this, &APortal_Normal::OnStartFadeIn);
-    PlayerCharacter->DisableInput(CharacterPC.Get());
-	PlayerCharacter->SetActorEnableCollision(false);
+
+	UAPUserWidgetSubsystem::CreateFadeUI(this, true);
+
+	auto Subsystem = UAPUserWidgetSubsystem::GetSubsystemSafe(this);
+	if(Subsystem)
+	{
+		Subsystem->OnEndedFadeOut.AddDynamic(this, &APortal_Normal::OnEndedFadeOut);
+		Subsystem->OnStartFadeIn.AddDynamic(this, &APortal_Normal::OnStartFadeIn);
+	}
 	
+	PlayerCharacter->SetActorEnableCollision(false);
 }
 
 void APortal_Normal::OnEndedFadeOut()
@@ -60,9 +65,11 @@ void APortal_Normal::OnEndedFadeOut()
 	if(!CharacterPC.IsValid()) return;
 	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
 	Character->SetActorEnableCollision(true);
+	Character->DisableInput(CharacterPC.Get());
+
 	StartTeleport(Character, Dest);
 
-	APGI->OnEndedFadeOut.RemoveDynamic(this, &APortal_Normal::OnEndedFadeOut);
+	UAPUserWidgetSubsystem::GetSubsystemSafe(this)->OnEndedFadeOut.RemoveDynamic(this, &APortal_Normal::OnEndedFadeOut);
 }
 
 void APortal_Normal::OnStartFadeIn()
@@ -71,10 +78,11 @@ void APortal_Normal::OnStartFadeIn()
 	auto Character = Cast<AArcanePunkCharacter>(CharacterPC->GetPawn()); if(!Character) return;
 	Character->EnableInput(CharacterPC.Get());
 	Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
 	Character->GetAPSpringArm()->TargetOffset = FVector::ZeroVector;
-	CharacterPC->StartFadeIn(1.0f, false);
 	Destination->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	APGI->OnStartFadeIn.RemoveDynamic(this, &APortal_Normal::OnStartFadeIn);
+
+	UAPUserWidgetSubsystem::GetSubsystemSafe(this)->OnStartFadeIn.RemoveDynamic(this, &APortal_Normal::OnStartFadeIn);
 }
 
 void APortal_Normal::BeginPlay()

@@ -97,7 +97,6 @@ void AArcanePunkPlayerController::InitMainPlayer(AActor* PlayerStart)
     SwapPlayer(PlayerStart->GetActorLocation(), PlayerStart->GetActorRotation());
 
     SetMouseCursor();
-    StartLoading();
     LookStatus(); LookStatus(); // 오류 때문에 삽입
 }
 
@@ -217,56 +216,6 @@ void AArcanePunkPlayerController::OptionSetting()
         OptionSettingUI->AddToViewport();
         SetPause(true);
     }
-}
-
-void AArcanePunkPlayerController::StartFadeIn(float MultipleSpeed, bool bEntrance)
-{
-    if(!FadeLoadingWidget.IsValid())
-    {
-        FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget.IsValid()) return;
-    }
-
-    if(!FadeLoadingWidget->IsInViewport()) FadeLoadingWidget->AddToViewport();
-
-    FadeLoadingWidget->FadeIn(MultipleSpeed);
-
-    if(MyCharacter.IsValid()) MyCharacter->EnableInput(this); 
-    
-    if(bEntrance)
-    {
-        auto TutorialGM = Cast<AAPGameModeTutorialStage>(UGameplayStatics::GetGameMode(GetWorld()));
-        if(TutorialGM) TutorialGM->StartTutorial(this);
-
-        if(!LoadingWidget.IsValid()) return;
-        LoadingWidget->RemoveFromParent();
-        GetWorldTimerManager().ClearTimer(LoadTimerHandle);
-                
-        // CreateEntranceUI();
-    }
-}
-
-void AArcanePunkPlayerController::StartFadeOut(float MultipleSpeed, bool bEntrance)
-{
-    if(!FadeLoadingWidget.IsValid())
-    {
-        FadeLoadingWidget = Cast<ULoadingFade>(CreateWidget(this, FadeLoadingWidgetClass)); if(!FadeLoadingWidget.IsValid()) return;
-    }
-
-    FadeLoadingWidget->AddToViewport();
-    
-    if(FadeLoadingWidget.IsValid()) FadeLoadingWidget->FadeOut(MultipleSpeed, bEntrance);
-}
-
-void AArcanePunkPlayerController::StartLoading()
-{
-    if(MyCharacter.IsValid()) MyCharacter->DisableInput(this); 
-
-    LoadingWidget = CreateWidget(this, LoadingWidgetClass); if(!LoadingWidget.IsValid()) return;
-    
-    LoadingWidget->AddToViewport();
-
-    FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AArcanePunkPlayerController::StartFadeIn, 1.0f, true);
-	GetWorld()->GetTimerManager().SetTimer(LoadTimerHandle, TimerDelegate, LoadingTime, false);
 }
 
 void AArcanePunkPlayerController::OpenSaveSlot()

@@ -11,7 +11,23 @@
 	],
 	"settings": {
 		"typescript.tsc.autoDetect": "off",
-		"npm.autoDetect": "off"
+		"npm.autoDetect": "off",
+		"files.associations": {
+			"alignedvector3": "cpp",
+			"fft": "cpp",
+			"*.rh": "cpp",
+			"adolcforward": "cpp",
+			"complex": "cpp",
+			"valarray": "cpp",
+			"cstdlib": "cpp",
+			"ios": "cpp",
+			"xiosbase": "cpp",
+			"regex": "cpp",
+			"span": "cpp",
+			"chrono": "cpp",
+			"utility": "cpp",
+			"__config": "cpp"
+		}
 	},
 	"extensions": {
 		"recommendations": [

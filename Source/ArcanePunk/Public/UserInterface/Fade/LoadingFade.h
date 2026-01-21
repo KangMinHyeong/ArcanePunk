@@ -15,12 +15,9 @@ class ARCANEPUNK_API ULoadingFade : public UUserWidget
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void FadeIn(float MultipleSpeed);
+	void FadeIn();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void FadeOut(float MultipleSpeed, bool bEntrance);
-
-	UFUNCTION(BlueprintCallable)
-	void OnEndedFade();
+	void FadeOut();
 	
 };
