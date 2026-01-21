@@ -3,14 +3,12 @@
 
 #include "Enemy/Drop/Enemy_DropBase.h"
 
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraComponent.h"
-#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Components/BoxComponent.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameInstance/APGameInstance.h"
+#include "DataStructs/Item/FItemData.h"
 
 // Sets default values
 AEnemy_DropBase::AEnemy_DropBase()

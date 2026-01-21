@@ -1,8 +1,10 @@
-
 #include "Interaction/APInteraction_Shop.h"
 
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/Character/APSkillHubComponent.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 AAPInteraction_Shop::AAPInteraction_Shop()
 {
@@ -464,21 +466,21 @@ TArray<uint8> AAPInteraction_Shop::IndexSuffle(uint8 MaxNumber)
     return SkillAbilities;
 }
 
-FSkillAbilityDataSheet* AAPInteraction_Shop::GetTierData(EEnHanceType EnHanceType, const FString & CurrentRowName)
+FSkillAbilityData* AAPInteraction_Shop::GetTierData(EEnHanceType EnHanceType, const FString & CurrentRowName)
 {
-    FSkillAbilityDataSheet* Data = nullptr;
+    FSkillAbilityData* Data = nullptr;
     switch (EnHanceType)
     {
     case EEnHanceType::Silver:
-        Data = SkillAbility_Silver->FindRow<FSkillAbilityDataSheet>(FName(*CurrentRowName), CurrentRowName);
+        Data = SkillAbility_Silver->FindRow<FSkillAbilityData>(FName(*CurrentRowName), CurrentRowName);
         break;
         
     case EEnHanceType::Gold:
-        Data = SkillAbility_Gold->FindRow<FSkillAbilityDataSheet>(FName(*CurrentRowName), CurrentRowName);
+        Data = SkillAbility_Gold->FindRow<FSkillAbilityData>(FName(*CurrentRowName), CurrentRowName);
         break;
         
     case EEnHanceType::Platinum:
-        Data = SkillAbility_Platinum->FindRow<FSkillAbilityDataSheet>(FName(*CurrentRowName), CurrentRowName);
+        Data = SkillAbility_Platinum->FindRow<FSkillAbilityData>(FName(*CurrentRowName), CurrentRowName);
         break;
     }
     return Data;

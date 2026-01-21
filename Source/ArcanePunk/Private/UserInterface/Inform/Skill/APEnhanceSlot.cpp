@@ -1,4 +1,3 @@
-
 #include "UserInterface/Inform/Skill/APEnhanceSlot.h"
 
 #include "Character/ArcanePunkCharacter.h"
@@ -25,23 +24,23 @@ void UAPEnhanceSlot::InitEnhanceData(UUserWidget *Parent, EEnHanceType UpdateEnh
     EnhanceNumber = UpdateEnhanceNumber;
     NestingNumber = UpdateNestingNumber;
 
-    auto DataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(UpdateRowName, UpdateRowName.ToString()); if(!DataTable) return;
+    auto DataTable = DataTableGI->GetRowByStruct<FSkillAbilityRowNameData>(UpdateRowName, UpdateRowName.ToString()); if(!DataTable) return;
     switch (EnHanceType)
     {
     case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName[EnhanceNumber-1];
-        AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName), RowName); 
         break;
     
     case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName[EnhanceNumber-1];
-        AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName), RowName); 
         Image_TierColor->SetColorAndOpacity(GoldColor);
         break;
 
     case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName[EnhanceNumber-1];
-        AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName), RowName); 
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName), RowName); 
         Image_TierColor->SetColorAndOpacity(PlatinumColor);
         break;
     }

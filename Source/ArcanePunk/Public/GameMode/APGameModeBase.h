@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameElements/Volume/SpawnVolume/DataTable/APBattleStageDataTable.h"
+#include "GameElements/Volume/SpawnVolume/DataTable/APBattleStageData.h"
 #include "GameFramework/GameModeBase.h"
 #include "APGameModeBase.generated.h"
 

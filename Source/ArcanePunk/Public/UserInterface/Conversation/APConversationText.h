@@ -1,15 +1,14 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "DataStructs/Common/FDialogueData.h"
 #include "APConversationText.generated.h"
 
 class UImage;
 class UTextBlock;
 class UWrapBox;
-struct FDialogueDataTable;
-struct FCharaterUIData;
+struct FCharacterUIData;
 class UWidgetAnimation;
 class UAPConversationUI;
 
@@ -23,7 +22,7 @@ public:
 	
 	FORCEINLINE void SetTickEnable(bool NewBool) {bTick = NewBool;};
 
-	void SetConversation(UAPConversationUI* ParentWidget, const FDialogueDataTable & Dialogues, const FCharaterUIData & CharacterUIData);
+	void SetConversation(UAPConversationUI* ParentWidget, const FDialogueData & Dialogues, const FCharacterUIData & CharacterUIData);
 	
 	void SkipConversation();
 

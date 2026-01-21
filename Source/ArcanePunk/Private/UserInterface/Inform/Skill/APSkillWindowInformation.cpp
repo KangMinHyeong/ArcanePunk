@@ -1,4 +1,3 @@
-
 #include "UserInterface/Inform/Skill/APSkillWindowInformation.h"
 
 #include "Character/ArcanePunkCharacter.h"
@@ -8,6 +7,8 @@
 #include "Components/SizeBox.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UAPSkillWindowInformation::NativeConstruct()
 {
@@ -17,7 +18,7 @@ void UAPSkillWindowInformation::NativeConstruct()
 
 }
 
-void UAPSkillWindowInformation::InitInformationData_Skill(EEnhanceCategory UpdateEnhanceCategory, FSkillNameList* SkillNameTable, float CoolTime)
+void UAPSkillWindowInformation::InitInformationData_Skill(EEnhanceCategory UpdateEnhanceCategory, const FSkillNameList* SkillNameTable, float CoolTime)
 {
     FString CategoryTypeName;
     switch (UpdateEnhanceCategory)
@@ -72,7 +73,7 @@ void UAPSkillWindowInformation::DisplayCoolTime(float CoolTime)
     }
 }
 
-void UAPSkillWindowInformation::InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber)
+void UAPSkillWindowInformation::InitInformationData_Enhance(EEnHanceType UpdateEnhanceType, const FSkillAbilityData* UpdateAbilityData, uint16 UpdateNestingNumber)
 {
     FString CategoryTypeName;
     switch (UpdateEnhanceType)

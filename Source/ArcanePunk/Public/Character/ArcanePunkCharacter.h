@@ -6,6 +6,7 @@
 #include "Components/Character/APCharacterAuraComponent.h"
 #include "Components/Common/APBuffComponent.h"
 #include "Interfaces/InteractionInterface.h"
+#include "DataStructs/Item/FItemData.h"
 #include "GameplayTagContainer.h"
 #include "ArcanePunkCharacter.generated.h"
 

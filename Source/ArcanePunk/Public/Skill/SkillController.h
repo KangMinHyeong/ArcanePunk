@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "SkillActor.h"
+#include "Skill/SkillActors/SkillActor.h"
 #include "CoreMinimal.h"
 #include "SkillController.generated.h"
 
@@ -18,13 +18,15 @@ class ARCANEPUNK_API ASkillController : public APlayerController
 public:
 	ASkillController();
 
-	FORCEINLINE ASkillActor* GetSkillActor() {return SkillActor;};
+public:
+	// Getter 함수도 안전하게 수정
+	FORCEINLINE ASkillActor* GetSkillActor() const { return SkillActor; }
 	FORCEINLINE AAPSkillRange* GetSkillTargetRange() {return SkillRange_Target.Get();};
 	FORCEINLINE bool IsReady() const {return bReady;};
 	
-	virtual void UseSkill(ESkillKey SkillKey, AArcanePunkCharacter* OwnerCharacter);
+	virtual void UseSkill(ESkillKey SkillKey);
 
-	void InitializeSkills(ESkillKey SkillKey, FName skillName, AArcanePunkCharacter* OwnerCharacter);
+	void InitializeSkills(ESkillKey SkillKey, FName SkillId, TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter);
 
 	void ShowSkillRange(float Range, FVector Location);
 
@@ -40,12 +42,16 @@ private:
 	bool CheckSkillCondition(ESkillKey SkillKey);
 	bool CheckSkillCool(ESkillKey SkillKey);
 
+	void StartCoolDown();
 private:
+	UPROPERTY()
+	FSkillControllerData CurSkillData;
 	UPROPERTY()
 	ASkillActor* SkillActor;
 
-	TWeakObjectPtr<AArcanePunkCharacter> OwnerPlayer;
-
+	TWeakObjectPtr<AArcanePunkCharacter> OwnerCharacter;
+	TWeakObjectPtr<UAnimMontage> SkillAction;
+	
 	TWeakObjectPtr<AAPSkillRange> SkillRange_Target;
 	TWeakObjectPtr<AAPSkillRange> SkillRange_Ground;
 
@@ -54,6 +60,5 @@ private:
 	FVector TargetLocation;
 
 	ESkillKey CurrentSkillKey;
-	
 };
 

@@ -1,4 +1,3 @@
-
 #include "Character/APCharacterBase.h"
 
 #include "Components/Character/APMovementComponent.h"
@@ -39,7 +38,7 @@ void AAPCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return; 
-    auto DataTable = DataTableGI->GetStatusDataTable()->FindRow<FStatusData>(CharacterName, CharacterName.ToString()); 
+    auto DataTable = DataTableGI->GetRowByStruct<FStatusData>(CharacterName, CharacterName.ToString()); 
     if(DataTable) TotalStatus_Origin.StatusData = * DataTable;  
 
 	CrowdControlComp->BindCrowdComp();

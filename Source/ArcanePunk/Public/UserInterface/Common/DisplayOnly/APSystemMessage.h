@@ -35,6 +35,7 @@ DECLARE_MULTICAST_DELEGATE(FSystemMessageDeactivated);
 *   @USystemMessageConfig
 *
 *   System Message의 UI 표시 정보를 담은 데이터 에셋
+*   유효성 검사 기능이 추가된 버전
 */
 UCLASS(BlueprintType)
 class ARCANEPUNK_API USystemMessageConfig : public UDataAsset
@@ -49,56 +50,60 @@ public:
         , LifeSpan(2)
         , FadeInTime(1)
         , FadeOutTime(1)
-        , MinWidthScale(10.f)     
-        , MaxWidthScale(43.f)     
-        , MinHeightScale(2.5f)    
-        , MaxHeightScale(5.f)     
-        , CharWidthMultiplier(1.2f) 
+        , MinWidthScale(10.f)
+        , MaxWidthScale(43.f)
+        , MinHeightScale(2.5f)
+        , MaxHeightScale(5.f)
     {
     }
 
 protected:
     //@폰트 사이즈 (12~24)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 구성",
         meta = (ClampMin = "12", ClampMax = "24"))
     int32 FontSize;
 
     //@최대 행/열 길이
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 구성",
+        meta = (ClampMin = "1"))
     int32 MaxRowSize;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 구성",
+        meta = (ClampMin = "1"))
     int32 MaxColumnSize;
 
     //@지속 시간
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 구성",
+        meta = (ClampMin = "1"))
     int32 LifeSpan;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 구성",
+        meta = (ClampMin = "1"))
     int32 FadeInTime;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Config")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 구성",
+        meta = (ClampMin = "1"))
     int32 FadeOutTime;
 
     //@최소/최대 크기 배율 (폰트 크기 기준)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 스케일",
+        meta = (ClampMin = "0.1"))
     float MinWidthScale;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 스케일",
+        meta = (ClampMin = "0.1"))
     float MaxWidthScale;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 스케일",
+        meta = (ClampMin = "0.1"))
     float MinHeightScale;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | 스케일",
+        meta = (ClampMin = "0.1"))
     float MaxHeightScale;
 
-    //@글자 길이 고려 가로 배율
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "시스템 메시지 | Scale",
-        meta = (ClampMin = "0.5", ClampMax = "3.0"))
-    float CharWidthMultiplier;
-
 public:
+    // Getter 함수들
     FORCEINLINE int32 GetFontSize() const { return FontSize; }
     FORCEINLINE int32 GetMaxRowSize() const { return MaxRowSize; }
     FORCEINLINE int32 GetMaxColumnSize() const { return MaxColumnSize; }
@@ -113,10 +118,11 @@ public:
     FORCEINLINE float GetMinHeight() const { return FontSize * MinHeightScale; }
     FORCEINLINE float GetMaxHeight() const { return FontSize * MaxHeightScale; }
 
-    //@동적 크기 계산
+    //@동적 크기 계산 (CharWidthMultiplier 제거)
     FORCEINLINE float CalculateWidth(int32 MaxLineLength) const
     {
-        float DynamicWidth = MaxLineLength * FontSize * CharWidthMultiplier;
+        // 기본 문자 너비를 폰트 크기로 계산 (이전의 CharWidthMultiplier 제거)
+        float DynamicWidth = MaxLineLength * FontSize;
         return FMath::Clamp(DynamicWidth, GetMinWidth(), GetMaxWidth());
     }
 
@@ -127,6 +133,39 @@ public:
         float HeightRatio = static_cast<float>(LineCount - 1) / static_cast<float>(MaxColumnSize - 1);
         return GetMinHeight() + (HeightRange * FMath::Clamp(HeightRatio, 0.0f, 1.0f));
     }
+
+    // 유효성 검사 함수
+    UFUNCTION(BlueprintCallable, Category = "시스템 메시지 | Validation")
+    bool ValidateConfiguration(FString& OutErrorMessage) const;
+
+#if WITH_EDITOR
+protected:
+    // 에디터에서 프로퍼티 변경 시 호출되는 함수
+    virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+    // 에디터 초기화 시 호출
+    virtual void PostInitProperties() override;
+
+private:
+    // 내부 유효성 검사 함수들 - 기존 함수들
+    bool ValidateMinMaxValues(FString& OutErrorMessage) const;
+    bool ValidateNonZeroValues(FString& OutErrorMessage) const;
+
+    // 새로운 검증 함수들 - 추가된 요구사항을 위한 함수들
+    bool ValidateFadeTimesEquality(FString& OutErrorMessage) const;
+    bool ValidateFontSizeRange(FString& OutErrorMessage) const;
+
+    // 자동 수정 함수들 - 기존 함수들
+    void FixMinMaxValues();
+    void FixZeroValues();
+
+    // 새로운 자동 수정 함수들 - 추가된 요구사항을 위한 함수들
+    void FixFadeTimesEquality();
+    void FixFontSizeRange();
+
+    // 에디터 알림을 위한 헬퍼 함수 - 사용자에게 친화적인 피드백 제공
+    void ShowEditorNotification(const FString& Message, bool bIsError = true) const;
+#endif
 };
 
 /*
@@ -172,7 +211,10 @@ public:
 
 private:
     FString ProcessTextForDisplay(const FString& InputText);
-    void UpdateContentHighSize(const TArray<FString>& Lines);
+    void CompleteCurrentAnimation();
+
+private:
+void UpdateContentHighSize(const TArray<FString>& Lines);
 
 private:
     void HideSystemMessage();
@@ -210,6 +252,13 @@ private:
     float CurrentOpacity;
     float TargetOpacity;
     float FadeSpeed;
+
+private:
+    float AnimationStartTime;     // 애니메이션이 시작된 절대 시간 (게임 월드 기준)
+    float AnimationDuration;      // 이번 애니메이션이 지속되어야 하는 총 시간 (초)
+    float StartOpacity;           // 애니메이션 시작 시점의 투명도 값
+    float EndOpacity;             // 애니메이션 완료 시점의 목표 투명도 값
+    bool bIsCurrentlyAnimating;
 #pragma endregion
 
 //@Delegates

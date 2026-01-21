@@ -1,4 +1,3 @@
-
 #include "UserInterface/EnhanceUI/ChoiceButton.h"
 
 #include "Components/Button.h"
@@ -10,7 +9,9 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "GameInstance/APGameInstance.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
-#include "Skill/SkillDataManager.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UChoiceButton::InitChoice(UUserWidget* UpdateParentWidget)
 {
@@ -19,21 +20,22 @@ void UChoiceButton::InitChoice(UUserWidget* UpdateParentWidget)
     ParentWidget = Cast<UAPEnhanceChoice>(UpdateParentWidget);
 
     // DataTable의 RowName 목록 가져오기
-    auto DataTable = USkillDataManager::GetInstance()->GetAbilityDataTable();
-    TArray<FName> RowNames = DataTable->GetRowNames();
+    // auto DataTable = USkillActorDataManager::GetInstance()->GetAbilityDataTable();
+    // TArray<FName> RowNames = DataTable->GetRowNames();
 
     // 유효한 인덱스인지 확인
-    AbilityIndex = FMath::RandRange(0, RowNames.Num()-1);
-        
-    // 인덱스에 해당하는 RowName으로 Row 가져오기
-    FName RowName = RowNames[AbilityIndex];
-    
-    auto SkillAbilityData = DataTable->FindRow<FSkillAbilityData>(RowName, RowName.ToString()); if(!SkillAbilityData) return;
+    // AbilityIndex = FMath::RandRange(0, RowNames.Num()-1);
+    //     
+    // // 인덱스에 해당하는 RowName으로 Row 가져오기
+    // FName RowName = RowNames[AbilityIndex];
 
-    SkillNumber_Text->SetText(FText::FromName(SkillAbilityData->AbilityName));  
-    SkillAbility_Text->SetText(FText::FromString(SkillAbilityData->AbilityInformation));
-    SkillAbility_Nesting->SetText(FText::FromString(FString::FromInt(SkillAbilityData->MaxNesting)));
-    SkillNumber_Image->SetBrushFromTexture(SkillAbilityData->AbilitySlotImage); 
+    // TODO: AbilityData 삭제 후 처리 어떻게 할 지 고려 필요
+    // auto SkillAbilityData = DataTable->FindRow<FSkillAbilityData>(RowName, RowName.ToString()); if(!SkillAbilityData) return;
+    //
+    // SkillNumber_Text->SetText(FText::FromName(SkillAbilityData->AbilityName));  
+    // SkillAbility_Text->SetText(FText::FromString(SkillAbilityData->AbilityInformation));
+    // SkillAbility_Nesting->SetText(FText::FromString(FString::FromInt(SkillAbilityData->MaxNesting)));
+    // SkillNumber_Image->SetBrushFromTexture(SkillAbilityData->AbilitySlotImage); 
 
     BindButton();
 }
@@ -50,9 +52,9 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkil
     SetSkillName();
 
     auto DataTableGI = Cast<UAPDataTableSubsystem>(GetGameInstance()->GetSubsystemBase(UAPDataTableSubsystem::StaticClass())); if(!DataTableGI) return;   
-    auto DataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillNumberName, SkillNumberName.ToString()); if(!DataTable) return;
+    auto DataTable = DataTableGI->GetRowByStruct<FSkillAbilityRowNameData>(SkillNumberName, SkillNumberName.ToString()); if(!DataTable) return;
 
-    FSkillAbilityDataSheet* AbilityData = nullptr;
+    const FSkillAbilityData* AbilityData = nullptr;
     TArray<FString> RowName;
     auto OwnerCharacter = Cast<AArcanePunkCharacter>(ParentWidget->GetOwningPlayerPawn()); if(!OwnerCharacter) return;
     
@@ -60,17 +62,17 @@ void UChoiceButton::SetEnhance(UUserWidget* UpdateParentWidget, uint8 UpdateSkil
     {
         case EEnHanceType::Silver:
         RowName = DataTable->SilverRowName;
-        AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Gold:
         RowName = DataTable->GoldRowName;
-        AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
 
         case EEnHanceType::Platinum:
         RowName = DataTable->PlatinumRowName;
-        AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[UpdateSkillAbility]), RowName[UpdateSkillAbility]);
         break;
     }
     if(!AbilityData) return;

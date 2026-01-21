@@ -1,5 +1,5 @@
-
 #include "GameElements/Volume/SpawnVolume/APSpawnVolume.h"
+#include "DataStructs/Stage/FSpawnerData.h"
 
 #include "Enemy/Enemy_BossBase.h"
 #include "Components/BoxComponent.h"
@@ -79,7 +79,7 @@ void AAPSpawnVolume::StartSpawn()
 
 	bActive = true;
 
-	for(FSpawnStep & Step : SpawnData->SpawnStep)
+	for(FSpawnStepData & Step : SpawnData->SpawnStep)
 	{
 		if(Step.SpawnStepStartCondition == ESpawnStepStartCondition::SpawnerActive)
 		{

@@ -1,4 +1,3 @@
-
 #include "UserInterface/EnhanceUI/APEnhanceChoice.h"
 
 #include "Components/Border.h"
@@ -13,7 +12,8 @@
 #include "UserInterface/EnhanceUI/ChoiceButton.h"
 #include "UserInterface/HUD/APHUD.h"
 #include "GameInstance/APGameInstance.h"
-#include "Components/HorizontalBoxSlot.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
+#include "DataStructs/Skill/FSkillAbilityRowNameData.h"
 
 void UAPEnhanceChoice::NativeConstruct()
 {
@@ -295,7 +295,7 @@ void UAPEnhanceChoice::EnhanceSuffle(FName SkillName)
 {  
     if(!OwnerCharacter.IsValid()) return; 
     if(!DataTableGI.IsValid()) return;  
-    auto DataTable = DataTableGI->GetSkillAbilityRowDataTable()->FindRow<FSkillAbilityRowNameData>(SkillName, SkillName.ToString()); if(!DataTable) return;
+    auto DataTable = DataTableGI->GetRowByStruct<FSkillAbilityRowNameData>(SkillName, SkillName.ToString()); if(!DataTable) return;
     
     TArray<FString> RowName;
     uint8 Num = 0;
@@ -342,19 +342,19 @@ void UAPEnhanceChoice::EnhanceSuffle(FName SkillName)
         }
     }
     
-    FSkillAbilityDataSheet* AbilityData = nullptr;
+    const FSkillAbilityData* AbilityData = nullptr;
     switch (EnHanceType)
     {
         case EEnHanceType::Silver:
-        AbilityData = DataTableGI->GetSilverAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Gold:
-        AbilityData = DataTableGI->GetGoldAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
 
         case EEnHanceType::Platinum:
-        AbilityData = DataTableGI->GetPlatinumAbilityDataTable()->FindRow<FSkillAbilityDataSheet>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
+        AbilityData = DataTableGI->GetRowByStruct<FSkillAbilityData>(FName(*RowName[SkillAbilities.Top()]), RowName[SkillAbilities.Top()]);
         break;
     }
     if(!AbilityData) return;

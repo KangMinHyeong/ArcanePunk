@@ -1,9 +1,7 @@
-
 #include "Enemy/Drop/Enemy_DropPackage.h"
 
 #include "Character/ArcanePunkCharacter.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
-#include "Components/SphereComponent.h"
 #include "GameInstance/APGameInstance.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -11,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameElements/Portal/Portal_Base.h"
 #include "EngineUtils.h"
+#include "DataStructs/Item/FItemData.h"
 
 AEnemy_DropPackage::AEnemy_DropPackage()
 {

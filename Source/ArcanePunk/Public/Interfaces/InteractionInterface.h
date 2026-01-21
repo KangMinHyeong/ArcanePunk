@@ -261,64 +261,6 @@ struct FShopListData
 	TArray<FShopGoodsData_NewSkill> ShopGoodsList_NewSkill;
 };
 
-USTRUCT()
-struct FStringDataTable : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FStringDataTable() {}
-
-	UPROPERTY(EditAnywhere)
-	int32 StringIndex = 0;
-
-	UPROPERTY(EditAnywhere)
-	EStringType StringType;
-
-	UPROPERTY(EditAnywhere)
-	FString StringType_Des;
-
-	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
-	FString Content;
-};
-
-USTRUCT()
-struct FDialogueDataTable : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FDialogueDataTable() {}
-
-	UPROPERTY(EditAnywhere)
-	int32 Diologue_ID = 0;
-
-	UPROPERTY(EditAnywhere)
-	int32 Message_Sort = 0;
-
-	UPROPERTY(EditAnywhere)
-	int32 Character_ID = 0;
-
-	UPROPERTY(EditAnywhere, meta = (MultiLine = true))
-	FString Diologue_Text;
-
-	UPROPERTY(EditAnywhere)
-	bool bEmphasize = false;
-
-	UPROPERTY(EditAnywhere)
-	uint8 Portrait_Type = 0;
-};
-
-USTRUCT()
-struct FDialogueGroupData
-{
-	GENERATED_USTRUCT_BODY()
-
-	FDialogueGroupData() {}
-
-	UPROPERTY()
-	TArray<FDialogueDataTable> DialogueGroupData;
-};
-
-
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractionInterface : public UInterface

@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 using UnrealBuildTool;
 
 public class ArcanePunk : ModuleRules
@@ -8,30 +6,32 @@ public class ArcanePunk : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { 
+		PublicDependencyModuleNames.AddRange(new string[] {
 			"Core", 
 			"CoreUObject", 
 			"Engine", 
 			"InputCore", 
 			"SlateCore", 
 			"Slate", 
-			"UMG" , 
+			"UMG", 
 			"GameplayTasks", 
 			"Niagara", 
 			"NavigationSystem", 
 			"GeometryCollectionEngine", 
 			"FieldSystemEngine", 
 			"MotionWarping",
-			"GameplayTags",});
+			"GameplayTags"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Niagara" });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
-
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(new string[] {
+				"UnrealEd",           // FAssetRegistryModule, PIE 관련 인터페이스
+				"EditorSubsystem",    // (선택) 에디터 내 동작 처리시
+				"AssetRegistry"       // FAssetRegistryModule
+			});
+		}
 	}
 }

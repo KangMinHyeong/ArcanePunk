@@ -5,6 +5,7 @@
 #include "Character/ArcanePunkCharacter.h"
 #include "PlayerController/ArcanePunkPlayerController.h"
 #include "Components/WrapBox.h"
+#include "DataStructs/Player/FCharacterUIData.h"
 
 void UAPSwapBarUI::Init(TArray<uint8> UI_ID)
 {
@@ -17,7 +18,8 @@ void UAPSwapBarUI::Init(TArray<uint8> UI_ID)
         UE_LOG(LogTemp, Display, TEXT("Your KeyNum %d"), UI);
         auto SwapUI = CreateWidget<UChangeCharacterUI>(GetWorld(), SwapUIClass);
 
-        auto CharacterUIData = DataTableGI->GetCharacterUIDataTable()->FindRow<FCharaterUIData>(FName(*FString::FromInt(UI)), TEXT("None")); 
+        // TODO: Portrait 설정 누락?
+        auto CharacterUIData = DataTableGI->GetRowByStruct<FCharacterUIData>(FName(*FString::FromInt(UI)), TEXT("None")); 
         if(CharacterUIData)
         {
             SwapUI->Init(KeyNum, CharacterUIData->Portraits[1]);

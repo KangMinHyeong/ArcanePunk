@@ -1,15 +1,15 @@
-
 #include "UserInterface/Inform/Skill/APSkillWindow.h"
 
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/ScrollBox.h"
-#include "Components/SizeBox.h"
 #include "UserInterface/Inform/Skill/APSkillWindowSlot.h"
 #include "Character/ArcanePunkCharacter.h"
 #include "GameInstance/APGameInstance.h"
 #include "UserInterface/Inform/Skill/APSkillWindowInformation.h"
+#include "DataStructs/Skill/FSkillAbilityData.h"
+#include "DataStructs/Skill/FSkillNameList.h"
 
 void UAPSkillWindow::NativeConstruct()
 {
@@ -128,7 +128,7 @@ void UAPSkillWindow::InitPassiveSkill()
     }
 }
 
-void UAPSkillWindow::OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory, FSkillNameList* SkillNameTable, float CoolTime)
+void UAPSkillWindow::OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory, const FSkillNameList* SkillNameTable, float CoolTime)
 {
     ScrollBox_Information->ClearChildren();
 
@@ -137,7 +137,7 @@ void UAPSkillWindow::OpenSkillInformation(EEnhanceCategory UpdateEnhanceCategory
     Information->InitInformationData_Skill(UpdateEnhanceCategory, SkillNameTable, CoolTime);
 }
 
-void UAPSkillWindow::OpenEnhanceInformation(EEnHanceType UpdateEnhanceType,  FSkillAbilityDataSheet* UpdateAbilityData, uint16 UpdateNestingNumber)
+void UAPSkillWindow::OpenEnhanceInformation(EEnHanceType UpdateEnhanceType, const FSkillAbilityData* UpdateAbilityData, uint16 UpdateNestingNumber)
 {
     ScrollBox_Information->ClearChildren();
 
